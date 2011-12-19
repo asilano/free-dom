@@ -1,0 +1,10 @@
+if (!@just_checking || !@player || !@player.lock)
+  page.replace_html("flash", :partial => "flash_area")
+  page.replace_html("game", :partial => "game", 
+                            :object => @game, 
+                            :locals => {:player => @player, :controls => @controls})
+  page << "onloadFunc();" 
+  if @full_title
+    page << "document.title = \"#{escape_javascript(@full_title)}\";"
+  end
+end

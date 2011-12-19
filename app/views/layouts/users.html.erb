@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <title>Dominion - <%= @title ? @title : controller.action_name.capitalize %></title>
+  <%= stylesheet_link_tag 'scaffold', 'common', 'users', 'style' %>
+  <link rel="stylesheet/less", type="text/css" href="/stylesheets/common2.less">
+	<link rel="shortcut icon" type="image/vnd.microsoft.icon" href='<%= image_path("/favicon.ico") %>' />
+  <%= javascript_include_tag :defaults, 'tablekit' %>
+  <%= javascript_include_tag "modernizr.freedom" %>
+  <%= javascript_include_tag "less" %>
+</head>
+<body>
+
+  <% link_to(games_path, :id => "siteLogo") do %>
+    <h1>FreeDom</h1>
+		<h2>Free Dominion Game Server</h2>
+	<% end %>
+
+  <div id="userInfoPadding">  
+  </div>     
+  <div id="userInfoPadBg">
+  </div>
+  <div id="userInfo">
+    <% if session[:user_id].nil? %>
+      Welcome, Guest. Please <%= link_to "login", login_path -%> or <%= link_to "register", new_user_path -%>
+    <% else %>
+      <% user = User.find(session[:user_id]) %>
+      Welcome, <%= user.name -%> | <%= link_to_unless_current "Preferences", settings_path -%> | Not <%= user.name-%>? Please <%= link_to "logout", logout_path -%> 
+    <% end %>
+  </div>
+	
+<div id="mainContent">
+	<div id="flash">
+    <%= render :partial => 'flash_area' -%>
+  </div>
+  <%= yield %>
+</div>
+
+<div id="footer">
+  <%= link_to "Home", games_path %> | <%= link_to "About", about_path%> | <%= link_to "Feedback", contact_path %>	
+</div>
+</body>
+</html>

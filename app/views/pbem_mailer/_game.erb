@@ -1,0 +1,72 @@
+<% if !@controls.blank? -%>
+Your action is required for the following:
+<% @controls.each do |where, ctrls| -%>
+<%   case where
+     when :hand -%>
+<%=    render :partial => 'hand_control', :collection => ctrls %>
+<%   when :piles -%>
+<%=    render :partial => 'piles_control', :collection => ctrls %>
+<%   when :player -%>
+<%=    render :partial => 'player_control', :collection => ctrls %>
+<%   when :revealed -%>
+<%=    render :partial => 'revealed_control', :collection => ctrls %>
+<%   when :peeked -%>
+<%=    render :partial => 'peeked_control', :collection => ctrls %>
+<%   end -%>
+<% end -%>
+You may need to specify the full text of the desired option after "None".
+Reply with "Resolve PA <number>: <choice>".
+
+<% end -%>
+Game number <%= @game.id %>: <%= @game.name %> (<%= {"waiting" => "waiting to start", "running" => "in progress", "ended" => "ended"}[@game.state] || @game.state %>)
+
+<% if @game.state == "ended" -%>
+<%   ply_ordered = @game.players.sort_by {|p| p.score}.reverse -%>
+<%=  ply_ordered[0].name -%> - Winner with <%= ply_ordered[0].score -%> points! (Deck: <%= ply_ordered[0].cards_for_decklist(false) -%>)
+<%   ply_ordered.each_with_index do |ply, ix| -%>
+<%     if ix != 0 -%>
+<%=      ply.name -%> - <%= %w<first second third fourth fifth sixth>[ix] + " with #{ply.score}" -%> points. (Deck: <%= ply.cards_for_decklist(false) -%>)
+<%     end -%>
+<%   end -%>
+
+<% end -%>
+Events since last update:
+<% @game.histories.find(:all, :conditions => ['created_at > ?', @player.last_emailed]).each do |hist| -%>
+ - <%= format_history(hist, @player) %>
+<% end -%>
+
+Chat since last update:
+<% @game.chats.find(:all, :conditions => ['created_at > ?', @player.last_emailed]).each do |chat| -%>
+ - <%= (chat.player ? chat.player.name : chat.non_ply_name) %> said: <%= chat.statement %>
+<% end -%>
+
+<%= render :partial => 'player_private' -%>
+
+====
+<% @player.other_players.each do |ply| -%>
+<%= render :partial => 'player', :object => ply -%>
+<% end -%>
+
+====
+Piles:
+Index  Type              Cost  Remaining   State
+-----  ----              ----  ---------   -----
+<% @game.piles.each_with_index do |pile, ix| -%>
+<%=  sprintf("%4d.  %-16s  %3d  %2d ", ix, pile.card_class.readable_name, pile.cost, pile.cards.size) -%>
+<%   start_size = pile.card_class.starting_size(@game.players.size) -%>
+<%   if start_size == :unlimited -%>
+<%=    "(inf. )" -%>
+<%   else -%>
+<%=    sprintf("(of %2d)", start_size) -%>
+<%   end %>
+<%=  sprintf(" %s\n", pile.state.inspect) -%>
+<% end %>
+
+====
+Your settings:
+AutoMoat:                [<%= @player.settings.automoat ? 'X' : ' ' -%>]
+AutoCrat:                [<%= @player.settings.autocrat ? 'X' : ' ' -%>]
+AutoBaron:               [<%= @player.settings.autobaron ? 'X' : ' ' -%>]
+AutoTorturer for Curses: [<%= @player.settings.autotorture_curse ? 'X' : ' ' -%>]
+AutoTreasury:            [<%= @player.settings.autotreasury ? 'X' : ' ' -%>]
+AutoMountebank:          [<%= @player.settings.automountebank ? 'X' : ' ' -%>]

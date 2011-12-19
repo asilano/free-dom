@@ -1,0 +1,224 @@
+@font-face {
+  font-family: 'CloisterBlackLight';
+  src: url('../fonts/CloisterBlack-webfont.eot');
+  src: local('☺'), url('../fonts/CloisterBlack-webfont.woff') format('woff'), url('../fonts/CloisterBlack-webfont.ttf') format('truetype'), url('../fonts/CloisterBlack-webfont.svg#webfontqTaa2iI3') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.border-radius (@radius:5px) {
+  -webkit-border-radius: @radius;
+  -moz-border-radius: @radius;
+  border-radius: @radius;
+}
+
+.left {float: left;}
+.right {float: right;}
+.inline {display: inline;}
+.light {color: grey;}
+.lighter {font-weight: normal; color: #ccc;}
+.lighter a {color: #ccc;}
+.underline {text-decoration: underline}
+.pad-under {padding-bottom: 5px;}
+
+h1, h2
+{	
+	font-family: 'CloisterBlackLight';
+	font-weight: normal;
+	line-height: 1em;
+	margin: 0;
+	a, a:hover, a:visited
+  {
+    text-decoration: none;
+    color: inherit;
+    background: transparent;
+  } 
+}
+
+h1 
+{  
+  font-size: 4em; 
+	color: blue;
+}
+h2 
+{  
+  font-size: 3em; 
+	a:hover {text-decoration: underline;}
+}
+h3 {  font-size: 1.5em; }
+
+.details-page h1, .details-page h2 
+{
+	font-family: inherit; 
+	font-weight: bold; 
+	color: black; 
+	font-size: 1.5em;
+}
+
+.details-page p {padding: 0.5em 0 1em 0.5em;}
+
+.expansion-settings 
+{
+  margin-top: 5px;
+  padding-left: 5px;
+  
+  h1
+  {
+    font-family: inherit; 
+    color: black; 
+    text-decoration: underline;
+    font-size: 1em;
+    margin-left: -5px;
+    padding-bottom: 2px;
+  }
+}
+
+#errorExplanation h2 {font-family: verdana,arial,helvetica,sans-serif} /* Override CloisterBlack for Error boxes */
+
+#userInfo
+{
+  position: fixed;
+  z-index: 1501;
+  top: 0;
+  right: 0;
+  padding: 0 5px 0 10px;
+  max-width: 80%;
+  height: 1.6em;
+  background-color: #f0e68c;
+  text-align: right;
+     -moz-border-radius-bottomleft: 1em;
+  -webkit-border-bottom-left-radius: 1em;
+          border-bottom-left-radius: 1em;
+}
+
+#siteLogo
+{
+		padding: 0 10px;
+		background-color: #f5f4d6;
+    background-image: -moz-linear-gradient(left top, #fff 10%, #f5f4d6, #fff 90%);
+		background-image: -webkit-gradient(linear, 0 0, 100% 100%, color-stop(0.1, white), color-stop(0.5, #f5f4d6), color-stop(0.9, white));
+		border: 3px outset navy;	
+		display: inline-block;
+		text-decoration: none;
+		text-align: center;
+		h2 {font-size: 1.5em; color: blue;}
+}
+
+#mainContent
+{
+  height: 100%;
+  margin-top: 2em;
+  overflow: visible;
+	padding-left: 2em;
+}
+
+#nav
+{
+	margin-bottom: 1em;
+}
+
+#card_selects 
+{
+	.pileLabel {width: 10em;}
+	.cardText {padding-left: 5px;}
+	//tr {border: 1px solid black;}	
+	td {padding: 1px;}
+	.rowEven {background-color: #def;}
+}
+
+#game_list
+{
+	clear: both;
+	td,th {border: 1px solid black;}
+	th#blank_th {border: none;}
+	
+	tr .bold {font-weight: bold;}
+	
+	tr.ended.rowEven {background-color: #fee;}
+	tr.ended.rowOdd {background-color: #fdd;}
+	
+	tr.running.rowEven {background-color: #efe;}
+  tr.running.rowOdd {background-color: #dfd;}
+	
+	tr.waiting.rowEven {background-color: #def;}
+  tr.waiting.rowOdd {background-color: #cdf;}	
+}
+
+.userform label
+{
+	float: left;
+	text-align: right;
+	margin-right: 10px;
+	width: 10em;
+}
+
+.prefsform label {width: auto; float: none;}
+label.checkLabel {float: none;}
+.loginform label {width: 6em;}
+
+.userform input {margin-bottom: 5px;}
+/*.userform*/ input:not([type=submit]):not([type=button]):focus {background-color: #f8f8ff;}
+/*.userform*/ .fieldWithErrors {display: inline; background-color: inherit; padding: 0;}
+/*.userform*/ .fieldWithErrors label {color: red;}
+/*.userform*/ .fieldWithErrors input {background-color: #fff8f8;}
+
+.opacity5 {opacity: 0.05;}
+.opacity10 {opacity: 0.1;}
+.opacity15 {opacity: 0.15;}
+.opacity20 {opacity: 0.2;}
+.opacity25 {opacity: 0.25;}
+.opacity30 {opacity: 0.3;}
+.opacity35 {opacity: 0.35;}
+.opacity40 {opacity: 0.4;}
+.opacity45 {opacity: 0.45;}
+.opacity50 {opacity: 0.5;}
+.opacity55 {opacity: 0.55;}
+.opacity60 {opacity: 0.6;}
+.opacity65 {opacity: 0.65;}
+.opacity70 {opacity: 0.7;}
+.opacity75 {opacity: 0.75;}
+.opacity80 {opacity: 0.8;}
+.opacity85 {opacity: 0.85;}
+.opacity90 {opacity: 0.9;}
+.opacity95 {opacity: 0.95;}
+.opacity100 {opacity: 1.0;}
+
+#footer {clear: both; margin-top: 1em; border-top: 1px solid #ccf; font-size: 1.1em; }
+#footer a {font-weight: bold; margin: 0 0.5em;}
+
+::-webkit-input-placeholder {font-style: italic;}
+input:-moz-placeholder {font-style: italic;}
+.input-hack
+{
+   border            : none !important;
+   height            : 0px !important;
+   padding            : 0px !important;
+   width            : 0px !important;
+}
+
+.title {font-weight: bold;}
+
+#card_selects, #random_options
+{
+  margin: 5px 0 10px 10px;
+}  
+
+.lastVal
+{
+  float: right;
+  height: 15px;
+  margin-left: 10px;
+  .arrow
+  {
+    display: inline-block;
+    width: 15px;
+    height: 15px;    
+    background-image: url('/images/arrows.png');
+    vertical-align: middle;
+    margin-left: -5px;
+  }
+  
+  .same {}
+  .up { background-position: -15px 0; }
+  .down { background-position: -30px 0; }
+}

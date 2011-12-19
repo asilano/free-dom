@@ -1,0 +1,7 @@
+<td>
+	<% classes = card.varieties.join(" ") -%>
+	<% content = content_tag(:div, h(card.class.readable_name), :class => "content") +		
+				 content_tag(:div, nil, :class => "bg left") +
+				 content_tag(:div, nil, :class => "bg right") -%> 
+	<%= content_tag(:div, content, :class => "container " + classes, :title => card.text) -%>				
+</td>

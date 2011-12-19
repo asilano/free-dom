@@ -1,0 +1,203 @@
+<% player_private.reload %>
+<div class="playerMain">
+<table class="player">
+	<tr>	
+		<th>Playing as:</th><td><%= h player_private.name -%></td>
+	</tr>
+	<% if not player_private.active_actions.empty? -%><tr>
+		<th>Waiting for you to:</th>
+		<td><%= h(player_private.active_actions.reject{|a| a.text.nil? or a.text.empty?}.map {|a| a.text}.join(', ')) %></td>
+	</tr><% end %>
+	<tr>	
+		<th>Deck:</th>
+		<td>
+      <%= h player_private.cards.deck.length -%> cards						
+		</td>	
+	</tr><tr>
+		<th>Hand:</th>
+		<% if (!player_private.cards.hand.empty?) or (not controls[:hand].empty?) -%>
+			<td>
+			  <% form_tag('/null') do -%>
+				<table class="hand">
+					<tr> 
+						<%= render :partial => 'card', :collection => player_private.cards.hand -%>
+					</tr>
+					<%= render :partial => 'control', :collection => controls[:hand] -%>
+				</table>
+			  <% end -%>	
+			</td>	
+		<% else -%>
+			<td>None</td>
+		<% end -%>
+	</tr>
+	<% if !player_private.cards.in_play.empty? -%><tr>
+		<th>In Play:</th>
+    <td>
+      <% form_tag('/null') do -%>
+      <table class="hand">
+        <tr> 
+          <%= render :partial => 'card', :collection => player_private.cards.in_play -%>
+        </tr>
+        <%= render :partial => 'control', :collection => controls[:play] -%>
+      </table>
+      <% end -%>	
+    </td>
+	</tr><% end -%>
+	<tr>
+		<th>Discard:</th><td>
+			<%= if !player_private.cards.in_discard.empty?
+					h player_private.cards.in_discard.join(', ')
+				else
+					h 'None'
+				end -%></td>
+	</tr>
+	<% if (!player_private.cards.enduring.empty?) || (!controls[:durations].empty?) -%>
+    <tr>
+    	<th>Durations:</th>
+      <td>
+        <% form_tag('/null') do -%>
+        <table class="hand">
+          <tr> 
+            <%= render :partial => 'card', :collection => player_private.cards.enduring -%>
+          </tr>
+          <%= render :partial => 'control', :collection => controls[:durations] -%>
+        </table>
+        <% end -%>  
+      </td> 
+		</tr>
+	<% end %>
+	<% if (!player_private.cards.revealed.empty?) or 
+			  (!controls[:revealed].select {|c| c[:player_id] == player_private.id}.empty?) -%>
+		  <tr>
+			<th>Revealed:</th><td>
+				<% form_tag('javascript:void(0)') do -%>
+					<table class="revealed">
+	   				<tr> 					
+						  <%= render :partial => 'card', :collection => player_private.cards.revealed -%>						
+					  </tr>				
+					  <%= render :partial => 'control', 
+							   :collection => controls[:revealed].select {|c| c[:player_id] == player_private.id} -%>
+					</table>
+				<% end -%>
+				</td>
+			</tr>
+	<% end -%>
+	<% if (!player_private.cards.peeked.empty?) || 
+        (!controls[:peeked].empty?) -%>
+      <tr>
+      <th>Looked at:</th><td>
+        <% form_tag('javascript:void(0)') do -%>
+          <table class="hand peeked">
+            <tr>          
+              <%= render :partial => 'card', :collection => player_private.cards.peeked -%>           
+            </tr>       
+            <%= render :partial => 'control', 
+                 :collection => controls[:peeked] -%>
+          </table>
+        <% end -%>
+        </td>
+      </tr>
+  <% end -%>
+	<% if !player_private.cards.of_type("Seaside::PirateShip").empty?%>
+    <tr><th>Pirate Coins:</th><td><%= player_private.state.pirate_coins %></td></tr>
+	<% end %>
+  <% if player_private.score && player_private.score != 0 %>
+      <tr class="scoreRow"><th>Score:</th><td><%= player_private.score %></td></tr>
+    <% end %>
+	<% if not player_private.actions.nil? %>
+		<tr><td>&nbsp;</td></tr>
+		<tr>
+			<th>Actions:</th><td><%= h player_private.actions -%></td>			
+		</tr>
+		<tr>
+			<th>Buys:</th><td><%= h player_private.buys -%></td>			
+		</tr>		
+		<tr>
+			<th>Cash:</th><td><%= h player_private.cash -%></td>			
+		</tr>
+	<% end -%>
+	
+	<% if not controls[:player].length == 0 -%>
+	 <td colspan="2"><table>
+		<% controls[:player].each do |control| -%>
+		  <tr>			
+			<% case control[:type]
+		   	   when :buttons -%>	
+					<td><%= control[:label] %></td>
+					<% control[:options].each do |opt| %>
+						<td> 			
+							<% form_remote_tag :url => {:action => control[:action]},                             
+														     :loading => "disable_named('#{control[:name]}'); $('locked').innerHTML = 'true';",
+		                             :before => "$('spinner').show()",
+		                             :complete => "$('spinner').hide(); $('locked').innerHTML = 'false';",
+		                             
+		                             :html => {:class => "inline"} do -%>
+								<% if control[:params] -%>
+									<% control[:params].each do |key, value| -%>
+										<%= hidden_field_tag key, value, :id => "#{key}_#{control[:name]}_#{control.object_id}" -%>
+									<% end %>
+								<% end %>		
+								<% opt.reject{|k,v| k == :text}.each do |key, value| %>
+								  <%= hidden_field_tag key, value, :id => "#{key}_#{control[:name]}_#{opt.object_id}" -%>
+								<% end %>					
+								<%= submit_tag opt[:text], :name => control[:name], :style => "display: inline;" -%>
+							<% end -%>
+						</td>
+					<% end %>
+				<% when :checkboxes -%>
+					<td><% form_tag('/null') do -%>
+            <% if control[:params] -%>
+              <% control[:params].each do |key, value| -%>
+                <%= hidden_field_tag key, value, :id => "#{key}_#{control[:name]}_#{control.object_id}" -%>
+              <% end %>
+            <% end %>
+						<table class="choices">
+							<tr>
+								<th colspan="<%= control[:choices].length -%>"><%= h control[:label] -%></th>
+							</tr>
+							<tr>
+								<% control[:choices].each_with_index do |choice, ix| %>
+								  <td>
+								  	<%= check_box_tag(control[:name] + "[]", ix, false, :id => "#{control.object_id}_#{ix}") -%>
+                    <%= label_tag("#{control.object_id}_#{ix}", choice) -%>
+								  </td>
+								<% end %>
+								  <td>
+								  	<% submit_hash = {:loading => "disable_named('#{control[:name]}[]'); disable_named('#{control[:name]}_btn'); $('locked').innerHTML = 'true'",
+							                        :before => "$('spinner').show()",
+							                        :complete => "$('spinner').hide(); $('locked').innerHTML = 'false';",
+							                        :url => {:action => control[:action]}}.merge(control[:params]) -%>
+                    <%= submit_to_remote control[:name]+"_btn", control[:button_text], submit_hash -%>
+								  </td>
+							</tr>
+						</table>
+					<% end %>
+				</td>
+        <% when :dropdown -%>
+					<td><% form_tag('/null') do -%>
+            <% if control[:params] -%>
+              <% control[:params].each do |key, value| -%>
+                <%= hidden_field_tag key, value, :id => "#{key}_#{control[:name]}_#{control.object_id}" -%>
+              <% end -%>
+            <% end -%>            
+            <%= control[:label] %>
+            <%= select_tag(control[:name], options_for_select(control[:choices], control[:selected]), :id => "#{control.object_id}_#{control[:name]}") %>
+            <% submit_hash = {:loading => "disable_named('#{control[:name]}'); disable_named('#{control[:name]}_btn'); $('locked').innerHTML = 'true'",
+                              :before => "$('spinner').show()",
+                              :complete => "$('spinner').hide(); $('locked').innerHTML = 'false';",
+                              :url => {:action => control[:action]}}.merge(control[:params]) -%>
+            <%= submit_to_remote control[:name]+"_btn", control[:button_text], submit_hash -%>
+            
+					<% end %>
+				</td>
+			<% end -%>
+			</tr>
+		<% end -%>
+	 </table></td>	
+	<% end -%>
+</table>
+</div>
+<% set_aside = set_aside_area(player_private, false) %>
+    <% if set_aside != "" %>
+      <div class="setAside"><table class="player"><%= set_aside %></table></div>
+    <% end %>	

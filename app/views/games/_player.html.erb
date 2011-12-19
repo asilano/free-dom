@@ -1,0 +1,61 @@
+<td style="vertical-align: top; width: 50%">
+	<table class="player <%= 'curr_turn' if player.game.current_turn_player == player -%>">
+		<tr><th><%= h player.name -%></th>
+		    <td><span class="lighter">Updating: <%= player.settings.update_interval %>s </span></td>
+		</tr>
+		<tr><th>Deck:</th><td><%= h player.cards.deck.count -%></td></tr>	
+	   	<tr><th>Hand:</th><td><%= h player.cards.hand.count -%></td></tr>
+			<tr><th>Play:</th><td>
+				<% if (!player.cards.in_play.empty?) %>
+				  <table class="play">
+				  	<% player.cards.in_play.in_groups_of(5) do |chunk| -%>
+              <tr>
+                <%= render :partial => 'card', :collection => chunk.compact -%>  
+              </tr>
+            <% end -%>
+					</table>
+				<% end %>
+      </td></tr>
+			<% if (!player.cards.enduring.empty?) %>
+        <tr><th>Durations:</th>
+          <td><table class="play">
+            <% player.cards.enduring.in_groups_of(5) do |chunk| -%>
+              <tr>
+                <%= render :partial => 'card', :collection => chunk.compact -%>  
+              </tr>
+            <% end -%>
+          </table></td>
+				</tr>
+      <% end %>
+	   	<tr><th>Discard:</th><td>
+	   		<%= if not player.cards.in_discard.empty?
+					h(player.cards.in_discard[0].class.readable_name) + h(" and #{player.cards.in_discard.count - 1} others")
+				else
+					h 'None'
+				end -%></td></tr>
+		<% if (!player.cards.revealed.empty?) ||
+                  (!controls[:revealed].select {|c| c[:player_id] == player.id}.empty?) -%>
+		  <tr>
+			<th>Revealed:</th><td>
+				<% form_tag('javascript:void(0)') do -%>
+					<table class="revealed">
+	   				<tr> 
+					
+						  <%= render :partial => 'card', :collection => player.cards.revealed -%>						
+						</tr>				
+						<%= render :partial => 'control', 
+								   :collection => controls[:revealed].select {|c| c[:player_id] == player.id} -%>
+					</table>
+				<% end -%>
+				</td>
+			</tr>
+		<% end -%>	
+		<% if !player.cards.of_type("Seaside::PirateShip").empty?%>
+      <tr><th>Pirate Coins:</th><td><%= player.state.pirate_coins %></td></tr>
+    <% end %>		
+		<%= set_aside_area(player) %>
+    <% if player.score && player.score != 0%>
+      <tr class="scoreRow"><th>Score:</th><td><%= player.score %></td></tr>
+    <% end %>
+	</table>					 		
+</td>				

@@ -1,0 +1,8 @@
+Hi <%= @user.name %>,
+
+<%= @new_player.name %> joined your game '<%= @game.name %>'. The game state is below.
+You will receive further emails when more players join the game.
+
+You can now start the game, by sending a reply to this email with "Game Number: <%= @game.id %>" and "Action: Start Game" as the only text on their lines. Don't forget to include your "Username: "
+
+<%= render :partial => 'game' %>

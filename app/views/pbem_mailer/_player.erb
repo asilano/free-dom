@@ -1,0 +1,15 @@
+<%= player.name %>:
+<%= "-" * player.name.length %>
+  <%= hidden_line player, :deck, "Deck" %>
+  <%= hidden_line player, :hand, "Hand" %>
+  <%= public_zone_line player, :in_play, "In Play" %>
+  <%= public_zone_line player, :in_discard, "Discard" %>
+  <%= public_zone_line player, :enduring, "Enduring" %>
+  <%= control_line player, :revealed, "Revealed" %>
+<%= extra_info player, :public %>
+<% if player.actions -%>
+  
+  Actions: <%= h player.actions %>
+  Buys: <%= h player.buys %>			
+  Cash: <%= h player.cash %>
+<% end -%>

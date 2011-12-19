@@ -1,0 +1,10 @@
+<% control = player_control -%>
+<%= PendingAction.find(control[:pa_id]).text -%> (PA <%= control[:pa_id] -%>): <% -%>
+<% case control[:type]
+   when :buttons -%>
+Choose one. Valid choices: <%= opts_for_buttons_from_options(control, :options, "Choose") -%>
+<% when :dropdown -%>
+Choose one. Valid choices: <%= control[:choices].map {|opt| "'Choose #{opt[1]}' for #{opt[0]}"}.join(', ') -%>
+<% when :checkboxes -%>
+Reply with Choose then a space-separated set from <%= control[:choices].each_with_index.map {|opt, ix| "#{ix} for #{opt}"}.join(', ') -%>.
+<% end %>

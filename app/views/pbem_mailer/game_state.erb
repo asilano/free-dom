@@ -1,0 +1,10 @@
+Hi <%= @user.name %>,
+
+<%= @text %>
+<% if !@warn.blank? -%>
+
+You are warned about the following:
+<%= @warn %>
+<% end -%>
+
+<%= render :partial => 'game' %>

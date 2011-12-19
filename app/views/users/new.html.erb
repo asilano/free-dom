@@ -1,0 +1,44 @@
+<div class="form">
+  <% form_for(@user, :html => {:class => "userform"}) do |f| %>
+  <%= f.error_messages %>
+  <fieldset>
+    <legend>
+      New User
+    </legend>
+    <p>
+      <%= f.label :name, 'Name:' %>
+      <%= f.text_field :name %>
+    </p>
+		<p>
+			<%= f.label :email, "E-mail address:" %>
+			<%= f.email_field :email %>
+    <p>
+      <%= f.label :password, 'Password:' %>
+      <%= f.password_field :password %>
+    </p>
+    <p>
+      <%= f.label :password_confirmation, 'Retype password:' %>
+      <%= f.password_field :password_confirmation %>
+    </p>
+		<p>
+      <%= check_box_tag :remember_me, true, :name => "remember_me" %>
+      <%= label_tag :remember_me, "Remember my login on this computer (for #{User.cookie_timeout} days)", :class => "checkLabel"%>
+		</p>
+		<div>
+			<%= f.check_box :contact_me %>
+			<%= f.label :contact_me, 'Email me with important announcements', :class => "checkLabel"%>
+			<div id="explain_contact">
+				<%= image_tag "question.jpg" %>
+				<div id="contact_explanation">
+					Stay informed about major updates to the free-dom server. We will only use this to contact you about new versions and items of similar importance.
+				</div>
+			</div>
+		</div>
+    <p>
+      <%= f.submit "Create" %>
+    </p>
+  </fieldset>
+  <% end %>
+</div>
+
+<%= link_to 'Back', games_path %>

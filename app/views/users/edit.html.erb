@@ -1,0 +1,109 @@
+<div class="form">
+  <% form_for(@user) do |f| %>
+  <%= f.error_messages %>
+  <fieldset class="userform">
+    <legend>
+      Account details for user <%= h @user.name -%>
+    </legend>
+		<p>    
+		  <%= f.label :email, 'Email address:' %>
+			<%= f.email_field :email%>
+		</p>
+		<p class="underline">
+			Change password
+		</p>
+		<p>
+      <%= f.label :password, 'New password:' %>      
+      <%= f.password_field :password %>
+    </p>
+    <p>
+      <%= f.label :password_confirmation, 'Retype password:' %>
+      <%= f.password_field :password_confirmation %>
+    </p> 		
+    <p>
+      <%= f.check_box :contact_me %>
+      <%= f.label :contact_me, 'Email me with important announcements', :class => "checkLabel"%>
+      <span id="explain_contact">
+        <%= image_tag "question.jpg" %>
+        <div id="contact_explanation">
+          Stay informed about major updates to the free-dom server. We will only use this to contact you about new versions and items of similar importance.
+        </div>
+      </span>
+    </p>   		
+  </fieldset>
+	<fieldset class="user prefsform">
+		<legend>
+			Preferences
+		</legend>
+    <p class="explain">These settings are your overall preferences. Whenever you join a new game, the settings you have set here will apply to that game.</p>
+    <p class="explain">You can override these settings from within a particular game; doing so will not change these settings.</p>
+    <p class="explain">Changing these settings will not change your preferences in any existing game.</p>
+		<% f.fields_for :settings do |sf| %>
+			<p>
+	      <%= sf.label :update_interval, 'Update interval (seconds):' %>
+				<%= sf.text_field :update_interval, :size => 4 %>
+	    </p>
+      <div class="expansion-settings">
+        <h1>Base Game Cards</h1>
+        <p>
+          <%= sf.check_box :automoat %>
+          <%= sf.label :automoat, "Enable AutoMoat" %>
+        </p>
+        <p class="explain">If AutoMoat is enabled, you will always react with a
+                           Moat if you are attacked while one is in your hand.</p>
+        <p class="explain">If AutoMoat is enabled, attacks against you will 
+                           succeed immediately if you have no reaction in your hand</p>	
+        <p>
+          <%= sf.check_box :autocrat_victory %>
+          <%= sf.label :autocrat_victory, "Enable AutoCrat" %>
+        </p>
+        <p class="explain">If AutoCrat is enabled, you will  
+                           automatically place a Victory card on top of your deck
+                           if you are holding exactly one type of Victory card
+                           when successfully attacked by the Bureaucrat.</p>		  				
+      </div>
+      <div class="expansion-settings">
+        <h1>Intrigue Cards</h1>
+        <p>
+          <%= sf.check_box :autobaron %>
+          <%= sf.label :autobaron, "Enable AutoBaron" %>
+        </p>
+        <p class="explain">If AutoBaron is enabled, you will automatically discard an Estate
+                           card if you are holding one when you play Baron.</p>									 
+        <p>  
+          <%= sf.check_box :autotorture_curse %>
+          <%= sf.label :autotorture_curse, "Enable AutoTorturer for Curses" %>
+        </p>
+        <p class="explain">If AutoTorturer for Curses is enabled, you will  
+                           automatically choose to gain a Curse card
+                           when successfully attacked by the Torturer.</p>		  				
+      </div>
+      <div class="expansion-settings">
+        <h1>Seaside Cards</h1>
+        <p>
+          <%= sf.check_box :autotreasury %>
+          <%= sf.label :autotreasury, "Enable AutoTreasury" %>
+        </p>
+        <p class="explain">If AutoTreasury is enabled, you will automatically place a Treasury
+                           on top of your deck (if eligible) when it would be put into your 
+                           discard pile from play.</p>									 
+      </div>
+      <div class="expansion-settings">
+        <h1>Prosperity Cards</h1>
+        <p>
+          <%= sf.check_box :automountebank %>
+          <%= sf.label :automountebank, "Enable AutoMountebank" %>
+        </p>
+        <p class="explain">If AutoMountebank is enabled, you will  
+                           automatically discard a Curse card if you are holding one
+                           when successfully attacked by the Mountebank.</p>		  				
+      </div>
+		<% end %>
+	</fieldset>
+	<p>
+      <%= f.submit "Update" %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to 'Back to Lobby', games_path %>

@@ -1,0 +1,12 @@
+Hi <%= @user.name %>,
+
+Your new game is nearly created! Just check over the details below and make any changes you want to. Then copy them and paste them into a blank reply to this email (which should send to <%= @rep_add %>).
+
+Username: <%= @user.name %>
+Action: Create Game
+Name: <%= @game.name %>
+Max Players: <%= @game.max_players %>
+<% (1..10).each do |num| %>
+Kingdom Card <%= num %>: <%= card = @game.send("pile_#{num}").constantize; "#{card.parent} - #{card.readable_name} [#{card.text}]"%><% end %>
+
+Include Platinum and Colony: <%= @game.plat_colony || 'rules' %>

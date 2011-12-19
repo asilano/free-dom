@@ -1,0 +1,8 @@
+<% control = hand_control -%>
+<%= PendingAction.find(control[:pa_id]).text -%> (PA <%= control[:pa_id] -%>): <% -%>
+<% case control[:type]
+   when :button -%>
+Choose one from your hand cards. Valid choices: <%= opts_for_buttons_from_valid(control, :cards, "Card") %>
+<% when :checkboxes -%>
+Valid responses: '<%= control[:name] -%>' then a space-separated set from <%= control[:cards].each_with_index.map {|valid, ix| "#{ix}" if valid}.compact.join(', ') %>
+<% end %>

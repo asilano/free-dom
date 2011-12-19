@@ -1,0 +1,7 @@
+<h1>Joining game <%= @game.name -%></h1>
+<% form_for(:game, :url => 'do_join') do |f| %>
+  <% fields_for :player do |p| %>
+	    
+  <% end %>
+  <%= f.submit 'Join' %>
+<% end %>
