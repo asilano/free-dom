@@ -2,7 +2,7 @@ class PlayerState < ActiveRecord::Base
   belongs_to :player
   serialize :gained_last_turn, Array
   
-  before_validation_on_create :init_fields
+  before_validation :init_fields, :on => :create
   
   def init_fields
     self.gained_last_turn ||= []    
@@ -16,7 +16,6 @@ class PlayerState < ActiveRecord::Base
     self.gained_last_turn = []
     self.bought_victory = false
     self.played_treasure = false
-    logger.info(self.inspect)
     save!
   end
 end

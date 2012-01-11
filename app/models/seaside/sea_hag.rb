@@ -3,7 +3,7 @@
 class Seaside::SeaHag < Card
   costs 4
   action :attack => true, 
-         :order_relevant => lambda {
+         :order_relevant => lambda { |params|           
            curses_pile = game.piles.find_by_card_type("BasicCards::Curse")
            curses_pile.cards.length < game.players.length - 1}
   card_text "Action (Attack; cost: 4) - Each other player discards the top card of his deck, then gains a Curse card, putting it on top of his deck."

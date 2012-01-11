@@ -5,14 +5,11 @@ class User < ActiveRecord::Base
   validates_uniqueness_of :name, :case_sensitive => false
   
   #attr_accessor :password_confirmation
-  validates_confirmation_of :password
+  validates :password, :confirmation => true
   #validate :password_non_blank
-  validates_presence_of :hashed_password
-  validates_presence_of :password_confirmation, :if => :hashed_password_changed?
-  validates_presence_of :email
-  validates_uniqueness_of :email, :case_sensitive => false
-  validates_format_of :email, :with => /^$|^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,4}$/i,
-                               :message => "doesn't appear to be a valid email address. Please use the Contact Me link if you're sure it is."
+  validates :hashed_password, :presence => true
+  validates :password_confirmation, :presence => {:if => :hashed_password_changed?}
+  validates :email, :presence => true, :uniqueness => true, :format => /^$|^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,4}$/i
   
   has_many :players, :dependent => :destroy
   has_many :games, :through => :players
@@ -20,7 +17,7 @@ class User < ActiveRecord::Base
   accepts_nested_attributes_for :settings
   has_one :ranking, :dependent => :destroy
   
-  before_validation_on_create :latinify
+  before_validation :downcase_email
   
   before_create :create_settings, :create_ranking
   
@@ -78,10 +75,8 @@ private
     self.salt = self.object_id.to_s + rand.to_s
   end
   
-  def latinify
-    # Force Latin1 as long as we're on toothycat
-    #c = Iconv.new("UTF-8", "LATIN1")
-    #self.name = c.iconv(self.name)
+  def downcase_email
+    self.email = self.email.downcase if self.email.present?
   end
   
   def random_password(size = 8)

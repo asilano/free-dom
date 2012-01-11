@@ -18,24 +18,24 @@ class PbemMailerTest < ActionMailer::TestCase
       game = Factory.build(:dist_random_game)
       game.expand_random_choices      
       
-      email = PbemMailer.deliver_game_params(@user, game)
+      email = PbemMailer.game_params(@user, game).deliver
       assert_same_elements [@user.email], email.to
       assert_equal "free-dom: Confirm / Modify New Game Details", email.subject
       assert_same_elements([ENV['CLOUDMAILIN_FORWARD_ADDRESS'].sub(/@/, "+#{@user.id}_#{@user.hashed_email(6,8)}@")], email.reply_to)
-      assert_match(/Action: Create Game/, email.body)
-      assert_match(/Username: #{@user.name}/, email.body)
-      assert_match(/Name: #{game.name}/, email.body)
-      assert_match(/Max Players: #{game.max_players}/, email.body)
+      assert_match(/Action: Create Game/, email.encoded)
+      assert_match(/Username: #{@user.name}/, email.encoded)
+      assert_match(/Name: #{game.name}/, email.encoded)
+      assert_match(/Max Players: #{game.max_players}/, email.encoded)
       
       BaseGame.kingdom_cards[0,7].each do |card|
-        assert_match(/Kingdom Card \d+: BaseGame - #{card.readable_name} \[#{Regexp.quote card.text}\]/, email.body)
+        assert_match(/Kingdom Card \d+: BaseGame - #{card.readable_name} \[#{Regexp.quote card.text}\]/, email.encoded)
       end
       
       Prosperity.kingdom_cards[0,3].each do |card|
-        assert_match(/Kingdom Card \d+: Prosperity - #{card.readable_name} \[#{Regexp.quote card.text}\]/, email.body)
+        assert_match(/Kingdom Card \d+: Prosperity - #{card.readable_name} \[#{Regexp.quote card.text}\]/, email.encoded)
       end
       
-      assert_match(/Include Platinum and Colony: #{game.plat_colony || 'rules'}/, email.body)
+      assert_match(/Include Platinum and Colony: #{game.plat_colony || 'rules'}/, email.encoded)
     end
   end
   

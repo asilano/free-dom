@@ -5,7 +5,7 @@ class PendingAction < ActiveRecord::Base
   
   after_create :email_owner
   
-  def before_create
+  before_create do
     # If a :text hasn't been specified, set it to the humanized version of the
     # :expected_action string
     self.text ||= expected_action.humanize
@@ -16,7 +16,6 @@ class PendingAction < ActiveRecord::Base
   end
   
   def concurrent(att_sets)
-    logger.info att_sets.inspect
     att_sets.each {|att| children.create!(att)}
   end
   

@@ -68,9 +68,8 @@ class Prosperity::Vault < Card
     else
       # Discard each selected card, taking note of its class for logging purposes
       cards_discarded = []
-      params[:discard].each do |d|
-        card_index = d.to_i
-        card = ply.cards.hand[card_index]
+      cards_chosen = params[:discard].map {|ix| ply.cards.hand[ix.to_i]}
+      cards_chosen.each do |card|       
         card.discard
         cards_discarded << card.class.readable_name
       end

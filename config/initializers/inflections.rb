@@ -9,7 +9,7 @@ ActiveSupport::Inflector.inflections do |inflect|
 #   inflect.uncountable %w( fish sheep )
 
     # Cards with names in the plural need to be inflected as uncountable
-    plural_cards = Dir.glob("#{RAILS_ROOT}/app/models/*/*s.rb").map{|fn| File.basename(fn, '.rb')}
+    plural_cards = Dir.glob("#{Rails.root}/app/models/*/*s.rb").map{|fn| File.basename(fn, '.rb')}
     inflect.uncountable plural_cards
     inflect.uncountable 'militia'
     inflect.plural /^talisman$/, 'talismans'

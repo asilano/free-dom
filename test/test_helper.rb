@@ -1,8 +1,9 @@
 ENV["RAILS_ENV"] = "test"
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
-require 'test_help'
-require 'shoulda'
-require File.dirname(__FILE__) + "/factories"  
+require 'rails/test_help'
+require 'shoulda/rails'
+require 'active_support/testing/pending'
+#require File.dirname(__FILE__) + "/factories"  
 
 class ActiveSupport::TestCase
   # Transactional fixtures accelerate your tests by wrapping each test method
@@ -101,6 +102,7 @@ class ActiveSupport::TestCase
     end
     
     roots = actual.select {|pa| !actual.include?(pa.parent)}
+    dupe = actual.map {|pa| PendingAction.new(pa.attributes)}
     
     roots.each do |pa|
       valid = false
@@ -119,14 +121,7 @@ class ActiveSupport::TestCase
         end
       end
       
-			if !valid
-				foo = actual.dup
-				foo.each do |p|
-					p.children.each {|c| foo << c}
-				end
-			end
-			
-      assert valid, "expected actions do not match. Expected \n#{pattern.to_yaml}, got \n#{actual.to_yaml}"
+      assert valid, "expected actions do not match. Expected \n#{pattern.to_yaml}, got \n#{dupe.to_yaml}"
     end
     
     return true
@@ -153,14 +148,14 @@ class ActiveSupport::TestCase
   private
 
   def log_test
-    if Rails::logger
+    #if Rails.logger
       # When I run tests in rake or autotest I see the same log message multiple times per test for some reason.
       # This guard prevents that.
-      unless @already_logged_this_test
-        Rails::logger.info "\n\nStarting #{@method_name}\n#{'-' * (9 + @method_name.length)}\n"
-      end
-      @already_logged_this_test = true
-    end
+    #  unless @already_logged_this_test
+    #    Rails.logger.info "\n\nStarting #{@method_name}\n#{'-' * (9 + @method_name.length)}\n"
+    #  end
+    #  @already_logged_this_test = true
+    #end
   end
 end
 

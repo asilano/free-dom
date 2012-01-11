@@ -181,16 +181,12 @@ class GamesController < ApplicationController
     # (XHR) request to update the page if anything has changed since the
     # specified time. Updates the last-checked element if no change
     @just_checking = true
-    since_time = Time.httpdate(params[:since])
-    logger.info "Check for change since #{since_time}."
-    logger.info "Last change #{@game.last_modified}"
+    since_time = Time.httpdate(params[:since])    
     if @game.last_modified >= since_time
       # Game state has changed. Call process_result to update the game state
-      logger.info "Change is more recent"
       process_result("OK", false)
     else
       # No change. Render nothing, but do ensure the Last-Modified header is set
-      logger.info "No change"
       @last_mod = @game.last_modified
       headers["Last-Modified"] = @last_mod.httpdate
       respond_to do |format| 
@@ -218,10 +214,11 @@ class GamesController < ApplicationController
 protected
   def find_game    
     @game = Game.find(params[:id])
+    Game.current = @game
     @omit_onload = false
     @just_checking = false
   rescue ActiveRecord::RecordNotFound
-    logger.error("Attempt to access non-existant game #{params[:id]}" )
+    Rails.logger.error("Attempt to access non-existant game #{params[:id]}" )
     flash[:warning] = "That Game doesn't exist"
     redirect_to :action => 'index'
   end
@@ -234,7 +231,7 @@ protected
   def authorise       
     unless @user
       flash[:warning] = "Please log in"
-      session[:original_uri] = request.request_uri
+      session[:original_uri] = request.url
       redirect_to login_path
     end
   end

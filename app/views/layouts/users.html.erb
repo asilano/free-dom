@@ -5,12 +5,9 @@
 <head>
   <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
   <title>Dominion - <%= @title ? @title : controller.action_name.capitalize %></title>
-  <%= stylesheet_link_tag 'scaffold', 'common', 'users', 'style' %>
-  <link rel="stylesheet/less", type="text/css" href="/stylesheets/common2.less">
+  <%= stylesheet_link_tag 'application' %>
 	<link rel="shortcut icon" type="image/vnd.microsoft.icon" href='<%= image_path("/favicon.ico") %>' />
-  <%= javascript_include_tag :defaults, 'tablekit' %>
-  <%= javascript_include_tag "modernizr.freedom" %>
-  <%= javascript_include_tag "less" %>
+  <%= javascript_include_tag 'application' %>
 </head>
 <body>
 

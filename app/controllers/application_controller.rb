@@ -10,8 +10,7 @@ class ApplicationController < ActionController::Base
   before_filter :check_cookied_user
   before_filter :record_player_pa_ids
   
-  after_filter :check_player_pa_ids
-  after_filter :email_pbem_players
+  after_filter {check_player_pa_ids; email_pbem_players}
   
   def nop
     render :text => ""
@@ -52,7 +51,7 @@ protected
   end
   
   def check_player_pa_ids
-    Player.all.each do |ply|
+    Game.current and Game.current.players.each do |ply|
       new_ids = ply.active_actions(true).map(&:id)
       diff = new_ids - (@pa_ids[ply.id] || [])
 
@@ -68,7 +67,7 @@ protected
   end
   
   def email_pbem_players
-    Player.to_email.each do |pid, mails|
+    Player.to_email.sort.each do |pid, mails|
       player = Player.find(pid)
       game = player.game
       user = player.user
@@ -77,7 +76,7 @@ protected
           args[args.index(:controls)] = player.determine_controls
         end
         args = [user, game, player] + args
-        PbemMailer.send("deliver_#{kind}".to_sym, *args)
+        PbemMailer.send("#{kind}".to_sym, *args).deliver
       end
       player.emailed
       player.save      

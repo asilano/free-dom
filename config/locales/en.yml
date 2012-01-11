@@ -6,4 +6,14 @@ en:
     attributes:
       user:
         hashed_password: "Password"
-        email: "E-mail address"
+        email: "E-mail address"   
+    errors:
+      models:
+        settings:
+          attributes:
+            update_interval: 
+              greater_than_or_equal_to: "must be at least %{count} seconds."
+  errors:
+    attributes:
+      email:
+        invalid: "doesn't appear to be a valid email address. Please use the Contact Me link if you're sure it is."

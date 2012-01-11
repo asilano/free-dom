@@ -8,7 +8,7 @@ module CardDecorators
   # Define the cost of a card, modified by Bridges
   def costs(cost)
     raise unless cost.is_a? Fixnum
-    class_inheritable_accessor :raw_cost
+    class_attribute :raw_cost
     self.raw_cost = cost
   end
   
@@ -18,7 +18,7 @@ module CardDecorators
     def self.is_treasure? 
       true  
     end
-    class_inheritable_accessor :cash
+    class_attribute :cash
     self.cash = opts[:cash]    
     
     if opts[:special]
@@ -39,7 +39,7 @@ module CardDecorators
         instance_eval &block
       end
     else      
-      class_inheritable_accessor :points 
+      class_attribute :points 
       self.points = opts[:points]
     end
   end
@@ -48,7 +48,7 @@ module CardDecorators
     def self.is_reaction?
       true
     end
-    class_inheritable_accessor :react_trigger
+    class_attribute :react_trigger
     self.react_trigger = opts[:to] || :attack
   end
   
@@ -76,7 +76,7 @@ module CardDecorators
   
   # Define the card text
   def card_text(text)
-    class_inheritable_accessor :text
+    class_attribute :text
     self.text = text
   end
   
@@ -93,7 +93,7 @@ module CardDecorators
     end
 
     if opts[:attack]
-      class_inheritable_accessor :order_relevant, :affects_attacker
+      class_attribute :order_relevant, :affects_attacker
       self.order_relevant = opts[:order_relevant]
       self.affects_attacker = opts[:affects_attacker]
       include AttackMethods

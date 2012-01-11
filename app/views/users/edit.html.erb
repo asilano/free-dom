@@ -1,6 +1,16 @@
 <div class="form">
-  <% form_for(@user) do |f| %>
-  <%= f.error_messages %>
+  <%= form_for(@user) do |f| %>
+    <% if @user.errors.any? %>
+      <div id="errorExplanation">
+        <h1>There were some problems with your account settings</h1>
+        <p>Sorry, but we couldn't update your account. Please fix the following problems and try again.</p>
+        <ul>
+          <% @user.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
   <fieldset class="userform">
     <legend>
       Account details for user <%= h @user.name -%>

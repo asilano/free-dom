@@ -67,8 +67,18 @@
     @game.random_select = "0"
     tweaking = true
   end %>
-  <% form_for @game do |f| %>
-  <%= f.error_messages %>
+  <%= form_for @game do |f| %>
+    <% if @game.errors.any? %>
+      <div id="errorExplanation">
+        <h1>There were some problems with your Game</h1>
+        <p>Sorry, but we couldn't create your Game. Please fix the following problems and try again.</p>
+        <ul>
+          <% @game.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
   <fieldset>
     <legend>
       <%= tweaking ? 'Adjust kingdom cards' : 'New Game' %>
@@ -107,7 +117,7 @@
 						<div id='<%= "card_text_#{ix}"%>'>
 						</div>
 					</td>															 
-           <% javascript_tag do %>
+           <%= javascript_tag do %>
 					   Event.observe('<%= "game_pile_#{ix}" %>', 'change', function(){update_card_text(<%= ix %>)})
 						 Event.observe('<%= "game_pile_#{ix}" %>', 'keyup', function(){update_card_text(<%= ix %>)}); 
                 																	 

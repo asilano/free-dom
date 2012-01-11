@@ -2,14 +2,8 @@ class Settings < ActiveRecord::Base
   belongs_to :user
   belongs_to :player
   
-  validates_numericality_of :update_interval
-  validate :interval_long_enough
+  validates :update_interval, :numericality => {:greater_than_or_equal_to => 60}
   
   alias_attribute :autocrat, :autocrat_victory
-  
-protected
-  def interval_long_enough
-    errors.add(:update_interval, 'must be at least 60 seconds.') if update_interval < 60
-  end
   
 end

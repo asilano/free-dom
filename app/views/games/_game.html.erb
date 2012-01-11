@@ -84,7 +84,7 @@
       :locals => {:controls => controls} %>
       <!--     <%= button_to "Leave Game", :action => 'clear_player', :id => game %> -->
     </div><hr/><% end %>
-    <%= game_facts(game) %>
+    <%= raw game_facts(game) %>
     <div id="player_public">
       <table class="other_players" cellspacing="5">
         <% other_players = game.players.reject {|p| p == player} -%>
@@ -130,7 +130,7 @@
           <% if control[:nil_action] -%>
             <% case control[:type]
                when :button -%>        
-	            <% form_remote_tag :url => {:action => control[:action]},
+	            <%= form_remote_tag :url => {:action => control[:action]},
 							 								            :before => "$('spinner').show()",
 															            :complete => "$('spinner').hide()",
 															            :loading => "disable_named('#{control[:name]}')" do -%>
@@ -158,15 +158,15 @@
     if (game.players.length >= 2 and
     player and
     player == game.players[0] and
-    game.state == 'waiting')
-    form_remote_tag(:url => { :action => :start_game },
-    :before => "$('gameStartSpinner').show()",
-    :after => "$('start_game_btn').disabled = true",
-    :complete => "$('gameStartSpinner').hide()",
-    :failure => "alert('Sorry, something went wrong. Please refresh and try again');") do %>
-    <%= submit_tag "Start Game", :onclick => "this.value = 'Please Wait...';", :id => "start_game_btn" %>
-    <% end
-    end %>
+    game.state == 'waiting') %>
+      <%= form_remote_tag(:url => { :action => :start_game },
+                                    :before => "$('gameStartSpinner').show()",
+                                    :after => "$('start_game_btn').disabled = true",
+                                    :complete => "$('gameStartSpinner').hide()",
+                                    :failure => "alert('Sorry, something went wrong. Please refresh and try again');") do %>
+        <%= submit_tag "Start Game", :onclick => "this.value = 'Please Wait...';", :id => "start_game_btn" %>
+      <% end %>
+    <% end %>
   </div>
 	<div id="join_button">
 		<% if !player && @user &&
@@ -184,7 +184,7 @@
 		  <%= render :partial => 'chat_line', :object => chat_line %>
 		<% end %>
   </div>
-	<% form_remote_tag :url => speak_game_url, 
+	<%= form_remote_tag :url => speak_game_url, 
                      :update => {:success => 'chatbox', :failure => 'flash'}, 
                      :position => 'bottom',
                      :after => 'this.reset()',
@@ -236,7 +236,7 @@
 	      "$(this).hide(); $('show_deck_0').show();" + visual_effect(:blind_up, 'deck_list_0', :duration => 0.5),
 	      {:class => "showHideDeck", :id => "hide_deck_0", :style => "display: none"}) -%>
 	      <p class="deckList" style="display: none;" id="deck_list_0">
-					<%= ply_ordered[0].cards_for_decklist %>
+					<%= raw ply_ordered[0].cards_for_decklist %>
 	      </p>
 	    </li>
 	    <% ply_ordered.each_with_index do |ply, ix| %>
@@ -250,7 +250,7 @@
 	      "$(this).hide(); $('show_deck_#{ix}').show();" + visual_effect(:blind_up, "deck_list_#{ix}", :duration => 0.5),
 	      {:class => "showHideDeck", :id => "hide_deck_#{ix}", :style => "display: none"}) -%>
 	      <p class="deckList" style="display: none;" id=<%= "deck_list_#{ix}" -%>>
-	        <%= ply.cards_for_decklist -%>
+	        <%= raw ply.cards_for_decklist -%>
 	      </p>
 	    </li>
 	    <% end %>

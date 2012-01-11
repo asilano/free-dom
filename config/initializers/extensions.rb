@@ -38,7 +38,7 @@ class Module
   # Return a list of card classes within this module - that is, module constants
   # which are classes, and whose superclass is Card
   def card_classes
-    model_files = Dir.glob("#{RAILS_ROOT}/app/models/#{name.underscore}/*.rb")    
+    model_files = Dir.glob("#{Rails.root}/app/models/#{name.underscore}/*.rb")    
     model_names = model_files.map {|fn| File.basename(fn,'.rb').classify}    
     model_names.map {|mn| "#{name}::#{mn}".constantize}.sort_by {|c| [c.cost, c.readable_name]}
   end
@@ -70,6 +70,12 @@ module ActionView
     class FormBuilder
       def email_field(method, options = {})
         @template.email_field(@object_name, method, objectify_options(options))
+      end
+    end
+    
+    module PrototypeHelper
+      def method_option_to_s(method)
+        (method.is_a?(String) and !method.index("'").nil?) ? method : "'#{method}'"
       end
     end
   end  

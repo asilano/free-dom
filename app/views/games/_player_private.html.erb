@@ -17,7 +17,7 @@
 		<th>Hand:</th>
 		<% if (!player_private.cards.hand.empty?) or (not controls[:hand].empty?) -%>
 			<td>
-			  <% form_tag('/null') do -%>
+			  <%= form_tag('/null') do -%>
 				<table class="hand">
 					<tr> 
 						<%= render :partial => 'card', :collection => player_private.cards.hand -%>
@@ -33,7 +33,7 @@
 	<% if !player_private.cards.in_play.empty? -%><tr>
 		<th>In Play:</th>
     <td>
-      <% form_tag('/null') do -%>
+      <%= form_tag('/null') do -%>
       <table class="hand">
         <tr> 
           <%= render :partial => 'card', :collection => player_private.cards.in_play -%>
@@ -55,7 +55,7 @@
     <tr>
     	<th>Durations:</th>
       <td>
-        <% form_tag('/null') do -%>
+        <%= form_tag('/null') do -%>
         <table class="hand">
           <tr> 
             <%= render :partial => 'card', :collection => player_private.cards.enduring -%>
@@ -70,7 +70,7 @@
 			  (!controls[:revealed].select {|c| c[:player_id] == player_private.id}.empty?) -%>
 		  <tr>
 			<th>Revealed:</th><td>
-				<% form_tag('javascript:void(0)') do -%>
+				<%= form_tag('javascript:void(0)') do -%>
 					<table class="revealed">
 	   				<tr> 					
 						  <%= render :partial => 'card', :collection => player_private.cards.revealed -%>						
@@ -86,7 +86,7 @@
         (!controls[:peeked].empty?) -%>
       <tr>
       <th>Looked at:</th><td>
-        <% form_tag('javascript:void(0)') do -%>
+        <%= form_tag('javascript:void(0)') do -%>
           <table class="hand peeked">
             <tr>          
               <%= render :partial => 'card', :collection => player_private.cards.peeked -%>           
@@ -126,7 +126,7 @@
 					<td><%= control[:label] %></td>
 					<% control[:options].each do |opt| %>
 						<td> 			
-							<% form_remote_tag :url => {:action => control[:action]},                             
+							<%= form_remote_tag :url => {:action => control[:action]},                             
 														     :loading => "disable_named('#{control[:name]}'); $('locked').innerHTML = 'true';",
 		                             :before => "$('spinner').show()",
 		                             :complete => "$('spinner').hide(); $('locked').innerHTML = 'false';",
@@ -145,7 +145,7 @@
 						</td>
 					<% end %>
 				<% when :checkboxes -%>
-					<td><% form_tag('/null') do -%>
+					<td><%= form_tag('/null') do -%>
             <% if control[:params] -%>
               <% control[:params].each do |key, value| -%>
                 <%= hidden_field_tag key, value, :id => "#{key}_#{control[:name]}_#{control.object_id}" -%>
@@ -174,7 +174,7 @@
 					<% end %>
 				</td>
         <% when :dropdown -%>
-					<td><% form_tag('/null') do -%>
+					<td><%= form_tag('/null') do -%>
             <% if control[:params] -%>
               <% control[:params].each do |key, value| -%>
                 <%= hidden_field_tag key, value, :id => "#{key}_#{control[:name]}_#{control.object_id}" -%>
@@ -199,5 +199,5 @@
 </div>
 <% set_aside = set_aside_area(player_private, false) %>
     <% if set_aside != "" %>
-      <div class="setAside"><table class="player"><%= set_aside %></table></div>
+      <div class="setAside"><table class="player"><%= raw set_aside %></table></div>
     <% end %>	

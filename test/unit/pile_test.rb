@@ -14,6 +14,6 @@ class PileTest < ActiveSupport::TestCase
       assert_equal Intrigue::GreatHall, @pile.card_class
     end
 	
-    should validate_uniqueness_of(:card_type).scoped_to(:game_id).with_message(/Kingdom cards must be different/)
+    should validate_uniqueness_of(:card_type).scoped_to(:game_id).with_message(/Kingdom cards must be different/).allow_nil
   end
 end

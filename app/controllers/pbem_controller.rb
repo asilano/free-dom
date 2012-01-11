@@ -21,18 +21,16 @@ class PbemController < ApplicationController
     @user = User.find_by_name(username)
     
     if @user
-      logger.info "Found user"
       # Try to validate the disposable part of the email.
       expect_disp = "#{@user.id}_#{@user.hashed_email(6,8)}"
       if params[:disposable] != expect_disp
-        logger.info "Disposable mismatch"
         @user = nil
       end
     end  
     
     if @user.nil?
-      # Bad user.
-      PbemMailer.deliver_bad_user_error(@message.reply_to || @message.from, @message) 
+      # Bad user. No cookie for you
+      PbemMailer.bad_user_error(@message.reply_to || @message.from, @message).deliver
       return
     end
     
@@ -62,12 +60,12 @@ class PbemController < ApplicationController
                        "free-dom: Chatted into Game '#{@game.name}'",
                        "Your chat was accepted."
       else        
-        PbemMailer.deliver_game_error(@user, @game, @player, @controls, "Unable to chat without both game and user", @message)        
+        PbemMailer.game_error(@user, @game, @player, @controls, "Unable to chat without both game and user", @message).deliver        
       end      
     else
       find_game_and_player(body)
       @controls = @player.determine_controls if @player
-      PbemMailer.deliver_game_error(@user, @game, @player, @controls, "Couldn't work out what to do with your request", @message)
+      PbemMailer.game_error(@user, @game, @player, @controls, "Couldn't work out what to do with your request", @message).deliver
     end
   end
 
@@ -129,15 +127,14 @@ private
     
     /Platinum.*Colony:[ \t]*(yes|no|rules)/i =~ body
     game_params[:plat_colony] = $1
-    
-    logger.info("Creating game: params #{game_params.inspect}")
+        
     res = ag_create(game_params)
     
     case res
     when :invalid
-      PbemMailer.deliver_game_create_error(@user, @game, @message)
+      PbemMailer.game_create_error(@user, @game, @message).deliver
     when :tweak
-      PbemMailer.deliver_game_params(@user, @game)
+      PbemMailer.game_params(@user, @game).deliver
     when :created
       process_result "OK", 
                      "free-dom: Game '#{@game.name}' Created", 
@@ -278,6 +275,7 @@ private
   end
   
   def process_result(rc, subject, text)
+    
     @game.process_actions if @game
     @controls = @player.determine_controls if @player
     if rc =~ /^OK ?(.*)?/
@@ -301,8 +299,9 @@ private
     
     begin
       @game = Game.find(game_id)
+      Game.current = @game
     rescue ActiveRecord::RecordNotFound
-      PbemMailer.deliver_game_not_found(@user, game_id, @message)
+      PbemMailer.game_not_found(@user, game_id, @message).deliver
     end
     
     @player = @user.players.find_by_game_id(@game.id) if (@game and @user)

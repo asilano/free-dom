@@ -61,7 +61,6 @@ class UsersController < ApplicationController
     respond_to do |format|
       if @user.save        
         session[:user_id] = @user.reload.id
-        logger.info(session.inspect)
         cookie_login if params[:remember_me]
         @user.create_ranking
         format.html { redirect_to(:controller => :users, :action => "edit", :method => :get) }
@@ -143,8 +142,7 @@ class UsersController < ApplicationController
       @user = User.find_by_name(params[:name])
       if @user
         new_pass = @user.reset_password
-        email = UserMailer.create_password_reset(@user, new_pass)
-        UserMailer.deliver(email)
+        UserMailer.password_reset(@user, new_pass).deliver
         flash[:notice] = "A new password has been sent to the email address on record for #{@user.name}"
         flash[:name] = params[:name] 
         redirect_to login_path        

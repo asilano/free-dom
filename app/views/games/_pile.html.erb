@@ -12,10 +12,10 @@
 				<p class="right light">
 				  <% start_size = pile.card_class.starting_size(num_players) %>
 					<% start_size = '&infin;' if start_size == :unlimited %>
-				  (of <%= start_size -%>)</p>
+				  (of <%= raw start_size -%>)</p>
 		</td>
 		<td>
-      <%= pile_state(pile) %>
+      <%= raw pile_state(pile) %>
 		</td>
 	<% if controls.include?(:piles) -%>
 		<% controls[:piles].each do |control| -%>						
@@ -23,7 +23,7 @@
 			<% if control[:piles][pile.position] -%>
 					<% case control[:type] 
 			   		   when :button -%>
-						<% form_remote_tag :url => {:action => control[:action]},
+						<%= form_remote_tag :url => {:action => control[:action]},
                                :before => "$('spinner').show()",
                                :complete => "$('spinner').hide()",
 										           :loading => "disable_named('#{control[:name]}')" do -%>

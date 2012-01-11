@@ -2,7 +2,7 @@ class Intrigue::Swindler < Card
   costs 3
   # Order becomes important if any pile has fewer cards than attacked players
   action :attack => true, 
-         :order_relevant => lambda{game.piles.any?{|p| p.cards.size < game.players.size - 1}}
+         :order_relevant => lambda{|params| game.piles.any?{|p| p.cards.size < game.players.size - 1}}
   card_text "Action (Attack; cost: 3) - +2 Cash. Each other player trashes the top " +
                                "card of his or her deck, and gains a card " +
                                "with the same cost of your choice."

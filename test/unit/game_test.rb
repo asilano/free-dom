@@ -183,7 +183,7 @@ class GameTest < ActiveSupport::TestCase
               total_cards += 20  # ... a Curse pile of 20...
               total_cards += 102 # ... 10 Kingdom piles of 10 each, except Nobles which is 12...
               total_cards += 30  # ... and three players' decks of 10 each.
-              assert_equal total_cards, @game.cards.length
+              assert_equal total_cards, @game.cards(true).length
             end
             
             should "give players starting decks" do

@@ -1,6 +1,16 @@
 <div class="form">
-  <% form_for(@user, :html => {:class => "userform"}) do |f| %>
-  <%= f.error_messages %>
+  <%= form_for(@user, :html => {:class => "userform"}) do |f| %>
+    <% if @user.errors.any? %>
+      <div id="errorExplanation">
+        <h1>There were some problems with your account settings</h1>
+        <p>Sorry, but we couldn't create your account. Please fix the following problems and try again.</p>
+        <ul>
+          <% @user.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
   <fieldset>
     <legend>
       New User
@@ -9,9 +19,6 @@
       <%= f.label :name, 'Name:' %>
       <%= f.text_field :name %>
     </p>
-		<p>
-			<%= f.label :email, "E-mail address:" %>
-			<%= f.email_field :email %>
     <p>
       <%= f.label :password, 'Password:' %>
       <%= f.password_field :password %>
@@ -20,6 +27,10 @@
       <%= f.label :password_confirmation, 'Retype password:' %>
       <%= f.password_field :password_confirmation %>
     </p>
+		<p>
+			<%= f.label :email, "E-mail address:" %>
+			<%= f.email_field :email %>
+    </p>    
 		<p>
       <%= check_box_tag :remember_me, true, :name => "remember_me" %>
       <%= label_tag :remember_me, "Remember my login on this computer (for #{User.cookie_timeout} days)", :class => "checkLabel"%>

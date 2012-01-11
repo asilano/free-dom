@@ -20,7 +20,7 @@ class Prosperity::Peddler < Card
     # First get the baseline cost
     actual = super
     
-    if game.current_turn_player.waiting_for?("buy")
+    if game.current_turn_player && game.current_turn_player.waiting_for?("buy")
       # Now adjust for Actions cards in play      
       in_play = game.current_turn_player.cards.in_location("play", "enduring")
       actual = [0, actual - 2*(in_play.select {|c| c.is_action? }.length)].max

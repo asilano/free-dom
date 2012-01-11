@@ -7,20 +7,18 @@ class Card < ActiveRecord::Base
   belongs_to :game
   belongs_to :pile
   
-  validate :revealed_is_boolean
-  validate :peeked_is_boolean
-  validate :type_valid
+  validates :revealed, :peeked, :inclusion => [true, false]
   
   %w<deck hand enduring pile>.each do |loc|
-    named_scope loc.to_sym, :conditions => {:location => loc}, :order => "position"
+    scope loc.to_sym, :conditions => {:location => loc}, :order => "position"
   end
   %w<play discard trash>.each do |loc|
-    named_scope "in_#{loc}".to_sym, :conditions => {:location => loc}, :order => "position"
+    scope "in_#{loc}".to_sym, :conditions => {:location => loc}, :order => "position"
   end
-  named_scope :revealed, :conditions => {:revealed => true}
-  named_scope :peeked, :conditions => {:peeked => true}
-  named_scope :of_type, lambda {|*types| {:conditions => {:type => types}}}
-  named_scope :in_location, lambda {|*locs| {:conditions => {:location => locs}, :order => "position"}}
+  scope :revealed, :conditions => {:revealed => true}
+  scope :peeked, :conditions => {:peeked => true}
+  scope :of_type, lambda {|*types| {:conditions => {:type => types}}}
+  scope :in_location, lambda {|*locs| {:conditions => {:location => locs}, :order => "position"}}
   
   before_save :clear_visibility, :check_end
   
@@ -82,6 +80,8 @@ class Card < ActiveRecord::Base
       self.seaside_card_types + self.prosperity_card_types +
       self.basic_victory_types + self.basic_treasure_types
   end  
+  
+  # validates :type, :inclusion => Card.all_card_types
   
   def self.all_kingdom_cards
     BaseGame.kingdom_cards + Intrigue.kingdom_cards + 
@@ -169,7 +169,7 @@ class Card < ActiveRecord::Base
     res = [0, res - bridges].max
     
     # Handle Quarries
-    if is_action?
+    if is_action? && game.current_turn_player
       quarries = game.current_turn_player.cards.in_play.of_type("Prosperity::Quarry").length
       res = [0, res - 2*quarries].max
     end
@@ -305,17 +305,6 @@ class Card < ActiveRecord::Base
   end
   
 private
-  
-  def revealed_is_boolean
-    revealed.in? [true, false]
-  end
-  def peeked_is_boolean
-    peeked.in? [true, false]
-  end
-  
-  def type_valid
-    type.in? Card.all_card_types 
-  end
 
   def clear_visibility
     if changed.include?('location') || changed.include?('player')       

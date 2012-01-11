@@ -2,7 +2,7 @@
 
 class Prosperity::Mountebank < Card
   action :attack => true, 
-         :order_relevant => lambda {
+         :order_relevant => lambda {|params|
            curses_pile = game.piles.find_by_card_type("BasicCards::Curse")
            curses_pile.cards.length < game.players.length - 1}
   costs 5

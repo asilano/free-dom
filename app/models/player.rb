@@ -12,19 +12,19 @@ class Player < ActiveRecord::Base
                         
   has_many :pending_actions        
   has_many :active_actions, :class_name => "PendingAction",
-                            :finder_sql => 'select p.* from pending_actions p where player_id = #{id} and (select count(*) from pending_actions where parent_id = p.id) = 0',
-                            :counter_sql => 'select count(*) from pending_actions p where player_id = #{id} and (select count(*) from pending_actions where parent_id = p.id) = 0'
+                            :finder_sql => proc {"select p.* from pending_actions p where player_id = #{id} and (select count(*) from pending_actions where parent_id = p.id) = 0"},
+                            :counter_sql => proc {"select count(*) from pending_actions p where player_id = #{id} and (select count(*) from pending_actions where parent_id = p.id) = 0"}
 
   has_one :state, :class_name => "PlayerState", :dependent => :destroy  
   has_many :chats, :dependent => :delete_all, :order => "created_at"
   has_one :settings, :dependent => :destroy
   accepts_nested_attributes_for :settings
 
-  validates_uniqueness_of :user_id, :scope => 'game_id'
-  validates_uniqueness_of :seat, :scope => 'game_id', :allow_nil => true
+  validates :user_id, :uniqueness => {:scope => 'game_id'}
+  validates :seat, :uniqueness => {:scope => 'game_id', :allow_nil => true}
   after_save :email_creator
   
-  def before_create
+  before_create do
     if user and user.settings.nil?
       user.create_settings
     end
@@ -69,7 +69,6 @@ class Player < ActiveRecord::Base
     self.reload
     controls = Hash.new([])
     active_actions(true).each do |action|
-      logger.info("for action: #{action.expected_action}")
       case action.expected_action
       when 'play_action'
         controls[:hand] += [{:type => :button, 
@@ -116,7 +115,8 @@ class Player < ActiveRecord::Base
                               :pa_id => action.id
                             }]
       when 'end_turn'
-        logger.info "Deprecated action"
+        # Maintaining as stub in case needed for undo processing
+        Rails.logger.info "Deprecated action"
         controls[:player] += [{:type => :buttons,
                                :action => :end_turn,
                                :name => "end_turn",
@@ -225,7 +225,6 @@ class Player < ActiveRecord::Base
     end
     split_string = self.buys <= 1 ? "" : ", split #{self.buys} ways"
     if cards_played.empty?
-      logger.info("Auto-playing without total when no treasures playable!") if !give_total
       game.histories.create!(:event => "#{name} played no Treasures. (#{self.cash} total#{split_string}).", 
                             :css_class => "player#{seat} play_treasure")
     else      
@@ -913,7 +912,7 @@ class Player < ActiveRecord::Base
     end
           
     if candidate_acts.length > 1
-      logger.warn("Ambiguous request")
+      Rails.logger.warn("Ambiguous request")
     end
     
     this_act = candidate_acts[0]

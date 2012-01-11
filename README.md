@@ -6,6 +6,19 @@ This is the codebase for my free, online Dominion server.
 Notes
 -----
 
-Currently, this is the codebase as it exists locally, for dev purposes. It's a different branch on my (again, local) Subversion repository from the one I push to heroku. This is deliberate; the heroku branch has a number of grungy artefacts which I just hacked into place to Make It Work. I intend to eventually have the heroku branch up here, once I've cleaned up the grunge and worked out the minimal changes from a locally-runnable version to a heroku-runnable version.
+Currently, this is the codebase as it exists locally, for dev purposes. It is now the same branch on my (again, local) Subversion repository as the one I push to heroku, but this codebase has not yet been pushed.
 
-This codebase currently runs Rails 2.3.11 and the Prototype javascript library. It's time to move on - I'll be migrating to Rails 3.1 and jQuery as the first stage in my next release (which will mainly be to implement Hinterlands). This is probably quite tricky, and so I'd advise against contributing until I've done that.
+This codebase now runs Rails 3.1, but is still using the Prototype javascript library. It's time to move on - I'll be migrating to jQuery in my next release (which will mainly be to implement Hinterlands). However, the trickiest work - migrating to Rails 3.1 - is done. I'll be pushing this to a staging app soon for verification, and then sending it live.
+
+Once this is live, I'll open it up for outside contributions. I'll be creating branches for:
+
+* Migration to jQuery
+* Implementation of Hinterlands
+* Per-card unit tests (likely using [Cucumber](http://cukes.info/), and general test improvements including integration tests
+
+Additional features possibly up for implementation include:
+
+* Structural "bug fixes" that aren't fatal, but are large. Such as occasional loss of transactional integrity
+* Richer set of random-game options, a la [this randomiser](http://www.hiwiller.com/dominion/)
+* Front-end restyling
+* Ratings history

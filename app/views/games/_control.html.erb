@@ -5,7 +5,7 @@
 	<% end %>
 <% end %>	
 <% if control[:on_update] %>
-  <% javascript_tag do %>
+  <%= javascript_tag do %>
     changed_<%= control.object_id -%> = function (){
       <%= send(control[:on_update], control) %>
     }
@@ -85,7 +85,7 @@
     
     <% if control[:on_update] %>
       <span id='<%= control.object_id.to_s + "_js" -%>'></span>
-      <% javascript_tag do %>
+      <%= javascript_tag do %>
         <%= "changed_#{control.object_id}()" %>
       <% end %>
     <% end %>

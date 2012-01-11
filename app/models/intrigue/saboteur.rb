@@ -1,10 +1,12 @@
 class Intrigue::Saboteur < Card
   costs 5
-  action :attack => true
+  # Order becomes important if any pile has fewer cards than attacked players
+  action :attack => true, 
+         :order_relevant => lambda{|params| game.piles.any?{|p| p.cards.size < game.players.size - 1}}
   card_text "Action (Attack; cost: 5) - Each other player reveals cards from the top " +
             "of his deck until he reveals one costing 3 or more. He trashes " +
             "that card and may gain a card costing at most 2 less than it. He " +
-            "discard the other revealed cards."
+            "discards the other revealed cards."
             
   def play(parent_act)
     super

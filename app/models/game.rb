@@ -1,4 +1,6 @@
 class Game < ActiveRecord::Base  
+  class_attribute :current
+  
   has_many :piles, :order => "position", :dependent => :destroy
   #accepts_nested_attributes_for :piles
   has_many :cards, :dependent => :delete_all                     
@@ -22,21 +24,20 @@ class Game < ActiveRecord::Base
                         :conditions => "parent_id is null"
   has_many :pending_actions, :dependent => :delete_all
   has_many :active_actions, :class_name => "PendingAction",
-                            :finder_sql => 'select p.* from pending_actions p where game_id = #{id} and player_id is null and (select count(*) from pending_actions where parent_id = p.id) = 0',
-                            :counter_sql => 'select count(*) from pending_actions p where game_id = #{id} and player_id is null and (select count(*) from pending_actions where parent_id = p.id) = 0'  
+                            :finder_sql => proc {"select p.* from pending_actions p where game_id = #{id} and player_id is null and (select count(*) from pending_actions where parent_id = p.id) = 0"},
+                            :counter_sql => proc {"select count(*) from pending_actions p where game_id = #{id} and player_id is null and (select count(*) from pending_actions where parent_id = p.id) = 0"}
   has_many :active_ply_actions, :class_name => "PendingAction",
-                            :finder_sql => 'select p.* from pending_actions p where game_id = #{id} and player_id is not null and (select count(*) from pending_actions where parent_id = p.id) = 0',
-                            :counter_sql => 'select count(*) from pending_actions p where game_id = #{id} and player_id is not null and (select count(*) from pending_actions where parent_id = p.id) = 0'  
+                            :finder_sql => proc {"select p.* from pending_actions p where game_id = #{id} and player_id is not null and (select count(*) from pending_actions where parent_id = p.id) = 0"}, 
+                            :counter_sql => proc {"select count(*) from pending_actions p where game_id = #{id} and player_id is not null and (select count(*) from pending_actions where parent_id = p.id) = 0"}
 
-  validates_presence_of :name, :max_players
-  #1.upto(10) {|n| validates_presence_of "pile_#{n}".to_sym}
-  validates_numericality_of :max_players
-  validate :max_players_2_to_6   
-  validate_on_create :unique_valid_piles
-  validate_on_create :total_cards_10
-  validate_on_create :some_sets_present
+  validates :name, :presence => true
+  validates :max_players, :presence => true, :numericality => true, :inclusion => { :in => 2..6, :message => 'must be between 2 and 6 inclusive' }
   
-  before_validation_on_create :normalise_inputs  
+  validate :unique_valid_piles, :on => :create
+  validate :total_cards_10, :on => :create
+  validate :some_sets_present, :on => :create
+  
+  before_validation :normalise_inputs, :on => :create
   before_create :init_facts   
   after_create :expand_random_choices, :make_piles, :log_creation, :age_oldest   
   
@@ -67,15 +68,12 @@ class Game < ActiveRecord::Base
     if state == "running"
       # Game is already running. Odd, but maybe we got a double submission
       # somehow. Log and exit.
-      logger.info("Received request to start a running game. Taking no action.")
       return "OK"
     elsif players.length < 2 or players.length > max_players
-      logger.info("Received request to start game with invalid player base: #{players.length}")
       return "Invalid number of players (#{players.length})"
     else
       # To prevent anyone starting the game while we're working, update
       # the state and save now.
-      logger.info("Starting game #{name}")
       reset_facts
       histories.create!(:event => "Game started.", 
                        :css_class => "meta game_start")
@@ -89,19 +87,14 @@ class Game < ActiveRecord::Base
     
     # Initialise tokens for Trade Route mat
     if !cards(true).of_type("Prosperity::TradeRoute").empty?
-      logger.info("Initing trade route")
       self.facts_will_change!
       self.facts[:trade_route_value] = 0
       
       piles.each do |pile|
-        logger.info("Examining pile of type #{pile.card_type}")
         if pile.card_class.is_victory?        
-          logger.info("Pile is victory - updating token")
-          logger.info("Pile state currently: #{pile.state.inspect}")
           pile.state_will_change!
           pile.state = {} if pile.state.blank?
           pile.state[:trade_route_token] = true
-          logger.info("Pile state now: #{pile.state.inspect}")
           pile.save!
         end
       end        
@@ -319,11 +312,7 @@ class Game < ActiveRecord::Base
     end
   end
   
-protected
-  def max_players_2_to_6
-    errors.add(:max_players, 'must be between 2 and 6 inclusive') unless (2..6).include?(max_players)
-  end
-  
+protected  
   def unique_valid_piles    
     if not random_select.to_i == 1
       piles_array = (1..10).map {|ix| self.send("pile_#{ix}")}
@@ -342,7 +331,7 @@ protected
     if random_select.to_i == 1 && specify_distr.to_i == 1
       sum = [BaseGame, Intrigue, Seaside, Prosperity].inject(0) {|total, exp| total + self.send("num_#{exp.name.underscore}_cards").to_i}
       if sum != 10
-        errors.add_to_base("Number of cards from each set must sum to 10.")
+        errors[:base] << "Number of cards from each set must sum to 10."
       end
     end
   end
@@ -350,7 +339,7 @@ protected
   def some_sets_present
     if random_select.to_i == 1 && specify_distr.to_i == 0
       if [BaseGame, Intrigue, Seaside, Prosperity].all? {|set| self.send("#{set.name.underscore}_present") == 0}
-        errors.add_to_base("Must select at least one set.")
+        errors[:base] << "Must select at least one set."
       end
     end
   end

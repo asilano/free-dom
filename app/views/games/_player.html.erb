@@ -37,7 +37,7 @@
                   (!controls[:revealed].select {|c| c[:player_id] == player.id}.empty?) -%>
 		  <tr>
 			<th>Revealed:</th><td>
-				<% form_tag('javascript:void(0)') do -%>
+				<%= form_tag('javascript:void(0)') do -%>
 					<table class="revealed">
 	   				<tr> 
 					
@@ -53,7 +53,7 @@
 		<% if !player.cards.of_type("Seaside::PirateShip").empty?%>
       <tr><th>Pirate Coins:</th><td><%= player.state.pirate_coins %></td></tr>
     <% end %>		
-		<%= set_aside_area(player) %>
+		<%= raw set_aside_area(player) %>
     <% if player.score && player.score != 0%>
       <tr class="scoreRow"><th>Score:</th><td><%= player.score %></td></tr>
     <% end %>

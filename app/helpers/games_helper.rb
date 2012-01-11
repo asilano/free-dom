@@ -77,25 +77,6 @@ module GamesHelper
     facts
   end
   
-  def set_aside_area_private(player)
-    card_types = [Seaside::Haven, Seaside::Island]
-    
-    if player.cards.of_type(card_types.map{|t| t.to_s}).empty?
-      return ""
-    end
-    
-    html_string = "<div class='setAside'><table class='hand'>"
-    card_types.each do |type|
-      if !player.cards.of_type(type.to_s).empty?
-        html_string += "<tr><th>#{type.readable_name}:</th>"
-        html_string += (render(:partial => 'card', :collection => player.cards.in_location(type.readable_name.underscore)) || "<td>None</td>") 
-        html_string += "</tr>"
-      end
-    end
-    html_string += "</table></div>"
-    return html_string
-  end
-  
   def set_aside_area(player, public = true)
     public_card_types = [Seaside::Island]
     private_card_types = [Seaside::Haven, Seaside::NativeVillage]
