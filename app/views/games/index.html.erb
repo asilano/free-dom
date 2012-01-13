@@ -33,7 +33,7 @@
 						 str += "</span>" unless p.active_actions.empty? 
 						 str 
 					 end.join(', ') %>
-					<%= ply_list %>
+					<%= raw ply_list %>
 				<% elsif game.state == 'ended' %>
 				  <% ply_ordered = game.players.sort_by {|p| p.score}.reverse %>
 				  <span class="bold"><%= h ply_ordered[0].name %> (1st)</span><% ply_ordered[1..-1].each_with_index do |p, ix| -%>
