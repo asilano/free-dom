@@ -6,15 +6,15 @@ This is the codebase for my free, online Dominion server.
 Notes
 -----
 
-Currently, this is the codebase as it exists locally, for dev purposes. It is now the same branch on my (again, local) Subversion repository as the one I push to heroku, but this codebase has not yet been pushed.
+Currently, "master" is the codebase as it exists on heroku.
 
-This codebase now runs Rails 3.1, but is still using the Prototype javascript library. It's time to move on - I'll be migrating to jQuery in my next release (which will mainly be to implement Hinterlands). However, the trickiest work - migrating to Rails 3.1 - is done. I'll be pushing this to a staging app soon for verification, and then sending it live.
+This codebase now runs Rails 3.1, but is still using the Prototype javascript library. It's time to move on - I'll be migrating to jQuery in my next release (which will mainly be to implement Hinterlands). However, the trickiest work - migrating to Rails 3.1 - is done.
 
-Once this is live, I'll open it up for outside contributions. I'll be creating branches for:
+This codebase is now open for outside contributions in certain areas. Branches exist or will be created for:
 
-* Migration to jQuery
-* Implementation of Hinterlands
-* Per-card unit tests (likely using [Cucumber](http://cukes.info/), and general test improvements including integration tests
+* [Migration to jQuery](https://github.com/asilano/free-dom/tree/prototype-to-jquery)
+* [General test improvements](https://github.com/asilano/free-dom/tree/improve-testing) including integration tests and per-card unit tests (likely using [Cucumber](http://cukes.info/))
+* Implementation of Hinterlands _(deferred until the Cucumber test framework is in place)_
 
 Additional features possibly up for implementation include:
 
@@ -22,3 +22,5 @@ Additional features possibly up for implementation include:
 * Richer set of random-game options, a la [this randomiser](http://www.hiwiller.com/dominion/)
 * Front-end restyling
 * Ratings history
+
+_**Please fork and contribute where possible!**_
