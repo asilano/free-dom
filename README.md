@@ -1,8 +1,15 @@
-FreeDom/prototype-to-jquery
+FreeDom/test-improvements
 =======
 
 This is a branch of the [main codebase](https://github.com/asilano/free-dom) for my free, online Dominion server.
 
-FreeDom is still using the Prototype javascript framework and script.aculo.us effects library. It's time to move on - this branch is for migrating to jQuery, and converting the plethora of javascript buttons etc. to UJS (as far as possible)!
+FreeDom's tests aren't complete. The following are definitely needed:
 
-_**Please, feel free to fork and contribute to this branch!**_
+* **Integration tests**, to automatically test the web front-end
+* **Per-card unit tests**, to test that each card does what it should. Using [Cucumber](http://cukes.info)
+
+... and I may well be missing something else.
+
+Note
+----
+_**Please fork and contribute to this branch**_ - but not the per-card tests! I don't have Cucumber set up yet, and I want to be able to drive the inital step definitions.
