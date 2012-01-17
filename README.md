@@ -1,4 +1,4 @@
-FreeDom/test-improvements
+free-dom/improve-testing
 =======
 
 This is a branch of the [main codebase](https://github.com/asilano/free-dom) for my free, online Dominion server.
