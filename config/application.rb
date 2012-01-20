@@ -54,11 +54,11 @@ module Dominion
 end
 
 ActionMailer::Base.smtp_settings = {  
-  :address              => "smtp.gmail.com",  
-  :port                 => 587,  
-  :domain               => "gmail.com",  
-  :user_name            => "chowlett09",  
-  :password             => "d0rmouse",  
+  :address              => MAIL_SERV,  
+  :port                 => MAIL_PORT,  
+  :domain               => MAIL_DOM,  
+  :user_name            => MAIL_USER,  
+  :password             => MAIL_PASS,  
   :authentication       => "plain",  
   :enable_starttls_auto => true  
 } 
