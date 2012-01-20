@@ -7,7 +7,7 @@
 <% if control[:on_update] %>
   <%= javascript_tag do %>
     changed_<%= control.object_id -%> = function (){
-      <%= send(control[:on_update], control) %>
+      <%= raw send(control[:on_update], control) %>
     }
   <% end %>
 <% end %>

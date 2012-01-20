@@ -12,7 +12,7 @@ Planned for the next release:
 * Announcement script to web-page for ease of use
 * Allow settings to be altered in PBEM
 * Allow PBEMer to receive Game Created notifications
-
+* Make invoking of manual treasure playing smarter
 
 Just released:
  Support for the Prosperity expansion
