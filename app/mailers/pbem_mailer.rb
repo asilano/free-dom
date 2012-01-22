@@ -20,7 +20,7 @@ class PbemMailer < ActionMailer::Base
     
     mail :subject => 'free-dom: Couldn\'t find game',
          :to => user.email,
-         :reply_to  => rep_add    
+         :reply_to  => @rep_add    
   end
   
   def game_params(user, game)
