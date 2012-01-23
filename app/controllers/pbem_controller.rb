@@ -175,6 +175,7 @@ private
   def resolve_actions(body)
     # Resolve PA message. It's legal to try to resolve multiple Pending Actions at once
     find_game_and_player(body)
+    return unless @game && @player
     overall_ret = "OK "
     Game.transaction do
       body.scan(/^\s*Resolve PA (\d+): (.*)/i) do |pa_id, choice|
@@ -305,5 +306,9 @@ private
     end
     
     @player = @user.players.find_by_game_id(@game.id) if (@game and @user)
+    
+    if !@player
+      PbemMailer.game_error(@user, @game, nil, nil, "You are not a player in Game #{@game.id}", body)
+    end
   end  
 end
