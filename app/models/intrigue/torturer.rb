@@ -51,7 +51,7 @@ class Intrigue::Torturer < Card
     target = Player.find(params[:target])
     parent_act = params[:parent_act]
     
-    if target.settings.autotorture.curse
+    if target.settings.autotorture_curse
       # Target has chosen to always take a curse. How odd. Ah well, call resolve_choose directly
       return resolve_choose(target, {:choice => 'curse'}, parent_act)
     else
