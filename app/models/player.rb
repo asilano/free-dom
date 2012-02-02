@@ -735,7 +735,7 @@ class Player < ActiveRecord::Base
 
     if cards_drawn.length < num
       excess = num - cards_drawn.length
-			game.histories.create!(:event => "#{name} tried to draw #{excess} more cards#{reason}, but their deck was empty.",
+			game.histories.create!(:event => "#{name} tried to draw #{excess} more card#{'s' unless excess == 1}#{reason}, but their deck was empty.",
 														:css_class => "player#{seat} card_draw")
     end    
     save!

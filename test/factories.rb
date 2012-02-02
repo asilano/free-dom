@@ -1,6 +1,7 @@
 FactoryGirl.define do
   #Games
-  factory :incomplete_game, :class => Game do 
+  factory :game do end
+  factory :incomplete_game, :parent => :game do 
     name "Game 1"
     max_players 3     
   end
@@ -43,7 +44,10 @@ FactoryGirl.define do
   end
   
   # Players
-  factory :player do end
+  factory :player do
+    association :user
+    association :game
+  end
   
   # Pending Actions
   factory :pending_action do

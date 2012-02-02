@@ -110,10 +110,10 @@ class GameTest < ActiveSupport::TestCase
         @user_bob = Factory(:user, :name => "Bob", :password => "b")
         @user_chas = Factory(:user, :name => "Chas", :password => "c")
         @user_dave = Factory(:user, :name => "Dave", :password => "d")
-        @ply_alan = Factory(:player, :user => @user_alan)
-        @ply_bob = Factory(:player, :user => @user_bob)
-        @ply_chas = Factory(:player, :user => @user_chas)
-        @ply_dave = Factory(:player, :user => @user_dave)
+        @ply_alan = Factory(:player, :user => @user_alan, :game => nil)
+        @ply_bob = Factory(:player, :user => @user_bob, :game => nil)
+        @ply_chas = Factory(:player, :user => @user_chas, :game => nil)
+        @ply_dave = Factory(:player, :user => @user_dave, :game => nil)
       end
       
       should "be able to add a player to a Game" do
