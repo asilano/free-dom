@@ -1,3 +1,8 @@
+Given /my hand is empty/ do
+  @me.cards.hand.destroy_all
+  @hand_contents = {}
+end
+
 # Matches:
 #   my hand contains Smithy
 #   my hand contains Smithy, Witch
@@ -125,6 +130,28 @@ end
   
 Given /I have nothing in play/ do
   @me.cards.in_play.destroy_all
+end
+
+Given(/I have ((?:(?:#{CARD_NAMES.join('|')})(?:, )?)*)(?: and )?(?:(\d+) (?:other )?cards?(?: named "(.*)")?)? in play/) do |fixed_list, num_rand, rand_name|
+  @me.cards.in_play.destroy_all
+
+  @play_contents = {:fixed => (fixed_list.try(:split, /,\s*/) || [])}
+  @play_contents[:fixed].each do |card_name|
+    CARD_TYPES[card_name].create(:location => 'play', :player => @me, :game => @me.game)
+  end
+  
+  rand_name ||= "rest of play"
+  @play_contents[rand_name] = []
+  num_rand.to_i.times do |i|
+    type = CARD_TYPES.keys[rand(CARD_TYPES.length)]
+    @play_contents[rand_name] << type
+    CARD_TYPES[type].create(:location => 'play', :player => @me, :game => @me.game)
+  end
+  
+  @me.renum(:play)
+  
+  Rails.logger.info("Created play: #{@play_contents.inspect}")
+  Rails.logger.info("play is: #{@me.cards.in_play.join(', ')}")
 end
 
 Given /I have nothing in discard/ do
