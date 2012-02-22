@@ -6,6 +6,8 @@ class PbemController < ApplicationController
   skip_before_filter :verify_authenticity_token
   before_filter :verify_signature, :only => :handle
   
+  rescue_from Exception, :with => :error_reply
+  
   SECRET = ENV['CLOUDMAILIN_SECRET'] || '46075664a79b141cfbac'
 
   def handle
@@ -175,6 +177,7 @@ private
   def resolve_actions(body)
     # Resolve PA message. It's legal to try to resolve multiple Pending Actions at once
     find_game_and_player(body)
+    return unless @game && @player
     overall_ret = "OK "
     Game.transaction do
       body.scan(/^\s*Resolve PA (\d+): (.*)/i) do |pa_id, choice|
@@ -305,5 +308,23 @@ private
     end
     
     @player = @user.players.find_by_game_id(@game.id) if (@game and @user)
+    
+    if !@player
+      PbemMailer.game_error(@user, @game, nil, nil, "You are not a player in Game #{@game.id}", body).deliver
+    end
   end  
+  
+  def error_reply
+    if @user
+      if @game
+        PbemMailer.game_error(@user, @game, @player, nil, "Sorry, something went wrong", body).deliver
+      else
+        PbemMailer.game_not_found(@user, "unknown", @message).deliver
+      end
+    else
+      PbemMailer.bad_user_error(@message.reply_to || @message.from, @message).deliver
+    end
+    
+    return
+  end
 end

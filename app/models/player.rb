@@ -708,7 +708,7 @@ class Player < ActiveRecord::Base
       end
       cards.hand << card
       card.location = "hand"
-      cards_drawn << card.readable_name      
+      cards_drawn << card      
       card.save
     end
       
