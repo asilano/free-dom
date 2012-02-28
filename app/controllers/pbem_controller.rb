@@ -317,7 +317,7 @@ private
   def error_reply
     if @user
       if @game
-        PbemMailer.game_error(@user, @game, @player, nil, "Sorry, something went wrong", body).deliver
+        PbemMailer.game_error(@user, @game, @player, nil, "Sorry, something went wrong", @message.body.to_s).deliver
       else
         PbemMailer.game_not_found(@user, "unknown", @message).deliver
       end
