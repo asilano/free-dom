@@ -1,3 +1,21 @@
+AfterStep do |scenario|
+  # Verify that each player's cards match what we expect
+  @skip_card_checking ||= 0
+  
+  if @skip_card_checking == 0
+    @players.each do |name, player|      
+      assert_same_elements @hand_contents[name], player.cards.hand(true).map(&:readable_name)
+      assert_same_elements @discard_contents[name], player.cards.in_discard(true).map(&:readable_name)
+      assert_same_elements @play_contents[name], player.cards.in_play(true).map(&:readable_name)
+      assert_same_elements @enduring_contents[name], player.cards.enduring(true).map(&:readable_name)
+      
+      assert_equal @deck_contents[name], player.cards.deck(true).map(&:readable_name)
+    end
+  else
+    @skip_card_checking -= 1
+  end
+end
+
 # Asserts that the given collection contains item x.  If x is a regular expression, ensure that
 # at least one element from the collection matches x.  +extra_msg+ is appended to the error message if the assertion fails.
 #

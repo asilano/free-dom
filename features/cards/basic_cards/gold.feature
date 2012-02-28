@@ -15,7 +15,7 @@ Feature: Gold
       And I have nothing in play
       And it's my Play Treasure phase
     When the game checks actions
-    Then I should have only Gold in play
+    Then I should have played Gold
       And I should have 3 cash
       And it should be my Buy phase
     
@@ -23,12 +23,11 @@ Feature: Gold
     Given I have nothing in discard
     Then there should be 10 Gold cards in piles
     When I gain Gold
-    Then I should have only Gold in discard
+    Then I should have gained Gold
       And there should be 10 Gold cards in piles
       
   Scenario: Gold should be unlimited in quantity - return
     Given my hand contains Gold
     Then there should be 10 Gold cards in piles
     When I move Gold from hand to pile
-    Then I should not have Gold in hand
-      And there should be 10 Gold cards in piles
+    Then there should be 10 Gold cards in piles

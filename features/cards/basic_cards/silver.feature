@@ -15,7 +15,7 @@ Feature: Silver
       And I have nothing in play
       And it's my Play Treasure phase
     When the game checks actions
-    Then I should have only Silver in play
+    Then I should have played Silver
       And I should have 2 cash
       And it should be my Buy phase
     
@@ -23,12 +23,11 @@ Feature: Silver
     Given I have nothing in discard
     Then there should be 10 Silver cards in piles
     When I gain Silver
-    Then I should have only Silver in discard
+    Then I should have gained Silver
       And there should be 10 Silver cards in piles
       
   Scenario: Silver should be unlimited in quantity - return
     Given my hand contains Silver
     Then there should be 10 Silver cards in piles
     When I move Silver from hand to pile
-    Then I should not have Silver in hand
-      And there should be 10 Silver cards in piles
+    Then there should be 10 Silver cards in piles

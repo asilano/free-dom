@@ -1,182 +1,241 @@
-Given /my hand is empty/ do
-  @me.cards.hand.destroy_all
-  @hand_contents = {}
+# Matches:
+#   my hand is empty
+#   Bob's hand is empty
+Given(/^(\w*?)(?:'s)? hand is empty/) do |name|
+  name = 'Alan' if name == 'my'
+  @players[name].cards.hand.destroy_all
+  @hand_contents[name] = []
 end
 
 # Matches:
 #   my hand contains Smithy
 #   my hand contains Smithy, Witch
+#   Bob's hand contains Smithy, Witch and 4 other cards
 #   my hand contains Smithy and 4 other cards named "rest of hand"
-Given(/my hand contains ((?:(?:#{CARD_NAMES.join('|')})(?:, )?)*)(?: and )?(?:(\d+) (?:other )?cards?(?: named "(.*)")?)?/) do |fixed_list, num_rand, rand_name|
-  @me.cards.hand.destroy_all
+Given(/^(\w*?)(?:'s)? hand contains ((?:(?:#{CARD_NAMES.join('|')})(?:, )?)*)(?: and )?(?:(\d+) (?:other )?cards?(?: named "(.*)")?)?/) do |name, fixed_list, num_rand, rand_name|
+  name = 'Alan' if name == 'my'
+  player = @players[name]
+  player.cards.hand.destroy_all
 
-  @hand_contents = {:fixed => fixed_list.split(/,\s*/)}
-  @hand_contents[:fixed].each do |card_name|
-    CARD_TYPES[card_name].create(:location => 'hand', :player => @me, :game => @me.game)
+  fixed_list ||= ""
+  @hand_contents[name] = fixed_list.split(/,\s*/)
+  @hand_contents[name].each do |card_name|
+    CARD_TYPES[card_name].create(:location => 'hand', :player => player, :game => player.game)
   end
   
-  rand_name ||= "rest of hand"
-  @hand_contents[rand_name] = []
+  @named_cards[rand_name] = [] if rand_name
   num_rand.to_i.times do |i|
     type = CARD_TYPES.keys[rand(CARD_TYPES.length)]
-    @hand_contents[rand_name] << type
-    CARD_TYPES[type].create(:location => 'hand', :player => @me, :game => @me.game)
+    @hand_contents[name] << type
+    @named_cards[rand_name].andand << type
+    CARD_TYPES[type].create(:location => 'hand', :player => player, :game => player.game)
   end
   
-  @me.renum(:hand)
-  
-  Rails.logger.info("Created hand: #{@hand_contents.inspect}")
-  Rails.logger.info("Hand is: #{@me.cards.hand.join(', ')}")
+  player.renum(:hand)  
 end
 
-Given /my deck is empty/ do
-  @me.cards.deck.destroy_all
-  @deck_contents = {}
+# Matches:
+#   my deck is empty
+#   Bob's deck is empty
+Given(/^(\w*?)(?:'s)? deck is empty/) do |name|
+  name = 'Alan' if name == 'my'
+  @players[name].cards.deck.destroy_all
+  @deck_contents[name] = []
 end
 
 # Matches "my deck contains <top> then <middle> then <bottom>". Either of the middle and bottom sections may be missing
 # Each section may be like "Smithy, Witch" or like "4 other cards (named "rest of deck")"
-Given(/my deck contains (?:(\d+ cards?(?: named ".*")?|(?:(?:#{CARD_NAMES.join('|')})(?:, )?)*) then )?(?:(\d+ (?:other )?cards?(?: named ".*")?|(?:(?:#{CARD_NAMES.join('|')})(?:, )?)*) then )?(?:(\d+ (?:other )?cards?(?: named ".*")?|(?:(?:#{CARD_NAMES.join('|')})(?:, )?)*))?/) do |top, middle, bottom|
-  @me.cards.deck.destroy_all
+Given(/^(\w*?)(?:'s)?? deck contains (?:(\d+ cards?(?: named ".*")?|(?:(?:#{CARD_NAMES.join('|')})(?:, )?)*) then )?(?:(\d+ (?:other )?cards?(?: named ".*")?|(?:(?:#{CARD_NAMES.join('|')})(?:, )?)*) then )?(?:(\d+ (?:other )?cards?(?: named ".*")?|(?:(?:#{CARD_NAMES.join('|')})(?:, )?)*))?/) do |name, top, middle, bottom|
+  name = 'Alan' if name == 'my'
+  player = @players[name]
+  
+  player.cards.deck.destroy_all
+  @deck_contents[name] = []
   rand_top = rand_mid = fixed_bottom = false
   
   rand_top = (top =~ /(\d+) cards?(?: named "(.*)")?/)
   num_rand_top = $1
-  @name_rand_top = $2 || "top of deck"
+  name_rand_top = $2
   rand_mid = (middle =~ /(\d+) (?:other )?cards?(?: named "(.*)")?/)
   num_rand_mid = $1
-  @name_rand_mid = $2 || "mid of deck"
+  name_rand_mid = $2
   rand_bottom = (bottom =~ /(\d+) (?:other )?cards?(?: named "(.*)")?/)
   num_rand_bottom = $1
-  @name_rand_bottom = $2 || "bottom of deck"
+  name_rand_bottom = $2
   
   position = 0
-  @deck_contents = {}
-  
-  @deck_contents[:fixed_top] = []
-  if rand_top
-    @deck_contents[@name_rand_top] = []
+    
+  @named_cards[name_rand_top] = [] if name_rand_top
+  if rand_top    
     num_rand_top.to_i.times do |i|
       type = CARD_TYPES.keys[rand(CARD_TYPES.length)]
-      @deck_contents[@name_rand_top] << type
+      @deck_contents[name] << type
+      @named_cards[name_rand_top].andand << type
       CARD_TYPES[type].create(:location => 'deck', 
-                              :player => @me,
+                              :player => player,
                               :position => position, 
-                              :game => @me.game)
+                              :game => player.game)
       position += 1
     end
-  elsif top && !rand_top
-    @deck_contents[:fixed_top] = top.split(/,\s*/)
-    @deck_contents[:fixed_top].each do |card_name|
-      CARD_TYPES[card_name].create(:location => 'deck', 
-                                   :player => @me,
-                                   :position => position, 
-                                   :game => @me.game)
+  elsif top
+    top_types = top.split(/,\s*/)
+    top_types.each do |type|
+      @deck_contents[name] << type
+      CARD_TYPES[type].create(:location => 'deck', 
+                              :player => player,
+                              :position => position, 
+                              :game => player.game)
       position += 1                             
     end
   end
   
-  @deck_contents[:fixed_mid] = []
+  @named_cards[name_rand_mid] = [] if name_rand_mid
   if rand_mid
-    @deck_contents[@name_rand_mid] = []
     num_rand_mid.to_i.times do |i|
       type = CARD_TYPES.keys[rand(CARD_TYPES.length)]
-      @deck_contents[@name_rand_mid] << type
+      @deck_contents[name] << type
+      @named_cards[name_rand_mid].andand << type
       CARD_TYPES[type].create(:location => 'deck', 
-                              :player => @me,
+                              :player => player,
                               :position => position, 
-                              :game => @me.game)
+                              :game => player.game)
       position += 1
     end
-  elsif middle && !rand_mid
-    @deck_contents[:fixed_mid] = middle.split(/,\s*/)
-    @deck_contents[:fixed_mid].each do |card_name|
-      CARD_TYPES[card_name].create(:location => 'deck', 
-                                   :player => @me,
-                                   :position => position, 
-                                   :game => @me.game)
+  elsif middle
+    mid_types = middle.split(/,\s*/)
+    mid_types.each do |type|
+      @deck_contents[name] << type
+      CARD_TYPES[type].create(:location => 'deck', 
+                              :player => player,
+                              :position => position, 
+                              :game => player.game)
       position += 1                             
     end
   end
   
-  @deck_contents[:fixed_bottom] = []
+  @named_cards[name_rand_bottom] = [] if name_rand_bottom
   if rand_bottom
-    @deck_contents[@name_rand_bottom] = []
     num_rand_bottom.to_i.times do |i|
       type = CARD_TYPES.keys[rand(CARD_TYPES.length)]
-      @deck_contents[@name_rand_bottom] << type
+      @deck_contents[name] << type
+      @named_cards[name_rand_bottom].andand << type
       CARD_TYPES[type].create(:location => 'deck', 
-                              :player => @me,
+                              :player => player,
                               :position => position, 
-                              :game => @me.game)
+                              :game => player.game)
       position += 1
     end
-  elsif bottom && !rand_bottom
-    @deck_contents[:fixed_bottom] = bottom.split(/,\s*/)
-    @deck_contents[:fixed_bottom].each do |card_name|
-      CARD_TYPES[card_name].create(:location => 'deck', 
-                                   :player => @me,
-                                   :position => position, 
-                                   :game => @me.game)
+  elsif bottom
+    bottom_types = bottom.split(/,\s*/)
+    bottom_types.each do |type|
+      @deck_contents[name] << type
+      CARD_TYPES[type].create(:location => 'deck', 
+                              :player => player,
+                              :position => position, 
+                              :game => player.game)
       position += 1                             
     end
   end
   
-  @me.renum(:deck)
-  
-  Rails.logger.info("Created deck: #{@deck_contents.inspect}")
-  Rails.logger.info("Deck is: #{@me.cards.deck.join(', ')}")
+  player.renum(:deck)
 end
   
-Given /I have nothing in play/ do
-  @me.cards.in_play.destroy_all
+# Matches:
+#   I have nothing in play
+#   Bob has nothing in play
+Given /^(\w*) ha(?:ve|s) nothing in play/ do |name|
+  name = 'Alan' if name == 'I'
+  @players[name].cards.in_play.destroy_all
+  @play_contents[name] = []
 end
 
-Given(/I have ((?:(?:#{CARD_NAMES.join('|')})(?:, )?)*)(?: and )?(?:(\d+) (?:other )?cards?(?: named "(.*)")?)? in play/) do |fixed_list, num_rand, rand_name|
-  @me.cards.in_play.destroy_all
+# Matches:
+#   I have Smithy in play
+#   I have Smithy, Witch in play
+#   Bob has Smithy, Witch and 4 other cards in play
+#   I have Smithy and 4 other cards named "rest of play" in play
+Given(/^(\w*) ha(?:ve|s) ((?:(?:#{CARD_NAMES.join('|')})(?:, )?)*)(?: and )?(?:(\d+) (?:other )?cards?(?: named "(.*)")?)? in play/) do |name, fixed_list, num_rand, rand_name|
+  name = 'Alan' if name == 'I'
+  player = @players[name]
+  player.cards.in_play.destroy_all
 
-  @play_contents = {:fixed => (fixed_list.try(:split, /,\s*/) || [])}
-  @play_contents[:fixed].each do |card_name|
-    CARD_TYPES[card_name].create(:location => 'play', :player => @me, :game => @me.game)
+  fixed_list ||= ""
+  @play_contents[name] = fixed_list.split(/,\s*/)
+  @play_contents[name].each do |card_name|
+    CARD_TYPES[card_name].create(:location => 'play', :player => player, :game => player.game)
   end
   
-  rand_name ||= "rest of play"
-  @play_contents[rand_name] = []
+  @named_cards[rand_name] = [] if rand_name
   num_rand.to_i.times do |i|
     type = CARD_TYPES.keys[rand(CARD_TYPES.length)]
-    @play_contents[rand_name] << type
-    CARD_TYPES[type].create(:location => 'play', :player => @me, :game => @me.game)
+    @play_contents[name] << type
+    @named_cards[rand_name].andand << type
+    CARD_TYPES[type].create(:location => 'play', :player => player, :game => player.game)
   end
   
-  @me.renum(:play)
-  
-  Rails.logger.info("Created play: #{@play_contents.inspect}")
-  Rails.logger.info("play is: #{@me.cards.in_play.join(', ')}")
+  player.renum(:play)
 end
 
-Given /I have nothing in discard/ do
-  Rails.logger.info("Clearing discard")
-  @me.cards.in_discard.destroy_all
+# Matches:
+#   I have nothing in discard
+#   Bob has nothing in discard
+Given /^(\w*) ha(?:ve|s) nothing in discard/ do |name|
+  name = "Alan" if name == "I"
+  @players[name].cards.in_discard.destroy_all
+  @discard_contents[name] = []
 end
 
-Given(/I have ((?:(?:#{CARD_NAMES.join('|')})(?:, )?)*)(?: and )?(?:(\d+) (?:other )?cards?(?: named "(.*)")?)? in discard/) do |fixed_list, num_rand, rand_name|
-  @me.cards.in_discard.destroy_all
+# Matches:
+#   I have Smithy in discard
+#   I have Smithy, Witch in discard
+#   Bob has Smithy, Witch and 4 other cards in discard
+#   I have Smithy and 4 other cards named "rest of discard" in discard
+Given(/^(\w*) ha(?:ve|s) ((?:(?:#{CARD_NAMES.join('|')})(?:, )?)*)(?: and )?(?:(\d+) (?:other )?cards?(?: named "(.*)")?)? in discard/) do |name, fixed_list, num_rand, rand_name|
+  name = 'Alan' if name == 'I'
+  player = @players[name]
+  player.cards.in_discard.destroy_all
 
-  @discard_contents = {:fixed => (fixed_list.try(:split, /,\s*/) || [])}
-  @discard_contents[:fixed].each do |card_name|
-    CARD_TYPES[card_name].create(:location => 'discard', :player => @me, :game => @me.game)
+  fixed_list ||= ""
+  @discard_contents[name] = fixed_list.split(/,\s*/)
+  @discard_contents[name].each do |card_name|
+    CARD_TYPES[card_name].create(:location => 'discard', :player => player, :game => player.game)
   end
   
-  rand_name ||= "rest of discard"
-  @discard_contents[rand_name] = []
+  @named_cards[rand_name] = [] if rand_name
   num_rand.to_i.times do |i|
     type = CARD_TYPES.keys[rand(CARD_TYPES.length)]
-    @discard_contents[rand_name] << type
-    CARD_TYPES[type].create(:location => 'discard', :player => @me, :game => @me.game)
+    @discard_contents[name] << type
+    @named_cards[rand_name].andand << type
+    CARD_TYPES[type].create(:location => 'discard', :player => player, :game => player.game)
   end
   
-  @me.renum(:discard)
+  player.renum(:discard)
+end
+
+# Matches:
+#   I have Lighthouse as a duration
+#   I have Lighthouse, Wharf as durations
+#   Bob has Lighthouse, Wharf and 4 other cards as durations
+#   I have Lighthouse and 4 other cards named "rest of durations" as durations
+Given(/^(\w*) ha(?:ve|s) ((?:(?:#{CARD_NAMES.join('|')})(?:, )?)*)(?: and )?(?:(\d+) (?:other )?cards?(?: named "(.*)")?)? as (?:a )?durations?/) do |name, fixed_list, num_rand, rand_name|
+  name = 'Alan' if name == 'I'
+  player = @players[name]
+  player.cards.enduring.destroy_all
+
+  fixed_list ||= ""
+  @enduring_contents[name] = fixed_list.split(/,\s*/)
+  @enduring_contents[name].each do |card_name|
+    CARD_TYPES[card_name].create(:location => 'enduring', :player => player, :game => player.game)
+  end
   
-  Rails.logger.info("Created discard: #{@discard_contents.inspect}")
-  Rails.logger.info("Discard is: #{@me.cards.in_discard.join(', ')}")
+  @named_cards[rand_name] = [] if rand_name
+  num_rand.to_i.times do |i|
+    type = CARD_TYPES.keys[rand(CARD_TYPES.length)]
+    redo unless CARD_TYPES[type].is_duration?
+    @enduring_contents[name] << type
+    @named_cards[rand_name].andand << type
+    CARD_TYPES[type].create(:location => 'enduring', :player => player, :game => player.game)
+  end
+  
+  player.renum(:enduring)
 end

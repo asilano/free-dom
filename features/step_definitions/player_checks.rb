@@ -1,9 +1,16 @@
-Then /I should have (\d+) cash/ do |cash|
-  assert_equal cash.to_i, @me.reload.cash
+Then /(.*) should have (\d+) actions? available/ do |name, actions|
+  name = "Alan" if name == "I"
+  assert_equal actions.to_i, @players[name].reload.actions
 end
 
-Then /my score should be (-)?(\d+)/ do |neg, score|
+Then /(.*) should have (\d+) cash/ do |name, cash|
+  name = "Alan" if name == "I"
+  assert_equal cash.to_i, @players[name].reload.cash
+end
+
+Then(/(.*?)(?:'s)? score should be (-)?(\d+)/) do |name, neg, score|
+  name = "Alan" if name == "my"
   exp = score.to_i
   exp = -exp if neg
-  assert_equal exp, @me.reload.score
+  assert_equal exp, @players[name].reload.score
 end

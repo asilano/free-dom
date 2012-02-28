@@ -81,7 +81,7 @@ class Prosperity::Bishop < Card
     # when they played Bishop. We round down - taking advantage of the quirks of integer arithmetic
     player.score += card.cost / 2
     player.save!
-    game.histories.create!(:event => "#{ply.name} trashed a #{card.class.readable_name} from hand, gaining #{card.cost / 2} point #{card.cost / 2 == 1 ? '' : 's'}.",
+    game.histories.create!(:event => "#{ply.name} trashed a #{card.class.readable_name} from hand, gaining #{card.cost / 2} point#{card.cost / 2 == 1 ? '' : 's'}.",
                           :css_class => "player#{ply.seat} card_trash score")      
     
     return "OK"

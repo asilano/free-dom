@@ -57,3 +57,19 @@ end
 # See https://github.com/cucumber/cucumber-rails/blob/master/features/choose_javascript_database_strategy.feature
 Cucumber::Rails::Database.javascript_strategy = :truncation
 
+# Override shuffle algorithms to a "somewhat random" sort. Allows us to know we have the same arrangement after shuffle
+class Array
+  def shuffle
+    sort
+  end
+  
+  def shuffle!
+    sort!
+  end
+end
+
+class Card
+  def <=>(rhs)
+    return readable_name <=> rhs.readable_name
+  end
+end

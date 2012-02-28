@@ -16,8 +16,7 @@ Feature: Smithy
       And I have nothing in play
       And it's my Play Action phase
     When I play Smithy
-    Then I should have only Smithy in play
-      And I should have drawn 3 cards
+    Then I should have drawn 3 cards
       And it should be my Play Treasure phase
     
   Scenario: Playing Smithy with a small deck draws as much as possible
@@ -27,9 +26,8 @@ Feature: Smithy
       And it's my Play Action phase
       And I have noted the last history
     When I play Smithy
-    Then I should have only Smithy in play
-      And I should have drawn 2 cards
-      And later history should include "<I> tried to draw 1 more card, but their deck was empty."
+    Then I should have drawn 2 cards
+      And later history should include "[I] tried to draw 1 more card, but their deck was empty."
       And it should be my Play Treasure phase
     
   Scenario: Playing Smithy with an empty deck draws nothing
@@ -39,10 +37,9 @@ Feature: Smithy
       And it's my Play Action phase
       And I have noted the last history
     When I play Smithy
-    Then I should have only Smithy in play
-      And I should have drawn 0 cards
-      And later history should include "<I> drew no cards."
-      And later history should include "<I> tried to draw 3 more cards, but their deck was empty."
+    Then I should have drawn 0 cards
+      And later history should include "[I] drew no cards."
+      And later history should include "[I] tried to draw 3 more cards, but their deck was empty."
       And it should be my Play Treasure phase
 
   Scenario: Playing Smithy with a small deck and discards draws three cards
@@ -51,8 +48,6 @@ Feature: Smithy
       And I have nothing in play
       And I have 3 cards in discard
       And it's my Play Action phase
-      And I have noted the last history
     When I play Smithy
-    Then I should have only Smithy in play
-      And I should have drawn 3 cards
+    Then I should have drawn 3 cards
       And it should be my Play Treasure phase

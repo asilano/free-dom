@@ -17,7 +17,7 @@ Feature: Copper
       And I have nothing in play
       And it's my Play Treasure phase
     When the game checks actions
-    Then I should have only Copper in play
+    Then I should have played Copper
       And I should have 1 cash
       And it should be my Buy phase
     
@@ -25,12 +25,11 @@ Feature: Copper
     Given I have nothing in discard
     Then there should be 10 Copper cards in piles
     When I gain Copper
-    Then I should have only Copper in discard
+    Then I should have gained Copper
       And there should be 10 Copper cards in piles
       
   Scenario: Copper should be unlimited in quantity - return
     Given my hand contains Copper
     Then there should be 10 Copper cards in piles
     When I move Copper from hand to pile
-    Then I should not have Copper in hand
-      And there should be 10 Copper cards in piles
+    Then there should be 10 Copper cards in piles

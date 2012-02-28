@@ -1,12 +1,14 @@
-Given /it's my (.*) phase/ do |phase| #'
+Given /it's (.*?)(?:'s)? (.*) phase/ do |name, phase|
+  name = 'Alan' if name == 'my'
+  player = @players[name]
   @game.pending_actions.destroy_all
-  @me.start_turn
+  player.start_turn
   
   case phase
   when "Play Action"
   when "Play Treasure"
     # Destroy the leaf "Play Action" action
-    @me.active_actions[0].destroy
+    player.active_actions[0].destroy
   else
     flunk "Unexpected phase '#{phase}'"
   end  

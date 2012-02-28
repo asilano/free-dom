@@ -1,4 +1,5 @@
 source 'http://rubygems.org'
+source 'http://gems.github.com'
 
 gem 'rails', '3.1.0'
 gem 'i18n'
@@ -23,6 +24,8 @@ end
 
 gem 'jquery-rails'
 gem 'therubyracer'
+
+gem 'andand'
 
 # Use unicorn as the web server
 # gem 'unicorn'
