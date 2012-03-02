@@ -7,7 +7,7 @@ class Game < ActiveRecord::Base
                         
   has_many :players, :order => "seat, id", :dependent => :destroy
   has_one :current_turn_player, :class_name => 'Player',
-                                :conditions => 'actions is not null'
+                                :conditions => 'cash is not null'
   has_many :users, :through => :players
   has_many :histories, :dependent => :delete_all, :order => "created_at"
   has_many :chats, :dependent => :delete_all, :order => "created_at"

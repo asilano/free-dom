@@ -104,7 +104,7 @@
   <% if player_private.score && player_private.score != 0 %>
       <tr class="scoreRow"><th>Score:</th><td><%= player_private.score %></td></tr>
     <% end %>
-	<% if not player_private.actions.nil? %>
+	<% if not player_private.cash.nil? %>
 		<tr><td>&nbsp;</td></tr>
 		<tr>
 			<th>Actions:</th><td><%= h player_private.actions -%></td>			
