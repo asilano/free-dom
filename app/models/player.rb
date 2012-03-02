@@ -179,16 +179,14 @@ class Player < ActiveRecord::Base
       pending_actions.each do |act|
         act.destroy if act.expected_action == "play_action"
       end
-      self.actions = 0
     else
       card = cards.hand[params[:card_index].to_i]
       game.histories.create!(:event => "#{name} played #{card.class.readable_name}.",
                             :css_class => "player#{seat} play_action #{card.is_attack? ? 'play_attack' : ''}")
       rc = cards.hand[params[:card_index].to_i].play(parent_act)
-      self.reload.actions -= 1
     end
     
-    save!
+    #save!
     
     return rc
   end
@@ -364,13 +362,11 @@ class Player < ActiveRecord::Base
       pending_actions.each do |act|
         act.destroy if act.expected_action == "buy"
       end
-      self.buys = 0
     else
       # Process the Buy. 
                             
       # Subtract the cost from the player's cash, and decrement the number of buys
       self.cash -= pile.cost
-      self.buys -= 1
       
       # Check whether the pile was embargoed
       if pile.state && pile.state[:embargo] && pile.state[:embargo] > 0
@@ -526,10 +522,8 @@ class Player < ActiveRecord::Base
   end    
 
   def next_turn(params)
-    # ... nil off the Actions, Cash, Buys parameters for this player ...
-    self.actions = nil
+    # ... nil off the Cash parameter for this player ...
     self.cash = nil
-    self.buys = nil    
     save!
 
     # ... stop here if the game's ended ...
@@ -555,9 +549,7 @@ class Player < ActiveRecord::Base
           
   def start_turn
     # Start this player's turn. They should already have a hand.
-    # Set up number of actions, buys, cash and create their pending_actions
-    self.actions = 1
-    self.buys = 1  
+    # Set up cash and create their pending_actions
     self.cash = 0
         
     save!
@@ -604,7 +596,7 @@ class Player < ActiveRecord::Base
   def add_actions(num, parent_act)
     # Add _num_ actions to the Player.
     # First, check that it's the player's turn
-    raise RuntimeError.new("Not Player #{id}'s turn") if actions.nil?
+    raise RuntimeError.new("Not Player #{id}'s turn") unless cash
     
     # Store off the parent_act we've been given - we may want to return it later
     orig_act = parent_act
@@ -630,7 +622,6 @@ class Player < ActiveRecord::Base
                                             :game => game)
     end
     
-    self.actions += num
     save!       
     
     return (return_orig ? orig_act : parent_act)
@@ -641,7 +632,7 @@ class Player < ActiveRecord::Base
   def add_buys(num, parent_act)
     # Add _num_ buys to the Player.
     # First, check that it's the player's turn
-    raise RuntimeError.new("Not Player #{id}'s turn") if actions.nil?
+    raise RuntimeError.new("Not Player #{id}'s turn") unless cash
     
     # Store off the parent_act we've been given - we may want to return it later
     orig_act = parent_act
@@ -661,13 +652,11 @@ class Player < ActiveRecord::Base
     
     # Now create the specified number of Buys
     1.upto(num) do |n|
-      parent_act = parent_act.insert_child!(:expected_action => "buy")
-      parent_act.player = self
-      parent_act.game = game
-      parent_act.save!
+      parent_act = parent_act.insert_child!(:expected_action => "buy",
+                                            :player => self,
+                                            :game => game)
     end
     
-    self.buys += num
     save!
     
     return (return_orig ? orig_act : parent_act)
@@ -1058,6 +1047,17 @@ class Player < ActiveRecord::Base
   def emailed
     self.last_emailed = Time.now
     save!
+  end
+  
+  # Synthetic attribute for number of actions
+  def actions
+    return nil unless game.root_action.expected_action == "player_end_turn;player=#{id}"
+    pending_actions.where(:expected_action => 'play_action').count
+  end
+  
+  def buys
+    return nil unless game.root_action.expected_action == "player_end_turn;player=#{id}"
+    pending_actions.where(:expected_action => 'buy').count
   end
   
 private

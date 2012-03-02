@@ -7,7 +7,7 @@
   <%= public_zone_line player, :enduring, "Enduring" %>
   <%= control_line player, :revealed, "Revealed" %>
 <%= extra_info player, :public %>
-<% if player.actions -%>
+<% if player.cash -%>
   
   Actions: <%= h player.actions %>
   Buys: <%= h player.buys %>			

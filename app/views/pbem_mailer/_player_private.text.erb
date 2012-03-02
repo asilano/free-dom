@@ -8,7 +8,7 @@
   <%= control_line @player, :revealed, "Revealed" %>
   <%= control_line @player, :peeked, "Looked at" %>
 <%= extra_info @player %>
-<% if @player.actions -%>
+<% if @player.cash -%>
   
   Actions: <%= h @player.actions %>
   Buys: <%= h @player.buys %>			
