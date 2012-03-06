@@ -1,4 +1,4 @@
-Given /it's (.*?)(?:'s)? (.*) phase/ do |name, phase|
+Given(/it is (.*?)(?:'s)? (.*) phase/) do |name, phase|
   name = 'Alan' if name == 'my'
   player = @players[name]
   @game.pending_actions.destroy_all

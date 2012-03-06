@@ -15,7 +15,7 @@ Feature: Copper
   Scenario: Copper should be a treasure worth 1 cash
     Given my hand contains Copper, Duchy, Duchy, Duchy, Duchy
       And I have nothing in play
-      And it's my Play Treasure phase
+      And it is my Play Treasure phase
     When the game checks actions
     Then I should have played Copper
       And I should have 1 cash

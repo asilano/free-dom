@@ -110,3 +110,14 @@ CARD_TYPES = {"Cellar" => BaseGame::Cellar,
 "Gold" => BasicCards::Gold}
 
 CARD_NAMES = CARD_TYPES.keys
+
+CardListNoMatch = 
+/ (?:
+    (?:#{CARD_NAMES.join('|').gsub(/ /, '\ ')}) # Any Card Name
+    (?:\ ?x\ ?\d+)?                             # Repeated "x 10"
+    (?:,\ )?                                    # Optional comma separator
+  )*  
+/x
+CardList = /(#{CardListNoMatch})/
+NamedRandCards = /(\d+) (?:other )?cards?(?: named "(.*)")?/
+NamedRandCardsNoMatch = /\d+ (?:other )?cards?(?: named ".*")?/

@@ -54,7 +54,7 @@ def assert_subset(subset, superset, extra_msg = "")
   failed = false
   sub.each do |elem|
     if supe.index(elem)
-      supe.delete_at(supe.index(elem))
+      supe.delete_first(elem)
     else
       failed = true
       break

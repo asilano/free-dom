@@ -13,7 +13,7 @@ Feature: Gold
   Scenario: Gold should be a treasure worth 3 cash
     Given my hand contains Gold, Duchy, Duchy, Duchy, Duchy
       And I have nothing in play
-      And it's my Play Treasure phase
+      And it is my Play Treasure phase
     When the game checks actions
     Then I should have played Gold
       And I should have 3 cash

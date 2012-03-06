@@ -3,6 +3,11 @@ Then /(.*) should have (\d+) actions? available/ do |name, actions|
   assert_equal actions.to_i, @players[name].reload.actions
 end
 
+Then /(.*) should have (\d+) buys? available/ do |name, buys|
+  name = "Alan" if name == "I"
+  assert_equal buys.to_i, @players[name].reload.buys
+end
+
 Then /(.*) should have (\d+) cash/ do |name, cash|
   name = "Alan" if name == "I"
   assert_equal cash.to_i, @players[name].reload.cash

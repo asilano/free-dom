@@ -17,10 +17,12 @@ Given /I am a player in a (?:([2-6])-player )?standard game(?: with (.*))?/ do |
     reqd_cards = card_list.split(/,\s*/)
     assert_operator reqd_cards.length, :<=, 10
     
-    pos = 1
+    # Kingdom cards start right after Curse
+    pos = @game.piles.find_index {|p| p.card_type == 'BasicCards::Curse'} + 1
     reqd_cards.each do |card|
       if !@game.piles(true).map(&:card_type).include?(CARD_TYPES[card].name)
         @game.piles[pos].card_type = CARD_TYPES[card].name
+        @game.piles[pos].save!
         pos += 1
       end
     end

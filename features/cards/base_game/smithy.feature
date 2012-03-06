@@ -14,7 +14,7 @@ Feature: Smithy
     Given my hand contains Smithy and 4 other cards
       And my deck contains 5 cards
       And I have nothing in play
-      And it's my Play Action phase
+      And it is my Play Action phase
     When I play Smithy
     Then I should have drawn 3 cards
       And it should be my Play Treasure phase
@@ -23,7 +23,7 @@ Feature: Smithy
     Given my hand contains Smithy and 4 other cards
       And my deck contains 2 cards
       And I have nothing in play
-      And it's my Play Action phase
+      And it is my Play Action phase
       And I have noted the last history
     When I play Smithy
     Then I should have drawn 2 cards
@@ -34,7 +34,7 @@ Feature: Smithy
     Given my hand contains Smithy and 4 other cards
       And my deck is empty
       And I have nothing in play
-      And it's my Play Action phase
+      And it is my Play Action phase
       And I have noted the last history
     When I play Smithy
     Then I should have drawn 0 cards
@@ -47,7 +47,7 @@ Feature: Smithy
       And my deck contains 2 cards
       And I have nothing in play
       And I have 3 cards in discard
-      And it's my Play Action phase
+      And it is my Play Action phase
     When I play Smithy
     Then I should have drawn 3 cards
       And it should be my Play Treasure phase

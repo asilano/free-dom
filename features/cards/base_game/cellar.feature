@@ -12,7 +12,7 @@ Feature: Cellar
     Given my hand contains Cellar, <otherhand>
       And my deck contains <decksize> cards
       And I have <discardsize> cards in discard
-      And it's my Play Action phase
+      And it is my Play Action phase
     When I play Cellar
     Then I should need to Discard any number of cards, with Cellar
     When I choose <choice> in my hand

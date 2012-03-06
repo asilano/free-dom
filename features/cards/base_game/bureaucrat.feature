@@ -18,7 +18,7 @@ Feature: Bureaucrat
       And my deck contains 3 cards
       And Bob's deck contains 4 cards
       And Charlie's deck is empty
-      And it's my Play Action phase
+      And it is my Play Action phase
     When I play Bureaucrat
       And the game checks actions
     Then the following 3 steps should happen at once
@@ -38,7 +38,7 @@ Feature: Bureaucrat
       And my deck contains 3 cards
       And Bob's deck contains 4 cards
       And Charlie's deck is empty
-      And it's my Play Action phase
+      And it is my Play Action phase
     When I play Bureaucrat
       And the game checks actions
     Then the following 3 steps should happen at once
@@ -61,7 +61,7 @@ Feature: Bureaucrat
       And my deck contains 3 cards
       And Bob's deck contains 4 cards
       And Charlie's deck is empty
-      And it's my Play Action phase
+      And it is my Play Action phase
     When I play Bureaucrat
       And the game checks actions
     Then the following 3 steps should happen at once

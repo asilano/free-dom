@@ -13,7 +13,7 @@ Feature: Silver
   Scenario: Silver should be a treasure worth 2 cash
     Given my hand contains Silver, Duchy, Duchy, Duchy, Duchy
       And I have nothing in play
-      And it's my Play Treasure phase
+      And it is my Play Treasure phase
     When the game checks actions
     Then I should have played Silver
       And I should have 2 cash

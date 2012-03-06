@@ -4,7 +4,7 @@ When(/(.*) play(?:s)? (.*)/) do |name, kind|
   card = @players[name].cards.hand.first(:conditions => ['type = ?', CARD_TYPES[kind].name])
   assert_not_nil card
   
-  @hand_contents[name].delete_at(@hand_contents[name].index(kind))
+  @hand_contents[name].delete_first(kind)
   @play_contents[name] << kind
   parent_act = @players[name].active_actions[0]
   assert_match /play_action/, parent_act.expected_action
@@ -27,7 +27,7 @@ When(/(.*) move(?:s)? (.*) from (.*) to (.*)/) do |name, kind, from, to|
   
   if (%w<hand play discard enduring>.include? from)
     conts = instance_variable_get("@#{from}_contents")
-    conts[name].delete_at(conts[name].index(kind))
+    conts[name].delete_first(kind)
   end
   
   if (%w<hand play discard enduring>.include? to)
