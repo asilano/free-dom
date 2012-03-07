@@ -33,7 +33,7 @@ class BaseGame::Feast < Card
                             :params => {:card => "#{self.class}#{id}",
                                         :substep => "take"},
                             :piles => game.piles.map do |pile|
-                              pile.cost <= 5
+                              pile.cost <= 5 && !pile.empty?
                             end
                           }]
     end
