@@ -12,7 +12,7 @@ class Intrigue::ShantyTown < Card
     
     # "Reveal" the hand (actually, just stick it in history, since it doesn't
     # need to be persistently visible)
-    game.histories.create!(:event => "#{player.name} revealed their hand to Shanty Town:.", 
+    game.histories.create!(:event => "#{player.name} revealed their hand to Shanty Town:", 
                           :css_class => "player#{player.seat} card_reveal")
     game.histories.create!(:event => "#{player.name} revealed #{player.cards.hand.join(', ')}.", 
                           :css_class => "player#{player.seat} card_reveal")
