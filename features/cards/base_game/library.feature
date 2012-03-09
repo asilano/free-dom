@@ -25,3 +25,24 @@ Feature: Library
       |  9  | Copper x10 |   0   |
       |  2  | Copper x 3 |   3   |
     
+  Scenario: Playing Library with Actions
+  Given my hand contains Library and 2 other cards
+      And my deck contains Copper x2, Smithy, Copper x1, Witch, Mine, Copper
+      And it is my Play Action phase
+    When I play Library
+    Then I should have drawn 3 cards
+      And I should need to Set aside or keep a card.
+    When I choose Smithy in my hand
+    Then the following 2 steps should happen at once
+      Then I should have removed Smithy from my hand
+      And I should have drawn 2 cards
+    And I should need to Set aside or keep a card.
+    When I choose Witch in my hand
+    Then the following 2 steps should happen at once
+      Then I should have removed Witch from my hand
+      And I should have drawn 1 card
+    And I should need to Set aside or keep a card.
+    When I choose Keep in my hand
+    Then the following 2 steps should happen at once
+      Then I should have drawn 1 card
+      And I should have placed Smithy, Witch in my discard

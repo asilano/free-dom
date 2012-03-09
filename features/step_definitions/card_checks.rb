@@ -168,3 +168,24 @@ Then(/(.*) should have removed #{CardList} from (?:his |my )?(.*)/) do |name, ki
     end
   end
 end
+
+# Used to note that a card has moved to a tracked zone from anywhere else
+#
+# Matches
+#   I should have placed Curse in my hand
+#   Bob should have placed Copper, Curse in his discard
+Then(/(.*) should have placed #{CardList} in (?:his |my )?(.*)/) do |name, kinds, location|
+  name = "Alan" if name == "I"
+  player = @players[name]
+  
+  to = instance_variable_get("@#{location}_contents")[name]
+  kinds.split(/,\s*/).each do |kind| 
+    /(.*) ?x ?(\d+)/ =~ kind
+    kind = $1.rstrip if $1
+    num = $2.andand.to_i || 1
+    
+    num.times do
+      to << kind
+    end
+  end
+end
