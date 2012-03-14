@@ -111,6 +111,13 @@ CARD_TYPES = {"Cellar" => BaseGame::Cellar,
 
 CARD_NAMES = CARD_TYPES.keys
 
+CardListNoRep = 
+/ (
+    (?:
+      (?:#{CARD_NAMES.join('|').gsub(/ /, '\ ')})
+      (?:,\ )?
+    )*
+  )/x
 CardListNoMatch = 
 / (?:
     (?:#{CARD_NAMES.join('|').gsub(/ /, '\ ')}) # Any Card Name

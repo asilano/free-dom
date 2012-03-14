@@ -19,11 +19,12 @@ Given /I am a player in a (?:([2-6])-player )?standard game(?: with (.*))?/ do |
     
     # Kingdom cards start right after Curse
     pos = @game.piles.find_index {|p| p.card_type == 'BasicCards::Curse'} + 1
-    reqd_cards.each do |card|
-      if !@game.piles(true).map(&:card_type).include?(CARD_TYPES[card].name)
+    pos += 1 while reqd_cards.include?(@game.piles[pos])
+    reqd_cards.each do |card|      
+      unless @game.piles.map(&:card_type).map(&:readable_name).include?(card)
         @game.piles[pos].card_type = CARD_TYPES[card].name
         @game.piles[pos].save!
-        pos += 1
+        pos += 1 while reqd_cards.include?(@game.piles[pos].card_type.readable_name)
       end
     end
   end

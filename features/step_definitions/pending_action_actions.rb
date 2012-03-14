@@ -4,7 +4,7 @@
 #   I choose Estate in my hand
 #   Bob chooses Estate, Copper in his hand
 #   I choose Don't trash in my hand  // (Where "Don't trash" is the nil-action text)
-When(/(.*) chooses? (.*) in (?:his|my) hand/) do |name, choice|
+When(/^(\w*?)(?:'s)? chooses? (.*) in (?:his|my) hand/) do |name, choice|
   name = "Alan" if name == "I"
   player = @players[name]
   

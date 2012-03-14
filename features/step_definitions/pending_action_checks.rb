@@ -1,3 +1,5 @@
+# Check the pending action is correct for a given ("stack-empty") phase of the game.
+# Checks for Play Action, Play Treasure and Buy phases
 Then(/it should be (.*?)(?:'s)? (.*) phase/) do |name, phase|
   name = 'Alan' if name == 'my'
   exp_action = case phase
@@ -15,17 +17,49 @@ Then(/it should be (.*?)(?:'s)? (.*) phase/) do |name, phase|
   assert_contains(actions, Regexp.new(exp_action))
 end
 
+# Check for the readable text of a pending action
 Then(/(.*) should need to (.*)/) do |name, action|
   name = "Alan" if name == "I"
   actions = @players[name].active_actions(true).map(&:text)
   assert_contains(actions, Regexp.new(action, Regexp::IGNORECASE))
 end
 
+# Check the specified player is not currently required to do anything
 Then(/(.*) should not need to act/) do |name|
   name = "Alan" if name == "I"
   assert_empty @players[name].active_actions
 end
 
+# Verify that the stated cards in hand are (not) choosable
+# 
+# Matches:
+#   I should be able to choose Silver, Gold, Village in my hand
+#   Bob should not be able to choose Province in his hand
+Then(/(.*) should (not )?be able to choose #{CardListNoRep} in (?:my|his) hand/) do |name, negate, kinds|
+  name = "Alan" if name == "I"
+  player = @players[name]
+  
+  # We want to check the valid options for a hand-based action. 
+  # These are encoded in the control that that action produces.
+  all_controls = player.determine_controls
+  controls = all_controls[:hand]
+  flunk "Unimplemented multi-hand controls in testbed" unless controls.length == 1
+  
+  ctrl = controls[0]
+  acceptable = ctrl[:cards].map.with_index {|valid, ix| player.cards.hand[ix].readable_name if valid}.compact
+  
+  unless negate
+    assert_subset kinds.split(/,\s*/), acceptable
+  else
+    assert_disjoint kinds.split(/,\s*/), acceptable
+  end
+end
+
+# Verify that the stated piles are (not) choosable
+# 
+# Matches:
+#   I should be able to choose the Silver, Gold, Village piles
+#   Bob should not be able to choose the Province pile
 Then(/(.*) should (not )?be able to choose the (.*) piles?/) do |name, negate, kinds|
   name = "Alan" if name == "I"
   player = @players[name]
