@@ -76,6 +76,14 @@
     <div id="mainContent">
     	<div id="flash">
     		<%= render :partial => 'flash_area' -%>
+                <% unless ["watch", "play"].include?(params[:action]) -%>
+                <p class="flash warning">FreeDom needs to be updated to the latest Rails version and corresponding Heroku stack. 
+This will involve a brief period of downtime while the database is migrated. <br/>
+
+The downtime is scheduled for <strong>0700 UTC on Sunday 19th March</strong>, and is expected to last less than 1 hour. However, please be patient if it takes longer, in which case I will endeavour to post updates on FreeDom's <a href="http://www.toothycat.net/wiki/wiki.pl?FreeDom">wiki page</a>.
+
+</p>
+                <% end -%>
     	</div>
       <%= yield %>
     </div>
