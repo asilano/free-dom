@@ -51,6 +51,8 @@ module Dominion
     
     config.colorize_logging = false
     config.action_mailer.delivery_method = :smtp
+
+    config.active_support.deprecation = :log
   end
 end
 

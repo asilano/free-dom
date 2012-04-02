@@ -76,6 +76,11 @@
     <div id="mainContent">
     	<div id="flash">
     		<%= render :partial => 'flash_area' -%>
+        <% unless ["watch", "play"].include?(params[:action]) -%>
+          <p class="flash warning">FreeDom has now been updated to the latest Rails version and corresponding Heroku stack. 
+              If you notice any problems, please <%= link_to "report them to me", contact_path -%>.
+          </p>
+        <% end -%>
     	</div>
       <%= yield %>
     </div>

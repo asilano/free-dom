@@ -48,7 +48,7 @@
     <p class="explain">These settings are your overall preferences. Whenever you join a new game, the settings you have set here will apply to that game.</p>
     <p class="explain">You can override these settings from within a particular game; doing so will not change these settings.</p>
     <p class="explain">Changing these settings will not change your preferences in any existing game.</p>
-		<% f.fields_for :settings do |sf| %>
+		<%= f.fields_for :settings do |sf| %>
 			<p>
 	      <%= sf.label :update_interval, 'Update interval (seconds):' %>
 				<%= sf.text_field :update_interval, :size => 4 %>
