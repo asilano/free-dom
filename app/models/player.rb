@@ -304,6 +304,11 @@ class Player < ActiveRecord::Base
     if this_act && !cards.hand(true).any? {|c| c.is_treasure?}
       # No more treasures in hand. Destroy this action, to trip the buy.
       this_act.remove!
+      
+      # Also log the total cash available.
+      split_string = buys <= 1 ? "" : ", split #{buys} ways"
+      game.histories.create!(:event => "#{name} has #{cash} total cash#{split_string}.",
+                             :css_class => "player#{seat} play_treasure")
     end
     
     return rc
