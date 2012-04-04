@@ -1,4 +1,4 @@
-# 4	Native Village	Seaside	Action	$2	+2 Actions, Choose one: Set aside the top card of your deck face down on your Native Village mat; or put all the cards from your mat into your hand.
+# 4  Native Village  Seaside  Action  $2  +2 Actions, Choose one: Set aside the top card of your deck face down on your Native Village mat; or put all the cards from your mat into your hand.
 # You may look at the cards on your mat at any time; return them to your deck at the end of the game.
 
 class Seaside::NativeVillage < Card

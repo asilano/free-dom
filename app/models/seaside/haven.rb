@@ -1,4 +1,4 @@
-# 2	Haven	Seaside	Action - Duration	$2	+1 Card, +1 Action, Set aside a card from your hand face down. At the start of your next turn, put it into your hand.
+# 2  Haven  Seaside  Action - Duration  $2  +1 Card, +1 Action, Set aside a card from your hand face down. At the start of your next turn, put it into your hand.
 
 class Seaside::Haven < Card
   costs 2

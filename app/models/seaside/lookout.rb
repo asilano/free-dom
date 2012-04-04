@@ -1,4 +1,4 @@
-# 8	Lookout	Seaside	Action	$3	+1 Action, Look at the top 3 cards of your deck. Trash one of them. Discard one of them. Put the other one on top of your deck.
+# 8  Lookout  Seaside  Action  $3  +1 Action, Look at the top 3 cards of your deck. Trash one of them. Discard one of them. Put the other one on top of your deck.
 
 class Seaside::Lookout < Card
   costs 3

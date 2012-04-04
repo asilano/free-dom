@@ -1,4 +1,4 @@
-# 12	Cutpurse	Seaside	Action - Attack	$4	+2 Cash, Each other player discards a Copper card (or reveals a hand with no Copper).
+# 12  Cutpurse  Seaside  Action - Attack  $4  +2 Cash, Each other player discards a Copper card (or reveals a hand with no Copper).
 class Seaside::Cutpurse < Card
   costs 4
   action :attack => true

@@ -662,12 +662,12 @@ class Player < ActiveRecord::Base
     return (return_orig ? orig_act : parent_act)
   end
      
-	# Add cash and save.
-	def add_cash(num)
-		self.cash += num
-		save!
+  # Add cash and save.
+  def add_cash(num)
+    self.cash += num
+    save!
   end
-		 
+     
   # Draw, or attempt to, the specified number of cards, shuffling the discard
   # pile under the deck if needed.
   #
@@ -679,10 +679,10 @@ class Player < ActiveRecord::Base
     cards.hand(true)
     cards_drawn = []
     
-		if nil==reason
-			reason = ""
-		end
-		
+    if nil==reason
+      reason = ""
+    end
+    
     shuffle_point = cards.deck.size
     if cards.deck.size < num and not cards.in_discard.empty?
       shuffle_discard_under_deck(:log => shuffle_point == 0)
@@ -702,11 +702,11 @@ class Player < ActiveRecord::Base
     end
       
     renum(:deck)  
-		
-		if cards_drawn.empty?
-			game.histories.create!(:event => "#{name} drew no cards#{reason}.",
-														:css_class => "player#{seat} card_draw")
-		else
+    
+    if cards_drawn.empty?
+      game.histories.create!(:event => "#{name} drew no cards#{reason}.",
+                            :css_class => "player#{seat} card_draw")
+    else
       drawn_string = "[#{id}?"
       if shuffle_point > 0 && shuffle_point < cards_drawn.length
         drawn_string << cards_drawn[0,shuffle_point].join(', ')
@@ -718,14 +718,14 @@ class Player < ActiveRecord::Base
         drawn_string << "#{cards_drawn.join(', ')}|#{cards_drawn.length} card#{cards_drawn.length == 1 ? '' : 's'}]"
       end
       
-			game.histories.create!(:event => "#{name} drew #{drawn_string}#{reason}.",
-														:css_class => "player#{seat} card_draw #{'shuffle' if (shuffle_point > 0 && shuffle_point < cards_drawn.length)}")          
-		end
+      game.histories.create!(:event => "#{name} drew #{drawn_string}#{reason}.",
+                            :css_class => "player#{seat} card_draw #{'shuffle' if (shuffle_point > 0 && shuffle_point < cards_drawn.length)}")          
+    end
 
     if cards_drawn.length < num
       excess = num - cards_drawn.length
-			game.histories.create!(:event => "#{name} tried to draw #{excess} more cards#{reason}, but their deck was empty.",
-														:css_class => "player#{seat} card_draw")
+      game.histories.create!(:event => "#{name} tried to draw #{excess} more cards#{reason}, but their deck was empty.",
+                            :css_class => "player#{seat} card_draw")
     end    
     save!
     

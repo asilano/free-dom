@@ -1,4 +1,4 @@
-# 25	Treasury	Seaside	Action	$5	+1 Card, +1 Action, +1 Coin, When you discard this from play, if you didn't buy a Victory card this turn, you may put this on top of your deck.
+# 25  Treasury  Seaside  Action  $5  +1 Card, +1 Action, +1 Coin, When you discard this from play, if you didn't buy a Victory card this turn, you may put this on top of your deck.
 
 class Seaside::Treasury < Card
   costs 5
@@ -7,24 +7,24 @@ class Seaside::Treasury < Card
   
   def play(parent_act)
     super
-		
-		# First, draw the cards.
+    
+    # First, draw the cards.
     player.draw_cards(1)
         
     # Now create the new Action
     player.add_actions(1, parent_act)
 
-		# And add the coin
-		player.add_cash(1)
-		
+    # And add the coin
+    player.add_cash(1)
+    
     return "OK"
   end
 
-	def leave_play(parent_act)
-				
-		if (!player.state.bought_victory)			
-			# Player bought no victory card this turn. Ask them where they want the Treasury.
-		  # Hang the action to do so off parent_act, which can't be nil
+  def leave_play(parent_act)
+        
+    if (!player.state.bought_victory)      
+      # Player bought no victory card this turn. Ask them where they want the Treasury.
+      # Hang the action to do so off parent_act, which can't be nil
       raise "Need a non-nil parent act" if parent_act.nil?
       
       if player.settings.autotreasury
@@ -36,15 +36,15 @@ class Seaside::Treasury < Card
                                    :player => player,
                                    :game => game)
       end
-		else
+    else
       # Player did buy a victory this turn. Just discard the card.
       super  
     end
-		
-		return "OK"
-	end
+    
+    return "OK"
+  end
 
-	def determine_controls(player, controls, substep, params)
+  def determine_controls(player, controls, substep, params)
     case substep
     when "replace"
       controls[:player] += [{:type => :buttons,
@@ -61,7 +61,7 @@ class Seaside::Treasury < Card
     end
   end
 
-	def resolve_replace(ply, params, parent_act)		
+  def resolve_replace(ply, params, parent_act)    
     # We expect to have a :choice parameter, either "deck" or "discard"
     if (not params.include? :choice) or
        (not params[:choice].in? ["deck", "discard"])

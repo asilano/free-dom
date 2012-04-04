@@ -1,4 +1,4 @@
-# 5	Pearl Diver	Seaside	Action	$2	+1 Card, +1 Action, Look at the bottom card of your deck. You may put it on top.
+# 5  Pearl Diver  Seaside  Action  $2  +1 Card, +1 Action, Look at the bottom card of your deck. You may put it on top.
 
 class Seaside::PearlDiver < Card
   costs 2
@@ -7,14 +7,14 @@ class Seaside::PearlDiver < Card
   
   def play(parent_act)
     super
-		
-		# A card and an action
+    
+    # A card and an action
     player.draw_cards(1)
     parent_act = player.add_actions(1, parent_act)
-		
-		# Look at the BOTTOM card of deck, and make a choice about it.
+    
+    # Look at the BOTTOM card of deck, and make a choice about it.
     num_seen = player.peek_at_deck(1, :bottom).length
-		
+    
     if player.cards.deck.count == 1
       # Saw only one card. Can't move it, so just unpeek it.
       game.histories.create!(:event => "#{player.name} saw the only card in their deck.",
@@ -22,16 +22,16 @@ class Seaside::PearlDiver < Card
 
       player.cards.deck[0].peeked = false
       player.cards.deck[0].save!
-		elsif (num_seen != 0)
-			parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_choose",
+    elsif (num_seen != 0)
+      parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_choose",
                                  :text => "Choose whether to move the seen card with Pearl Diver",
                                  :player => player,
                                  :game => game)
-		end
-		
+    end
+    
     return "OK"
   end
-	
+  
   def determine_controls(player, controls, substep, params)
     case substep
     when "choose"
@@ -47,7 +47,7 @@ class Seaside::PearlDiver < Card
                             }] 
     end
   end
-	
+  
   def resolve(ply, params, parent_act)
     # We expect to have a :choice parameter, either "move" or "leave"
     if (not params.include? :choice) or
@@ -77,6 +77,6 @@ class Seaside::PearlDiver < Card
     card.save!
     
     return "OK" 
-  end	
+  end  
 end
 

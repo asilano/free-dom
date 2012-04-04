@@ -1,4 +1,4 @@
-# 22	Merchant Ship	Seaside	Action - Duration	$5	Now and at the start of your next turn: +2 Cash.
+# 22  Merchant Ship  Seaside  Action - Duration  $5  Now and at the start of your next turn: +2 Cash.
 
 class Seaside::MerchantShip < Card
   costs 5

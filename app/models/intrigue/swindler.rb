@@ -48,24 +48,24 @@ class Intrigue::Swindler < Card
     target.shuffle_discard_under_deck if target.cards.deck.empty?
 
     card = target.cards.deck[0]
-		if ( card )
-			cost = card.cost
-			card.trash
-			game.histories.create!(:event => "Swindler caused #{target.name} to trash a #{card.class.readable_name}.",
-														:css_class => "player#{target.seat} card_trash")
-			
-			# And hang an action off the parent to ask the attacker to choose a 
-			# replacement card.
-			act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_choose;target=#{target.id};trashed_cost=#{cost}",
-																			 :text => "Choose Swindler actions for #{target.name}")
-			act.player = source
-			act.game = game
-			act.save!
-		else
-			game.histories.create!(:event => "Swindler could not make #{target.name} trash a card, as they have an empty deck.",
-														:css_class => "player#{target.seat} card_trash")
-		end
-		
+    if ( card )
+      cost = card.cost
+      card.trash
+      game.histories.create!(:event => "Swindler caused #{target.name} to trash a #{card.class.readable_name}.",
+                            :css_class => "player#{target.seat} card_trash")
+      
+      # And hang an action off the parent to ask the attacker to choose a 
+      # replacement card.
+      act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_choose;target=#{target.id};trashed_cost=#{cost}",
+                                       :text => "Choose Swindler actions for #{target.name}")
+      act.player = source
+      act.game = game
+      act.save!
+    else
+      game.histories.create!(:event => "Swindler could not make #{target.name} trash a card, as they have an empty deck.",
+                            :css_class => "player#{target.seat} card_trash")
+    end
+    
     return "OK"
   end
   

@@ -1,4 +1,4 @@
-# 13	Island	Seaside	Action - Victory	$4	Set aside this and another card from your hand. Return them to your deck at the end of the game. 2 VP
+# 13  Island  Seaside  Action - Victory  $4  Set aside this and another card from your hand. Return them to your deck at the end of the game. 2 VP
 
 class Seaside::Island < Card
   costs 4

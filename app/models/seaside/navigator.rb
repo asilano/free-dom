@@ -1,4 +1,4 @@
-# 14	Navigator	Seaside	Action	$4	+2 Coins, Look at the top 5 cards of your deck. Either discard all of them, or put them back on top of your deck in any order.
+# 14  Navigator  Seaside  Action  $4  +2 Coins, Look at the top 5 cards of your deck. Either discard all of them, or put them back on top of your deck in any order.
 
 class Seaside::Navigator < Card
   costs 4

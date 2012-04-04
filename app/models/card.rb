@@ -253,13 +253,13 @@ class Card < ActiveRecord::Base
     return "OK"
   end
 
-	# The card is leaving play - a card may override this if it has work to do then
-	# (For example Seaside::Treasury)
-	def leave_play(parent_act = nil)
-		raise "Card not in play" unless location == 'play'
-		
-		discard
-	end
+  # The card is leaving play - a card may override this if it has work to do then
+  # (For example Seaside::Treasury)
+  def leave_play(parent_act = nil)
+    raise "Card not in play" unless location == 'play'
+    
+    discard
+  end
 
   # This just moves a treasure card to play. The caller should do the rest
   # (in practice, that will be Player adding the treasure's cash).

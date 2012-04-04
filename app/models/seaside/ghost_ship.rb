@@ -1,4 +1,4 @@
-# 21	Ghost Ship	Seaside	Action - Attack	$5	+2 Card, Each other player with 4 or more cards in hand puts cards from his hand on top of his deck until he has 3 cards in his hand.
+# 21  Ghost Ship  Seaside  Action - Attack  $5  +2 Card, Each other player with 4 or more cards in hand puts cards from his hand on top of his deck until he has 3 cards in his hand.
 
 class Seaside::GhostShip < Card
   costs 5

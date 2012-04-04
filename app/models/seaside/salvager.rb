@@ -1,4 +1,4 @@
-# 16	Salvager	Seaside	Action	$4	+1 Buy, Trash a card from your hand. +Cash equal to its cost.
+# 16  Salvager  Seaside  Action  $4  +1 Buy, Trash a card from your hand. +Cash equal to its cost.
 
 class Seaside::Salvager < Card
   costs 4
