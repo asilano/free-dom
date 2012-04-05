@@ -1,14 +1,87 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>FreeDom</title>
-  <%= stylesheet_link_tag    "application" %>
-  <%= javascript_include_tag "application" %>
-  <%= csrf_meta_tags %>
-</head>
-<body>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <title><%= @full_title ? @full_title : ("Dominion - " + (@title ? @title : controller.action_name.capitalize)) -%></title>
+    <%= stylesheet_link_tag 'application' %>
+    <%= javascript_include_tag "application" %>
+    <link rel="shortcut icon" type="image/vnd.microsoft.icon" href='<%= image_path("/favicon.ico") %>' />
+    
+    <script type='text/javascript'>
+      function disable_named(name){
+          var arr = new Array();
+          arr = document.getElementsByName(name);
+          for (var i = 0; i < arr.length; i++) {
+              arr[i].disabled = true;
+          }
+      }
+            
+      /*
+        Copyright Robert Nyman, http://www.robertnyman.com
+        Free to use if this text is included
+      */
+      function getElementsByAttribute(oElm, strTagName, strAttributeName, strAttributeValue){
+        var arrElements = (strTagName == "*" && oElm.all)? oElm.all : oElm.getElementsByTagName(strTagName);
+        var arrReturnElements = new Array();
+        var oAttributeValue = (typeof strAttributeValue != "undefined")? new RegExp("(^|\\s)" + strAttributeValue + "(\\s|$)") : null;
+        var oCurrent;
+        var oAttribute;
+        for(var i=0; i<arrElements.length; i++){
+          oCurrent = arrElements[i];
+          oAttribute = oCurrent.getAttribute && oCurrent.getAttribute(strAttributeName);
+          if(typeof oAttribute == "string" && oAttribute.length > 0){
+            if(typeof strAttributeValue == "undefined" || (oAttributeValue && oAttributeValue.test(oAttribute))){
+              arrReturnElements.push(oCurrent);
+            }
+          }
+        }
+        return arrReturnElements;
+      }
 
-<%= yield %>
+      function onloadFunc() {
+        // Scroll to bottom of history
+        var histDiv=document.getElementById('history'); 
+        if (histDiv) {
+          histDiv.scrollTop = histDiv.scrollHeight;
+        }
+        
+        // Scroll to bottom of chat
+        $('chatbox').scrollTop = $('chatbox').scrollHeight;
+        
+        // Enable all buttons
+        var buttons = getElementsByAttribute(document.body, "input", "type", "button")
+        buttons = buttons.concat(getElementsByAttribute(document.body, "input", "type", "submit"))
+        for (var i = 0; i < buttons.length; i++) {
+          buttons[i].disabled = false;
+        }
+      }
+    </script>
+  </head>
+  <body onload="onloadFunc();">
 
-</body>
+    <%= link_to(games_path, :id => "siteLogo") do %>
+      <h1>FreeDom</h1>
+      <h2>Free Dominion Game Server</h2>
+    <% end %>
+    
+    <div id="userInfo">
+      <% if session[:user_id].nil? %>
+        Welcome, Guest. Please <%= link_to "login", login_path -%> or <%= link_to "register", new_user_path -%>
+      <% else %>
+        <% user = User.find(session[:user_id]) %>
+        Welcome, <%= user.name -%> | <%= link_to_unless_current "Preferences", settings_path -%> | Not <%= user.name-%>? Please <%= link_to "logout", logout_path -%> 
+      <% end %>
+    </div>
+    
+    <div id="mainContent">
+      <div id="flash">
+        <%= render :partial => 'flash_area' -%>        
+      </div>
+      <%= yield %>
+    </div>
+    
+    <div id="footer">
+      <%= link_to "Home", games_path %> | <%= link_to "About", about_path%> | <%= link_to "Feedback", contact_path %> 
+    </div>
+  </body>
 </html>
