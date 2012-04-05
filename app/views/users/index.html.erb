@@ -6,84 +6,84 @@
 <%= link_to_function "What's this?", visual_effect(:toggle_blind, 'explain_ranking'), :class => "light" %>
 <div id='explain_ranking' style="display: none;">
 <p>
-	This table shows the ranking and rating of each registered user by a number of measures.
+  This table shows the ranking and rating of each registered user by a number of measures.
 </p>
 <p> 
-	Users who have yet to complete a game are hidden, as are users who haven't completed a game in the last 4 months or so.
-	Users who haven't completed a game in the last two weeks are progressively faded according to how long they've been inactive. 
-	You are always shown.
+  Users who have yet to complete a game are hidden, as are users who haven't completed a game in the last 4 months or so.
+  Users who haven't completed a game in the last two weeks are progressively faded according to how long they've been inactive. 
+  You are always shown.
 </p>
 <p>
-	The table is sortable - simply click on the column headings; click again to reverse the sort order.
+  The table is sortable - simply click on the column headings; click again to reverse the sort order.
 </p>
 <p>
-	Hopefully, most of the table's fields are pretty self-explanatory. However, three of the fields are a little more complex:
-	<dl>
-		<dt>Mean normalised position</dt>
-		<dd>
-			A player's <em>normalised position</em> is a comparable measure of where they finished in a game, regardless of the number of players. 
-			The winner has a normalised position of 0.0 for that match, the loser has 1.0, and the remaining players are evenly spaced (so second place
-			in a three-player game has 0.5; in a four-player, 0.333). If multiple players tie, they all receive the appropriate normalised position as
-			if they were a single player (so two players tying for second in a four-player game each get 0.5). The mean normalised position simply
-			returns the total of all a user's positions, divided by the number of games. 
-		</dd>
-		<dt>Rating</dt>
-		<dd>
-			<em>Rating</em> is a measure of the player's effective skill. It is based on the Elo rating system as used for chess and <em>Magic: the Gathering</em>.
-			Each user starts with a rating of 1600, and their score is adjusted after each match - for each player they finished behind, their rating decreases;
-			for each player they finished ahead of, their rating increases. The change is related to the difference in the two player's current rating - you gain more
-			for defeating a good opponent - and the two players gain and lose the same amount.<br/>
-			<em class="lighter">Technical info: K-Value for each pairing is 16, divided by the number of pairings for a player (that is, the number of players minus 1)</em>
-		</dd>
-		<dt>Rating (score-adjusted)</dt>
-		<dd>
-			A user's <em>score-adjusted rating</em> is similar to their rating, but takes the difference between each player's score into account when calculating how much
-			to adjust the ratings by. If you win by a large margin, you'll gain more score-adjusted rating than if you win by the skin of your teeth.<br/>
-			<span class="lighter"><em>Technical info: K-Value for each pairing is </em>d<sup>s</sup><em>, where </em>d<em> is the difference in score, and </em>s<em>= log<sub>6</sub></em>k
-			<em>, where </em>k<em> is the K-Value for the normal Rating. This assumes that a difference of 6 points per position is roughly "par".</em>
-			</span> 
-			</dd>
-	</dl>
+  Hopefully, most of the table's fields are pretty self-explanatory. However, three of the fields are a little more complex:
+  <dl>
+    <dt>Mean normalised position</dt>
+    <dd>
+      A player's <em>normalised position</em> is a comparable measure of where they finished in a game, regardless of the number of players. 
+      The winner has a normalised position of 0.0 for that match, the loser has 1.0, and the remaining players are evenly spaced (so second place
+      in a three-player game has 0.5; in a four-player, 0.333). If multiple players tie, they all receive the appropriate normalised position as
+      if they were a single player (so two players tying for second in a four-player game each get 0.5). The mean normalised position simply
+      returns the total of all a user's positions, divided by the number of games. 
+    </dd>
+    <dt>Rating</dt>
+    <dd>
+      <em>Rating</em> is a measure of the player's effective skill. It is based on the Elo rating system as used for chess and <em>Magic: the Gathering</em>.
+      Each user starts with a rating of 1600, and their score is adjusted after each match - for each player they finished behind, their rating decreases;
+      for each player they finished ahead of, their rating increases. The change is related to the difference in the two player's current rating - you gain more
+      for defeating a good opponent - and the two players gain and lose the same amount.<br/>
+      <em class="lighter">Technical info: K-Value for each pairing is 16, divided by the number of pairings for a player (that is, the number of players minus 1)</em>
+    </dd>
+    <dt>Rating (score-adjusted)</dt>
+    <dd>
+      A user's <em>score-adjusted rating</em> is similar to their rating, but takes the difference between each player's score into account when calculating how much
+      to adjust the ratings by. If you win by a large margin, you'll gain more score-adjusted rating than if you win by the skin of your teeth.<br/>
+      <span class="lighter"><em>Technical info: K-Value for each pairing is </em>d<sup>s</sup><em>, where </em>d<em> is the difference in score, and </em>s<em>= log<sub>6</sub></em>k
+      <em>, where </em>k<em> is the K-Value for the normal Rating. This assumes that a difference of 6 points per position is roughly "par".</em>
+      </span> 
+      </dd>
+  </dl>
 </p>
 </div>
 <table class="tablekit sortable">
-	<thead>
+  <thead>
   <tr>
     <th class="sortcol">Name</th>
-		<th class="sortcol">Games played</th>
-		<th class="sortcol">Number of Wins</th>
-		<th class="sortcol">Mean normalised position</th>
-		<th class="sortcol">Mean score</th>
-		<th class="sortcol sortfirstdesc">Rating</th>
-		<th class="sortcol">Rating (score-adjusted)</th>
+    <th class="sortcol">Games played</th>
+    <th class="sortcol">Number of Wins</th>
+    <th class="sortcol">Mean normalised position</th>
+    <th class="sortcol">Mean score</th>
+    <th class="sortcol sortfirstdesc">Rating</th>
+    <th class="sortcol">Rating (score-adjusted)</th>
   </tr>
-	</thead>
+  </thead>
 
 <% @users.each do |user| %>
   <% rank = user.ranking%>
-	<% rowclass = ranking_class(rank, user) %>
-	<% next if rowclass == "absent" %>
+  <% rowclass = ranking_class(rank, user) %>
+  <% next if rowclass == "absent" %>
   <% arrowDir = ["down", "same", "up"] %>
   <tr class="<%= rowclass %>">
     <td><%= user.name %></td>
-		<td><%= rank.num_played%></td>
-		<td><%= rank.num_won%><span class="lastVal">(
+    <td><%= rank.num_played%></td>
+    <td><%= rank.num_won%><span class="lastVal">(
         <span class="arrow <%= arrowDir[(rank.num_won <=> rank.last_num_won) + 1]%>"></span>
         <%= rank.last_num_won %>)
     </span></td>
-		<td><%= number_with_precision(rank.mean_norm_pos)%><span class="lastVal">(
+    <td><%= number_with_precision(rank.mean_norm_pos)%><span class="lastVal">(
         <span class="arrow <%= arrowDir[-(number_with_precision(rank.mean_norm_pos) <=> number_with_precision(rank.last_mean_norm_pos)) + 1]%>"></span>
         <%= number_with_precision(rank.last_mean_norm_pos) %>)
     </span></td>
-		<td><%= number_with_precision(rank.mean_score)%><span class="lastVal">(
+    <td><%= number_with_precision(rank.mean_score)%><span class="lastVal">(
         <span class="arrow <%= arrowDir[(number_with_precision(rank.mean_score) <=> number_with_precision(rank.last_mean_score)) + 1]%>"></span>
         <%= number_with_precision(rank.last_mean_score) %>)
     </span></td>
-		<td><%= rank.result_elo.to_i%><span class="lastVal">(
+    <td><%= rank.result_elo.to_i%><span class="lastVal">(
         <span class="arrow <%= arrowDir[(rank.result_elo.to_i <=> rank.last_result_elo.to_i) + 1]%>"></span>
         <%= rank.last_result_elo.to_i %>)
     </span></td>
-		<td><%= rank.score_elo.to_i%><span class="lastVal">(
+    <td><%= rank.score_elo.to_i%><span class="lastVal">(
         <span class="arrow <%= arrowDir[(rank.score_elo.to_i <=> rank.last_score_elo.to_i) + 1]%>"></span>
         <%= rank.last_score_elo.to_i %>)
     </span></td>

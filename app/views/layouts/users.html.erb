@@ -6,15 +6,15 @@
   <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
   <title>Dominion - <%= @title ? @title : controller.action_name.capitalize %></title>
   <%= stylesheet_link_tag 'application' %>
-	<link rel="shortcut icon" type="image/vnd.microsoft.icon" href='<%= image_path("/favicon.ico") %>' />
+  <link rel="shortcut icon" type="image/vnd.microsoft.icon" href='<%= image_path("/favicon.ico") %>' />
   <%= javascript_include_tag 'application' %>
 </head>
 <body>
 
   <% link_to(games_path, :id => "siteLogo") do %>
     <h1>FreeDom</h1>
-		<h2>Free Dominion Game Server</h2>
-	<% end %>
+    <h2>Free Dominion Game Server</h2>
+  <% end %>
 
   <div id="userInfoPadding">  
   </div>     
@@ -28,16 +28,16 @@
       Welcome, <%= user.name -%> | <%= link_to_unless_current "Preferences", settings_path -%> | Not <%= user.name-%>? Please <%= link_to "logout", logout_path -%> 
     <% end %>
   </div>
-	
+  
 <div id="mainContent">
-	<div id="flash">
+  <div id="flash">
     <%= render :partial => 'flash_area' -%>    
   </div>
   <%= yield %>
 </div>
 
 <div id="footer">
-  <%= link_to "Home", games_path %> | <%= link_to "About", about_path%> | <%= link_to "Feedback", contact_path %>	
+  <%= link_to "Home", games_path %> | <%= link_to "About", about_path%> | <%= link_to "Feedback", contact_path %>  
 </div>
 </body>
 </html>
