@@ -306,8 +306,9 @@ class Player < ActiveRecord::Base
       this_act.remove!
       
       # Also log the total cash available.
-      split_string = buys <= 1 ? "" : ", split #{buys} ways"
-      game.histories.create!(:event => "#{name} has #{cash} total cash#{split_string}.",
+      reload
+      split_string = self.buys <= 1 ? "" : ", split #{self.buys} ways"
+      game.histories.create!(:event => "#{name} has #{self.cash} total cash#{split_string}.",
                              :css_class => "player#{seat} play_treasure")
     end
     
