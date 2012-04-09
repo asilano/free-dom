@@ -18,7 +18,7 @@ class Prosperity::Vault < Card
                                 {:expected_action => "resolve_#{self.class}#{id}_choose",
                                  :text => "Discard first card or choose not to, with #{self}",
                                  :player => ply,
-                                 :game => game} unless ply.cards.hand.size < 2
+                                 :game => game} unless ply.cards.hand.size < 1
                               end.compact)
                      
     "OK"
