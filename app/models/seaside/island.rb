@@ -41,13 +41,14 @@ class Seaside::Island < Card
                           :name => "setaside",
                           :text => "Set Aside",
                           :nil_action => nil,
-                          :params => {:card => "#{self.class}#{id}"},
+                          :params => {:card => "#{self.class}#{id}",
+                                      :substep => "setaside"},
                           :cards => [true] * player.cards.hand.size
                          }]
     end
   end
   
-  def resolve(ply, params, parent_act)
+  def resolve_setaside(ply, params, parent_act)
     # We expect to have been passed a :card_index
     if (not params.include? :nil_action) and (not params.include? :card_index)
       return "Invalid parameters"
