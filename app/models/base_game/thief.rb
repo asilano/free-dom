@@ -99,12 +99,15 @@ class BaseGame::Thief < Card
     else
       card_index, option_index = params[:choice].scan(/([0-9]+)\.([0-9]+)/)[0].map {|i| i.to_i}
       
-      if card_index > 1
+      if card_index >= target.cards.revealed.length 
         # Asked to trash/take an invalid card
         return "Invalid request - card index #{card_index} is greater than number of revealed cards"
       elsif option_index > 1
         # Asked to do something invalid with a card
         return "Invalid request - option index #{option_index} is greater than number of options"
+      elsif target.cards.revealed[card_index].is_treasure?
+        # Asked to do something to a non-treasure
+        return "Invalid request - card index #{card_index} is not a treasure"
       end
       
       # Everything checks out. Do the requested action with the specified card.
