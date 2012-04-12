@@ -14,7 +14,7 @@ class Prosperity::Bank < Card
     player.cash += cash
     player.save!
     
-    game.histories.create!(:event => "#{player.name} played Bank, for #{cash} cash.",
+    game.histories.create!(:event => "Bank granted #{player.name} #{cash} cash.",
                           :css_class => "player#{player.seat} play_treasure")
     "OK"
   end
