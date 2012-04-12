@@ -27,7 +27,7 @@ end
 # Check the specified player is not currently required to do anything
 Then(/(.*) should not need to act/) do |name|
   name = "Alan" if name == "I"
-  assert_empty @players[name].active_actions
+  assert_empty @players[name].active_actions(true)
 end
 
 # Verify that the stated cards in hand are (not) choosable
