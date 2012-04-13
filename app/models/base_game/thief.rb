@@ -105,7 +105,7 @@ class BaseGame::Thief < Card
       elsif option_index > 1
         # Asked to do something invalid with a card
         return "Invalid request - option index #{option_index} is greater than number of options"
-      elsif target.cards.revealed[card_index].is_treasure?
+      elsif !target.cards.revealed[card_index].is_treasure?
         # Asked to do something to a non-treasure
         return "Invalid request - card index #{card_index} is not a treasure"
       end
