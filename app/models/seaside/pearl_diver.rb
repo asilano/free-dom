@@ -39,7 +39,8 @@ class Seaside::PearlDiver < Card
                              :action => :resolve,
                              :name => "choose",
                              :label => "#{readable_name}:",                             
-                             :params => {:card => "#{self.class}#{id}"},
+                             :params => {:card => "#{self.class}#{id}",
+                                         :substep => "choose"},
                              :options => [{:text => "Move #{player.cards.deck[-1].readable_name} to top of deck",
                                            :choice => "move"},
                                           {:text => "Leave #{player.cards.deck[-1].readable_name} on bottom of deck",
@@ -48,7 +49,7 @@ class Seaside::PearlDiver < Card
     end
   end
   
-  def resolve(ply, params, parent_act)
+  def resolve_choose(ply, params, parent_act)
     # We expect to have a :choice parameter, either "move" or "leave"
     if (not params.include? :choice) or
        (not params[:choice].in? ["move", "leave"])
