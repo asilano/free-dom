@@ -41,8 +41,8 @@ class Seaside::Cutpurse < Card
       # Target is holding at least one Copper. Discard it.
       card = target_coppers[0]
       card.discard
-      game.histories.create!(:event => "#{player.name} discarded #{card}.",
-                            :css_class => "player#{player.seat} card_discard")
+      game.histories.create!(:event => "#{target.name} discarded #{card}.",
+                            :css_class => "player#{target.seat} card_discard")
     end    
 
     return "OK"
