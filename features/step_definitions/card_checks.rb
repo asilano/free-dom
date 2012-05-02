@@ -123,6 +123,31 @@ Then(/(.*) should have gained #{CardList}/) do |name, kinds|
 end
 
 # Matches
+#   I should have moved Copper, Silver x2, Gold from discard to hand
+Then(/(.*) should have moved #{CardList} from (.*) to (.*)/) do |name, kinds, from, to|
+  name = "Alan" if name == "I"
+  player = @players[name]
+  
+  cards = kinds.split(/,s*/)
+
+  # First, remove the cards from whence they came
+  if from == "deck"
+    # The named cards should be on top in order
+    assert_operator @deck_contents[name].length, :>=, cards.length
+    assert_equal cards, @deck_contents[name][0, cards.length]
+    
+    @deck_contents[name].shift(cards.length)
+  else
+    from_cont = instance_variable_get("@#{from}_contents")[name]    
+    cards.each {|card| from_cont.delete_first(card)}
+  end
+  
+  # Now, put them onto the target
+  to_cont = instance_variable_get("@#{to}_contents")[name]
+  cards.each {|card| to_cont.unshift card}
+end
+
+# Matches
 #   I should have moved the cards named "named cards" from deck to discard
 Then(/(.*) should have moved the cards named "([^"]*)" from (.*) to (.*)/) do |name, grp_name, from, to|
   name = "Alan" if name == "I"
@@ -187,5 +212,30 @@ Then(/(.*) should have placed #{CardList} in (?:his |my )?(.*)/) do |name, kinds
     num.times do
       to << kind
     end
+  end
+end
+
+# One-off check that a player has got the correct cards revealed.
+# Note that you must list all the revealed cards!
+#
+# Matches
+#   I should be revealing Copper, Duchy
+#   Bob should be revealing nothing
+Then(/(.*) should be revealing (#{CardListNoCapture}|nothing)/) do |name, kinds|
+  name = "Alan" if name == "I"
+  player = @players[name]
+
+  if kinds == "nothing"
+    assert_empty player.cards.revealed(true)
+  else
+    expected = []
+    kinds.split(/,\s*/).each do |kind|
+      /(.*) ?x ?(\d+)/ =~ kind
+      kind = $1.rstrip if $1
+      num = $2.andand.to_i || 1
+
+      num.times {expected << kind}
+    end
+    assert_equal expected, player.cards.revealed(true).map(&:readable_name)
   end
 end

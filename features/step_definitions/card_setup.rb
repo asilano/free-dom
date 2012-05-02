@@ -58,7 +58,7 @@ end
 
 # Matches "my deck contains <top> then <middle> then <bottom>". Either of the middle and bottom sections may be missing
 # Each section may be like "Smithy, Witch" or like "4 other cards (named "rest of deck")"                                         
-Given(/^(\w*?)(?:'s)?? deck contains (?:(#{NamedRandCardsNoMatch}|#{CardListNoMatch}) then )?(?:(#{NamedRandCardsNoMatch}|#{CardListNoMatch}) then )?(?:(#{NamedRandCardsNoMatch}|#{CardListNoMatch}))?/) do |name, top, middle, bottom|
+Given(/^(\w*?)(?:'s)?? deck contains (?:(#{NamedRandCardsNoMatch}|#{CardListNoCapture}) then )?(?:(#{NamedRandCardsNoMatch}|#{CardListNoCapture}) then )?(?:(#{NamedRandCardsNoMatch}|#{CardListNoCapture}))?/) do |name, top, middle, bottom|
   name = 'Alan' if name == 'my'
   player = @players[name]
   

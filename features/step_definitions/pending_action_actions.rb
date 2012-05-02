@@ -15,7 +15,8 @@ When(/^(\w*?)(?:'s)? chooses? (.*) in (?:his|my) hand/) do |name, choice|
   flunk "Unimplemented multi-hand controls in testbed" unless controls.length == 1
   
   ctrl = controls[0]
-  params = ctrl[:params]
+  params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
+
   key = if ctrl[:type] == :button
     :card_index
   else
@@ -55,7 +56,7 @@ When(/(.*) chooses? the option (.*)/) do |name, choice|
   flunk "Unimplemented multi-player controls in testbed" unless controls.length == 1
   
   ctrl = controls[0]
-  params = ctrl[:params]
+  params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
   
   params[:choice] = ctrl[:options].detect {|opt| opt[:text] =~ Regexp.new(choice, Regexp::IGNORECASE)}[:choice]
   
@@ -82,7 +83,7 @@ When(/^(\w*?)(?:'s)? chooses? (?:the )?(.*) (?:for )?piles?/) do |name, choice|
   flunk "Unimplemented multi-piles controls in testbed" unless controls.length == 1
   
   ctrl = controls[0]
-  params = ctrl[:params]
+  params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
   
   if ctrl[:nil_action].andand == choice
     params[:nil_action] = true
@@ -101,3 +102,38 @@ When(/^(\w*?)(?:'s)? chooses? (?:the )?(.*) (?:for )?piles?/) do |name, choice|
   # Probably chosen the card for a reason
   @skip_card_checking = 1
 end
+
+# Step for any control that requires you to choose an action on revealed cards
+#
+# Matches
+#   I choose Discard for Bob's revealed Gold
+#   Bob chooses Put back for my revealed Market
+When(/^(\w*?) chooses? (.*?) for (\w*?)(?:'s)? revealed (#{SingleCardNoCapture}|nothing)/) do |name, choice, tgt_name, card|
+  name = "Alan" if name == "I"
+  player = @players[name]
+
+  all_controls = player.determine_controls
+  controls = all_controls[:revealed] 
+  
+  tgt_name = "Alan" if tgt_name == "my"
+  target = @players[tgt_name]
+
+  ctrl = controls.detect {|c| c[:player_id] == target.id}
+  params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
+  
+  if ctrl[:nil_action].andand == choice
+    params[:choice] = "nil_action"
+  elsif (ix = ctrl[:options].index(choice))
+    card_ix = target.cards.revealed.map(&:readable_name).index(card)
+    flunk "Can't find #{card} in #{tgt_name} revealed" unless card_ix
+
+    params[:choice] = "#{card_ix}.#{ix}"
+  end
+  Rails.logger.info(params.inspect)
+  player.resolve(params)
+
+  # Probably expect something to happen to the chosen card
+  @skip_card_checking = 1
+end
+
+    

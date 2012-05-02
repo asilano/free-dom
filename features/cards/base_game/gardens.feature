@@ -31,7 +31,7 @@ Feature: Gardens
      |   4  |  2   |   15    |     0    |   2   |
      |   0  | 23   |    4    |     2    |   3   |
     
-  Scenario: Duchy should contribute to score from all zones
+  Scenario: Gardens should contribute to score from all zones
     Given I am a player in a standard game
       And my hand contains Gardens, Copper x10
       And my deck contains Gardens
