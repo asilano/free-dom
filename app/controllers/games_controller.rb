@@ -96,6 +96,7 @@ class GamesController < ApplicationController
   # GET /games/new.xml
   def new
     @game = Game.new
+    @game.max_players = 6
     @game.random_select = 0
     @game.specify_distr = 1
     @game.plat_colony = "rules"
