@@ -58,22 +58,28 @@ class UsersController < ApplicationController
   def create
     @user = User.new(params[:user])
     
-    respond_to do |format|
-      if @user.save        
-        session[:user_id] = @user.reload.id
-        cookie_login if params[:remember_me]
-        @user.create_ranking
-        
-        UserMailer.registered(@user).deliver
-        UserMailer.report_registered(@user).deliver
-        
-        @title = "Resigtration successful"
-        format.html { render :action => "registered" }
-        format.xml  { render :xml => @user, :status => :created, :location => @user }
-      else
+    if @user.save        
+      session[:user_id] = @user.reload.id
+      cookie_login if params[:remember_me]
+      @user.create_ranking
+      
+      UserMailer.registered(@user).deliver
+      UserMailer.report_registered(@user).deliver
+      
+      redirect_to registered_path               
+    else
+      respond_to do |format|
         format.html { render :action => "new" }
         format.xml  { render :xml => @user.errors, :status => :unprocessable_entity }
       end
+    end
+  end
+  
+  def registered
+    @title = "Resigtration successful"
+    respond_to do |format|
+      format.html { render :action => "registered" }
+      format.xml  { render :xml => @user, :status => :created, :location => @user }
     end
   end
   

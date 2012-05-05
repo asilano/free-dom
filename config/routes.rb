@@ -3,6 +3,7 @@ Dominion::Application.routes.draw do
   match 'users/logout', :controller => 'users', :action => 'logout', :as => 'logout'
   match 'users/settings', :method => :get, :controller => 'users', :action => 'edit', :as => 'settings'
   match 'users/password_reset', :controller => 'users', :action => 'password_reset', :as => 'password_reset'
+  match 'users/registered', :controller => 'users', :action => 'registered', :as => 'registered'
   resources :users, :except => [:edit]
   
   match 'dominion/clear_player', :controller => 'games', :action => 'clear_player', :as => 'clear_player'
