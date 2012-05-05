@@ -63,7 +63,12 @@ class UsersController < ApplicationController
         session[:user_id] = @user.reload.id
         cookie_login if params[:remember_me]
         @user.create_ranking
-        format.html { redirect_to(:controller => :users, :action => "edit", :method => :get) }
+        
+        UserMailer.registered(@user).deliver
+        UserMailer.report_registered(@user).deliver
+        
+        @title = "Resigtration successful"
+        format.html { render :action => "registered" }
         format.xml  { render :xml => @user, :status => :created, :location => @user }
       else
         format.html { render :action => "new" }
