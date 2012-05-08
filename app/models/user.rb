@@ -1,6 +1,8 @@
 require 'digest/sha1'
 
 class User < ActiveRecord::Base
+  attr_accessible :name, :email, :password, :password_confirmation, :contact_me, :pbem
+
   validates_presence_of :name
   validates_uniqueness_of :name, :case_sensitive => false
   

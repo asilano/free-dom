@@ -1,5 +1,6 @@
 class UserMailer < ActionMailer::Base
-  default :from => 'Free-Dom <chowlett09+free-dom@gmail.com>'
+  AdminAddr = 'chowlett09+free-dom@gmail.com'
+  default :from => "Free-Dom <#{AdminAddr}>"
 
   def password_reset(user, new_pass)
     @user = user
@@ -17,4 +18,17 @@ class UserMailer < ActionMailer::Base
          :to => user.email
   end
   
+  def registered(user)
+    @user = user
+    
+    mail :subject => 'Registration successful at free-dom',
+         :to => user.email         
+  end
+  
+  def report_registered(user)
+    @new_user = user
+    
+    mail :subject => 'New user at free-dom',
+         :to => AdminAddr
+  end
 end

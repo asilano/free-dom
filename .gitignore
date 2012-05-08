@@ -1,6 +1,9 @@
 .bundle
+.env
+.project
+*.log
 db/*.sqlite3
-log/*.log
+log/
 tmp/
 .sass-cache/
 .svn/

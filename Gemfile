@@ -24,6 +24,7 @@ end
 
 gem 'jquery-rails'
 gem 'therubyracer'
+gem 'actionmailer-with-request'
 
 # Use unicorn as the web server
 # gem 'unicorn'
