@@ -73,11 +73,13 @@
       <% end %>
     </div>
     
-    <div id="mainContent">
+    <div id="contentWrap">
       <div id="flash">
         <%= render :partial => 'flash_area' -%>        
       </div>
-      <%= yield %>
+      <div id="mainContent">
+        <%= yield %>
+      </div>
     </div>
     
     <div id="footer">
