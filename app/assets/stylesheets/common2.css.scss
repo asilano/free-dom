@@ -98,6 +98,7 @@ h1, h2
 #siteLogo
 {
 		padding: 0 10px;
+		margin-top: 2em;
 		background-color: #f5f4d6;
     background-image: -moz-linear-gradient(left top, #fff 10%, #f5f4d6, #fff 90%);
 		background-image: -webkit-gradient(linear, 0 0, 100% 100%, color-stop(0.1, white), color-stop(0.5, #f5f4d6), color-stop(0.9, white));
@@ -112,7 +113,7 @@ h1, h2
 {
   min-height: 100%;
   overflow: visible;
-	padding-left: 2em;
+	padding: 0 2em;
   
   &:before 
   { /* Opera and IE8 "redraw" bug fix */
@@ -125,13 +126,13 @@ h1, h2
 * html #contentWrap { height: 100% } /* IE6 workaround */
 
 #flash { margin-top: 2em; }
-#mainContent { padding-bottom: 20px; }
+#mainContent { padding-bottom: 22px; }
 
 #footer 
 {
   clear: both;
   height: 20px;
-  margin-top: -20px; 
+  margin-top: -22px; 
   border-top: 1px solid #ccf; 
   font-size: 1.1em; 
   

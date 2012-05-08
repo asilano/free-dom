@@ -58,11 +58,6 @@
     </script>
   </head>
   <body onload="onloadFunc();">
-
-    <%= link_to(games_path, :id => "siteLogo") do %>
-      <h1>FreeDom</h1>
-      <h2>Free Dominion Game Server</h2>
-    <% end %>
     
     <div id="userInfo">
       <% if session[:user_id].nil? %>
@@ -74,6 +69,10 @@
     </div>
     
     <div id="contentWrap">
+      <%= link_to(games_path, :id => "siteLogo") do %>
+        <h1>FreeDom</h1>
+        <h2>Free Dominion Game Server</h2>
+      <% end %>
       <div id="flash">
         <%= render :partial => 'flash_area' -%>        
       </div>
