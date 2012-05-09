@@ -153,7 +153,7 @@ $p5fgcol: #d0d;
   
 #history
 {
-	height: 65%;
+	height: 350px;
   li 
   { 
     position: relative; 
@@ -188,7 +188,12 @@ $p5fgcol: #d0d;
   z-index: 1500;
   overflow: auto;
 }
-#chat {height:35%; margin-bottom: 5px; position: relative;}
+#chat 
+{
+  height:250px; 
+  margin-bottom: 5px; 
+  position: relative;
+}
 #history ul {padding-left: 40px;}
 #chatbox 
 {
