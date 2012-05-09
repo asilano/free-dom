@@ -1,4 +1,4 @@
-When(/(.*) play(?:s)? (.*)/) do |name, kind|
+When(/^(\w*?) play(?:s)? (.*)/) do |name, kind|
   name = 'Alan' if name == 'I'
   assert_contains @hand_contents[name], kind
   card = @players[name].cards.hand.first(:conditions => ['type = ?', CARD_TYPES[kind].name])

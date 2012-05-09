@@ -128,7 +128,7 @@ Then(/(.*) should have moved #{CardList} from (.*) to (.*)/) do |name, kinds, fr
   name = "Alan" if name == "I"
   player = @players[name]
   
-  cards = kinds.split(/,s*/)
+  cards = kinds.split(/,\s*/)
 
   # First, remove the cards from whence they came
   if from == "deck"

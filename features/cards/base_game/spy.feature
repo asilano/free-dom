@@ -21,6 +21,7 @@ Feature: Spy
       And Charlie should be revealing nothing
       And I should need to Choose Spy actions for Alan
       And I should need to Choose Spy actions for Bob
+      And I should need to Choose Spy actions for Charlie
     When I choose Discard for my revealed Copper
     Then I should have moved Copper from deck to discard
     When I choose Put back for Bob's revealed Gold
