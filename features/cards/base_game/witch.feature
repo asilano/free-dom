@@ -10,7 +10,7 @@ Feature: Witch
 
   Scenario: Playing Witch
     Given my hand contains Witch
-      And my deck contains 3 cards
+      And my deck contains Market x3
       And it is my Play Action phase
     When I play Witch
       And the game checks actions
@@ -26,7 +26,7 @@ Feature: Witch
       And Charlie's hand contains Estate, Duchy, Curse
       And Charlie has Lighthouse as a duration
       And Bob has setting automoat on
-      And my deck contains 3 cards
+      And my deck contains Market x3
       And it is my Play Action phase
     When I play Witch
       And the game checks actions

@@ -8,3 +8,7 @@ end
 Given /^PENDING/ do
   pending
 end
+
+Then /dump actions/ do
+  PendingAction.all.each {|pa| Rails.logger.info(pa.inspect)}
+end

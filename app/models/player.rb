@@ -149,6 +149,7 @@ class Player < ActiveRecord::Base
   def play_action(params)
     # Checks. In order to be playing an action, the player must be waiting to
     # play an action
+    active_actions.reload
     if not waiting_for?("play_action")
       return "Not expecting an Action at this time"
     elsif (!params.include?(:nil_action) &&
@@ -168,6 +169,7 @@ class Player < ActiveRecord::Base
     rc = "OK"
     this_act = active_actions.detect {|act| act.expected_action == "play_action"}
     parent_act = this_act.parent
+Rails.logger.info("Destroying action #{this_act.id} to play action")
     this_act.destroy
     
     # Now process the action played

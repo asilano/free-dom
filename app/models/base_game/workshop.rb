@@ -6,7 +6,7 @@ class BaseGame::Workshop < Card
   def play(parent_act)
     super
     act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}",
-                                     :text => "Take card with Workshop")
+                                     :text => "Take a card with Workshop")
     act.player = player
     act.game = game
     act.save!
