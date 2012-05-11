@@ -1,4 +1,4 @@
-# 17	Sea Hag	Seaside	Action - Attack	$4	Each other player discards the top card of his deck, then gains a Curse card, putting it on top of his deck.
+# 17  Sea Hag  Seaside  Action - Attack  $4  Each other player discards the top card of his deck, then gains a Curse card, putting it on top of his deck.
 
 class Seaside::SeaHag < Card
   costs 4

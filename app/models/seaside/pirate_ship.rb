@@ -1,4 +1,4 @@
-# 15	Pirate Ship	Seaside	Action - Attack	$4	Choose one: Each other player reveals the top 2 cards of his deck, trashes a revealed Treasure that you choose, discards the rest, and if anyone trashed a Treasure you take a Coin token; or, +1 Coin per Coin token you've taken with Pirate Ships this game.
+# 15  Pirate Ship  Seaside  Action - Attack  $4  Choose one: Each other player reveals the top 2 cards of his deck, trashes a revealed Treasure that you choose, discards the rest, and if anyone trashed a Treasure you take a Coin token; or, +1 Coin per Coin token you've taken with Pirate Ships this game.
 
 class Seaside::PirateShip < Card
   costs 4

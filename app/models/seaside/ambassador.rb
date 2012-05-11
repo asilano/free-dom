@@ -1,4 +1,4 @@
-# 6	Ambassador	Seaside	Action - Attack	$3	Reveal a card from your hand. Return up to 2 copies of it from your hand to the Supply. Then each other player gains a copy of it.
+# 6  Ambassador  Seaside  Action - Attack  $3  Reveal a card from your hand. Return up to 2 copies of it from your hand to the Supply. Then each other player gains a copy of it.
 
 class Seaside::Ambassador < Card
   costs 3

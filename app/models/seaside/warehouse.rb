@@ -1,4 +1,4 @@
-# 10	Warehouse	Seaside	Action	$3	+3 Card, +1 Action, Discard 3 cards.
+# 10  Warehouse  Seaside  Action  $3  +3 Card, +1 Action, Discard 3 cards.
 
 class Seaside::Warehouse < Card
   costs 3
@@ -7,20 +7,20 @@ class Seaside::Warehouse < Card
   
   def play(parent_act)
     super
-		
-		# First, draw the cards.
+    
+    # First, draw the cards.
     player.draw_cards(3)
         
     # Now create the new Action
     parent_act = player.add_actions(1, parent_act)
 
-		# If the player has very few cards in deck, it's possible for the draw to fail, and
-		# thus there to be fewer than 3 cards available to discard.
-		
-		num_discards = [3, player.cards.hand.length].min
-		
-		if ( 0 == num_discards )
-			# Just log that we're out of cards
+    # If the player has very few cards in deck, it's possible for the draw to fail, and
+    # thus there to be fewer than 3 cards available to discard.
+    
+    num_discards = [3, player.cards.hand.length].min
+    
+    if ( 0 == num_discards )
+      # Just log that we're out of cards
       game.histories.create!(:event => "#{player.name} discarded no cards to Warehouse, due to having none.",
                             :css_class => "player#{player.seat} card_discard")
     elsif (num_discards == player.cards.hand.length)
@@ -38,19 +38,19 @@ class Seaside::Warehouse < Card
         game.histories.create!(:event => "#{player.name} discarded #{card}.",
                               :css_class => "player#{player.seat} card_discard")
       end
-		else
-			# Queue up the requests to do the discards
-			1.upto(num_discards) do |num|
-				parent_act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_discard",
-				                                        :text => "Discard #{num} card#{num > 1 ? 's' : ''}",
+    else
+      # Queue up the requests to do the discards
+      1.upto(num_discards) do |num|
+        parent_act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_discard",
+                                                :text => "Discard #{num} card#{num > 1 ? 's' : ''}",
                                                 :player => player, 
                                                 :game => game)
-			end
-		end
-		
+      end
+    end
+    
     return "OK"
   end
-	
+  
   def determine_controls(player, controls, substep, params)
     # determine_react_controls(player, controls, substep, params)
     

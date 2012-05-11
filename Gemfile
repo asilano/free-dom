@@ -25,6 +25,7 @@ end
 
 gem 'jquery-rails'
 gem 'therubyracer'
+gem 'actionmailer-with-request'
 
 gem 'andand'
 

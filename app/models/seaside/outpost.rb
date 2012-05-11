@@ -1,4 +1,4 @@
-# 23	Outpost	Seaside	Action - Duration	$5	You only draw 3 cards (instead of 5) in this turn's Clean-up phase. Take an extra turn after this one. This can't cause you to take more than two consecutive turns.
+# 23  Outpost  Seaside  Action - Duration  $5  You only draw 3 cards (instead of 5) in this turn's Clean-up phase. Take an extra turn after this one. This can't cause you to take more than two consecutive turns.
 
 class Seaside::Outpost < Card
   costs 5

@@ -1,4 +1,4 @@
-# 9	Smugglers	Seaside	Action	$3	Gain a copy of a card costing up to 6 Coins that the player to your right gained on his last turn.
+# 9  Smugglers  Seaside  Action  $3  Gain a copy of a card costing up to 6 Coins that the player to your right gained on his last turn.
 
 class Seaside::Smuggler < Card
   costs 3

@@ -1,9 +1,9 @@
 <tr>
 <% if control[:params] -%>
-	<% control[:params].each do |key, value| -%>
-		<%= hidden_field_tag key, value, :id => "#{key}_#{control[:name]}_#{control.object_id}" -%>
-	<% end %>
-<% end %>	
+  <% control[:params].each do |key, value| -%>
+    <%= hidden_field_tag key, value, :id => "#{key}_#{control[:name]}_#{control.object_id}" -%>
+  <% end %>
+<% end %>  
 <% if control[:on_update] %>
   <%= javascript_tag do %>
     changed_<%= control.object_id -%> = function (){
@@ -12,27 +12,27 @@
   <% end %>
 <% end %>
 <% control[:cards].each_with_index do |card_ctrl, ix| -%>
-	<td>
-		<% if card_ctrl -%>
-			<% case control[:type] 
-			   when :button -%>
-		   		<% submit_hash = {:url => {:action => control[:action]},
-								  :loading => "disable_named('#{control[:name]}'); $('locked').innerHTML = 'true'",
-                  :complete => "$('spinner').hide(); $('locked').innerHTML = 'false'",
-								  :before => "$('spinner').show(); disable_named('card_index');
-                              nil_act = document.getElementById('#{control[:action]}_nil_action_#{control.object_id}');
-                              if (nil_act) nil_act.disabled=true; 
-                              document.getElementById('card_index_#{control.object_id}_#{ix}').disabled=false"} -%>
-					<%= submit_to_remote control[:name], control[:text], submit_hash -%>
-					<%= hidden_field_tag :card_index, ix, :id => "card_index_#{control.object_id}_#{ix}", :disabled => true -%>					
-			<% when :two_d_radio -%>
-				<% control[:options].each_with_index do |opt, optix| -%>
-					<%= radio_button_tag(:choice, 
-									 "#{ix}.#{optix}", false, :onclick => ("changed_#{control.object_id}()" if control[:on_update])) -%><%= h opt -%><br/>
-				<% end %> 
-			<% when :latin_radio -%>
+  <td>
+    <% if card_ctrl -%>
+      <% case control[:type] 
+         when :button -%>
+           <% submit_hash = {:url => {:action => control[:action]},
+                            :loading => "disable_named('#{control[:name]}'); $('locked').innerHTML = 'true'",
+                            :complete => "$('spinner').hide(); $('locked').innerHTML = 'false'",
+                            :before => "$('spinner').show(); disable_named('card_index');
+                                        nil_act = document.getElementById('#{control[:action]}_nil_action_#{control.object_id}');
+                                        if (nil_act) nil_act.disabled=true; 
+                                        document.getElementById('card_index_#{control.object_id}_#{ix}').disabled=false"} -%>
+          <%= submit_to_remote control[:name], control[:text], submit_hash -%>
+          <%= hidden_field_tag :card_index, ix, :id => "card_index_#{control.object_id}_#{ix}", :disabled => true -%>          
+      <% when :two_d_radio -%>
+        <% control[:options].each_with_index do |opt, optix| -%>
+          <%= radio_button_tag(:choice, 
+                   "#{ix}.#{optix}", false, :onclick => ("changed_#{control.object_id}()" if control[:on_update])) -%><%= h opt -%><br/>
+        <% end %> 
+      <% when :latin_radio -%>
         <% control[:options].each_with_index do |opt, optix| %>
-				  <%= radio_button_tag("choice[#{ix}]", 
+          <%= radio_button_tag("choice[#{ix}]", 
                                "#{optix}",
                                false,
                                {"data-rowid".to_sym => "#{optix}",
@@ -43,45 +43,44 @@
     if (radio != this) {
       radio.checked = false;}
   }" + (control[:on_update] ? "changed_#{control.object_id}()" : "")})%><%= h opt %>
-					<br />
-				<% end %>
-			<% when :checkboxes -%>
-				<%= check_box_tag(control[:name] + "[]", ix, nil, :id => "#{control.object_id}_#{ix}", :onclick => ("changed_#{control.object_id}()" if control[:on_update]), :"data-js" => (control[:data][ix] if control[:data])) -%>
-				<%= label_tag("#{control.object_id}_#{ix}", control[:choice_text]) -%>	
-			<% end -%>
-		<% end %>
-	</td>
+          <br />
+        <% end %>
+      <% when :checkboxes -%>
+        <%= check_box_tag(control[:name] + "[]", ix, nil, :id => "#{control.object_id}_#{ix}", :onclick => ("changed_#{control.object_id}()" if control[:on_update]), :"data-js" => (control[:data][ix] if control[:data])) -%>
+        <%= label_tag("#{control.object_id}_#{ix}", control[:choice_text]) -%>  
+      <% end -%>
+    <% end %>
+  </td>
 <% end %>
 <% if (control[:type] != :button) || control[:nil_action] || control[:on_update]-%>
-	<td>
-		<% case control[:type] 
-		   when :button -%>
+  <td>
+    <% case control[:type] 
+       when :button -%>
       <% if control[:nil_action] %>
         <% submit_hash = {:url => {:action => control[:action]},
-                  :loading => "disable_named('#{control[:name]}'); $('locked').innerHTML = 'true'",
-                  :complete => "$('spinner').hide()",
-                  :before => "$('spinner').show(); $('locked').innerHTML = 'false'; disable_named('card_index');
-                              document.getElementById('#{control[:action]}_nil_action_#{control.object_id}').disabled=false"} -%>
+                          :loading => "disable_named('#{control[:name]}'); $('locked').innerHTML = 'true'",
+                          :complete => "$('spinner').hide()",
+                          :before => "$('spinner').show(); $('locked').innerHTML = 'false'; disable_named('card_index');
+                                      document.getElementById('#{control[:action]}_nil_action_#{control.object_id}').disabled=false"} -%>
         <%= submit_to_remote control[:name], control[:nil_action], submit_hash -%>
         <%= hidden_field_tag :nil_action, control[:nil_action], :id => "#{control[:action]}_nil_action_#{control.object_id}", :disabled => true -%>
       <% end %>
-		<% when :two_d_radio, :latin_radio -%>
-			<% if control[:nil_action] -%>
-			   	<%= radio_button_tag(:choice, 
-									 "nil_action", true) -%><%= h control[:nil_action] -%><br/>
-			<% end -%>
-			<% submit_hash = {:loading => "disable_named('choice'); disable_named('choice_btn'); $('locked').innerHTML = 'true'",
+    <% when :two_d_radio, :latin_radio -%>
+      <% if control[:nil_action] -%>
+        <%= radio_button_tag(:choice, "nil_action", true) -%><%= h control[:nil_action] -%><br/>
+      <% end -%>
+      <% submit_hash = {:loading => "disable_named('choice'); disable_named('choice_btn'); $('locked').innerHTML = 'true'",
                         :before => "$('spinner').show(); $('locked').innerHTML = 'false'",
                         :complete => "$('spinner').hide()",
-							          :url => {:action => control[:action]}}.merge(control[:params]) -%>
-			<%= submit_to_remote "choice_btn", control[:text], submit_hash -%>
-		<% when :checkboxes -%>			
-			<% submit_hash = {:loading => "disable_named('#{control[:name]}[]'); disable_named('#{control[:name]}_btn'); $('locked').innerHTML = 'true'",
+                        :url => {:action => control[:action]}}.merge(control[:params]) -%>
+      <%= submit_to_remote "choice_btn", control[:text], submit_hash -%>
+    <% when :checkboxes -%>      
+      <% submit_hash = {:loading => "disable_named('#{control[:name]}[]'); disable_named('#{control[:name]}_btn'); $('locked').innerHTML = 'true'",
                         :before => "$('spinner').show(); $('locked').innerHTML = 'false'",
                         :complete => "$('spinner').hide()",
-							          :url => {:action => control[:action]}}.merge(control[:params]) -%>
-			<%= submit_to_remote control[:name]+"_btn", control[:button_text], submit_hash -%>	
-		<% end -%>
+                        :url => {:action => control[:action]}}.merge(control[:params]) -%>
+      <%= submit_to_remote control[:name]+"_btn", control[:button_text], submit_hash -%>  
+    <% end -%>
     
     <% if control[:on_update] %>
       <span id='<%= control.object_id.to_s + "_js" -%>'></span>
@@ -89,6 +88,6 @@
         <%= "changed_#{control.object_id}()" %>
       <% end %>
     <% end %>
-	</td>
+  </td>
 <% end -%>
 </tr>

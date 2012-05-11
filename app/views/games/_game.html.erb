@@ -1,6 +1,3 @@
-<p class="flash warning">FreeDom has now been updated to the latest Rails version and corresponding Heroku stack. 
-              If you notice any problems, please <%= link_to "report them to me", contact_path -%>.
-</p>
 <div id="game_state" style="">
   <div id="last_changed">
     Game state last changed at: <span id="last_change_value"><%= h @last_mod.httpdate -%></span>
@@ -8,56 +5,56 @@
   <div id="last_refreshed">
     Last checked for changes at: <span id="last_refresh_value"><%= h Time.new.httpdate -%></span>
   </div>
-	<div id="update_freq" class="lighter">
-		<% if @player %>
-		  Updating every <span id="update_freq_value"><%= @player.settings.update_interval %></span> 
-			<span id="update_freq_form" style="display: none;">                   
+  <div id="update_freq" class="lighter">
+    <% if @player %>
+      Updating every <span id="update_freq_value"><%= @player.settings.update_interval %></span> 
+      <span id="update_freq_form" style="display: none;">                   
         <%= text_field_tag :update_interval, @player.settings.update_interval, :size => 4 %> 
-				<%= submit_tag "Set", 
+        <%= submit_tag "Set", 
                        :onclick => remote_function(:update => nil,
                                                    :url => {:action => :update_player_settings,
                                                             :id => @game},
                                                    :with => "'settings[update_interval]=' + escape($('update_interval').value)",
                                                    :success => "$('cancel_freq').innerHTML = 'Please refresh to enable change'")
                                    %>
-			</span>
-			seconds. <span id="change_freq"><%= link_to_function "Change.", "enable_freq_form()" %></span>
-			         <span id="cancel_freq" style="display: none;"><%= link_to_function "Cancel.", "disable_freq_form()" %></span>
-			<script>
-				function enable_freq_form()
-				{
-					$('update_freq').className = "";
-					$('update_freq_value').hide();
-					$('update_freq_form').show();
-					$('change_freq').hide();
-					$('cancel_freq').show();					
-				}
-				function disable_freq_form()
+      </span>
+      seconds. <span id="change_freq"><%= link_to_function "Change.", "enable_freq_form()" %></span>
+               <span id="cancel_freq" style="display: none;"><%= link_to_function "Cancel.", "disable_freq_form()" %></span>
+      <script>
+        function enable_freq_form()
         {
-					$('update_freq').className = "lighter";
+          $('update_freq').className = "";
+          $('update_freq_value').hide();
+          $('update_freq_form').show();
+          $('change_freq').hide();
+          $('cancel_freq').show();          
+        }
+        function disable_freq_form()
+        {
+          $('update_freq').className = "lighter";
           $('update_freq_value').show();
           $('update_freq_form').hide();
           $('change_freq').show();
           $('cancel_freq').hide();          
-        }			
-			</script>
-		<% else %>
-		  <% freq = @user ? @user.settings.update_interval : 60 %>
-			Updating every <%= freq %> seconds.			
-		<% end %> 
-	</div>
+        }      
+      </script>
+    <% else %>
+      <% freq = @user ? @user.settings.update_interval : 60 %>
+      Updating every <%= freq %> seconds.      
+    <% end %> 
+  </div>
   <div id="status">
-  	<div id="ended" style="display: none;"><%= game.state == 'ended' %></div>
-		<div id="locked" style="display: none;">false</div>
+    <div id="ended" style="display: none;"><%= game.state == 'ended' %></div>
+    <div id="locked" style="display: none;">false</div>
     <p>
       Game state:
-			<% if game.state == 'waiting' %>
+      <% if game.state == 'waiting' %>
         Waiting for players
-			<% elsif game.state == 'running' %>
+      <% elsif game.state == 'running' %>
         In progress
-			<% elsif game.state == 'ended' %>
+      <% elsif game.state == 'ended' %>
         Ended
-			<% else %>
+      <% else %>
         <%= h game.state %>
       <% end %>
     </p>
@@ -94,7 +91,7 @@
         <% if player && player.seat             
             other_players = other_players.sort_by {|p| (p.seat - player.seat) % game.players.length} 
            end %>
-				<% other_players.in_groups_of(2) do |chunk| %>
+        <% other_players.in_groups_of(2) do |chunk| %>
           <tr class="other_players">
             <%= render :partial => 'player',
                        :collection => chunk.compact,
@@ -117,7 +114,7 @@
         <th>
           Remaining
         </th>
-				<th><!-- pile state--></th>
+        <th><!-- pile state--></th>
       </tr>
       <% if controls.include? :piles -%>
       <tr>
@@ -127,27 +124,27 @@
         </td>
         <td>
         </td>
-				<td></td>
+        <td></td>
         <% controls[:piles].each do |control| -%>
-				<td>
+        <td>
           <% if control[:nil_action] -%>
             <% case control[:type]
                when :button -%>        
-	            <%= form_remote_tag :url => {:action => control[:action]},
-							 								            :before => "$('spinner').show()",
-															            :complete => "$('spinner').hide()",
-															            :loading => "disable_named('#{control[:name]}')" do -%>
-		            <%= hidden_field_tag :nil_action, control[:nil_action], :id => "#{control[:action]}_nil_action" -%>
-		            <% if control[:params] -%>
-		              <% control[:params].each do |key, value| -%>
-		                <%= hidden_field_tag key, value, :id => "#{key}_nil}" -%>
-		              <% end %>
-		            <% end %>
-	              <%= submit_tag control[:nil_action], :name => control[:name] -%>
-	            <% end -%>				        
-	          <% end -%>
-	        <% end -%>
-				</td>					
+              <%= form_remote_tag :url => {:action => control[:action]},
+                                           :before => "$('spinner').show()",
+                                          :complete => "$('spinner').hide()",
+                                          :loading => "disable_named('#{control[:name]}')" do -%>
+                <%= hidden_field_tag :nil_action, control[:nil_action], :id => "#{control[:action]}_nil_action" -%>
+                <% if control[:params] -%>
+                  <% control[:params].each do |key, value| -%>
+                    <%= hidden_field_tag key, value, :id => "#{key}_nil}" -%>
+                  <% end %>
+                <% end %>
+                <%= submit_tag control[:nil_action], :name => control[:name] -%>
+              <% end -%>                
+            <% end -%>
+          <% end -%>
+        </td>          
         <% end -%>
       </tr>
       <% end -%>
@@ -171,33 +168,33 @@
       <% end %>
     <% end %>
   </div>
-	<div id="join_button">
-		<% if !player && @user &&
+  <div id="join_button">
+    <% if !player && @user &&
           (game.users.include?(@user) ||
            (game.state == 'waiting' &&
             game.players.length < game.max_players)) %>
       <%= button_to "Join Game", join_game_path(game) %>
-		<% end %>
+    <% end %>
   </div>
   <%= link_to 'Lobby', games_path %>
 </div>
 <div id="chat">
-	<div id="chatbox">
-		<% game.chats.each do |chat_line| %>
-		  <%= render :partial => 'chat_line', :object => chat_line %>
-		<% end %>
+  <div id="chatbox">
+    <% game.chats.each do |chat_line| %>
+      <%= render :partial => 'chat_line', :object => chat_line %>
+    <% end %>
   </div>
-	<%= form_remote_tag :url => speak_game_url, 
+  <%= form_remote_tag :url => speak_game_url, 
                      :update => {:success => 'chatbox', :failure => 'flash'}, 
                      :position => 'bottom',
                      :after => 'this.reset()',
                      :complete => '$(\'chatbox\').scrollTop = $(\'chatbox\').scrollHeight;' do %>
-	 <div>
+   <div>
     <%= text_field_tag("name", nil, :placeholder => "Name?") if !@user%>
     <%= text_field_tag("say", nil, :placeholder => "What do you want to say?", :autocomplete => 'off') %>
-		<%= submit_tag "Say", :class => 'input-hack' %>
-	 </div>
-	<% end %>
+    <%= submit_tag "Say", :class => 'input-hack' %>
+   </div>
+  <% end %>
 </div>
 <div id="history">
   <ul>
@@ -221,46 +218,46 @@
 </div>
 
 <% if game.state == "ended" %>
-	<div id="resultOverlay" class="overlay">
-	</div>
+  <div id="resultOverlay" class="overlay">
+  </div>
 
-	<div id="result">
-	  <p class="centred header">
-	    Game Over - Results
-	  </p>
-	  <% ply_ordered = game.players.sort_by {|p| p.score}.reverse %>
-	  <ul id="resultList">
-	    <li class="resultEntry winner">
-	      <span class="name"><%= h(ply_ordered[0].name) -%></span>
-	      - Winner with <%= h(ply_ordered[0].score) -%> points! <%= link_to_function("(show deck)",
-	      "$(this).hide(); $('hide_deck_0').show();" + visual_effect(:blind_down, 'deck_list_0', :duration => 0.5),
-	      {:class => "showHideDeck", :id => "show_deck_0"}) -%>
-	      <%= link_to_function("(hide deck)",
-	      "$(this).hide(); $('show_deck_0').show();" + visual_effect(:blind_up, 'deck_list_0', :duration => 0.5),
-	      {:class => "showHideDeck", :id => "hide_deck_0", :style => "display: none"}) -%>
-	      <p class="deckList" style="display: none;" id="deck_list_0">
-					<%= raw ply_ordered[0].cards_for_decklist %>
-	      </p>
-	    </li>
-	    <% ply_ordered.each_with_index do |ply, ix| %>
-	    <% if ix != 0 %>
-	    <li class="resultEntry">
-	      <span class="name"><%= h(ply.name) -%></span>
-	      -<%= %w<first second third fourth fifth sixth>[ix] + " with " + h(ply.score) -%> points <%= link_to_function("(show deck)",
-	      "$(this).hide(); $('hide_deck_#{ix}').show();" + visual_effect(:blind_down, "deck_list_#{ix}", :duration => 0.5),
-	      {:class => "showHideDeck", :id => "show_deck_#{ix}"}) -%>
-	      <%= link_to_function("(hide deck)",
-	      "$(this).hide(); $('show_deck_#{ix}').show();" + visual_effect(:blind_up, "deck_list_#{ix}", :duration => 0.5),
-	      {:class => "showHideDeck", :id => "hide_deck_#{ix}", :style => "display: none"}) -%>
-	      <p class="deckList" style="display: none;" id=<%= "deck_list_#{ix}" -%>>
-	        <%= raw ply.cards_for_decklist -%>
-	      </p>
-	    </li>
-	    <% end %>
-	    <% end %>
-	  </ul>
-	  <p class="centred gapAbove">
-	    <%= link_to "Back to Index", games_path -%>
-	  </p>
-	</div>
+  <div id="result">
+    <p class="centred header">
+      Game Over - Results
+    </p>
+    <% ply_ordered = game.players.sort_by {|p| p.score}.reverse %>
+    <ul id="resultList">
+      <li class="resultEntry winner">
+        <span class="name"><%= h(ply_ordered[0].name) -%></span>
+        - Winner with <%= h(ply_ordered[0].score) -%> points! <%= link_to_function("(show deck)",
+        "$(this).hide(); $('hide_deck_0').show();" + visual_effect(:blind_down, 'deck_list_0', :duration => 0.5),
+        {:class => "showHideDeck", :id => "show_deck_0"}) -%>
+        <%= link_to_function("(hide deck)",
+        "$(this).hide(); $('show_deck_0').show();" + visual_effect(:blind_up, 'deck_list_0', :duration => 0.5),
+        {:class => "showHideDeck", :id => "hide_deck_0", :style => "display: none"}) -%>
+        <p class="deckList" style="display: none;" id="deck_list_0">
+          <%= raw ply_ordered[0].cards_for_decklist %>
+        </p>
+      </li>
+      <% ply_ordered.each_with_index do |ply, ix| %>
+      <% if ix != 0 %>
+      <li class="resultEntry">
+        <span class="name"><%= h(ply.name) -%></span>
+        -<%= %w<first second third fourth fifth sixth>[ix] + " with " + h(ply.score) -%> points <%= link_to_function("(show deck)",
+        "$(this).hide(); $('hide_deck_#{ix}').show();" + visual_effect(:blind_down, "deck_list_#{ix}", :duration => 0.5),
+        {:class => "showHideDeck", :id => "show_deck_#{ix}"}) -%>
+        <%= link_to_function("(hide deck)",
+        "$(this).hide(); $('show_deck_#{ix}').show();" + visual_effect(:blind_up, "deck_list_#{ix}", :duration => 0.5),
+        {:class => "showHideDeck", :id => "hide_deck_#{ix}", :style => "display: none"}) -%>
+        <p class="deckList" style="display: none;" id=<%= "deck_list_#{ix}" -%>>
+          <%= raw ply.cards_for_decklist -%>
+        </p>
+      </li>
+      <% end %>
+      <% end %>
+    </ul>
+    <p class="centred gapAbove">
+      <%= link_to "Back to Index", games_path -%>
+    </p>
+  </div>
 <% end %>

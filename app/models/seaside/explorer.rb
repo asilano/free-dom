@@ -1,4 +1,4 @@
-# 20	Explorer	Seaside	Action	$5	You may reveal a Province card from your hand. If you do, gain a Gold card, putting it into your hand. Otherwise, gain a Silver card, putting it into your hand.
+# 20  Explorer  Seaside  Action  $5  You may reveal a Province card from your hand. If you do, gain a Gold card, putting it into your hand. Otherwise, gain a Silver card, putting it into your hand.
 
 class Seaside::Explorer < Card
   costs 5

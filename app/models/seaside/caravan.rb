@@ -1,4 +1,4 @@
-# 11	Caravan	Seaside	Action - Duration	$4	+1 Card, +1 Action.  At the start of your next turn, +1 Card.
+# 11  Caravan  Seaside  Action - Duration  $4  +1 Card, +1 Action.  At the start of your next turn, +1 Card.
 
 class Seaside::Caravan < Card
   costs 4

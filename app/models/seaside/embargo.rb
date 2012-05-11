@@ -1,4 +1,4 @@
-# 1	Embargo	Seaside	Action	$2	+2 Coins, Trash this card. Put an Embargo token on top of a Supply pile. - When a player buys a card, he gains a Curse card per Embargo token on that pile.
+# 1  Embargo  Seaside  Action  $2  +2 Coins, Trash this card. Put an Embargo token on top of a Supply pile. - When a player buys a card, he gains a Curse card per Embargo token on that pile.
 
 class Seaside::Embargo < Card
   costs 2

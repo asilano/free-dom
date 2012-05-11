@@ -98,6 +98,7 @@ h1, h2
 #siteLogo
 {
 		padding: 0 10px;
+		margin-top: 2em;
 		background-color: #f5f4d6;
     background-image: -moz-linear-gradient(left top, #fff 10%, #f5f4d6, #fff 90%);
 		background-image: -webkit-gradient(linear, 0 0, 100% 100%, color-stop(0.1, white), color-stop(0.5, #f5f4d6), color-stop(0.9, white));
@@ -108,12 +109,34 @@ h1, h2
 		h2 {font-size: 1.5em; color: blue;}
 }
 
-#mainContent
+#contentWrap
 {
-  height: 100%;
-  margin-top: 2em;
+  min-height: 100%;
   overflow: visible;
-	padding-left: 2em;
+	padding: 0 2em;
+  
+  &:before 
+  { /* Opera and IE8 "redraw" bug fix */
+    content:"";
+    float:left;
+    height:100%;
+    margin-top:-999em;
+  }
+}
+* html #contentWrap { height: 100% } /* IE6 workaround */
+
+#flash { margin-top: 2em; }
+#mainContent { padding-bottom: 22px; }
+
+#footer 
+{
+  clear: both;
+  height: 20px;
+  margin-top: -22px; 
+  border-top: 1px solid #ccf; 
+  font-size: 1.1em; 
+  
+  a {font-weight: bold; margin: 0 0.5em;}
 }
 
 #nav
@@ -186,9 +209,6 @@ label.checkLabel {float: none;}
 .opacity90 {opacity: 0.9;}
 .opacity95 {opacity: 0.95;}
 .opacity100 {opacity: 1.0;}
-
-#footer {clear: both; margin-top: 1em; border-top: 1px solid #ccf; font-size: 1.1em; }
-#footer a {font-weight: bold; margin: 0 0.5em;}
 
 ::-webkit-input-placeholder {font-style: italic;}
 input:-moz-placeholder {font-style: italic;}

@@ -1,68 +1,68 @@
-<script type='text/javascript'>	
-	function show_hide_selects()
-	{
-		var chkbox = $('game_random_select')
-		var seldiv = $('card_selects')
-		
-		if (chkbox.checked && seldiv.visible())
-		{
-			Effect.BlindUp('card_selects', {duration: 0.5, afterFinish: function() {
+<script type='text/javascript'>  
+  function show_hide_selects()
+  {
+    var chkbox = $('game_random_select')
+    var seldiv = $('card_selects')
+    
+    if (chkbox.checked && seldiv.visible())
+    {
+      Effect.BlindUp('card_selects', {duration: 0.5, afterFinish: function() {
         Effect.BlindDown('random_options', {duration: 0.5})}});
-		}
-		else if (!chkbox.checked && !seldiv.visible())
-		{
-			Effect.BlindUp('random_options', {duration: 0.5, afterFinish: function() {
+    }
+    else if (!chkbox.checked && !seldiv.visible())
+    {
+      Effect.BlindUp('random_options', {duration: 0.5, afterFinish: function() {
         Effect.BlindDown('card_selects', {duration: 0.75})}});
-		}
-	}	 
+    }
+  }   
   
   function show_hide_distr()
   {
-		var chkbox = $('game_specify_distr')
-		var distdiv = $('set_distr')
-		
-		if (!chkbox.checked && distdiv.visible())
-		{
-			Effect.BlindUp('set_distr', {duration: 0.5, afterFinish: function(){
+    var chkbox = $('game_specify_distr')
+    var distdiv = $('set_distr')
+    
+    if (!chkbox.checked && distdiv.visible())
+    {
+      Effect.BlindUp('set_distr', {duration: 0.5, afterFinish: function(){
         Effect.BlindDown('set_presence', {duration: 0.5})}});
-		}
-		else if (chkbox.checked && !distdiv.visible())
-		{
-			Effect.BlindUp('set_presence', {duration: 0.5, afterFinish: function() {
+    }
+    else if (chkbox.checked && !distdiv.visible())
+    {
+      Effect.BlindUp('set_presence', {duration: 0.5, afterFinish: function() {
         Effect.BlindDown('set_distr', {duration: 0.5})}});
-		}
-	}	
-	
-	var choices = new Array();
-	
-	Event.observe(window, 'load', function() {
-		for (i = 1; i <= 10 ; i++)
-		{
-			target = $('card_text_' + i);
-			value = $('game_pile_' + i).value;
-			choices[i] = value;
-			target.innerHTML = card_dict[value];
-		}
-	});
-	
-	function update_card_text(index) {
-		var target_str = 'card_text_' + index;
-		var target = $('card_text_' + index);
-		var value = $('game_pile_' + index).value;
-		if (value != choices[index]) {
-			choices[index] = value;
-			new Effect.Fade(target, {
-				duration: 0.2,
-				afterFinish: function(){				
-						target.innerHTML = card_dict[value];
-						new Effect.Appear(target, {duration: 0.2});
-				}
-			});
-    }		
-	}	 
+    }
+  }  
+  
+  var choices = new Array();
+  
+  Event.observe(window, 'load', function() {
+    for (i = 1; i <= 10 ; i++)
+    {
+      target = $('card_text_' + i);
+      value = $('game_pile_' + i).value;
+      choices[i] = value;
+      target.innerHTML = card_dict[value];
+    }
+  });
+  
+  function update_card_text(index) {
+    var target_str = 'card_text_' + index;
+    var target = $('card_text_' + index);
+    var value = $('game_pile_' + index).value;
+    if (value != choices[index]) {
+      choices[index] = value;
+      new Effect.Fade(target, {
+        duration: 0.2,
+        afterFinish: function(){        
+            target.innerHTML = card_dict[value];
+            new Effect.Appear(target, {duration: 0.2});
+        }
+      });
+    }    
+  }   
 </script>
 <div class="form">
-	<% tweaking = false 
+  <% tweaking = false 
   if @game.random_select == 'tweak' 
     @game.random_select = "0"
     tweaking = true
@@ -97,36 +97,36 @@
       <%= f.label :random_select, (tweaking ? "Generate another random set of Kingdom Cards" : "Select Kingdom Cards randomly?") %>
       <%= f.check_box :random_select, {:onclick => "show_hide_selects()"} %>
     </p>
-		<div id="card_selects" style=<%= (@game.random_select == 1) ? "'display: none;'" : "" %> >
-	    <table>
-	      <% (1..10).each do |ix| %>
-	      <tr class='row<%= (ix % 2 == 0) ? "Even" : "Odd" -%>'>
-	        <td class="pileLabel">
-	          <%= f.label "pile_#{ix}", "Kingdom card #{ix}: " %>
-	        </td>
-	        <td>
-					 <%= f.grouped_collection_select("pile_#{ix}", 
+    <div id="card_selects" style=<%= (@game.random_select == 1) ? "'display: none;'" : "" %> >
+      <table>
+        <% (1..10).each do |ix| %>
+        <tr class='row<%= (ix % 2 == 0) ? "Even" : "Odd" -%>'>
+          <td class="pileLabel">
+            <%= f.label "pile_#{ix}", "Kingdom card #{ix}: " %>
+          </td>
+          <td>
+           <%= f.grouped_collection_select("pile_#{ix}", 
                                            [BaseGame, Intrigue, Seaside, Prosperity],
                                            :kingdom_cards,
                                            :name,
                                            :name,
                                            :readable_name_with_cost,
                                            {}) %>
-					</td>																 
-					<td class="cardText">
-						<div id='<%= "card_text_#{ix}"%>'>
-						</div>
-					</td>															 
+          </td>                                 
+          <td class="cardText">
+            <div id='<%= "card_text_#{ix}"%>'>
+            </div>
+          </td>                               
            <%= javascript_tag do %>
-					   Event.observe('<%= "game_pile_#{ix}" %>', 'change', function(){update_card_text(<%= ix %>)})
-						 Event.observe('<%= "game_pile_#{ix}" %>', 'keyup', function(){update_card_text(<%= ix %>)}); 
-                																	 
-					 <% end %>																					 	        
-	      </tr>
-	      <% end %>
-	    </table>
+             Event.observe('<%= "game_pile_#{ix}" %>', 'change', function(){update_card_text(<%= ix %>)})
+             Event.observe('<%= "game_pile_#{ix}" %>', 'keyup', function(){update_card_text(<%= ix %>)}); 
+                                                   
+           <% end %>                                                     
+        </tr>
+        <% end %>
+      </table>
     </div>
-		<div id="random_options" style=<%= (@game.random_select == 1) ? "" : "'display: none;'" %>>
+    <div id="random_options" style=<%= (@game.random_select == 1) ? "" : "'display: none;'" %>>
       <%= f.label :specify_distr, "Specify set distibution?" %>
       <%= f.check_box :specify_distr, {:onclick => "show_hide_distr()"} %>
       <div id="set_distr" style=<%= (@game.specify_distr == 1) ? "" : "'display: none;'" %>>
@@ -159,7 +159,7 @@
           <% end %>
         </table>
       </div>
-		</div>
+    </div>
     <div id="plat_colony">
       Include Platinum and Colony? <br/>
       <%= f.radio_button :plat_colony, "rules", :id => "game_plat_col_rules" %> <%= f.label "plat_col_rules", "At random, in proportion to number of Prosperity cards present (as in rules)" %><br/>

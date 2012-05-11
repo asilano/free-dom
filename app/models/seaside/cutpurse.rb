@@ -1,4 +1,4 @@
-# 12	Cutpurse	Seaside	Action - Attack	$4	+2 Cash, Each other player discards a Copper card (or reveals a hand with no Copper).
+# 12  Cutpurse  Seaside  Action - Attack  $4  +2 Cash, Each other player discards a Copper card (or reveals a hand with no Copper).
 class Seaside::Cutpurse < Card
   costs 4
   action :attack => true
@@ -41,8 +41,8 @@ class Seaside::Cutpurse < Card
       # Target is holding at least one Copper. Discard it.
       card = target_coppers[0]
       card.discard
-      game.histories.create!(:event => "#{player.name} discarded #{card}.",
-                            :css_class => "player#{player.seat} card_discard")
+      game.histories.create!(:event => "#{target.name} discarded #{card}.",
+                            :css_class => "player#{target.seat} card_discard")
     end    
 
     return "OK"
