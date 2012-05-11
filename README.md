@@ -12,7 +12,7 @@ FreeDom's tests aren't complete. The following are definitely needed:
 
 Note
 ----
-Please fork and contribute to this branch - _**especially not the per-card tests**_! I need features defined for all the cards in [Intrigue][int-code], [Seaside][sea-code] and [Prosperity][pros-code]. If you want to define tests for Hinterlands cards, that would be cool too - they need to be in place before we start implementation.
+Please fork and contribute to this branch - _**especially the per-card tests**_! I need features defined for all the cards in [Intrigue][int-code], [Seaside][sea-code] and [Prosperity][pros-code]. If you want to define tests for Hinterlands cards, that would be cool too - they need to be in place before we start implementation.
 
 [feat-code]: https://github.com/asilano/free-dom/tree/improve-testing/features
 [int-code]: https://github.com/asilano/free-dom/tree/improve-testing/app/models/intrigue
