@@ -83,20 +83,20 @@
     <legend>
       <%= tweaking ? 'Adjust kingdom cards' : 'New Game' %>
     </legend>
-    <p>
+    <div class="field">
       <%= f.label :name %>
       <br/>
       <%= f.text_field :name %>
-    </p>
-    <p>
+    </div>
+    <div class="field">
       <%= f.label :max_players, "Maximum number of players" %>
       <br/>
       <%= f.select(:max_players, [2,3,4,5,6]) %>
-    </p>
-    <p>
+    </div>
+    <div class="field">
       <%= f.label :random_select, (tweaking ? "Generate another random set of Kingdom Cards" : "Select Kingdom Cards randomly?") %>
       <%= f.check_box :random_select, {:onclick => "show_hide_selects()"} %>
-    </p>
+    </div>
     <div id="card_selects" style=<%= (@game.random_select == 1) ? "'display: none;'" : "" %> >
       <table>
         <% (1..10).each do |ix| %>
@@ -105,13 +105,15 @@
             <%= f.label "pile_#{ix}", "Kingdom card #{ix}: " %>
           </td>
           <td>
-           <%= f.grouped_collection_select("pile_#{ix}", 
-                                           [BaseGame, Intrigue, Seaside, Prosperity],
-                                           :kingdom_cards,
-                                           :name,
-                                           :name,
-                                           :readable_name_with_cost,
-                                           {}) %>
+          	<div class="field">
+	           <%= f.grouped_collection_select("pile_#{ix}", 
+	                                           [BaseGame, Intrigue, Seaside, Prosperity],
+	                                           :kingdom_cards,
+	                                           :name,
+	                                           :name,
+	                                           :readable_name_with_cost,
+	                                           {}) %>
+	        </div>
           </td>                                 
           <td class="cardText">
             <div id='<%= "card_text_#{ix}"%>'>
@@ -135,10 +137,14 @@
           <% ['Base Game', 'Intrigue', 'Seaside', 'Prosperity'].each do |set| %>
             <tr>
               <td>
-                <%= f.label "num_#{set.parameterize('_')}_cards", "Number of #{set} cards: " %>
+              	<div class="field">
+                	<%= f.label "num_#{set.parameterize('_')}_cards", "Number of #{set} cards: " %>
+            	</div>
               </td>
               <td>
-                <%= f.select "num_#{set.parameterize('_')}_cards", 0..10 %>
+              	<div class="field">
+                	<%= f.select "num_#{set.parameterize('_')}_cards", 0..10 %>
+            	</div>
               </td>
             </tr>
           <% end %>
@@ -150,10 +156,14 @@
           <% ['Base Game', 'Intrigue', 'Seaside', 'Prosperity'].each do |set| %>
             <tr>
               <td>
-                <%= f.label "#{set.parameterize('_')}_present", "Include #{set}? " %>
+              	<div class="field">
+                	<%= f.label "#{set.parameterize('_')}_present", "Include #{set}? " %>
+        		</div>
               </td>
               <td>
-                <%= f.check_box "#{set.parameterize('_')}_present" %>
+              	<div class="field">
+                	<%= f.check_box "#{set.parameterize('_')}_present" %>
+            	</div>
               </td>
             </tr>
           <% end %>
@@ -162,9 +172,11 @@
     </div>
     <div id="plat_colony">
       Include Platinum and Colony? <br/>
-      <%= f.radio_button :plat_colony, "rules", :id => "game_plat_col_rules" %> <%= f.label "plat_col_rules", "At random, in proportion to number of Prosperity cards present (as in rules)" %><br/>
-      <%= f.radio_button :plat_colony, "yes", :id => "game_plat_col_yes" %> <%= f.label "plat_col_yes", "Yes" %><br/>
-      <%= f.radio_button :plat_colony, "no", :id => "game_plat_col_no" %> <%= f.label "plat_col_no", "No" %><br/>
+      <div class="field">
+	      <%= f.radio_button :plat_colony, "rules", :id => "game_plat_col_rules" %> <%= f.label "plat_col_rules", "At random, in proportion to number of Prosperity cards present (as in rules)" %><br/>
+	      <%= f.radio_button :plat_colony, "yes", :id => "game_plat_col_yes" %> <%= f.label "plat_col_yes", "Yes" %><br/>
+	      <%= f.radio_button :plat_colony, "no", :id => "game_plat_col_no" %> <%= f.label "plat_col_no", "No" %><br/>
+      </div>
     </div>
     <div>
       <%= f.submit 'Create' %>
