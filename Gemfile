@@ -3,13 +3,13 @@ source 'http://gems.github.com'
 
 gem 'rails', '3.1.0'
 gem 'i18n'
-gem 'thin'
 
 # Bundle edge Rails instead:
 # gem 'rails',     :git => 'git://github.com/rails/rails.git'
 
 group :production do
   gem 'pg'
+  gem 'thin'
 end
 group :development, :test do
   gem 'sqlite3'
@@ -24,7 +24,7 @@ group :assets do
 end
 
 gem 'jquery-rails'
-gem 'therubyracer'
+#gem 'therubyracer'
 gem 'actionmailer-with-request'
 
 gem 'andand'

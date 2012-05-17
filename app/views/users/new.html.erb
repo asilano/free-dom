@@ -15,26 +15,26 @@
     <legend>
       New User
     </legend>
-    <p>
+    <div class="field">
       <%= f.label :name, 'Name:' %>
       <%= f.text_field :name %>
-    </p>
-    <p>
+    </div>
+    <div class="field">
       <%= f.label :password, 'Password:' %>
       <%= f.password_field :password %>
-    </p>
-    <p>
+    </div>
+    <div class="field">
       <%= f.label :password_confirmation, 'Retype password:' %>
       <%= f.password_field :password_confirmation %>
-    </p>
-    <p>
+    </div>
+    <div class="field">
       <%= f.label :email, "E-mail address:" %>
       <%= f.email_field :email %>
-    </p>    
-    <p>
+    </div>    
+    <div class="field">
       <%= check_box_tag :remember_me, true, :name => "remember_me" %>
       <%= label_tag :remember_me, "Remember my login on this computer (for #{User.cookie_timeout} days)", :class => "checkLabel"%>
-    </p>
+    </div>
     <div>
       <%= f.check_box :contact_me %>
       <%= f.label :contact_me, 'Email me with important announcements', :class => "checkLabel"%>

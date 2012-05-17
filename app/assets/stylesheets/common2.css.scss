@@ -77,8 +77,6 @@ h1, h2
   }
 }
 
-#errorExplanation h2 {font-family: verdana,arial,helvetica,sans-serif} /* Override CloisterBlack for Error boxes */
-
 #userInfo
 {
   position: fixed;
@@ -171,6 +169,8 @@ h1, h2
   tr.waiting.rowOdd {background-color: #cdf;}	
 }
 
+#errorExplanation h2 {font-family: verdana,arial,helvetica,sans-serif} /* Override CloisterBlack for Error boxes */
+
 .userform label
 {
 	float: left;
@@ -184,10 +184,13 @@ label.checkLabel {float: none;}
 .loginform label {width: 6em;}
 
 .userform input {margin-bottom: 5px;}
-/*.userform*/ input:not([type=submit]):not([type=button]):focus {background-color: #f8f8ff;}
-/*.userform*/ .fieldWithErrors {display: inline; background-color: inherit; padding: 0;}
-/*.userform*/ .fieldWithErrors label {color: red;}
-/*.userform*/ .fieldWithErrors input {background-color: #fff8f8;}
+input:not([type=submit]):not([type=button]):focus {background-color: #e0f0ff;}
+.field_with_errors 
+{
+  display: inline; background-color: inherit; padding: 0;
+  label {color: darkred;}
+  input, select {background-color: #fdd;}
+}
 
 .opacity5 {opacity: 0.05;}
 .opacity10 {opacity: 0.1;}
