@@ -88,7 +88,6 @@ class Card < ActiveRecord::Base
       Seaside.kingdom_cards + Prosperity.kingdom_cards
   end
   
-        # TODO: Raise this up to Card:: level since lots of things want to use it:
   NonCards = [ "Ace of Spades",
                "Mr Bun the Baker",
                "Joker",
