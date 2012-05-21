@@ -175,7 +175,7 @@ DEPENDENCIES
   prototype-rails
   prototype_legacy_helper (= 0.0.0)!
   rails (= 3.1.0)
-  sass-rails (~> 3.1.0)
+  sass-rails (= 3.1.5)
   shoulda
   sqlite3
   thin
