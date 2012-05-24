@@ -35,3 +35,16 @@ When(/(.*) move(?:s)? (.*) from (.*) to (.*)/) do |name, kind, from, to|
     conts[name] << kind
   end
 end
+
+When(/^(\w*?) buy(?:s)? #{SingleCard}/) do |name, kind|
+  name = 'Alan' if name == 'I'
+  assert_contains @game.piles.map{|p| p.card_type.readable_name}, kind
+  pile = @game.piles.first(:conditions => ['card_type = ?', CARD_TYPES[kind].name])
+  assert_not_nil pile
+  
+  parent_act = @players[name].active_actions[0]
+  assert_match /buy/, parent_act.expected_action
+  
+  pile_ix = @game.piles.index {|p| p.card_type == pile.card_type}
+  @players[name].buy(:pile_index => pile_ix)  
+end
