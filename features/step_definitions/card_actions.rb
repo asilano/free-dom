@@ -1,4 +1,4 @@
-When(/^(\w*?) play(?:s)? (.*)/) do |name, kind|
+When(/^(\w*?) play(?:s)? #{SingleCard}$/) do |name, kind|
   name = 'Alan' if name == 'I'
   assert_contains @hand_contents[name], kind
   card = @players[name].cards.hand.first(:conditions => ['type = ?', CARD_TYPES[kind].name])
@@ -11,6 +11,24 @@ When(/^(\w*?) play(?:s)? (.*)/) do |name, kind|
   
   card_ix = @players[name].cards.hand.index {|c| c.type == card.type}
   @players[name].play_action(:card_index => card_ix)
+  
+  # Playing the card is likely to do something. Skip checking this step
+  @skip_card_checking = 1 if @skip_card_checking == 0
+end
+
+When(/^(\w*?) play(?:s)? #{SingleCard} as treasure$/) do |name, kind|
+  name = 'Alan' if name == 'I'
+  assert_contains @hand_contents[name], kind
+  card = @players[name].cards.hand.first(:conditions => ['type = ?', CARD_TYPES[kind].name])
+  assert_not_nil card
+  
+  @hand_contents[name].delete_first(kind)
+  @play_contents[name] << kind
+  parent_act = @players[name].active_actions[0]
+  assert_match /play_treasure/, parent_act.expected_action
+  
+  card_ix = @players[name].cards.hand.index {|c| c.type == card.type}
+  @players[name].play_treasure(:card_index => card_ix)
   
   # Playing the card is likely to do something. Skip checking this step
   @skip_card_checking = 1 if @skip_card_checking == 0

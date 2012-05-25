@@ -55,6 +55,30 @@ Then(/(.*) should (not )?be able to choose #{CardListNoRep} in (?:my|his) hand/)
   end
 end
 
+# Verify that there is (not) a nil action in the hand
+#
+# Matches:
+#   I should be able to choose a nil action in my hand
+#   Bob should not be able to choose a nil action in his hand
+Then /(.*) should (not )?be able to choose a nil action in (?:my|his) hand/ do |name, negate|
+  name = "Alan" if name == "I"
+  player = @players[name]
+  
+  # We want to check the valid options for a hand-based action. 
+  # These are encoded in the control that that action produces.
+  all_controls = player.determine_controls
+  controls = all_controls[:hand]
+  flunk "Unimplemented multi-hand controls in testbed" unless controls.length == 1
+  
+  ctrl = controls[0]
+  
+  unless negate
+    assert_not_nil ctrl[:nil_action]
+  else
+    assert_nil ctrl[:nil_action]
+  end
+end
+
 # Verify that the stated piles are (not) choosable
 # 
 # Matches:
