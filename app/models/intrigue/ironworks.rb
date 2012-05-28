@@ -8,7 +8,7 @@ class Intrigue::Ironworks < Card
     
     # Add a PendingAc... y'know what? It's exactly the same as Workshop.
     parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_take",
-                               :text => "Take card with Ironworks",
+                               :text => "Take a card with Ironworks",
                                :player => player,
                                :game => game)
     return "OK"

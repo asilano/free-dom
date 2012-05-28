@@ -9,13 +9,13 @@ Feature: Workshop
       And there should be 0 Workshop cards not in piles
       
   Scenario: Playing Workshop
-    Given my hand contains Workshop and 4 other cards
+    Given my hand contains Workshop, Duchy x4
       And I have nothing in discard
       And the Village pile is empty
     When I play Workshop
     Then I should need to Take a card with Workshop
       And I should be able to choose the Estate, Copper, Silver, Cellar, Workshop, Bridge piles
-      And I should not be able to choose the Duchym Province, Gold, Village, Adventurer, Bank, Mine, Peddler piles
+      And I should not be able to choose the Duchy, Province, Gold, Village, Adventurer, Bank, Mine, Peddler piles
     When I choose the Bridge pile
       And the game checks actions
     Then I should have gained Bridge
