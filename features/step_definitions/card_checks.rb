@@ -22,7 +22,11 @@ Then(/(.*) should have played #{CardList}/) do |name, kinds|
     
     num.times do
       @hand_contents[name].delete_first(kind)
-      @play_contents[name] << kind
+      if CARD_TYPES[kind].is_duration?
+        @enduring_contents[name] << kind
+      else
+        @play_contents[name] << kind
+      end
     end
   end
 end

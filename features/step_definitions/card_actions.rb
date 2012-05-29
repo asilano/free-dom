@@ -1,11 +1,15 @@
-When(/^(\w*?) play(?:s)? #{SingleCard}$/) do |name, kind|
+When(/^(\w*?) plays? #{SingleCard}$/) do |name, kind|
   name = 'Alan' if name == 'I'
   assert_contains @hand_contents[name], kind
   card = @players[name].cards.hand.first(:conditions => ['type = ?', CARD_TYPES[kind].name])
   assert_not_nil card
   
   @hand_contents[name].delete_first(kind)
-  @play_contents[name] << kind
+  if CARD_TYPES[kind].is_duration?
+    @enduring_contents[name] << kind
+  else
+    @play_contents[name] << kind
+  end
   parent_act = @players[name].active_actions[0]
   assert_match /play_action/, parent_act.expected_action
   
@@ -16,7 +20,15 @@ When(/^(\w*?) play(?:s)? #{SingleCard}$/) do |name, kind|
   @skip_card_checking = 1 if @skip_card_checking == 0
 end
 
-When(/^(\w*?) play(?:s)? #{SingleCard} as treasure$/) do |name, kind|
+When(/^(\w*?) stops? playing actions$/) do |name|
+  name = 'Alan' if name == 'I'
+  parent_act = @players[name].active_actions[0]
+  assert_match /play_action/, parent_act.expected_action
+  
+  @players[name].play_action(:nil_action => "Leave Action Phase")
+end
+
+When(/^(\w*?) plays? #{SingleCard} as treasure$/) do |name, kind|
   name = 'Alan' if name == 'I'
   assert_contains @hand_contents[name], kind
   card = @players[name].cards.hand.first(:conditions => ['type = ?', CARD_TYPES[kind].name])
@@ -34,7 +46,7 @@ When(/^(\w*?) play(?:s)? #{SingleCard} as treasure$/) do |name, kind|
   @skip_card_checking = 1 if @skip_card_checking == 0
 end
 
-When(/(.*) move(?:s)? (.*) from (.*) to (.*)/) do |name, kind, from, to|
+When(/(.*) moves? (.*) from (.*) to (.*)/) do |name, kind, from, to|
   assert_not_equal "deck", from
   assert_not_equal "deck", to
   
@@ -54,7 +66,7 @@ When(/(.*) move(?:s)? (.*) from (.*) to (.*)/) do |name, kind, from, to|
   end
 end
 
-When(/^(\w*?) buy(?:s)? #{SingleCard}/) do |name, kind|
+When(/^(\w*?) buys? #{SingleCard}/) do |name, kind|
   name = 'Alan' if name == 'I'
   assert_contains @game.piles.map{|p| p.card_type.readable_name}, kind
   pile = @game.piles.first(:conditions => ['card_type = ?', CARD_TYPES[kind].name])
@@ -65,4 +77,12 @@ When(/^(\w*?) buy(?:s)? #{SingleCard}/) do |name, kind|
   
   pile_ix = @game.piles.index {|p| p.card_type == pile.card_type}
   @players[name].buy(:pile_index => pile_ix)  
+end
+
+When(/^(\w*?) stops? buying cards$/) do |name|
+  name = 'Alan' if name == 'I'
+  parent_act = @players[name].active_actions(true)[0]
+  assert_match /buy/, parent_act.expected_action
+  
+  @players[name].buy(:nil_action => "Buy no more")
 end
