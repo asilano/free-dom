@@ -45,7 +45,7 @@ class Intrigue::Masquerade < Card
     
     # First, create the Trash action
     trash_act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_trash",
-                                           :text => "Optionally trash a card with Masquerarde",
+                                           :text => "Optionally trash a card with Masquerade",
                                            :player => player,
                                            :game => game)
     trash_act.save!
@@ -159,17 +159,23 @@ class Intrigue::Masquerade < Card
     # Game-handled action to cause the player to receive the card passed to them
     player = Player.find(params[:rcvr])
     cards = player.cards.in_location('masq_limbo')
-    raise "Unexpected multiple cards to receive" unless cards.length == 1
-    card = cards[0]
+    raise "Unexpected multiple cards to receive" if cards.length > 1
     
-    card.location = "hand"
-    card.position = player.cards.hand.size + 1
-    card.save!
-    game.histories.create!(:event => "#{player.name} received a " + 
-                            "[#{player.id}?#{card.class.readable_name}|card] " + 
-                            "from #{player.prev_player.name}.",
-                          :css_class => "player#{player.seat}")
-                                
+    unless cards.empty?
+      card = cards[0]
+      
+      card.location = "hand"
+      card.position = player.cards.hand.size + 1
+      card.save!
+      game.histories.create!(:event => "#{player.name} received a " + 
+                              "[#{player.id}?#{card.class.readable_name}|card] " + 
+                              "from #{player.prev_player.name}.",
+                            :css_class => "player#{player.seat}")
+    else
+      # No card to receive from the right. Just log.
+      game.histories.create!(:event => "#{player.name} received nothing from #{player.prev_player.name}",
+                             :css_class=> "player#{player.seat}")
+    end
     return "OK"                            
   end
   
