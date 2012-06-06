@@ -74,6 +74,17 @@
         <h2>Free Dominion Game Server</h2>
       <% end %>
       <div id="flash">
+        <div class="warning">
+          Recent changes in EU and British law require website owners to make their users aware of any cookies used by those websites. FreeDom uses cookies as follows:<br>
+          <br>
+          <ol>
+            <li>When you log in, FreeDom stores a transient cookie to track your session. This cookie is strictly necessary (within the definition of EU directive 2009/136/EC) for the correct operation of FreeDom.</li>
+            <li>If you choose to have FreeDom remember your login, FreeDom will store two persistent cookies to record your user details and validate you on return visits.</li>
+          </ol>
+          By choosing the "Remember my login on this computer" option via the <%= link_to 'login', login_path %> or <%= link_to 'new user', new_user_path %> pages, you are considered to have consented to the cookies described in 2 above being stored on your device.<br/>
+          <br/>
+          You may remove the cookies described in 2 above by <%= link_to 'logging out', logout_path %>.
+        </div>
         <%= render :partial => 'flash_area' -%>        
       </div>
       <div id="mainContent">
