@@ -123,7 +123,33 @@ h1, h2
 }
 * html #contentWrap { height: 100% } /* IE6 workaround */
 
-#flash { margin-top: 2em; }
+#flash 
+{ 
+  margin-top: 2em;
+  padding-left: 2px;
+  padding-right: 2px;
+  
+  div { padding: 5px; }
+  
+  .notice 
+  {
+    color: green;
+    border: 1px solid #008800;
+    background-color: #AAFFAA;
+  }
+  .warning 
+  {
+    color: black;
+    border: 1px solid red;
+    background-color: #87CEFA;     
+  }
+  .error 
+  {
+    color: #880000;
+    border: 1px solid red;
+    background-color: #FFCCCC;     
+  }
+}
 #mainContent { padding-bottom: 22px; }
 
 #footer 

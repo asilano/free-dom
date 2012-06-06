@@ -27,31 +27,3 @@ fieldset.user
 }
 .inline { display: inline;}
 .hidden {display: none;}
-
-.flash
-{
-  margin: 2px 10px 2px 10px;
-  padding-left: 2px;
-  padding-right: 2px;
-  max-width: 40%; 
-}
-.notice 
-{
-	color: green;
-	border: 1px solid #008800;
-	background-color: #AAFFAA;
-}
-.warning 
-{
-  color: black;
-  border: 1px solid red;
-  background-color: #87CEFA;     
-}
-.error 
-{
-  color: #880000;
-  border: 1px solid red;
-  background-color: #FFCCCC;     
-}
-
-
