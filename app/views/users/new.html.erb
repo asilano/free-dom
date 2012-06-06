@@ -34,13 +34,14 @@
     <div class="field">
       <%= check_box_tag :remember_me, true, :name => "remember_me" %>
       <%= label_tag :remember_me, "Remember my login on this computer (for #{User.cookie_timeout} days)", :class => "checkLabel"%>
+      <span class="inline_legal">We will use a cookie to remember you</span>
     </div>
     <div>
       <%= f.check_box :contact_me %>
       <%= f.label :contact_me, 'Email me with important announcements', :class => "checkLabel"%>
-      <div id="explain_contact">
+      <div class="tooltip_explain">
         <%= image_tag "question.jpg" %>
-        <div id="contact_explanation">
+        <div class="tooltip_explanation">
           Stay informed about major updates to the free-dom server. We will only use this to contact you about new versions and items of similar importance.
         </div>
       </div>
