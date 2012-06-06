@@ -27,6 +27,7 @@ When(/^(\w*?)(?:'s)? chooses? (.*) in (?:his|my) hand/) do |name, choice|
     params[:nil_action] = true
   else
     possibilities = player.cards.hand.map(&:readable_name)
+    assert_not_empty possibilities
     kinds = choice.split(/,\s*/)
     if kinds.length == 1
       params[key] = possibilities.index(kinds[0])
