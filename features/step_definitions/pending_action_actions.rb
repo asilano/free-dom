@@ -59,7 +59,7 @@ When(/(.*) chooses? the option (.*)/) do |name, choice|
   ctrl = controls[0]
   params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
   
-  params[:choice] = ctrl[:options].detect {|opt| opt[:text] =~ Regexp.new(choice, Regexp::IGNORECASE)}[:choice]
+  params[:choice] = ctrl[:options].detect {|opt| opt[:text] =~ Regexp.new(Regexp.escape(choice), Regexp::IGNORECASE)}[:choice]
   
   player.resolve(params)
   

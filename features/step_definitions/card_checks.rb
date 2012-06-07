@@ -93,7 +93,7 @@ end
 # Matches
 #   I should have discarded Copper, Curse
 #   Bob should have discarded Copper
-Then(/(.*) should have discarded #{CardList}/) do |name, kinds|
+Then(/(.*) should have discarded #{CardList}$/) do |name, kinds|
   name = "Alan" if name == "I"
   player = @players[name]
     
@@ -110,6 +110,28 @@ Then(/(.*) should have discarded #{CardList}/) do |name, kinds|
   end
 end
 
+# Matches
+#   I should have discarded the cards named "rest of hand"
+Then(/(.*) should have discarded the cards named "([^"]*)"/) do |name, grp_name|
+  name = "Alan" if name == "I"
+  player = @players[name]
+  
+  cards = @named_cards[grp_name]
+  assert_not_nil cards
+    
+  cards.each do |kind|
+    @discard_contents[name].unshift(kind)
+    assert_contains @hand_contents[name], kind
+    @hand_contents[name].delete_first(kind)
+  end
+end
+
+# This step is not usually required; its only current use is in Adventurer, where
+# there's a Scenario Outline, and "nothing" is an argument.
+# Matches
+#   I should have discarded nothing
+Then /^(.*) should have discarded nothing$/ do |_|
+end
 # Matches
 #   I should have gained Copper
 #   Bob should have gained Curse, Curse
