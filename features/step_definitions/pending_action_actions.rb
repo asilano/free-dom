@@ -42,7 +42,8 @@ When(/^(\w*?)(?:'s)? chooses? (.*) in (?:his|my) hand/) do |name, choice|
   @skip_card_checking = 1
 end
 
-# Step for any control that requires you to make an unattached choice; that is, process any controls[:player] control
+# Step for any control that requires you to make a single unattached choice; that is, process any button-type 
+# controls[:player] control
 #
 # Matches
 #   I choose the option Don't discard
@@ -60,6 +61,32 @@ When(/(.*) chooses? the option (.*)/) do |name, choice|
   params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
   
   params[:choice] = ctrl[:options].detect {|opt| opt[:text] =~ Regexp.new(Regexp.escape(choice), Regexp::IGNORECASE)}[:choice]
+  
+  player.resolve(params)
+  
+  # Probably chosen the option for a reason
+  @skip_card_checking = 1
+end
+
+# Step for any control that requires you to make a checkboxed unattached choice; that is, process any 
+# checkbox-type controls[:player] control
+#
+# Matches
+#   I choose the options Draw 1, +1 Action
+When(/(.*) chooses? the options (.*)/) do |name, choices|
+  name = "Alan" if name == "I"
+  player = @players[name]
+  
+  # We have to call resolve for the appropriate action with appropriate params.
+  # So, really, we need to duplicate the logic of what to do with a control
+  all_controls = player.determine_controls
+  controls = all_controls[:player]
+  flunk "Unimplemented multi-player controls in testbed" unless controls.length == 1
+  
+  ctrl = controls[0]
+  params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
+
+  params[:choice] = choices.split(/,\s*/).map {|choice| ctrl[:choices].index(choice) }
   
   player.resolve(params)
   
