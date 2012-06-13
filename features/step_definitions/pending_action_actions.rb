@@ -100,7 +100,7 @@ end
 #   I choose the Estate pile
 #   Bob chooses the Estate, Copper piles
 #   I choose Don't buy for piles  // (Where "Don't trash" is the nil-action text)
-When(/^(\w*?)(?:'s)? chooses? (?:the )?(.*) (?:for )?piles?/) do |name, choice|
+When(/^(\w*?)(?:'s)? chooses? (?:the )?(.*?) (?:for )?piles?/) do |name, choice|
   name = "Alan" if name == "I"
   player = @players[name]
   

@@ -65,6 +65,14 @@ Then /(.*) should have drawn (\d+) cards?/ do |name, num|
 end
 
 # Matches
+#  I should have shuffled my discards
+Then /(.*) should have shuffled (?:his|my) discards/ do |name|
+  name = 'Alan' if name == 'I'
+  @deck_contents[name].concat(@discard_contents[name].shuffle)
+  @discard_contents[name] = []
+end
+
+# Matches
 #   I should have put Silver on top of my deck // (that is, from an untracked location)
 #   Bob should have put Estate, Copper from his hand on top of his deck // (that is, Copper is on top and Estate is underneath)
 Then(/(.*) should have put #{CardList} (?:from (?:his|my) (.*) )?on top of (?:his|my) deck/) do |name, kinds, from_loc|
