@@ -31,17 +31,17 @@ Then(/(.*) should have played #{CardList}/) do |name, kinds|
   end
 end
   
-# # Matches
-# #   I should have Gold in play
-# #   Bob should have Copper, Gold in play
-# #
-# # Note that this sets the exact expected contents; we can do this because "shuffling" is now sorting by unprefixed name
-# Then /(.*) should have ((?!nothing).*) in (.*)/ do |name, kinds, location|
-  # name = 'Alan' if name == 'I'
-  # exp = instance_variable_get("@#{location}_contents")[name]
-  
-  # exp.replace(kinds.split(/,\s*/))
-# end
+# Matches
+#   I should have Gold in play
+#   Bob should have Copper, Gold in play
+#
+# Note that this sets the exact expected contents; we can do this because "shuffling" is now sorting by unprefixed name
+Then /(.*) should have ((?!nothing).*) [io]n (?:my )?(.*)/ do |name, kinds, location|
+  name = 'Alan' if name == 'I'
+  exp = instance_variable_get("@#{location}_contents")[name]
+
+  exp.replace(kinds.split(/,\s*/))
+end
 
 # Matches
 #  I should have drawn 1 card
@@ -140,6 +140,7 @@ end
 #   I should have discarded nothing
 Then /^(.*) should have discarded nothing$/ do |_|
 end
+
 # Matches
 #   I should have gained Copper
 #   Bob should have gained Curse, Curse
@@ -206,6 +207,29 @@ Then(/(.*) should have moved the cards named "([^"]*)" from (.*) to (.*)/) do |n
   to_cont = instance_variable_get("@#{to}_contents")[name]
   cards.each {|card| to_cont.unshift card}
 end
+
+# Matches
+#   I should have moved cards 1,3,4 from deck to discard
+# Note: 0-indexed.
+Then /(.*) should have moved cards? ((?:\d+,? ?)*) from deck to (.*)/ do |name, list, to|
+  name = "Alan" if name == "I"
+  player = @players[name]
+  
+  indices = list.split(/,\s*/).map(&:to_i)
+
+  # First, remove the cards from the deck
+  assert_operator @deck_contents[name].length, :>, indices.max
+  cards = []
+  indices.each do |ix| 
+    cards << @deck_contents[name][ix] 
+    @deck_contents[name][ix]= nil
+  end
+  @deck_contents[name].compact!
+    
+  # Now, put them onto the target
+  to_cont = instance_variable_get("@#{to}_contents")[name]
+  cards.each {|card| to_cont.unshift card}
+end 
 
 # Used to note that a card has moved from a tracked zone to anywhere else
 #

@@ -15,5 +15,5 @@ When(/(.*) gain(?:s)? (.*)/) do |name, kinds|
   @game.process_actions
   
   # Need the test to tell us what card movements are expected; especially since Watchtower etc can step in.
-  @skip_card_checking = 1
+  @skip_card_checking = 1 if @skip_card_checking == 0
 end
