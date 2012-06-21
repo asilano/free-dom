@@ -310,3 +310,15 @@ Given(/the (.*) piles? (?:is|are) empty/) do |kinds|
     @game.piles.find(:first, :conditions => {:card_type => CARD_TYPES[kind].name}).cards.delete_all
   end
 end
+
+Given(/the (.*) piles? contains? (\d+) cards?/) do |kinds, number|
+  number = number.to_i
+  kinds.split(/,\s*/).each do |kind|
+    pile = @game.piles.find(:first, :conditions => {:card_type => CARD_TYPES[kind].name})
+    if pile.cards.count < number
+      flunk "Don't support growing pile yet"
+    end
+    
+    pile.cards[number..-1].each(&:delete)
+  end
+end
