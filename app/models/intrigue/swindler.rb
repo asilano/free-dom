@@ -100,7 +100,7 @@ class Intrigue::Swindler < Card
       game.histories.create!(:event => "#{ply.name} gave #{target.name} a " + 
              "#{game.piles[params[:pile_index].to_i].card_class.readable_name} in exchange.",
                             :css_class => "player#{ply.seat} player#{target.seat} card_gain")
-      target.queue(parent_act, :gain, :pile => game.piles[params[:pile_index].to_i].id) 
+      target.gain(parent_act, game.piles[params[:pile_index].to_i].id) 
     end
     
     return "OK"

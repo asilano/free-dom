@@ -9,7 +9,7 @@ Feature: Feast
       And there should be 0 Feast cards not in piles
       
   Scenario: Playing Feast
-    Given my hand contains Feast and 4 other cards
+    Given my hand contains Feast, Duchy x4
       And I have nothing in discard
       And the Village pile is empty
     When I play Feast

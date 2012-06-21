@@ -143,8 +143,8 @@ end
 # Matches
 #   I choose the Estate pile
 #   Bob chooses the Estate, Copper piles
-#   I choose Don't buy for piles  // (Where "Don't trash" is the nil-action text)
-When(/^(\w*?)(?:'s)? chooses? (?:the )?(.*?) (?:for )?piles?/) do |name, choice|
+#   I choose Don't buy for piles  // (Where "Don't buy" is the nil-action text)
+When(/^(\w*?)(?:'s)? chooses? (?:the )?(.*?) (?:for )?piles?$/) do |name, choice|
   name = "Alan" if name == "I"
   player = @players[name]
   
@@ -152,6 +152,45 @@ When(/^(\w*?)(?:'s)? chooses? (?:the )?(.*?) (?:for )?piles?/) do |name, choice|
   # So, really, we need to duplicate the logic of what to do with a control
   all_controls = player.determine_controls
   controls = all_controls[:piles]
+  flunk "Unimplemented multi-piles controls in testbed" unless controls.length == 1
+  
+  ctrl = controls[0]
+  params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
+  
+  if ctrl[:nil_action].andand == choice
+    params[:nil_action] = true
+  else
+    possibilities = @game.piles.map{|p| p.card_type.readable_name}
+    kinds = choice.split(/,\s*/)
+    if kinds.length == 1
+      params[:pile_index] = possibilities.index(kinds[0])
+    else
+      flunk "Can't think of any multiple-pile cards at the mo..."
+    end
+  end
+  
+  player.resolve(params)
+  
+  # Probably chosen the card for a reason
+  @skip_card_checking = 1 if @skip_card_checking == 0
+end
+
+# Step for any control that requires you to choose a pile; that is, process any controls[:piles] control
+# Handles multiple controls present at once, by differentiating based on button text
+#
+# Matches
+#   I choose the Estate pile
+#   Bob chooses the Estate, Copper piles
+#   I choose Don't buy for piles  // (Where "Don't buy" is the nil-action text)
+When(/^(\w*?)(?:'s)? chooses? (?:the )?(.*?) (?:for )?piles? labelled (.*)$/) do |name, choice, label|
+  name = "Alan" if name == "I"
+  player = @players[name]
+  
+  # We have to call resolve for the appropriate action with appropriate params.
+  # So, really, we need to duplicate the logic of what to do with a control
+  all_controls = player.determine_controls
+  controls = all_controls[:piles]
+  controls.select! {|c| c[:text] =~ Regexp.new(Regexp.escape(label), Regexp::IGNORECASE)}
   flunk "Unimplemented multi-piles controls in testbed" unless controls.length == 1
   
   ctrl = controls[0]

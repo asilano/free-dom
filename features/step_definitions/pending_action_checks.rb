@@ -84,7 +84,7 @@ end
 # Matches:
 #   I should be able to choose the Silver, Gold, Village piles
 #   Bob should not be able to choose the Province pile
-Then(/(.*) should (not )?be able to choose the (.*) piles?/) do |name, negate, kinds|
+Then(/(.*) should (not )?be able to choose the (.*) piles?$/) do |name, negate, kinds|
   name = "Alan" if name == "I"
   player = @players[name]
   
@@ -94,6 +94,32 @@ Then(/(.*) should (not )?be able to choose the (.*) piles?/) do |name, negate, k
   controls = all_controls[:piles]
   flunk "Unimplemented multi-pile controls in testbed" unless controls.length == 1
   
+  ctrl = controls[0]
+  acceptable = ctrl[:piles].map.with_index {|valid, ix| @game.piles[ix].card_type.readable_name if valid}.compact
+  
+  unless negate
+    assert_subset kinds.split(/,\s*/), acceptable
+  else
+    assert_disjoint kinds.split(/,\s*/), acceptable
+  end
+end
+
+# Verify that the stated piles are (not) choosable.
+# Handles multiple actions present at once, by differentiating on button text
+# 
+# Matches:
+#   I should be able to choose the Silver, Gold, Village piles labelled Give to Bob
+Then(/(.*) should (not )?be able to choose the (.*) piles? labelled (.*)$/) do |name, negate, kinds, label|
+  name = "Alan" if name == "I"
+  player = @players[name]
+  
+  # We want to check the valid options for a pile-based action. 
+  # These are encoded in the control that that action produces.
+  all_controls = player.determine_controls
+  controls = all_controls[:piles]
+  
+  controls.select! {|c| c[:text] =~ Regexp.new(Regexp.escape(label), Regexp::IGNORECASE)}
+  flunk "Multiple pile controls with same button text" unless controls.length == 1
   ctrl = controls[0]
   acceptable = ctrl[:piles].map.with_index {|valid, ix| @game.piles[ix].card_type.readable_name if valid}.compact
   

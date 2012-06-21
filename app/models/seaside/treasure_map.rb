@@ -21,7 +21,7 @@ class Seaside::TreasureMap < Card
       # And acquire the FOUR gold to top of deck.
       gold_pile = game.piles.find_by_card_type("BasicCards::Gold")
       4.times do
-        player.queue(parent_act, :gain, :pile => gold_pile.id, :location => "deck")
+        player.gain(parent_act, gold_pile.id, :location => "deck")
       end
       
       game.histories.create!(:event => "#{player.name} gained four Gold to top of their deck.", 

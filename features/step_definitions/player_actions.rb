@@ -9,7 +9,7 @@ When(/(.*) gain(?:s)? (.*)/) do |name, kinds|
     params[:pile] = @game.piles.where(:card_type => CARD_TYPES[kind].to_s)[0].id
     pa = @game.pending_actions.where(:parent_id => nil)[0]
     params[:parent_act] = pa.id
-    @players[name].gain(params)
+    @players[name].do_gain(params)
   end
   
   @game.process_actions
