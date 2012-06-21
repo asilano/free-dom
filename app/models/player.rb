@@ -417,8 +417,7 @@ class Player < ActiveRecord::Base
       
       # Queue up a request for the player to gain the chosen card (assuming it's still there)
       if !pile.cards(true).empty?
-        parent_act.queue(:expected_action => "player_gain;player=#{id};pile=#{pile.id}",
-                         :game => game)
+        gain(parent_act, pile.id)
       end      
     end
     
@@ -427,7 +426,7 @@ class Player < ActiveRecord::Base
     return "OK"
   end  
   
-  def gain(params)
+  def do_gain(params)
     # Called to move a card from a pile to this player
     parent_act = params[:parent_act]
     pile = Pile.find(params[:pile])
@@ -616,8 +615,8 @@ class Player < ActiveRecord::Base
       # Had to step upwards, so should return the original parent_act
       return_orig = true
     end
-    if not (parent_act.player == self or 
-            (parent_act.player.nil? and parent_act.expected_action =~ /;player=#{id}/)) 
+    if !(parent_act.player == self || 
+            (parent_act.player.nil? && parent_act.expected_action =~ /;player=#{id}/)) 
       raise RuntimeError.new("PendingAction #{parent_act.id} doesn't belong to Player #{id}")
     end
     
@@ -1041,15 +1040,22 @@ class Player < ActiveRecord::Base
     active_actions.map {|act| act.expected_action}.any? {|exp| exp =~ Regexp.new("^" + action + "(;.*)?")}
   end
   
-  def queue(parent_act, act, opts={})
-    text = opts.delete :text
-    action = "player_#{act};player=#{id}"
+#  def queue(parent_act, act, opts={})
+#    text = opts.delete :text
+#    action = "player_#{act};player=#{id}"
+#    action += ";" + opts.map {|k,v| "#{k}=#{v}"}.join(';') unless opts.empty?
+#    parent_act.queue(:expected_action => action,
+#                     :text => text,
+#                     :game => game)
+#  end
+
+  def gain(parent_act, pile_id, opts = {})
+    action = "player_do_gain;player=#{id};pile=#{pile_id}"
     action += ";" + opts.map {|k,v| "#{k}=#{v}"}.join(';') unless opts.empty?
-    parent_act.queue(:expected_action => action,
-                     :text => text,
-                     :game => game)
+    parent_act.children.create!(:expected_action => action,
+                                :game => game)
   end
-  
+ 
   def emailed
     self.last_emailed = Time.now
     save!

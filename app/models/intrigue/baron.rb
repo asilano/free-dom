@@ -73,7 +73,7 @@ class Intrigue::Baron < Card
                             :css_class => "player#{ply.seat} card_gain")
       estate_pile = game.piles.find_by_card_type("BasicCards::Estate")
 
-      ply.queue(parent_act, :gain, :pile => estate_pile.id)
+      ply.gain(parent_act, estate_pile.id)
     else
       # Discard the selected card, and grant 4 cash.
       card = ply.cards.hand[params[:card_index].to_i] 

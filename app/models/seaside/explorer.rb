@@ -58,14 +58,14 @@ class Seaside::Explorer < Card
                             :css_class => "player#{ply.seat}")
       # Get a silver card from the pile
       silver_pile = game.piles.find_by_card_type("BasicCards::Silver")
-      ply.queue(parent_act, :gain, :pile => silver_pile.id, :location => "hand")
+      ply.gain(parent_act, silver_pile.id, :location => "hand")
     else
       # Player chose a card. Give them a gold.
       game.histories.create!(:event => "#{ply.name} revealed a Province, and gained a Gold to hand.",
                             :css_class => "player#{ply.seat}")
       # Get a gold card from the pile
       gold_pile = game.piles.find_by_card_type("BasicCards::Gold")
-      ply.queue(parent_act, :gain, :pile => gold_pile.id, :location => "hand")
+      ply.gain(parent_act, gold_pile.id, :location => "hand")
     end
     
     save!

@@ -73,7 +73,7 @@ class Prosperity::Mint < Card
         game.histories.create!(:event => "#{ply.name} took a copy of #{card} with Mint.",
                               :css_class => "player#{ply.seat} card_gain")
 
-        ply.queue(parent_act, :gain, :pile => pile.id)
+        ply.gain(parent_act, pile.id)
       end
         
       return "OK"

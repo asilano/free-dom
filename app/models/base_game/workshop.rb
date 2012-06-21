@@ -52,7 +52,7 @@ class BaseGame::Workshop < Card
            "#{game.piles[params[:pile_index].to_i].card_class.readable_name} from the Workshop.",
                           :css_class => "player#{ply.seat} card_gain")
 
-    ply.queue(parent_act, :gain, :pile => game.piles[params[:pile_index].to_i].id)                       
+    ply.gain(parent_act, game.piles[params[:pile_index].to_i].id)                       
     
     return "OK"
   end

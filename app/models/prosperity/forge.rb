@@ -94,7 +94,7 @@ class Prosperity::Forge < Card
            "#{valid_piles[0].card_class.readable_name} with Forge.",
                           :css_class => "player#{ply.seat} card_gain")
 
-      ply.queue(parent_act, :gain, :pile => valid_piles[0].id)
+      ply.gain(parent_act, valid_piles[0].id)
     elsif valid_piles.length == 0
       # No possible replacements
       game.histories.create!(:event => "#{ply.name} was unable to take a card costing #{cost}.",
@@ -131,7 +131,7 @@ class Prosperity::Forge < Card
             "#{game.piles[params[:pile_index].to_i].card_class.readable_name} with #{readable_name}.",
                           :css_class => "player#{ply.seat} card_gain")
                             
-    ply.queue(parent_act, :gain, :pile => game.piles[params[:pile_index].to_i].id)
+    ply.gain(parent_act, game.piles[params[:pile_index].to_i].id)
     
     return "OK"
   end
