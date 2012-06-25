@@ -24,7 +24,7 @@ Given /I am a player in a (?:([2-6])-player )?standard game(?: with (.*))?/ do |
       unless @game.piles.map(&:card_type).map(&:readable_name).include?(card)
         @game.piles[pos].card_type = CARD_TYPES[card].name
         @game.piles[pos].save!
-        pos += 1 while reqd_cards.include?(@game.piles[pos].card_type.readable_name)
+        pos += 1 while @game.piles[pos] && reqd_cards.include?(@game.piles[pos].card_type.readable_name)
       end
     end
   end
