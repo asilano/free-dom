@@ -81,4 +81,8 @@ class Card
   def <=>(rhs)
     return readable_name <=> rhs.readable_name
   end
+  
+  def self.non_card
+    "Ace of Spades"
+  end
 end
