@@ -1,15 +1,18 @@
 Given /I am a player in a (?:([2-6])-player )?standard game(?: with (.*))?/ do |player_count, card_list|
-  step_text = "Given the following users exist:
-      | Name       | Password | Password Confirmation | Email         |
-      | Alan       | a        | a                     | a@example.com |
-      | Bob        | b        | b                     | b@example.com |
-      | Charlie    | c        | c                     | c@example.com |
-      | Dave       | d        | d                     | d@example.com |
-      | Ethelred   | e        | e                     | e@example.com |
-      | Fred       | f        | f                     | f@example.com |"
-      
-  steps step_text
+  unless @players
+    step_text = "Given the following users exist:
+        | Name       | Password | Password Confirmation | Email         |
+        | Alan       | a        | a                     | a@example.com |
+        | Bob        | b        | b                     | b@example.com |
+        | Charlie    | c        | c                     | c@example.com |
+        | Dave       | d        | d                     | d@example.com |
+        | Ethelred   | e        | e                     | e@example.com |
+        | Fred       | f        | f                     | f@example.com |"
+        
+    steps step_text
+  end
      
+  @game.andand.destroy
   player_count ||= 3
   @game = Factory.create(:fixed_game, :max_players => player_count.to_i)
   
