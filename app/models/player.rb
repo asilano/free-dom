@@ -1065,14 +1065,14 @@ Rails.logger.info("Destroying action #{this_act.id} to play action")
   
   # Synthetic attribute for number of actions
   def actions
-    unless game.root_action && game.root_action.expected_action == "player_end_turn;player=#{id}"
+    unless game.pending_actions.any? {|act| act.expected_action == "player_end_turn;player=#{id}"}
       return nil
     end
     pending_actions.where(:expected_action => 'play_action').count
   end
   
   def buys
-    unless game.root_action && game.root_action.expected_action == "player_end_turn;player=#{id}"
+    unless game.pending_actions.any? {|act| act.expected_action == "player_end_turn;player=#{id}"}
       return nil
     end
     pending_actions.where(:expected_action => 'buy').count
