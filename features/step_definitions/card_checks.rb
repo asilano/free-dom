@@ -163,23 +163,28 @@ Then(/(.*) should have moved #{CardList} from (.*) to (.*)/) do |name, kinds, fr
   name = "Alan" if name == "I"
   player = @players[name]
   
-  cards = kinds.split(/,\s*/)
-
-  # First, remove the cards from whence they came
-  if from == "deck"
-    # The named cards should be on top in order
-    assert_operator @deck_contents[name].length, :>=, cards.length
-    assert_equal cards, @deck_contents[name][0, cards.length]
+  kinds.split(/,\s*/).each do |kind|
+    /(.*) ?x ?(\d+)/ =~ kind
+    kind = $1.rstrip if $1
+    num = $2.andand.to_i || 1
     
-    @deck_contents[name].shift(cards.length)
-  else
-    from_cont = instance_variable_get("@#{from}_contents")[name]    
-    cards.each {|card| from_cont.delete_first(card)}
+    num.times do  
+      # First, remove the cards from whence they came
+      if from == "deck"
+        # The named cards should be on top in order     
+        assert_equal kind, @deck_contents[name][0]
+        
+        @deck_contents[name].shift
+      else
+        from_cont = instance_variable_get("@#{from}_contents")[name]    
+        from_cont.delete_first(kind)
+      end
+      
+      # Now, put them onto the target
+      to_cont = instance_variable_get("@#{to}_contents")[name]
+      to_cont.unshift kind
+    end
   end
-  
-  # Now, put them onto the target
-  to_cont = instance_variable_get("@#{to}_contents")[name]
-  cards.each {|card| to_cont.unshift card}
 end
 
 # Matches

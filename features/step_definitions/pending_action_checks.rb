@@ -129,3 +129,28 @@ Then(/(.*) should (not )?be able to choose the (.*) piles? labelled (.*)$/) do |
     assert_disjoint kinds.split(/,\s*/), acceptable
   end
 end
+
+# Verify that a dropdown control has the stated options
+#
+# Matches:
+#   I should be able to choose exactly 0, 1, 2, 3 from the dropdown
+#   Bob should be able to choose 1, 2 from the dropdown // non-exact match
+Then /(.*) should be able to choose (exactly )?(.*) from the dropdown/ do |name, exact, choices|
+  name = "Alan" if name == "I"
+  player = @players[name]
+  
+  # We want to check the valid options for a player-based action. 
+  # These are encoded in the control that that action produces.
+  all_controls = player.determine_controls
+  controls = all_controls[:player]
+  flunk "Unimplemented multi-dropdown controls in testbed" unless controls.length == 1
+  flunk "Expected dropdown control" unless controls[0][:type] == :dropdown
+  
+  ctrl = controls[0]
+  
+  if exact
+    assert_same_elements choices.split(/,\s*/), ctrl[:choices].map(&:first)
+  else
+    assert_contains ctrl[:choices].map(&:first), choices.split(/,\s*/)
+  end
+end

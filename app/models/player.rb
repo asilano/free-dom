@@ -169,7 +169,6 @@ class Player < ActiveRecord::Base
     rc = "OK"
     this_act = active_actions.detect {|act| act.expected_action == "play_action"}
     parent_act = this_act.parent
-Rails.logger.info("Destroying action #{this_act.id} to play action")
     this_act.destroy
     
     # Now process the action played
@@ -244,7 +243,6 @@ Rails.logger.info("Destroying action #{this_act.id} to play action")
   # Play a specific treasure from hand, or play all simple treasures, or stop playing.
   def play_treasure(params)
     return "Cash unexpectedly nil for Player #{id}" if cash.nil?
-    
     # Unsurprisingly, this is much like play_action.
     if not waiting_for?("play_treasure")
       return "Not expecting a Treasure at this time"

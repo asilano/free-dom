@@ -138,6 +138,33 @@ When(/(.*) chooses? the options (.*)/) do |name, choices|
   @skip_card_checking = 1 if @skip_card_checking == 0
 end
 
+# Verify that a dropdown control has the stated options
+#
+# Matches:
+#   I should be able to choose exactly 0, 1, 2, 3 from the dropdown
+#   Bob should be able to choose 1, 2 from the dropdown // non-exact match
+Then /^(\w*?)(?:'s)? chooses? (.*) from the dropdown/ do |name, choice|
+  name = "Alan" if name == "I"
+  player = @players[name]
+  
+  # We have to call resolve for the appropriate action with appropriate params.
+  # So, really, we need to duplicate the logic of what to do with a control
+  all_controls = player.determine_controls
+  controls = all_controls[:player]
+  flunk "Unimplemented multi-dropdown controls in testbed" unless controls.length == 1
+  flunk "Expected dropdown control" unless controls[0][:type] == :dropdown
+  
+  ctrl = controls[0]
+  params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
+
+  params[:choice] = choice
+  
+  player.resolve(params)
+  
+  # Probably chosen the option for a reason
+  @skip_card_checking = 1 if @skip_card_checking == 0
+end
+
 # Step for any control that requires you to choose a pile; that is, process any controls[:piles] control
 #
 # Matches
@@ -246,5 +273,3 @@ When(/^(\w*?) chooses? (.*?) for (\w*?)(?:'s)? revealed (#{SingleCardNoCapture}|
   # Probably expect something to happen to the chosen card
   @skip_card_checking = 1 if @skip_card_checking == 0
 end
-
-    
