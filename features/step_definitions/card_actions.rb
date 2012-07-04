@@ -46,6 +46,27 @@ When(/^(\w*?) plays? #{SingleCard} as treasure$/) do |name, kind|
   @skip_card_checking = 1 if @skip_card_checking == 0
 end
 
+When(/^(\w*?) stops? playing treasures$/) do |name|
+  name = 'Alan' if name == 'I'
+  
+  parent_act = @players[name].active_actions[0]
+  assert_match /play_treasure/, parent_act.expected_action
+    
+  @players[name].play_treasure(:nil_action => "Stop Playing Treasures")   
+end
+
+When(/^(\w*?) plays? simple treasures$/) do |name|
+  name = 'Alan' if name == 'I'
+  
+  parent_act = @players[name].active_actions[0]
+  assert_match /play_treasure/, parent_act.expected_action
+    
+  @players[name].play_treasure(:nil_action => "Play Simple Treasures")
+  
+  # Skip checking this step, so the feature can move the cards
+  @skip_card_checking = 1 if @skip_card_checking == 0
+end
+
 When(/(.*) moves? (.*) from (.*) to (.*)/) do |name, kind, from, to|
   assert_not_equal "deck", from
   assert_not_equal "deck", to

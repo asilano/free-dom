@@ -158,7 +158,7 @@ When(/^(\w*?)(?:'s)? chooses? (?:the )?(.*?) (?:for )?piles?$/) do |name, choice
   params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
   
   if ctrl[:nil_action].andand == choice
-    params[:nil_action] = true
+    params[:nil_action] = choice
   else
     possibilities = @game.piles.map{|p| p.card_type.readable_name}
     kinds = choice.split(/,\s*/)

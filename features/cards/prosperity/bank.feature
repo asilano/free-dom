@@ -10,7 +10,10 @@ Feature: Bank
       
   Scenario: Playing Bank
     Given my hand contains Copper, Harem, Bank, Bank, Silver
-      And it is my Play Treasure phase
+      And it is my Play Action phase
+    When I stop playing actions
+      And the game checks actions
+    Then I should need to Play Treasure
     When I play Copper as treasure
       And I play Harem as treasure
     Then I should have 3 cash
