@@ -32,7 +32,11 @@ When(/^(\w*?) chooses? (.*) in (?:his|my) hand/) do |name, choice|
     if kinds.length == 1
       params[key] = possibilities.index(kinds[0])
     else
-      params[key] = kinds.map {|kind| possibilities.index(kind)}
+      params[key] = kinds.map  do |kind| 
+        ix = possibilities.index(kind)
+        possibilities[ix] = nil
+        ix
+      end
     end
   end
   
