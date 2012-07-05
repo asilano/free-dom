@@ -123,7 +123,33 @@ h1, h2
 }
 * html #contentWrap { height: 100% } /* IE6 workaround */
 
-#flash { margin-top: 2em; }
+#flash 
+{ 
+  margin-top: 2em;
+  padding-left: 2px;
+  padding-right: 2px;
+  
+  div { padding: 5px; }
+  
+  .notice 
+  {
+    color: green;
+    border: 1px solid #008800;
+    background-color: #AAFFAA;
+  }
+  .warning 
+  {
+    color: black;
+    border: 1px solid red;
+    background-color: #87CEFA;     
+  }
+  .error 
+  {
+    color: #880000;
+    border: 1px solid red;
+    background-color: #FFCCCC;     
+  }
+}
 #mainContent { padding-bottom: 22px; }
 
 #footer 
@@ -249,3 +275,24 @@ input:-moz-placeholder {font-style: italic;}
   .up { background-position: -15px 0; }
   .down { background-position: -30px 0; }
 }
+
+.tooltip_explain 
+{
+  position: relative; 
+  display: inline;
+  
+  img {vertical-align: middle;}
+  .tooltip_explanation
+  {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    width: 15em;
+    border: 1px solid black;
+    background: #f5f4d6;
+    margin-left: -9999px; 
+  }
+  &:hover .tooltip_explanation {margin-left: 0;}
+}
+
+.inline_legal { font-size: 0.7em; }
