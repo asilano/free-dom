@@ -6,7 +6,7 @@ class BaseGame::Workshop < Card
   def play(parent_act)
     super
     act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}",
-                                     :text => "Take card with Workshop")
+                                     :text => "Take a card with Workshop")
     act.player = player
     act.game = game
     act.save!
@@ -52,7 +52,7 @@ class BaseGame::Workshop < Card
            "#{game.piles[params[:pile_index].to_i].card_class.readable_name} from the Workshop.",
                           :css_class => "player#{ply.seat} card_gain")
 
-    ply.queue(parent_act, :gain, :pile => game.piles[params[:pile_index].to_i].id)                       
+    ply.gain(parent_act, game.piles[params[:pile_index].to_i].id)                       
     
     return "OK"
   end

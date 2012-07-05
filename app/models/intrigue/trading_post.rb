@@ -79,7 +79,7 @@ class Intrigue::TradingPost < Card
     if params[:gain] == 'true'
       # Parameters indicate we should now grant a Silver to hand. 
       silver_pile = game.piles.find_by_card_type("BasicCards::Silver")
-      ply.queue(parent_act, :gain, :pile => silver_pile.id, :location => "hand") 
+      ply.gain(parent_act, silver_pile.id, :location => "hand") 
       game.histories.create!(:event => "#{ply.name} gained a Silver to Hand.", 
                             :css_class => "player#{ply.seat} card_gain")      
     end

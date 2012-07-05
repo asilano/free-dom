@@ -8,6 +8,7 @@ class Seaside::Smuggler < Card
   def play(parent_act)
     super
     
+    # TODO: Should be select?
     valid_piles = game.piles.map do |pile| 
       (pile.cost <= 6 && 
        player.prev_player.state.gained_last_turn.include?(pile.card_class.to_s) &&
@@ -23,7 +24,7 @@ class Seaside::Smuggler < Card
       game.histories.create!(:event => "#{player.name} took #{valid_piles[0].card_class.readable_name} with Smuggler.",
                             :css_class => "player#{player.seat} card_gain")
       
-      player.queue(parent_act, :gain, :pile => valid_piles[0].id)
+      player.gain(parent_act, valid_piles[0].id)
     else
       # An actual choice exists. Ask the player
       parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_take",
@@ -92,7 +93,7 @@ class Seaside::Smuggler < Card
       game.histories.create!(:event => "#{ply.name} took #{game.piles[pile_index].card_class.readable_name} with Smuggler.",
                             :css_class => "player#{ply.seat} card_gain")
       
-      ply.queue(parent_act, :gain, :pile => game.piles[params[:pile_index].to_i].id)     
+      ply.gain(parent_act, game.piles[params[:pile_index].to_i].id)     
     else
       
     end

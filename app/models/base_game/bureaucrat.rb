@@ -11,7 +11,7 @@ class BaseGame::Bureaucrat < Card
     
     # First, acquire a Silver to top of deck.
     silver_pile = game.piles.find_by_card_type("BasicCards::Silver")
-    player.queue(parent_act, :gain, :pile => silver_pile.id, :location => "deck")
+    player.gain(parent_act, silver_pile.id, :location => "deck")
 
     game.histories.create!(:event => "#{player.name} gained a Silver to top of their deck.", 
                           :css_class => "player#{player.seat} card_gain")

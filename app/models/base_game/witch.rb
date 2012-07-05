@@ -31,7 +31,7 @@ class BaseGame::Witch < Card
     if not curses_pile.empty?
       game.histories.create!(:event => "#{ply.name} gained a Curse.",
                             :css_class => "player#{ply.seat} card_gain")
-      ply.queue(parent_act, :gain, :pile => curses_pile.id)       
+      ply.gain(parent_act, curses_pile.id)       
     else
       game.histories.create!(:event => "#{ply.name} couldn't gain a Curse - none left.", 
                             :css_class => "player#{ply.seat}")

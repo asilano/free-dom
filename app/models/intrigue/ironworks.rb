@@ -8,7 +8,7 @@ class Intrigue::Ironworks < Card
     
     # Add a PendingAc... y'know what? It's exactly the same as Workshop.
     parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_take",
-                               :text => "Take card with Ironworks",
+                               :text => "Take a card with Ironworks",
                                :player => player,
                                :game => game)
     return "OK"
@@ -55,7 +55,7 @@ class Intrigue::Ironworks < Card
     game.histories.create!(:event => "#{ply.name} took #{card.readable_name} from the Ironworks.",
                           :css_class => "player#{ply.seat} card_gain")
 
-    ply.queue(parent_act, :gain, :pile => card.pile.id)                      
+    ply.gain(parent_act, card.pile.id)                      
     
     # Now grant any bonuses
     if card.is_action?

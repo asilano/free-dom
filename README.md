@@ -1,26 +1,20 @@
-FreeDom
-======
+free-dom/improve-testing
+=======
 
-This is the codebase for my free, online Dominion server.
+This is a branch of the [main codebase](https://github.com/asilano/free-dom) for my free, online Dominion server.
 
-Notes
------
+FreeDom's tests aren't complete. The following are definitely needed:
 
-Currently, "master" is the codebase as it exists on heroku.
+* **Integration tests**, to automatically test the web front-end
+* **Per-card unit tests**, to test that each card does what it should. Using [Cucumber](http://cukes.info). See the README under [the features/ folder][feat-code] for more information.
 
-This codebase now runs Rails 3.1, but is still using the Prototype javascript library. It's time to move on - I'll be migrating to jQuery in my next release (which will mainly be to implement Hinterlands). However, the trickiest work - migrating to Rails 3.1 - is done.
+... and I may well be missing something else.
 
-This codebase is now open for outside contributions in certain areas. Branches exist or will be created for:
+Note
+----
+Please fork and contribute to this branch - _**especially the per-card tests**_! I need features defined for all the cards in [Intrigue][int-code], [Seaside][sea-code] and [Prosperity][pros-code]. If you want to define tests for Hinterlands cards, that would be cool too - they need to be in place before we start implementation.
 
-* [Migration to jQuery](https://github.com/asilano/free-dom/tree/prototype-to-jquery)
-* [General test improvements](https://github.com/asilano/free-dom/tree/improve-testing) including integration tests and per-card unit tests (likely using [Cucumber](http://cukes.info/))
-* Implementation of Hinterlands _(deferred until the Cucumber test framework is in place)_
-
-Additional features possibly up for implementation include:
-
-* Structural "bug fixes" that aren't fatal, but are large. Such as occasional loss of transactional integrity
-* Richer set of random-game options, a la [this randomiser](http://www.hiwiller.com/dominion/)
-* Front-end restyling
-* Ratings history
-
-_**Please fork and contribute where possible!**_
+[feat-code]: https://github.com/asilano/free-dom/tree/improve-testing/features
+[int-code]: https://github.com/asilano/free-dom/tree/improve-testing/app/models/intrigue
+[sea-code]: https://github.com/asilano/free-dom/tree/improve-testing/app/models/seaside
+[pros-code]: https://github.com/asilano/free-dom/tree/improve-testing/app/models/prosperity

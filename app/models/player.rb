@@ -149,6 +149,7 @@ class Player < ActiveRecord::Base
   def play_action(params)
     # Checks. In order to be playing an action, the player must be waiting to
     # play an action
+    active_actions.reload
     if not waiting_for?("play_action")
       return "Not expecting an Action at this time"
     elsif (!params.include?(:nil_action) &&
@@ -242,7 +243,6 @@ class Player < ActiveRecord::Base
   # Play a specific treasure from hand, or play all simple treasures, or stop playing.
   def play_treasure(params)
     return "Cash unexpectedly nil for Player #{id}" if cash.nil?
-    
     # Unsurprisingly, this is much like play_action.
     if not waiting_for?("play_treasure")
       return "Not expecting a Treasure at this time"
@@ -417,8 +417,7 @@ class Player < ActiveRecord::Base
       
       # Queue up a request for the player to gain the chosen card (assuming it's still there)
       if !pile.cards(true).empty?
-        parent_act.queue(:expected_action => "player_gain;player=#{id};pile=#{pile.id}",
-                         :game => game)
+        gain(parent_act, pile.id)
       end      
     end
     
@@ -427,7 +426,7 @@ class Player < ActiveRecord::Base
     return "OK"
   end  
   
-  def gain(params)
+  def do_gain(params)
     # Called to move a card from a pile to this player
     parent_act = params[:parent_act]
     pile = Pile.find(params[:pile])
@@ -616,8 +615,8 @@ class Player < ActiveRecord::Base
       # Had to step upwards, so should return the original parent_act
       return_orig = true
     end
-    if not (parent_act.player == self or 
-            (parent_act.player.nil? and parent_act.expected_action =~ /;player=#{id}/)) 
+    if !(parent_act.player == self || 
+            (parent_act.player.nil? && parent_act.expected_action =~ /;player=#{id}/)) 
       raise RuntimeError.new("PendingAction #{parent_act.id} doesn't belong to Player #{id}")
     end
     
@@ -730,7 +729,7 @@ class Player < ActiveRecord::Base
 
     if cards_drawn.length < num
       excess = num - cards_drawn.length
-      game.histories.create!(:event => "#{name} tried to draw #{excess} more cards#{reason}, but their deck was empty.",
+      game.histories.create!(:event => "#{name} tried to draw #{excess} more card#{'s' unless excess == 1}#{reason}, but their deck was empty.",
                             :css_class => "player#{seat} card_draw")
     end    
     save!
@@ -1041,15 +1040,22 @@ class Player < ActiveRecord::Base
     active_actions.map {|act| act.expected_action}.any? {|exp| exp =~ Regexp.new("^" + action + "(;.*)?")}
   end
   
-  def queue(parent_act, act, opts={})
-    text = opts.delete :text
-    action = "player_#{act};player=#{id}"
+#  def queue(parent_act, act, opts={})
+#    text = opts.delete :text
+#    action = "player_#{act};player=#{id}"
+#    action += ";" + opts.map {|k,v| "#{k}=#{v}"}.join(';') unless opts.empty?
+#    parent_act.queue(:expected_action => action,
+#                     :text => text,
+#                     :game => game)
+#  end
+
+  def gain(parent_act, pile_id, opts = {})
+    action = "player_do_gain;player=#{id};pile=#{pile_id}"
     action += ";" + opts.map {|k,v| "#{k}=#{v}"}.join(';') unless opts.empty?
-    parent_act.queue(:expected_action => action,
-                     :text => text,
-                     :game => game)
+    parent_act.children.create!(:expected_action => action,
+                                :game => game)
   end
-  
+ 
   def emailed
     self.last_emailed = Time.now
     save!
@@ -1057,14 +1063,14 @@ class Player < ActiveRecord::Base
   
   # Synthetic attribute for number of actions
   def actions
-    unless game.root_action && game.root_action.expected_action == "player_end_turn;player=#{id}"
+    unless game.pending_actions.any? {|act| act.expected_action == "player_end_turn;player=#{id}"}
       return nil
     end
     pending_actions.where(:expected_action => 'play_action').count
   end
   
   def buys
-    unless game.root_action && game.root_action.expected_action == "player_end_turn;player=#{id}"
+    unless game.pending_actions.any? {|act| act.expected_action == "player_end_turn;player=#{id}"}
       return nil
     end
     pending_actions.where(:expected_action => 'buy').count

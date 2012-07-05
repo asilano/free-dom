@@ -118,7 +118,7 @@ class BaseGame::Remodel < Card
       game.histories.create!(:event => "#{ply.name} took " + 
              "#{game.piles[params[:pile_index].to_i].card_class.readable_name} with Remodel.",
                             :css_class => "player#{ply.seat} card_gain")
-      ply.queue(parent_act, :gain, :pile => game.piles[params[:pile_index].to_i].id)      
+      ply.gain(parent_act, game.piles[params[:pile_index].to_i].id)      
     else
       # Create a history
       game.histories.create!(:event => "#{ply.name} couldn't take a replacement.",

@@ -115,6 +115,8 @@ class Intrigue::Scout < Card
                             :css_class => "player#{ply.seat}")
     end
     
+    ply.renum(:deck)
+    
     return "OK"
   end
 end
