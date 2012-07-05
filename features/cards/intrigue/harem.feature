@@ -1,6 +1,6 @@
 Feature: Harem
   Treasure - 2 cash
-  Victory - s points
+  Victory - 2 points
   
   Scenario Outline: Harem should be set up at game start
     Given I am a player in a <num>-player standard game with Harem
