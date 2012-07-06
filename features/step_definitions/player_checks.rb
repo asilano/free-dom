@@ -13,6 +13,11 @@ Then /(.*) should have (\d+) cash/ do |name, cash|
   assert_equal cash.to_i, @players[name].reload.cash
 end
 
+Then /(.*) should have (\d+) cards in hand/ do |name, cards|
+  name = "Alan" if name == "I"
+  assert_equal cards.to_i, @players[name].cards.hand(true).length
+end
+
 Then(/(.*?)(?:'s)? score should be (-)?(\d+)/) do |name, neg, score|
   name = "Alan" if name == "my"
   exp = score.to_i

@@ -61,10 +61,6 @@ Feature: Throne Room
   Scenario: Playing Throne Room - doubling a Duration
     Given my hand contains Throne Room, Lighthouse
       And my deck contains Duchy x5
-      And Bob's hand is empty
-      And Bob's deck is empty
-      And Charlie's hand is empty
-      And Charlie's deck is empty
       And it is my Play Action phase
     When I play Throne Room
       And the game checks actions
@@ -78,14 +74,7 @@ Feature: Throne Room
       And I stop buying cards
       And the game checks actions
     Then I should have drawn 5 cards    
-    When Bob stops playing actions
-      And the game checks actions
-      And Bob stops buying cards
-      And the game checks actions
-      And Charlie stops playing actions
-      And the game checks actions
-      And Charlie stops buying cards
-      And the game checks actions
+    When my next turn starts
     Then the following 3 steps should happen at once
       Then I should have 2 cash
       And I should have moved Throne Room, Lighthouse from enduring to play
