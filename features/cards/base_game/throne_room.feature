@@ -78,14 +78,7 @@ Feature: Throne Room
       And I stop buying cards
       And the game checks actions
     Then I should have drawn 5 cards    
-    When Bob stops playing actions
-      And the game checks actions
-      And Bob stops buying cards
-      And the game checks actions
-      And Charlie stops playing actions
-      And the game checks actions
-      And Charlie stops buying cards
-      And the game checks actions
+    When my next turn starts
     Then the following 3 steps should happen at once
       Then I should have 2 cash
       And I should have moved Throne Room, Lighthouse from enduring to play
