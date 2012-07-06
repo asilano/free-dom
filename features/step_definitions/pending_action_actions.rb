@@ -174,7 +174,7 @@ end
 # Matches
 #   I choose the Estate pile
 #   Bob chooses the Estate, Copper piles
-#   I choose Don't buy for piles  // (Where "Don't buy" is the nil-action text)
+#   I choose Take nothing for piles  // (Where "Take nothing" is the nil-action text)
 When(/^(\w*?)(?:'s)? chooses? (?:the )?(.*?) (?:for )?piles?$/) do |name, choice|
   name = "Alan" if name == "I"
   player = @players[name]
@@ -212,7 +212,7 @@ end
 # Matches
 #   I choose the Estate pile
 #   Bob chooses the Estate, Copper piles
-#   I choose Don't buy for piles  // (Where "Don't buy" is the nil-action text)
+#   I choose Take nothing for piles  // (Where "Take nothing" is the nil-action text)
 When(/^(\w*?)(?:'s)? chooses? (?:the )?(.*?) (?:for )?piles? labelled (.*)$/) do |name, choice, label|
   name = "Alan" if name == "I"
   player = @players[name]
