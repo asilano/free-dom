@@ -61,10 +61,6 @@ Feature: Throne Room
   Scenario: Playing Throne Room - doubling a Duration
     Given my hand contains Throne Room, Lighthouse
       And my deck contains Duchy x5
-      And Bob's hand is empty
-      And Bob's deck is empty
-      And Charlie's hand is empty
-      And Charlie's deck is empty
       And it is my Play Action phase
     When I play Throne Room
       And the game checks actions
