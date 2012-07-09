@@ -39,8 +39,7 @@ When(/^(\w*)(?:'s)? next turn starts$/) do |name|
   if player_hand.blank?
     step "Then #{current_name} should have drawn 5 cards"
   else
-    steps "Then the following 2 steps should happen at once
-      Then #{current_name} should have discarded #{player_hand}
+    steps "Then #{current_name} should have discarded #{player_hand}
       And #{current_name} should have drawn 5 cards"
   end
   
@@ -57,8 +56,7 @@ When(/^(\w*)(?:'s)? next turn starts$/) do |name|
     if player_hand.blank?
       step "Then #{this_name} should have drawn 5 cards"
     else
-      steps "Then the following 2 steps should happen at once
-        Then #{this_name} should have discarded #{player_hand}
+      steps "Then #{this_name} should have discarded #{player_hand}
         And #{this_name} should have drawn 5 cards"
     end
     # Avoid infinite loops if the name doesn't exist
@@ -68,6 +66,5 @@ When(/^(\w*)(?:'s)? next turn starts$/) do |name|
     end
   end
   steps "When the game checks actions
-    Then dump actions
-    And it should be #{name}'s Play Action phase"
+    Then it should be #{name}'s Play Action phase"
 end       

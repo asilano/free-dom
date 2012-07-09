@@ -15,8 +15,8 @@ Feature: Lighthouse
     Then I should have 1 cash
       And I should have 1 action available
     When my next turn starts
-    Then I should have 1 cash
-      And I should have moved Lighthouse from enduring to play
+    Then I should have moved Lighthouse from enduring to play
+      And I should have 1 cash
       And I should have 1 action available
       
   Scenario: Playing Lighthouse for defence
