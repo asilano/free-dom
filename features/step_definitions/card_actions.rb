@@ -89,6 +89,7 @@ end
 
 When(/^(\w*?) buys? #{SingleCard}/) do |name, kind|
   name = 'Alan' if name == 'I'
+  
   assert_contains @game.piles.map{|p| p.card_type.readable_name}, kind
   pile = @game.piles.first(:conditions => ['card_type = ?', CARD_TYPES[kind].name])
   assert_not_nil pile
@@ -97,7 +98,8 @@ When(/^(\w*?) buys? #{SingleCard}/) do |name, kind|
   assert_match /buy/, parent_act.expected_action
   
   pile_ix = @game.piles.index {|p| p.card_type == pile.card_type}
-  @players[name].buy(:pile_index => pile_ix)  
+  # Need to ensure player has correct record of cash from database, or buy fails
+  @players[name].reload.buy(:pile_index => pile_ix)
 end
 
 When(/^(\w*?) stops? buying cards$/) do |name|
