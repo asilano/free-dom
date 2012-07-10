@@ -12,6 +12,7 @@ When(/^(\w*?) chooses? (.*) in (?:his|my) hand/) do |name, choice|
   # So, really, we need to duplicate the logic of what to do with a control
   all_controls = player.determine_controls
   controls = all_controls[:hand]
+  flunk "No controls found in #{name}'s hand" if controls.length == 0
   flunk "Unimplemented multi-hand controls in testbed" unless controls.length == 1
   
   ctrl = controls[0]
