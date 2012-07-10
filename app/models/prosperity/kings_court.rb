@@ -19,8 +19,8 @@ class Prosperity::KingsCourt < Card
   # * On resolution of the Game actions, look up the specified card, and Play it
   def play(parent_act)
     super
-    if player.cards.hand.empty?
-      # Holding no cards. Just log
+    if !player.cards.hand.any?(&:is_action?)
+      # Holding no action cards. Just log
       game.histories.create!(:event => "#{player.name} chose no action to treble.",
                             :css_class => "player#{player.seat}")
     else
