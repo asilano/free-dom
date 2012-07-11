@@ -1,4 +1,7 @@
 AfterStep do |scenario|
+  # Make sure we have a correct record of each player's attribs
+  @players.values.each(&:reload)
+  
   # Verify that each player's cards match what we expect
   @skip_card_checking ||= 0
   
