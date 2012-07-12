@@ -37,6 +37,8 @@ Feature: Grand Market
   Scenario: Can't buy Grand Market with Copper
     Given my hand contains Gold, Silver, Copper
       And it is my Play Treasure phase
+    When the game checks actions
+    Then I should need to Play Treasure
     When I play simple treasures
     Then I should have played Gold, Silver, Copper
       And I should need to Buy
@@ -45,6 +47,8 @@ Feature: Grand Market
   Scenario: Can buy Grand Market without Copper
     Given my hand contains Gold, Gold
       And it is my Play Treasure phase
+    When the game checks actions
+    Then I should need to Play Treasure
     When I play simple treasures
     Then I should have played Gold, Gold
       And I should need to Buy
