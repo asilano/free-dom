@@ -1,5 +1,6 @@
 Feature: Lighthouse
-  +1 Action. Now and at the start of your next turn: +1 Coin. - While this is in play, when another player plays an Attack card, it doesn't affect you.
+  +1 Action. Now and at the start of your next turn: +1 Cash.
+  While this is in play, when another player plays an Attack card, it doesn't affect you.
   
   Background:
     Given I am a player in a standard game with Lighthouse

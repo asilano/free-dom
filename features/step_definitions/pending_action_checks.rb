@@ -14,7 +14,7 @@ Then(/it should be (.*?)(?:'s)? (.*) phase/) do |name, phase|
   assert_not_nil exp_action, "Unknown phase '#{phase}'"
     
   actions = @game.active_actions(true).map(&:expected_action) + @players[name].active_actions(true).map(&:expected_action)
-  assert_contains(actions, Regexp.new(exp_action))
+  assert_contains(actions, Regexp.new(exp_action), "Actions didn't contain #{phase}")
 end
 
 # Check for the readable text of a pending action
