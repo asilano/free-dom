@@ -8,22 +8,18 @@ class Seaside::Smuggler < Card
   def play(parent_act)
     super
     
-    valid_piles = game.piles.map do |pile| 
-      (pile.cost <= 6 && 
-       player.prev_player.state.gained_last_turn.include?(pile.card_class.to_s) &&
-       !pile.empty?)
-    end
+    valid_piles = pile_validities.select{|pile, tf| tf}
     
-    if valid_piles.empty?
+    if valid_piles.length == 0
       # Previous player gained nothing viable. Just log
       game.histories.create!(:event => "#{player.name} couldn't Smuggle anything.",
                             :css_class => "player#{player.seat}")
     elsif valid_piles.length == 1
       # Only one viable choice. Take it automatically
-      game.histories.create!(:event => "#{player.name} took #{valid_piles[0].card_class.readable_name} with Smuggler.",
+      game.histories.create!(:event => "#{player.name} took #{valid_piles[0][0].card_class.readable_name} with Smuggler.",
                             :css_class => "player#{player.seat} card_gain")
       
-      player.queue(parent_act, :gain, :pile => valid_piles[0].id)
+      player.gain(parent_act, valid_piles[0][0].id)
     else
       # An actual choice exists. Ask the player
       parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_take",
@@ -38,11 +34,7 @@ class Seaside::Smuggler < Card
   def determine_controls(player, controls, substep, params)
     case substep    
     when "take"
-      valid_piles = game.piles.map do |pile| 
-        (pile.cost <= 6 && 
-         player.prev_player.state.gained_last_turn.include?(pile.card_class.to_s) &&
-         !pile.empty?)
-      end
+      valid_piles = pile_validities.map {|pile, tf| tf}
       controls[:piles] += [{:type => :button,
                             :action => :resolve,
                             :name => "take",
@@ -53,6 +45,14 @@ class Seaside::Smuggler < Card
                             :piles => valid_piles
                           }]
     end
+  end
+  
+  def pile_validities
+    return game.piles.map do |pile| 
+        [pile, (pile.cost <= 6 && 
+         player.prev_player.state.gained_last_turn.include?(pile.card_class.to_s) &&
+         !pile.empty?)]
+      end
   end
   
   def resolve_take(ply, params, parent_act)
