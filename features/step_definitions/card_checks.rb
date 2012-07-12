@@ -46,8 +46,9 @@ end
 # Matches
 #  I should have drawn 1 card
 #  Bob should have drawn 3 cards
-Then /(.*) should have drawn (\d+) cards?/ do |name, num|
+Then /(.*) should have drawn (\d+|a) cards?/ do |name, num|
   name = 'Alan' if name == 'I'
+  num = 1 if num == 'a'
   deck = @deck_contents[name]
   
   num.to_i.times do
@@ -144,7 +145,7 @@ end
 # Matches
 #   I should have gained Copper
 #   Bob should have gained Curse, Curse
-Then(/(.*) should have gained #{CardList}/) do |name, kinds|
+Then(/^(.*) should have gained #{CardList}$/) do |name, kinds|
   name = "Alan" if name == "I"
   kinds.split(/,\s*/).each do |kind|
     /(.*) ?x ?(\d+)/ =~ kind
@@ -261,8 +262,8 @@ end
 #
 # Matches
 #   I should have placed Curse in my hand
-#   Bob should have placed Copper, Curse in his discard
-Then(/(.*) should have placed #{CardList} in (?:his |my )?(.*)/) do |name, kinds, location|
+#   Bob should have gained Copper, Curse to his discard
+Then(/(.*) should have (?:placed|gained) #{CardList} (?:in|to) (?:his |my )?(.*)/) do |name, kinds, location|
   name = "Alan" if name == "I"
   player = @players[name]
   
