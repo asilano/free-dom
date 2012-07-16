@@ -78,7 +78,7 @@ class Prosperity::Mountebank < Card
          params[:card_index].to_i > ply.cards.hand.length - 1))            
       # Asked to discard an invalid card (out of range)        
       return "Invalid request - card index #{params[:card_index]} is out of range"
-    elsif params.include? :card_index &&
+    elsif params.include?(:card_index) &&
           !ply.cards.hand[params[:card_index].to_i].is_curse?
       # Asked to discard an invalid card (not a Curse card)
       return "Invalid request - card index #{params[:card_index]} is not a Curse card"        
