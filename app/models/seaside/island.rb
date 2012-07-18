@@ -16,12 +16,11 @@ class Seaside::Island < Card
     super
     
     if player.cards.hand(true).map(&:class).uniq.length == 1
-      # Only holding one type of card. Call resolve directly
-      return resolve(player, {:card_index => 0}, parent_act)
+      # Only holding one type of card. Call resolve directly.
+      return resolve_setaside(player, {:card_index => 0}, parent_act)
     elsif player.cards.hand.empty?
-      # Holding no cards. Just log
-      game.histories.create!(:event => "#{player.name} only set #{self}, as their hand was empty.",
-                            :css_class => "player#{player.seat}")
+      # Holding no cards. Call resolve directly with nil card_index.
+      return resolve_setaside(player, {:card_index => nil}, parent_act)
     else
       # Queue up an action for setting a card aside
       parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_setaside",
@@ -50,16 +49,23 @@ class Seaside::Island < Card
   
   def resolve_setaside(ply, params, parent_act)
     # We expect to have been passed a :card_index
+    Rails.logger.info('Island resolving setaside')
     if (not params.include? :nil_action) and (not params.include? :card_index)
       return "Invalid parameters"
     end
     
     # Processing is pretty much the same as a Play; code shamelessly yoinked from
     # Player.play_action.
-    if ((params[:card_index].to_i < 0 ||
-         params[:card_index].to_i > ply.cards.hand.length - 1))            
-      # Asked to set aside an invalid card (out of range)        
-      return "Invalid request - card index #{params[:card_index]} is out of range"
+    if params[:card_index].nil? 
+      if !ply.cards.hand.empty?
+        return "Invalid request - hand was not empty but no card index specified"
+      end
+    else
+      if ((params[:card_index].to_i < 0 ||
+           params[:card_index].to_i > ply.cards.hand.length - 1))            
+        # Asked to set aside an invalid card (out of range)
+        return "Invalid request - card index #{params[:card_index]} is out of range"
+      end
     end
     
     # All checks out. Carry on
@@ -67,13 +73,19 @@ class Seaside::Island < Card
     self.location = "island"
     self.save!
     
-    # Set the selected card aside - that is, move it to the "island" location
-    card = ply.cards.hand[params[:card_index].to_i]
-    card.location = "island"
-    card.save!
-
-    game.histories.create!(:event => "#{ply.name} set #{readable_name} and #{card.readable_name} aside from their hand.",
-                          :css_class => "player#{ply.seat}")          
+    if !params[:card_index].nil?
+      # Set the selected card aside - that is, move it to the "island" location
+      card = ply.cards.hand[params[:card_index].to_i]
+      card.location = "island"
+      card.save!
+    
+      game.histories.create!(:event => "#{ply.name} set #{readable_name} and #{card.readable_name} aside from their hand.",
+                              :css_class => "player#{ply.seat}")
+    else
+      # There was nothing to set aside                   
+      game.histories.create!(:event => "#{player.name} only set aside #{readable_name}, as their hand was empty.",
+                            :css_class => "player#{player.seat}")
+    end
     
     return "OK"
   end
