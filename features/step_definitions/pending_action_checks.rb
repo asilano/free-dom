@@ -43,7 +43,8 @@ Then(/(.*) should (not )?be able to choose #{CardListNoRep} in (?:my|his) hand/)
   # These are encoded in the control that that action produces.
   all_controls = player.determine_controls
   controls = all_controls[:hand]
-  flunk "Unimplemented multi-hand controls in testbed" unless controls.length == 1
+  flunk "No controls found in #{name}'s hand" if controls.length == 0
+  flunk "Too many controls in #{name}'s hand" unless controls.length == 1
   
   ctrl = controls[0]
   acceptable = ctrl[:cards].map.with_index {|valid, ix| player.cards.hand[ix].readable_name if valid}.compact

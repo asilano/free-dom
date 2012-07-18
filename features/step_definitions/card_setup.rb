@@ -225,8 +225,8 @@ end
 
 # Matches:
 #   I have nothing in discard
-#   Bob has nothing in discard
-Given /^(\w*) ha(?:ve|s) nothing in discard/ do |name|
+#   Bob has nothing in his discard
+Given /^(\w*) ha(?:ve|s) nothing in (?:my |his )?discard/ do |name|
   name = "Alan" if name == "I"
   @players[name].cards.in_discard.destroy_all
   @discard_contents[name] = []
@@ -234,10 +234,10 @@ end
 
 # Matches:
 #   I have Smithy in discard
-#   I have Smithy, Witch in discard
-#   Bob has Smithy, Witch and 4 other cards in discard
+#   I have Smithy, Witch in my discard
+#   Bob has Smithy, Witch and 4 other cards in his discard
 #   I have Smithy and 4 other cards named "rest of discard" in discard
-Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? in discard/) do |name, fixed_list, num_rand, rand_name|
+Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? in (?:my |his )?discard/) do |name, fixed_list, num_rand, rand_name|
   name = 'Alan' if name == 'I'
   player = @players[name]
   player.cards.in_discard.destroy_all

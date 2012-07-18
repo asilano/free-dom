@@ -38,10 +38,11 @@ Feature: Island
       And it is my Play Action phase
     When I play Island
       Then I should need to Set a card aside with Island
+      And I should not be able to choose a nil action in my hand
     When I choose Estate in my hand
       Then the following 2 steps should happen at once
-      Then I should have removed Estate from my hand
-      And I should have removed Island from my play
+        Then I should have removed Estate from my hand
+        And I should have removed Island from my play
       And it should be my Play Treasure phase
     When the game ends
     Then my score should be 3
@@ -53,8 +54,8 @@ Feature: Island
       And it is my Play Action phase
     When I play Island
       Then the following 2 steps should happen at once
-      Then I should have removed Estate from my hand
-      And I should have removed Island from my play
+        Then I should have removed Estate from my hand
+        And I should have removed Island from my play
       And it should be my Play Treasure phase
     When the game ends
     Then my score should be 6
@@ -82,13 +83,13 @@ Feature: Island
       Then I should need to Set a card aside with Island
     When I choose Estate in my hand
       Then the following 2 steps should happen at once
-      Then I should have removed Estate from my hand
-      And I should have removed Island from my play
+        Then I should have removed Estate from my hand
+        And I should have removed Island from my play
       And I should have 1 action available
     When I play Island
       Then the following 2 steps should happen at once
-      Then I should have removed Curse from my hand
-      And I should have removed Island from my play
+        Then I should have removed Curse from my hand
+        And I should have removed Island from my play
       And it should be my Play Treasure phase
     When the game ends
     Then my score should be 4
@@ -104,8 +105,8 @@ Feature: Island
       And I should need to Set a card aside with Island
     When I choose Estate in my hand
       Then the following 2 steps should happen at once
-      Then I should have removed Estate from my hand
-      And I should have removed Island from my play
+        Then I should have removed Estate from my hand
+        And I should have removed Island from my play
     When the game checks actions
       Then I should need to Set a card aside with Island
     When I choose Curse in my hand

@@ -33,7 +33,7 @@ class Seaside::Cutpurse < Card
       # Target is holding no coppers.
       # "Reveal" the player's hand. Since no-one needs to
       # act on the revealed cards, just add a history entry detailing them.
-      game.histories.create!(:event => "#{target.name} revealed their hand to the #{readable_name}:.", 
+      game.histories.create!(:event => "#{target.name} revealed their hand to the #{readable_name}:", 
                             :css_class => "player#{target.seat} card_reveal")
       game.histories.create!(:event => "#{target.name} revealed #{target.cards.hand.join(', ')}.", 
                             :css_class => "player#{target.seat} card_reveal")

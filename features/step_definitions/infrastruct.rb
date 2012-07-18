@@ -13,6 +13,6 @@ Then /dump actions/ do
   PendingAction.all.each {|pa| Rails.logger.info(pa.inspect)}
 end
 
-Then /dump hand contents/ do
+Then /dump hands/ do
     @hand_contents.each {|plr, cards| Rails.logger.info("#{plr}'s hand was: #{cards.inspect}")}
 end
