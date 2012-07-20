@@ -36,7 +36,7 @@ end
 #   Bob should have Copper, Gold in play
 #
 # Note that this sets the exact expected contents; we can do this because "shuffling" is now sorting by unprefixed name
-Then /(.*) should have #{CardList} [io]n (?:my )?(.*)/ do |name, kinds, location|
+Then /(.*) should have #{CardList} [io]n (?:my |his )?(.*)/ do |name, kinds, location|
   name = 'Alan' if name == 'I'
   exp = instance_variable_get("@#{location}_contents")[name]
 

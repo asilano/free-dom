@@ -50,7 +50,7 @@ end
 # Step for any control that requires you to make a choice of revealed cards; that is, process any controls[:revealed] control
 #
 # Matches
-#   I choose my revealed Estate in my hand
+#   I choose my revealed Estate
 #   Bob chooses his revealed Estate, Copper
 #   I choose my revealed Don't trash // (Where "Don't trash" is the nil-action text)
 When(/^(\w*?)(?:'s)? chooses? (?:his|my) revealed (.*)/) do |name, choice|
