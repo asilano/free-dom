@@ -82,7 +82,7 @@ class Prosperity::Rabble < Card
       if revealed_cards.length >= discarded_cards.length + 2
         target.renum(:deck)
         target.reveal_from_deck(revealed_cards.length - discarded_cards.length, :silent => true)
-        (1..target.cards.revealed.length).each do |ix|      
+        (2..target.cards.revealed.length).each do |ix|
           parent_act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_place;posn=#{ix}",
                                                   :text => "Put a card #{ActiveSupport::Inflector.ordinalize(ix)} from top",
                                                   :player => target,
@@ -116,9 +116,23 @@ class Prosperity::Rabble < Card
     card.position = -1
     card.revealed = false
     card.save!
-    game.histories.create!(:event => "#{ply.name} placed #{card} #{ActiveSupport::Inflector.ordinalize(params[:posn])} from top.",
+    game.histories.create!(:event => "#{ply.name} placed [#{ply.id}?#{card}|a card] #{ActiveSupport::Inflector.ordinalize(params[:posn])} from top.",
                           :css_class => "player#{ply.seat}")
     
+    if params[:posn].to_i == 2
+      # That was the card second from top, so only one card remains to be placed. Do so.
+      raise "Wrong number of revealed cards" unless ply.cards.revealed(true).count == 1
+      card = ply.cards.revealed(true)[0]
+      card.location = "deck"
+      card.position = -2
+      card.revealed = false
+      card.save!
+      game.histories.create!(:event => "#{ply.name} placed [#{ply.id}?#{card}|a card] on top of their deck.",
+                            :css_class => "player#{ply.seat}")
+    end
+
+    ply.renum(:deck)
+
     return "OK"
   end
 end
