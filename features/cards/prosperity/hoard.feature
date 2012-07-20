@@ -1,5 +1,5 @@
 Feature: Hoard
-  2 Cash. Wheile this is in play, when you buy a Victory card, gain a Gold.
+  2 Cash. While this is in play, when you buy a Victory card, gain a Gold.
   
   Background:
     Given I am a player in a standard game with Hoard
