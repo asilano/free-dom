@@ -32,6 +32,7 @@ When(/^(\w*?) chooses? (.*) in (?:his|my) hand/) do |name, choice|
     kinds = choice.split(/,\s*/)
     if kinds.length == 1
       params[key] = possibilities.index(kinds[0])
+      assert_not_nil params[key], "Couldn't find #{kinds[0]} in hand (#{possibilities.inspect})"
     else
       params[key] = kinds.map  do |kind| 
         ix = possibilities.index(kind)
@@ -122,7 +123,7 @@ end
 #
 # Matches
 #   I choose the options Draw 1, +1 Action
-When(/(.*) chooses? the options (.*)/) do |name, choices|
+When(/^(.*) chooses? the options (.*)$/) do |name, choices|
   name = "Alan" if name == "I"
   player = @players[name]
   
@@ -143,12 +144,12 @@ When(/(.*) chooses? the options (.*)/) do |name, choices|
   @skip_card_checking = 1 if @skip_card_checking == 0
 end
 
-# Verify that a dropdown control has the stated options
+# Step for choosing from a dropdown control
 #
 # Matches:
-#   I should be able to choose exactly 0, 1, 2, 3 from the dropdown
-#   Bob should be able to choose 1, 2 from the dropdown // non-exact match
-Then /^(\w*?)(?:'s)? chooses? (.*) from the dropdown/ do |name, choice|
+#   I choose 0 from the dropdown
+#   Bob chooses 2 from the dropdown
+When /^(\w*?) chooses? (.*) from the dropdown/ do |name, choice|
   name = "Alan" if name == "I"
   player = @players[name]
   
@@ -176,7 +177,7 @@ end
 #   I choose the Estate pile
 #   Bob chooses the Estate, Copper piles
 #   I choose Take nothing for piles  // (Where "Take nothing" is the nil-action text)
-When(/^(\w*?)(?:'s)? chooses? (?:the )?(.*?) (?:for )?piles?$/) do |name, choice|
+When(/^(\w*?) chooses? (?:the )?(.*?) (?:for )?piles?$/) do |name, choice|
   name = "Alan" if name == "I"
   player = @players[name]
   
@@ -214,7 +215,7 @@ end
 #   I choose the Estate pile
 #   Bob chooses the Estate, Copper piles
 #   I choose Take nothing for piles  // (Where "Take nothing" is the nil-action text)
-When(/^(\w*?)(?:'s)? chooses? (?:the )?(.*?) (?:for )?piles? labelled (.*)$/) do |name, choice, label|
+When(/^(\w*?) chooses? (?:the )?(.*?) (?:for )?piles? labelled (.*)$/) do |name, choice, label|
   name = "Alan" if name == "I"
   player = @players[name]
   
@@ -276,5 +277,51 @@ When(/^(\w*?) chooses? (.*?) for (\w*?)(?:'s)? revealed (#{SingleCardNoCapture}|
   player.resolve(params)
 
   # Probably expect something to happen to the chosen card
+  @skip_card_checking = 1 if @skip_card_checking == 0
+end
+
+# Step for Lookout. Nothing else. Well, anything that provides 
+# multiple options for each of a number of peeked cards on deck.
+#
+# Matches
+#   I choose the matrix Trash the Estate, Discard the Province, Deck the Gold
+When(/^(\w*?) chooses? the matrix ((?:\w+ the #{SingleCardNoCapture}(?:, )?)+)$/) do |name, choices|
+  
+  name = "Alan" if name == "I"
+  player = @players[name]
+  
+  chosen_actions = choices.split(/,\s*/).map{|choice| choice.split(/ the /)}
+  
+  all_controls = player.determine_controls
+  controls = all_controls[:peeked]
+  flunk "No controls found in #{name}'s peeked deck cards" if controls.length == 0
+  controls = controls[0]
+  
+  # Default values for the other params
+  params = controls[:params]
+    
+  # Look at each peeked card (there may not necessarily be 3) and
+  # assemble the corresponding action in params[:choice][n]
+  peeked_cards = player.cards.peeked.map(&:readable_name)
+  params[:choice] = []
+  chosen_actions.each do |choice, cardname|
+    # Determine card index in the peeked array
+    card_ix = peeked_cards.index(cardname)
+    assert_not_nil card_ix, "Couldn't find #{cardname} in peeked cards (#{peeked_cards.inspect})"
+    
+    # Determine value of this choice
+    choice_val = controls[:options].find_index(choice)
+    assert_not_nil card_ix, "Couldn't find option #{choice} in options (#{controls[:options].inspect})"
+    
+    # Store the appropriate choice in params[:choice]
+    params[:choice] += [[card_ix.to_s, choice_val.to_s]]
+    
+    # Blank this card so that we can find a second one with the same name
+    peeked_cards[card_ix] = nil
+  end
+  
+  player.resolve(params)
+  
+  # Expect this to do something
   @skip_card_checking = 1 if @skip_card_checking == 0
 end

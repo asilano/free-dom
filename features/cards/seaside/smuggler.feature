@@ -20,8 +20,8 @@ Feature: Smuggler
     When Charlie stops buying cards
       And the game checks actions
       Then the following 2 steps should happen at once
-      Then Charlie should have moved Woodcutter, Gold x3 from play to discard 
-      And Charlie should have drawn 5 cards
+        Then Charlie should have moved Woodcutter, Gold x3 from play to discard 
+        And Charlie should have drawn 5 cards
     Then it should be my Play Action phase
     When I play Smuggler
       And the game checks actions
@@ -35,9 +35,9 @@ Feature: Smuggler
     When Charlie buys Estate
       And the game checks actions
       Then the following 3 steps should happen at once
-      And Charlie should have gained Estate
-      And Charlie should have moved Woodcutter, Gold x3 from play to discard 
-      And Charlie should have drawn 5 cards
+        Then Charlie should have gained Estate
+        And Charlie should have moved Woodcutter, Gold x3 from play to discard 
+        And Charlie should have drawn 5 cards
     Then it should be my Play Action phase
     When I play Smuggler
       And the game checks actions
@@ -52,9 +52,9 @@ Feature: Smuggler
     When Charlie buys Estate
       And the game checks actions
       Then the following 3 steps should happen at once
-      Then Charlie should have gained Estate
-      And Charlie should have moved Woodcutter, Gold x3 from play to discard 
-      And Charlie should have drawn 5 cards
+        Then Charlie should have gained Estate
+        And Charlie should have moved Woodcutter, Gold x3 from play to discard 
+        And Charlie should have drawn 5 cards
     Then it should be my Play Action phase
     When I play Smuggler
       And the game checks actions

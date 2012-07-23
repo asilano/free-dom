@@ -261,9 +261,9 @@ end
 # Used to note that a card has moved to a tracked zone from anywhere else
 #
 # Matches
-#   I should have placed Curse in my hand
+#   I should have placed Curse into my hand
 #   Bob should have gained Copper, Curse to his discard
-Then(/(.*) should have (?:placed|gained) #{CardList} (?:in|to) (?:his |my )?(.*)/) do |name, kinds, location|
+Then(/(.*) should have (?:placed|gained) #{CardList} (?:in|to|into) (?:his |my )?(.*)/) do |name, kinds, location|
   name = "Alan" if name == "I"
   player = @players[name]
   
@@ -301,5 +301,29 @@ Then(/(.*) should be revealing (#{CardListNoCapture}|nothing)/) do |name, kinds|
       num.times {expected << kind}
     end
     assert_equal expected, player.cards.revealed(true).map(&:readable_name)
+  end
+end
+
+# Check that a player is peeking at the correct cards
+#
+# Matches
+#   I should have seen Province
+#   Bob should have seen Copper, Copper, Estate
+Then /^(.*) should have seen (#{CardListNoCapture}|nothing)/ do |name, kinds|
+  name = "Alan" if name == "I"
+  player = @players[name]
+  
+  if kinds == "nothing"
+    assert_empty player.cards.peeked(true)
+  else
+    expected = []
+    kinds.split(/,\s*/).each do |kind|
+      /(.*) ?x ?(\d+)/ =~ kind
+      kind = $1.rstrip if $1
+      num = $2.andand.to_i || 1
+
+      num.times {expected << kind}
+    end
+    assert_equal expected, player.cards.peeked(true).map(&:readable_name)
   end
 end
