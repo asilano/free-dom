@@ -8,10 +8,16 @@ class Prosperity::Forge < Card
   def play(parent_act)
     super
     
-    parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_trash",
-                               :text => "Trash cards from hand with #{readable_name}.",
-                               :game => game,
-                               :player => player)
+    if player.cards.hand(true).empty?
+      # No cards in hand. Just call resolve_trash with no card indices.
+      resolve_trash(player, {}, parent_act)
+    else
+      # Add an action to ask for forge material
+      parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_trash",
+                                 :text => "Trash cards from hand with #{readable_name}.",
+                                 :game => game,
+                                 :player => player)
+    end
                                
     return "OK"
   end
