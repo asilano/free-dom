@@ -43,10 +43,14 @@ Feature: Forge
     Then I should have gained Forge
       And I should need to Play Treasure
       
-  Scenario: Playing Upgrade - nothing in hand
-    Given my hand contains Upgrade
+  Scenario: Playing Forge - nothing in hand
+    Given my hand contains Forge
       And my deck is empty
       And it is my Play Action phase
-    When I play Upgrade
-    Then it should be my Play Action phase
-      And I should have 1 action available
+    When I play Forge
+    Then I should need to Take a replacement card costing 0 with Forge
+      And I should be able to choose the Copper, Curse piles
+    When I choose the Copper pile
+      And the game checks actions
+    Then I should have gained Copper
+      And I should need to Play Treasure
