@@ -211,7 +211,7 @@ class Game < ActiveRecord::Base
     self.end_time = Time.now
     save!
     winner = players.sort_by {|p| p.score}[-1]
-    histories.create!(:event => "Game ended. #{winner.name} is the winner, with #{winner.score} points!.", 
+    histories.create!(:event => "Game ended. #{winner.name} is the winner, with #{winner.score} points!", 
                      :css_class => "meta player#{winner.seat} game_end")
        
     # Call the Ranking model to handle updating the players' rankings
@@ -226,7 +226,7 @@ class Game < ActiveRecord::Base
                        :score_elo => ply.user.ranking.score_elo)
       
       # Update the last-ended timestamp of the players
-      ply.user.last_completed = Time.now
+      ply.user.last_completed = end_time
       ply.user.save!
     end   
     
