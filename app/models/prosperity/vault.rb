@@ -9,17 +9,24 @@ class Prosperity::Vault < Card
     super
     
     player.draw_cards(2)
-    parent_act.concurrent([
-                            {:expected_action => "resolve_#{self.class}#{id}_discard",
-                             :text => "Discard any number of cards, with #{self}",
-                             :player => player,
-                             :game => game}
-                          ] + player.other_players.map do |ply|
-                                {:expected_action => "resolve_#{self.class}#{id}_choose",
-                                 :text => "Discard first card or choose not to, with #{self}",
-                                 :player => ply,
-                                 :game => game} unless ply.cards.hand.size < 1
-                              end.compact)
+    
+    if player.cards.hand(true).empty?
+      # No cards in hand to discard. Just log
+      game.histories.create!(:event => "#{player.name} had no cards in hand to discard to #{readable_name}")
+    else
+      # Just add an action to discard any number of cards
+      parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_discard",
+                                  :text => "Discard any number of cards, with #{self}",
+                                  :player => player,
+                                  :game => game)
+    end
+    
+    parent_act.concurrent(player.other_players.map do |ply|
+                            {:expected_action => "resolve_#{self.class}#{id}_choose",
+                             :text => "Discard first card or choose not to, with #{self}",
+                             :player => ply,
+                             :game => game} unless ply.cards.hand.size < 1
+                          end.compact)
                      
     "OK"
   end
@@ -113,7 +120,10 @@ class Prosperity::Vault < Card
       game.histories.create!(:event => "#{ply.name} discarded a #{card}.",
                             :css_class => "player#{ply.seat} card_discard")
                               
-      if ply.cards.hand.count > 0
+      if ply.cards.hand(true).map(&:class).uniq.length == 1
+        # Player must discard and has only one type left in hand. Call discardtwo directly
+        resolve_discardtwo(ply, {:card_index => 0}, parent_act)
+      elsif ply.cards.hand.count > 0
         # Player has more cards in hand, so must discard a second.
         parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_discardtwo",
                                    :text => "Discard second card with #{self}",
