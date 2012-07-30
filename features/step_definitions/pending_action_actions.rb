@@ -4,7 +4,7 @@
 #   I choose Estate in my hand
 #   Bob chooses Estate, Copper in his hand
 #   I choose Don't trash in my hand  // (Where "Don't trash" is the nil-action text)
-When(/^(\w*?) chooses? (.*) in (?:his|my) hand/) do |name, choice|
+When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in (?:his|my) hand/) do |name, choices|
   name = "Alan" if name == "I"
   player = @players[name]
   
@@ -24,20 +24,32 @@ When(/^(\w*?) chooses? (.*) in (?:his|my) hand/) do |name, choice|
     ctrl[:name].to_sym
   end
   
-  if ctrl[:nil_action].andand == choice
+  if ctrl[:nil_action].andand == choices
     params[:nil_action] = true
   else
     possibilities = player.cards.hand.map(&:readable_name)
     assert_not_empty possibilities
-    kinds = choice.split(/,\s*/)
-    if kinds.length == 1
+    
+    kinds = choices.split(/,\s*/)
+    if kinds.length == 1 && kinds[0] !~ /.* ?x ?\d*/
       params[key] = possibilities.index(kinds[0])
       assert_not_nil params[key], "Couldn't find #{kinds[0]} in hand (#{possibilities.inspect})"
     else
-      params[key] = kinds.map  do |kind| 
-        ix = possibilities.index(kind)
-        possibilities[ix] = nil
-        ix
+      params[key] = []
+      kinds.each do |kind|
+        num = 1
+        card_name = kind
+        if /(.*) ?x ?(\d+)/ =~ kind
+          card_name = $1.rstrip
+          num = $2.to_i
+        end
+      
+        num.times do      
+          ix = possibilities.index(card_name)
+          possibilities[ix] = nil
+            
+          params[key] << ix
+        end
       end
     end
   end
