@@ -27,6 +27,12 @@ Feature: Secret Chamber
       | Copper, Silver, Gold, Curse    | Copper, Curse        | 2         |
       | Copper, Silver, Gold, Curse    | Copper, Silver, Gold | 3         |
       
+  Scenario: Nothing in hand
+    Given my hand contains Secret Chamber
+      And it is my Play Action phase
+    When I play Secret Chamber    
+    Then it should be my Play Treasure phase
+      
   Scenario: Ask to react to attack
     Given my hand contains Secret Chamber, Estate, Duchy, Smithy, Witch
       And Bob's hand contains Bureaucrat and 4x Market
