@@ -12,13 +12,17 @@ class Intrigue::SecretChamber < Card
   def play(parent_act)
     super
     
-    # Just add an action to discard any number of cards
-    act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_discard",
-                                     :text => "Discard any number of cards, with Secret Chamber")
-    act.player = player
-    act.game = game
-    act.save!
-    
+    if player.cards.hand(true).empty?
+      # No cards in hand to discard. Just log
+      game.histories.create!(:event => "#{player.name} had no cards in hand to discard to #{readable_name}")
+    else
+      # Just add an action to discard any number of cards
+      parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_discard",
+                                  :text => "Discard any number of cards, with Secret Chamber",
+                                  :player => player,
+                                  :game => game)
+    end
+      
     return "OK"
   end
   
