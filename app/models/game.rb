@@ -415,7 +415,7 @@ protected
   end
   
   def age_oldest
-    while Game.count > 8
+    while Game.count > 5
       oldest_finished = Game.find(:first, 
                                   :conditions => ["state = 'ended' and (end_time is null or end_time < ?)", 3.days.until(Time.now)], 
                                   :order => "end_time, id")
