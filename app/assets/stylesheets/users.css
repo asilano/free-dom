@@ -16,17 +16,3 @@
 dl {margin: 0;}
 #explain_ranking dl {margin-top: 5px;}
 dt {font-weight: bold;}
-
-#explain_contact {position: relative; display: inline;}
-#explain_contact img {vertical-align: middle;}
-#contact_explanation
-{
-	position: absolute;
-	left: 10px;
-	top: 10px;
-	width: 15em;
-	border: 1px solid black;
-	background: #f5f4d6;
-	margin-left: -9999px;	
-}
-#explain_contact:hover #contact_explanation {margin-left: 0;}

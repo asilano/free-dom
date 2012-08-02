@@ -15,6 +15,7 @@
     <p>
       <%= check_box_tag :remember_me, nil, false, :tabindex => 1 %>
       <%= label_tag :remember_me, "Remember my login on this computer (for #{User.cookie_timeout} days)", :class => "checkLabel"%>
+      <span class="inline_legal">We will use a cookie to remember you</span>
     </p>              
     <div>
       <%= submit_tag "Login", :tabindex => 1 %>
