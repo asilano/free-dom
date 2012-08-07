@@ -8,28 +8,38 @@ class Seaside::TreasureMap < Card
   def play(parent_act)
     super
 
-    # Trash this card, and look for another Tresaure Map in hand
+    # Note the player and our current location before we trash ourselves
+    ply = player
+    already_trashed = (location == "trash")
+    # Trash this card, and look for another Treasure Map in hand
     trash
-    other = player.cards.hand(true).of_type("Seaside::TreasureMap")[0]
+    other = ply.cards.hand(true).of_type("Seaside::TreasureMap")[0]
     
     if other
-      # Found a second treasure map
-      game.histories.create!(:event => "#{player.name} trashed two Treasure Maps from hand.",
-                            :css_class => "player#{player.seat} card_trash")
+      # Found a second Treasure Map
       other.trash
+      game.histories.create!(:event => "#{ply.name} trashed #{already_trashed ? "another Treasure Map" : "two Treasure Maps"} from hand.",
+                            :css_class => "player#{ply.seat} card_trash")
 
-      # And acquire the FOUR gold to top of deck.
-      gold_pile = game.piles.find_by_card_type("BasicCards::Gold")
-      4.times do
-        player.gain(parent_act, gold_pile.id, :location => "deck")
+      if !already_trashed
+        # Really trashed two maps: acquire the FOUR gold to top of deck.
+        gold_pile = game.piles.find_by_card_type("BasicCards::Gold")
+        4.times do
+          ply.gain(parent_act, gold_pile.id, :location => "deck")
+        end
+        
+        game.histories.create!(:event => "#{ply.name} gained four Gold to top of their deck.", 
+                              :css_class => "player#{ply.seat} card_gain")
       end
-      
-      game.histories.create!(:event => "#{player.name} gained four Gold to top of their deck.", 
-                            :css_class => "player#{player.seat} card_gain")
     else
-      # No other treasure map exists.
-      game.histories.create!(:event => "#{player.name} trashed only one treasure map.",
-                            :css_class => "player#{player.seat} card_trash")
+      # No other Treasure Map exists.
+      if already_trashed
+        game.histories.create!(:event => "#{ply.name} couldn't trash any Treasure Maps.",
+                              :css_class => "player#{ply.seat}")
+      else
+        game.histories.create!(:event => "#{ply.name} trashed only one Treasure Map.",
+                              :css_class => "player#{ply.seat} card_trash")
+      end
     end
 
     return "OK"
