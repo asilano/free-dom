@@ -3,6 +3,8 @@ class BaseGame::ThroneRoom < Card
   action
   card_text "Action (cost: 4) - Choose an Action card in hand. Play it twice."
   
+  serialize :state
+
   # Throne room is a touch complicated. We will need to:
   # * On Play, ask the player to choose an Action card in hand
   # * On resolution of that choice, create two Game actions, one the child of
@@ -11,7 +13,7 @@ class BaseGame::ThroneRoom < Card
   # * On resolution of the Game actions, look up the specified card, and Play it
   def play(parent_act)
     super
-    
+
     if player.cards.hand(true).select {|c| c.is_action?}.map(&:class).uniq.length == 1
       # Only holding one type of card. Call resolve directly
       ix = player.cards.hand.index {|c| c.is_action?}      
@@ -81,8 +83,12 @@ class BaseGame::ThroneRoom < Card
                                                   
     if chosen.is_duration?
       # Chosen card is a duration. That means Throne Room should also endure
+      # Because you can TR a TR, and choose two durations, we must make state
+      # an array, and append to it.
       self.location = "enduring"
-      self.state = "#{chosen.class};#{chosen.id}"
+      self.state_will_change!
+      self.state ||= []
+      self.state << "#{chosen.class};#{chosen.id}"
     end
     
     save!
@@ -110,7 +116,12 @@ class BaseGame::ThroneRoom < Card
     super
     
     # Throne Room coming off duration? That must mean it's attached to a duration
-    /([[:alpha:]]+::[[:alpha:]]+);([[:digit:]]+)/.match(state)
+    raise "Throne Room #{id} enduring without any state!" if state.empty?
+    state_will_change!
+    state_item = state.pop
+    save!
+
+    /([[:alpha:]]+::[[:alpha:]]+);([[:digit:]]+)/.match(state_item)
     card_type = $1
     card_id = $2
     
@@ -125,7 +136,7 @@ class BaseGame::ThroneRoom < Card
                                                    "_attachedduration;" + 
                                                    "type=#{card_type};id=#{card_id}",
                                                    :game => game)
-    
+
     return "OK"
   end
   

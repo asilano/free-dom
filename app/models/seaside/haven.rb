@@ -20,8 +20,6 @@ class Seaside::Haven < Card
       # Holding no cards. Just log
       game.histories.create!(:event => "#{player.name} set nothing aside, as their hand was empty.",
                             :css_class => "player#{player.seat}")
-      self.state = []
-      save!
     else
       # Queue up an action for setting a card aside
       parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_setaside",

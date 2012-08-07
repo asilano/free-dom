@@ -5,6 +5,8 @@ class Prosperity::KingsCourt < Card
   costs 7
   card_text "Action (cost: 7) - You may choose an Action card in you hand. Play it three times"
   
+  serialize :state
+
   def self.readable_name
     "King's Court"
   end
@@ -19,6 +21,7 @@ class Prosperity::KingsCourt < Card
   # * On resolution of the Game actions, look up the specified card, and Play it
   def play(parent_act)
     super
+
     if !player.cards.hand.any?(&:is_action?)
       # Holding no action cards. Just log
       game.histories.create!(:event => "#{player.name} chose no action to treble.",
@@ -87,8 +90,12 @@ class Prosperity::KingsCourt < Card
                                                     
       if chosen.is_duration?
         # Chosen card is a duration. That means King's Court should also endure
+        # Because you can TR a KC, and choose two durations, we must make state
+        # an array, and append to it.
         self.location = "enduring"
-        self.state = "#{chosen.class};#{chosen.id}"
+        self.state_will_change!
+        self.state ||= []
+        self.state << "#{chosen.class};#{chosen.id}"
       end
       
       save!
@@ -121,7 +128,13 @@ class Prosperity::KingsCourt < Card
     super
     
     # King's Court coming off duration? That must mean it's attached to a duration
-    /([[:alpha:]]+::[[:alpha:]]+);([[:digit:]]+)/.match(state)
+    raise "#{readable_name} #{id} enduring without state!" if state.empty?
+
+    state_will_change!
+    state_item = state.pop
+    save!
+
+    /([[:alpha:]]+::[[:alpha:]]+);([[:digit:]]+)/.match(state_item)
     card_type = $1
     card_id = $2
     
@@ -140,6 +153,7 @@ class Prosperity::KingsCourt < Card
                                                    "_attachedduration;" + 
                                                    "type=#{card_type};id=#{card_id}",
                                                    :game => game)
+
     return "OK"
   end
   
