@@ -115,27 +115,30 @@ class BaseGame::ThroneRoom < Card
   def end_duration(parent_act)
     super
     
-    # Throne Room coming off duration? That must mean it's attached to a duration
+    # Throne Room coming off duration? That must mean it's attached to
+    # one or more duration
     raise "Throne Room #{id} enduring without any state!" if state.empty?
-    state_will_change!
-    state_item = state.pop
-    save!
+    
+    state.each do |state_item|
+      /([[:alpha:]]+::[[:alpha:]]+);([[:digit:]]+)/.match(state_item)
+      card_type = $1
+      card_id = $2
 
-    /([[:alpha:]]+::[[:alpha:]]+);([[:digit:]]+)/.match(state_item)
-    card_type = $1
-    card_id = $2
-    
-    card = card_type.constantize.find(card_id)
-    
-    if !card.is_duration?
-      raise "Throne Room #{id} enduring without a duration attached!"
+      card = card_type.constantize.find(card_id)
+
+      if !card.is_duration?
+        raise "Throne Room #{id} enduring without a duration attached!"
+      end
+
+      # Add in a game-level action to re-end the duration of the attached card
+      parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}" +
+                                                     "_attachedduration;" +
+                                                     "type=#{card_type};id=#{card_id}",
+                                                     :game => game)
     end
-    
-    # Add in a game-level action to re-end the duration of the attached card
-    parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}" +
-                                                   "_attachedduration;" + 
-                                                   "type=#{card_type};id=#{card_id}",
-                                                   :game => game)
+
+    state = []
+    save!
 
     return "OK"
   end
