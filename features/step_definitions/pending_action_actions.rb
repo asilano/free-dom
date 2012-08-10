@@ -60,20 +60,24 @@ When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in (?:his|my) hand/) do |name, 
   @skip_card_checking = 1 if @skip_card_checking == 0
 end
 
-# Step for any control that requires you to make a choice of revealed cards; that is, process any controls[:revealed] control
+# Step for any control that requires you to make a choice of revealed/peeked cards;
+# that is, process any controls[:revealed] / controls[:peeked] control
 #
 # Matches
 #   I choose my revealed Estate
 #   Bob chooses his revealed Estate, Copper
+#   I choose my peeked Province
 #   I choose my revealed Don't trash // (Where "Don't trash" is the nil-action text)
-When(/^(\w*?)(?:'s)? chooses? (?:his|my) revealed (.*)/) do |name, choice|
+When(/^(\w*?)(?:'s)? chooses? (?:his|my) (revealed|peeked) (.*)$/) do |name, location, choice|
   name = "Alan" if name == "I"
   player = @players[name]
+  
+  location = location.to_sym
   
   # We have to call resolve for the appropriate action with appropriate params.
   # So, really, we need to duplicate the logic of what to do with a control
   all_controls = player.determine_controls
-  controls = all_controls[:revealed]
+  controls = all_controls[location]
   flunk "Unimplemented multi-hand controls in testbed" unless controls.length == 1
   
   ctrl = controls[0]
@@ -88,7 +92,13 @@ When(/^(\w*?)(?:'s)? chooses? (?:his|my) revealed (.*)/) do |name, choice|
   if ctrl[:nil_action].andand == choice
     params[:nil_action] = true
   else
-    possibilities = player.cards.revealed.map(&:readable_name)
+    if location == :revealed
+      possibilities = player.cards.revealed.map(&:readable_name)
+    elsif location == :peeked
+      possibilities = player.cards.peeked.map(&:readable_name)
+    else
+      flunk "Unimplemented choosing cards in #{location}"
+    end
     assert_not_empty possibilities
     kinds = choice.split(/,\s*/)
     if kinds.length == 1
@@ -109,6 +119,7 @@ end
 #
 # Matches
 #   I choose the option Don't discard
+#   I choose the option Top of deck
 When(/(.*) chooses? the option (.*)/) do |name, choice|
   name = "Alan" if name == "I"
   player = @players[name]
@@ -117,14 +128,19 @@ When(/(.*) chooses? the option (.*)/) do |name, choice|
   # So, really, we need to duplicate the logic of what to do with a control
   all_controls = player.determine_controls
   controls = all_controls[:player]
-  flunk "Unimplemented multi-player controls in testbed" unless controls.length == 1
   
-  ctrl = controls[0]
-  params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
-  
-  params[:choice] = ctrl[:options].detect {|opt| opt[:text] =~ Regexp.new(Regexp.escape(choice), Regexp::IGNORECASE)}[:choice]
-  
-  player.resolve(params)
+  flunk "No controls found in hand" if controls.length == 0
+  # Look for an option of the chosen name anywhere in the controls
+  controls.each do |ctrl|
+    params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
+    
+    matching_controls = ctrl[:options].detect {|opt| opt[:text] =~ Regexp.new(Regexp.escape(choice), Regexp::IGNORECASE)}
+    if !matching_controls.empty?
+      params[:choice] = matching_controls[:choice]
+      player.resolve(params)
+      break
+    end
+  end
   
   # Probably chosen the option for a reason
   @skip_card_checking = 1 if @skip_card_checking == 0
@@ -279,11 +295,15 @@ When(/^(\w*?) chooses? (.*?) for (\w*?)(?:'s)? revealed (#{SingleCardNoCapture}|
   
   if ctrl[:nil_action].andand == choice
     params[:choice] = "nil_action"
-  elsif (ix = ctrl[:options].index(choice))
+  else
     card_ix = target.cards.revealed.map(&:readable_name).index(card)
     flunk "Can't find #{card} in #{tgt_name} revealed" unless card_ix
-
-    params[:choice] = "#{card_ix}.#{ix}"
+    if ctrl[:options]
+      ix = ctrl[:options].index(choice)
+      params[:choice] = "#{card_ix}.#{ix}"
+    else
+      params[:card_index] = card_ix;
+    end
   end
   Rails.logger.info(params.inspect)
   player.resolve(params)

@@ -24,3 +24,10 @@ Then(/(.*?)(?:'s)? score should be (-)?(\d+)/) do |name, neg, score|
   exp = -exp if neg
   assert_equal exp, @players[name].reload.score
 end
+
+Then(/^(.*?)(?:'s)? state (\w*) should be (.*)$/) do |name, prop, expected|
+  name = "Alan" if name == "my"
+             
+  actual = @players[name].state.send(prop.to_sym)
+  assert_equal expected, actual.to_s, "Expected player #{name}'s state #{prop} to be #{expected} but it was #{actual.to_s}"
+end
