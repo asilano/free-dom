@@ -10,6 +10,9 @@ class Seaside::Haven < Card
   def play(parent_act)
     super
     
+    self.state ||= []
+    save!
+    
     player.draw_cards(1)
     parent_act = player.add_actions(1, parent_act)
     
