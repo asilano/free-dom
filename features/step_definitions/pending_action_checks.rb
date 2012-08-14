@@ -4,17 +4,18 @@ Then(/it should be (.*?)(?:'s)? (.*) phase/) do |name, phase|
   name = 'Alan' if name == 'my'
   exp_action = case phase
     when "Play Action"
-      "play_action"
+      /play_action/
     when "Play Treasure"
-      "player_play_treasures;player=#{@players[name].id}"
+      /(play_treasure|player_play_treasures;player=#{@players[name].id})/
     when "Buy"
-      "buy"
+      /buy/
     end
     
   assert_not_nil exp_action, "Unknown phase '#{phase}'"
     
   actions = @game.active_actions(true).map(&:expected_action) + @players[name].active_actions(true).map(&:expected_action)
-  assert_contains(actions, Regexp.new(exp_action), "Actions didn't contain #{phase}")
+  
+  assert_contains(actions, exp_action, "Actions didn't contain #{phase}")
 end
 
 # Check for the readable text of a pending action

@@ -135,8 +135,9 @@ Then(/(.*) should have discarded the cards named "([^"]*)"/) do |name, grp_name|
   end
 end
 
-# This step is not usually required; its only current use is in Adventurer, where
-# there's a Scenario Outline, and "nothing" is an argument.
+# This step is occasionally used in templated lists of steps, such as 
+# in Adventurer, where there's a Scenario Outline, and in the "next turn starts"
+# meta-step, which makes players discard whatever's in their hand.
 # Matches
 #   I should have discarded nothing
 Then /^(.*) should have discarded nothing$/ do |_|
@@ -160,7 +161,7 @@ end
 
 # Matches
 #   I should have moved Copper, Silver x2, Gold from discard to hand
-Then(/(.*) should have moved #{CardList} from (.*) to (.*)/) do |name, kinds, from, to|
+Then(/^(.*) should have moved #{CardList} from (?:my |his )?(.*) to (?:my |his )?(.*)/) do |name, kinds, from, to|
   name = "Alan" if name == "I"
   player = @players[name]
   
@@ -274,7 +275,7 @@ Then(/(.*) should have (?:placed|gained) #{CardList} (?:in|to|into) (?:his |my )
     num = $2.andand.to_i || 1
     
     num.times do
-      to << kind
+      to.unshift kind
     end
   end
 end
@@ -326,4 +327,24 @@ Then /^(.*) should have seen (#{CardListNoCapture}|nothing)/ do |name, kinds|
     end
     assert_equal expected, player.cards.peeked(true).map(&:readable_name)
   end
+end
+
+# Check that a player's deck contents are precisely as expected.
+# This duplicates the normal checks performed by the AfterStep, so
+# is not normally necessary; use it only as a sanity check in unusual cases.
+Then /^(\w*?)(?:'s)? deck should contain #{CardList}$/ do |name, deck|
+  name = "Alan" if name == "my"
+  player = @players[name]
+  
+  deck_actual = player.cards.deck(true).map &:readable_name
+  
+  deck_expected = []
+  deck.split(/,\s*/).each do |kind|
+    /(.*) ?x ?(\d+)/ =~ kind
+    kind = $1.rstrip if $1
+    num = $2.andand.to_i || 1
+    num.times {deck_expected << kind}
+  end
+  assert_equal deck_actual, deck_expected
+  
 end
