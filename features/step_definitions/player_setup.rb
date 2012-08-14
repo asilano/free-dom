@@ -73,3 +73,18 @@ Given(/^(\w*) ha(?:ve|s) setting (.*) (on|off)/) do |name, setting, value|
   @players[name].settings.send(set_sym, value == "on")
   @players[name].settings.save!
 end
+
+Given(/^(.*?)(?:'s)? state (\w*) is (.*)$/) do |name, prop, value|
+  name = "Alan" if name == "my"
+  
+  set_sym = {
+    "outpost_queued"   => :outpost_queued=  ,
+    "outpost_prevent"  => :outpost_prevent= ,
+    "pirate_coins"     => :pirate_coins=    ,
+    "gained_last_turn" => :gained_last_turn=,
+    "bought_victory"   => :bought_victory=  ,
+    "played_treasure"  => :played_treasure= }[prop]
+             
+  @players[name].state.send(set_sym, value)
+  @players[name].state.save!
+end
