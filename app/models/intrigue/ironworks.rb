@@ -50,22 +50,37 @@ class Intrigue::Ironworks < Card
     end
     
   
-    # Process the take. 
+    # Process the take. Add a game-level action to grant the bonuses after the
+    # card has been gained
     card = game.piles[params[:pile_index].to_i].cards[0]
+    parent_act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_bonuses;card=#{card.id}",
+                                             :game => game)
     game.histories.create!(:event => "#{ply.name} took #{card.readable_name} from the Ironworks.",
                           :css_class => "player#{ply.seat} card_gain")
 
     ply.gain(parent_act, card.pile.id)                      
+        
+    return "OK"
+  end
+  
+  def bonuses(params)
+    # We expect a card ID
+    if !params.include?(:card)
+      return "Invalid parameters in game action!"
+    end
     
-    # Now grant any bonuses
+    parent_act = params[:parent_act]
+    card = Card.find(params[:card].to_i)
+    
+        # Now grant any bonuses
     if card.is_action?
-      ply.add_actions(1, parent_act)
+      player.add_actions(1, parent_act)
     end
     if card.is_treasure?
-      ply.add_cash(1)
+      player.add_cash(1)
     end
     if card.is_victory?
-      ply.draw_cards(1)
+      player.draw_cards(1)
     end
     
     return "OK"
