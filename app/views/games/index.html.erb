@@ -11,7 +11,7 @@
     <th>State</th>
     <th id="blank_th"/>
     </tr>
-  
+
   <% @games.each_with_index do |game, ix| %>
     <% css_class = game.state %>
     <% css_class += (ix % 2 == 0 ? ' rowEven' : ' rowOdd') %>
@@ -26,12 +26,12 @@
       </td>
       <td>
         <% if game.state == 'running' %>
-          <% ply_list = game.players.map do |p| 
-             str = "" 
-             str += "<span class='bold'>" unless p.active_actions.empty? 
-             str += p.name 
-             str += "</span>" unless p.active_actions.empty? 
-             str 
+          <% ply_list = game.players.map do |p|
+             str = ""
+             str += "<span class='bold'>" unless p.active_actions.empty?
+             str += p.name
+             str += "</span>" unless p.active_actions.empty?
+             str
            end.join(', ') %>
           <%= raw ply_list %>
         <% elsif game.state == 'ended' %>
@@ -40,14 +40,16 @@
 <%= h ", " + p.name + " (#{(ix+2).ordinalize})" -%>
 <% end -%>
         <% else %>
-          <%=h game.players.map{|p| p.name}.join(', ') %> 
+          <%=h game.players.map{|p| p.name}.join(', ') %>
         <% end %>
       </td>
       <td><%= h game.state.capitalize -%></td>
       <td><%= link_to 'Watch', watch_game_path(game) %></td>
-      <% if session[:user_id] %> 
+      <% if session[:user_id] %>
         <td><%= button_to 'Join', join_game_path(game) %></td>
-        <td><%= button_to 'Destroy', game, :confirm => 'Are you sure?', :method => :delete %></td>
+        <% if ((@user && @user.name == 'Chowlett') || request.host == '127.0.0.1') %>
+          <td><%= button_to 'Destroy', game, :confirm => 'Are you sure?', :method => :delete %></td>
+        <% end %>
       <% end %>
     </tr>
   <% end %>
