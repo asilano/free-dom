@@ -16,7 +16,9 @@ class Prosperity::Talisman < Card
                           :css_class => "player#{ply.seat} card_gain")
 
     num_talismans.times do |ix|
-      ply.gain(parent_act, pile.id)      
+      parent_act = ply.gain(parent_act, pile.id)
     end       
+
+    return parent_act
   end
 end

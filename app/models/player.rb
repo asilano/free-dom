@@ -404,7 +404,7 @@ class Player < ActiveRecord::Base
       # and not a Victory
       talismans = cards.in_play.of_type("Prosperity::Talisman").length
       if talismans > 0 && !pile.card_class.is_victory? && pile.cost <= 4
-        Prosperity::Talisman.bought_card(self, talismans, pile, parent_act)
+        parent_act = Prosperity::Talisman.bought_card(self, talismans, pile, parent_act)
       end
       
       # Check whether the card was a Mint, and if so trash all the player's in-play treasures

@@ -50,9 +50,10 @@ class Prosperity::Watchtower < Card
       return "Invalid parameters"
     end
 
-    to_del = game.pending_actions.select {|pa| pa.expected_action =~ /;gaining=[0-9]+/}
-           
-    card = Card.find(params[:gaining])
+    gaining_id = params[:gaining]
+    to_del = game.pending_actions.select {|pa| pa.expected_action =~ /;gaining=#{gaining_id}/}
+
+    card = Card.find(gaining_id)
     if params[:choice] == "normal"
       # If no-one else is trying to replace the gain, perform the default action here.
       if to_del.empty?

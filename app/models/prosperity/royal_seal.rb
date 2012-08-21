@@ -22,17 +22,18 @@ class Prosperity::RoyalSeal < Card
                             }]
     end
   end
-  
+
   def resolve_choose(ply, params, parent_act)
     # We expect to have a :choice parameter, either "deck" or "normal"
     if (not params.include? :choice) or
        (not params[:choice].in? ["deck", "normal"])
       return "Invalid parameters"
     end
-           
-    to_del = game.pending_actions.select {|pa| pa.expected_action =~ /;gaining=[0-9]+/}
-           
-    card = Card.find(params[:gaining])
+
+    gaining_id = params[:gaining]
+    to_del = game.pending_actions.select {|pa| pa.expected_action =~ /;gaining=#{gaining_id}/}
+
+    card = Card.find(gaining_id)
     if params[:choice] == "normal"
       # If no-one else is trying to replace the gain, perform the default action here.
       if to_del.empty?
@@ -44,14 +45,14 @@ class Prosperity::RoyalSeal < Card
         raise "Destroying gain replacement action with children" unless pa.children.empty?
         pa.destroy
       end
-      
+
       game.histories.create!(:event => "#{ply.name} placed #{card} on their deck with #{self}.",
                             :css_class => "player#{ply.seat}")
-      
+
       # Call Card#gain directly with the stated choice (to avoid an infinite loop!)
       card.gain(ply, parent_act, "deck")
     end
-    
+
     return "OK"
   end
 end
