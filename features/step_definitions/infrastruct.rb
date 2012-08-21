@@ -3,7 +3,7 @@ Then /the following (\d+) steps should happen at once/ do |num|
 end
 
 Then /nothing should have happened/ do
-end 
+end
 
 Given /^PENDING/ do
   pending
@@ -11,6 +11,10 @@ end
 
 Then /dump actions/ do
   PendingAction.all.each {|pa| Rails.logger.info(pa.inspect)}
+end
+
+Then /dump controls/ do
+    @players.each {|name, ply| Rails.logger.info(ply.determine_controls.inspect)}
 end
 
 Then /dump hands/ do
