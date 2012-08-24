@@ -13,8 +13,7 @@ This codebase now runs Rails 3.1, but is still using the Prototype javascript li
 This codebase is now open for outside contributions in certain areas. Branches exist or will be created for:
 
 * [Migration to jQuery](https://github.com/asilano/free-dom/tree/prototype-to-jquery)
-* [General test improvements](https://github.com/asilano/free-dom/tree/improve-testing) including integration tests and per-card unit tests (likely using [Cucumber](http://cukes.info/))
-* Implementation of Hinterlands _(deferred until the Cucumber test framework is in place)_
+* Implementation of Hinterlands
 
 Additional features possibly up for implementation include:
 

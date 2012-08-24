@@ -8,11 +8,17 @@ class Prosperity::Mint < Card
   def play(parent_act)
     super
     
-    parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_reveal",
-                               :text => "Reveal a Treasure card from hand",
-                               :player => player,
-                               :game => game)
-                               
+    if !player.cards.hand.any?(&:is_treasure?)
+      # Holding no treasure cards. Just log
+      game.histories.create!(:event => "#{player.name} chose to copy nothing.",
+                            :css_class => "player#{player.seat}")
+    else
+      parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_reveal",
+                                 :text => "Reveal a Treasure card from hand",
+                                 :player => player,
+                                 :game => game)
+    end
+
     return "OK"                              
   end
 

@@ -312,10 +312,13 @@ class Game < ActiveRecord::Base
     end
   end
   
+  def piles_array
+    (1..10).map {|ix| self.send("pile_#{ix}")}
+  end
+  
 protected  
   def unique_valid_piles    
     if not random_select.to_i == 1
-      piles_array = (1..10).map {|ix| self.send("pile_#{ix}")}
       piles_array.each_with_index do |pile, ix|        
         if piles_array.select {|p| p == pile}.length > 1
           errors.add("pile_#{ix+1}", 'must be unique.')
@@ -367,7 +370,6 @@ protected
 
   def make_piles
     # Prepare to add Platinum and Colony cards if the user (or the rules) say we should
-    piles_array = (1..10).map {|ix| self.send("pile_#{ix}")}
     test_pile = piles_array[rand(10)]    
     using_plat_col = false
     if plat_colony == "yes" || 

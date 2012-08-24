@@ -82,6 +82,10 @@ class Intrigue::Steward < Card
                                                   :game => game)      
           parent_act.save!
         end
+      else
+        # No cards in hand; just log.
+        game.histories.create!(:event => "#{ply.name} had no cards in hand to trash.",
+                               :css_class => "player#{ply.seat}")
       end
     end
     

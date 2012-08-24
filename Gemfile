@@ -1,4 +1,5 @@
 source 'http://rubygems.org'
+source 'http://gems.github.com'
 
 gem 'rails', '3.1.0'
 gem 'i18n'
@@ -27,6 +28,8 @@ gem 'jquery-rails'
 #gem 'therubyracer'
 gem 'actionmailer-with-request'
 
+gem 'andand'
+
 # Use unicorn as the web server
 # gem 'unicorn'
 
@@ -48,4 +51,7 @@ group :test do
   gem 'factory_girl_rails'
   gem 'capybara'
   gem 'launchy'  
+  
+  gem 'cucumber-rails'
+  gem 'database_cleaner'
 end

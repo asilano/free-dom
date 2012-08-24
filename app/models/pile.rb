@@ -17,7 +17,7 @@ class Pile < ActiveRecord::Base
     # 
     # If a card-type reports -1, it's unlimited - start with 10.
     start_size = card_class.starting_size(num_players)
-    start_size = 10 if start_size == :unlimited
+    start_size = 10 if start_size == :unlimited    
     1.upto(start_size) do |ix|
       card_params = {"game_id" => game.id,
                      "pile_id" => id,                 

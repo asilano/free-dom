@@ -149,6 +149,7 @@ class Player < ActiveRecord::Base
   def play_action(params)
     # Checks. In order to be playing an action, the player must be waiting to
     # play an action
+    active_actions.reload
     if not waiting_for?("play_action")
       return "Not expecting an Action at this time"
     elsif (!params.include?(:nil_action) &&
@@ -242,7 +243,6 @@ class Player < ActiveRecord::Base
   # Play a specific treasure from hand, or play all simple treasures, or stop playing.
   def play_treasure(params)
     return "Cash unexpectedly nil for Player #{id}" if cash.nil?
-    
     # Unsurprisingly, this is much like play_action.
     if not waiting_for?("play_treasure")
       return "Not expecting a Treasure at this time"
@@ -404,7 +404,7 @@ class Player < ActiveRecord::Base
       # and not a Victory
       talismans = cards.in_play.of_type("Prosperity::Talisman").length
       if talismans > 0 && !pile.card_class.is_victory? && pile.cost <= 4
-        Prosperity::Talisman.bought_card(self, talismans, pile, parent_act)
+        parent_act = Prosperity::Talisman.bought_card(self, talismans, pile, parent_act)
       end
       
       # Check whether the card was a Mint, and if so trash all the player's in-play treasures
@@ -729,7 +729,7 @@ class Player < ActiveRecord::Base
 
     if cards_drawn.length < num
       excess = num - cards_drawn.length
-      game.histories.create!(:event => "#{name} tried to draw #{excess} more cards#{reason}, but their deck was empty.",
+      game.histories.create!(:event => "#{name} tried to draw #{excess} more card#{'s' unless excess == 1}#{reason}, but their deck was empty.",
                             :css_class => "player#{seat} card_draw")
     end    
     save!

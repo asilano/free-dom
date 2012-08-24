@@ -116,18 +116,14 @@ class Seaside::Ambassador < Card
         return "Invalid request - returning a #{card.readable_name} when a #{params[:chosen]} was revealed"
       end
       
-      if card.class.starting_size(4) == :unlimited
-        # Card is unlimited, so we don't /really/ want to return it. Just destroy it.
-        card.destroy
-      else
-        pile = game.piles.find_by_card_type(params[:chosen])
-        card.pile_id = pile.id
-        card.location = 'pile'
-        card.position = 0
-        card.revealed = false
-        card.player = nil
-        card.save!
-      end
+      # Return the card to the pile
+      pile = game.piles.find_by_card_type(params[:chosen])
+      card.pile_id = pile.id
+      card.location = 'pile'
+      card.position = 0
+      card.revealed = false
+      card.player = nil
+      card.save!
       
       game.histories.create!(:event => "#{ply.name} returned a #{card.readable_name} to the supply.",
                             :css_class => "player#{ply.seat}")

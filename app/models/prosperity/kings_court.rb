@@ -5,6 +5,8 @@ class Prosperity::KingsCourt < Card
   costs 7
   card_text "Action (cost: 7) - You may choose an Action card in you hand. Play it three times"
   
+  serialize :state
+
   def self.readable_name
     "King's Court"
   end
@@ -19,8 +21,9 @@ class Prosperity::KingsCourt < Card
   # * On resolution of the Game actions, look up the specified card, and Play it
   def play(parent_act)
     super
-    if player.cards.hand.empty?
-      # Holding no cards. Just log
+
+    if !player.cards.hand.any?(&:is_action?)
+      # Holding no action cards. Just log
       game.histories.create!(:event => "#{player.name} chose no action to treble.",
                             :css_class => "player#{player.seat}")
     else
@@ -87,8 +90,12 @@ class Prosperity::KingsCourt < Card
                                                     
       if chosen.is_duration?
         # Chosen card is a duration. That means King's Court should also endure
+        # Because you can TR a KC, and choose two durations, we must make state
+        # an array, and append to it.
         self.location = "enduring"
-        self.state = "#{chosen.class};#{chosen.id}"
+        self.state_will_change!
+        self.state ||= []
+        self.state << "#{chosen.class};#{chosen.id}"
       end
       
       save!
@@ -120,26 +127,35 @@ class Prosperity::KingsCourt < Card
   def end_duration(parent_act)
     super
     
-    # King's Court coming off duration? That must mean it's attached to a duration
-    /([[:alpha:]]+::[[:alpha:]]+);([[:digit:]]+)/.match(state)
-    card_type = $1
-    card_id = $2
-    
-    card = card_type.constantize.find(card_id)
-    
-    if !card.is_duration?
-      raise "#{readable_name} #{id} enduring without a duration attached!"
+    # King's Court coming off duration? That must mean it's attached to
+    # one or more durations
+    raise "#{readable_name} #{id} enduring without state!" if state.empty?
+
+    state.each do |state_item|
+      /([[:alpha:]]+::[[:alpha:]]+);([[:digit:]]+)/.match(state_item)
+      card_type = $1
+      card_id = $2
+
+      card = card_type.constantize.find(card_id)
+
+      if !card.is_duration?
+        raise "#{readable_name} #{id} enduring without a duration attached!"
+      end
+
+      # Add in two game-level actions to re-end the duration of the attached card
+      act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}" +
+                                                     "_attachedduration;" +
+                                                     "type=#{card_type};id=#{card_id}",
+                                                     :game => game)
+      act.children.create!(:expected_action => "resolve_#{self.class}#{id}" +
+                                                     "_attachedduration;" +
+                                                     "type=#{card_type};id=#{card_id}",
+                                                     :game => game)
     end
-    
-    # Add in two game-level actions to re-end the duration of the attached card
-    act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}" +
-                                                   "_attachedduration;" + 
-                                                   "type=#{card_type};id=#{card_id}",
-                                                   :game => game)
-    act.children.create!(:expected_action => "resolve_#{self.class}#{id}" +
-                                                   "_attachedduration;" + 
-                                                   "type=#{card_type};id=#{card_id}",
-                                                   :game => game)
+
+    state = []
+    save!
+
     return "OK"
   end
   

@@ -52,17 +52,23 @@ module CardDecorators
     self.react_trigger = opts[:to] || :attack
   end
   
-  # Define starting pile sizes; and override gain() for :unlimited cards
+  # Define starting pile sizes; and instate before_save hook for :unlimited cards
   def pile_size(size = nil, &block)
     if size == :unlimited
       def self.starting_size(num_players) 
         :unlimited  
       end
-      define_method(:gain) do |player, parent_act, *optionals|
-        new_location, new_position, *ignored = *optionals
-        new_location = 'discard' unless new_location          
-        self.class.create!(attributes)
-        super(player, parent_act, new_location, position)
+      
+      before_save do
+        if location_changed? && location_was.present?
+          if location_was == 'pile'
+            # Moved out of pile. Duplicate
+            self.class.create!(attributes.merge(changed_attributes).reject{|k| k == "id" || k == "type"})
+          elsif location == 'pile'
+            # Moved back to pile. Destroy
+            destroy
+          end
+        end
       end      
     elsif block_given?
       @size_proc = block
