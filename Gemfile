@@ -39,10 +39,6 @@ gem 'andand'
 # To use debugger
 # gem 'ruby-debug19', :require => 'ruby-debug'
 
-# Remove when moved to modern jQuery
-gem 'prototype_legacy_helper', '0.0.0', :git => 'http://github.com/rails/prototype_legacy_helper.git'
-gem 'prototype-rails'#, :git => 'http://github.com/rails/prototype-rails.git'
-
 group :test do
   # Pretty printed test output
   gem 'turn', :require => false
@@ -50,8 +46,8 @@ group :test do
   gem 'shoulda'
   gem 'factory_girl_rails'
   gem 'capybara'
-  gem 'launchy'  
-  
+  gem 'launchy'
+
   gem 'cucumber-rails'
   gem 'database_cleaner'
 end
