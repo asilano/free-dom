@@ -47,7 +47,7 @@
       <td><%= link_to 'Watch', watch_game_path(game) %></td>
       <% if session[:user_id] %>
         <td><%= button_to 'Join', join_game_path(game) %></td>
-        <% if ((@user && @user.name == 'Chowlett') || request.host == '127.0.0.1') %>
+        <% if ((@user && (@user.name == 'Chowlett' || @user.games.include?(game))) || request.host == '#127.0.0.1') %>
           <td><%= button_to 'Destroy', game, :confirm => 'Are you sure?', :method => :delete %></td>
         <% end %>
       <% end %>
