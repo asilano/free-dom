@@ -16,5 +16,6 @@ Tasks include:
 * Ensuring remote forms are implemented and handled correctly
 * Updating any "loose" AJAX calls
 * Updating existing .rjs files to .js.erb (I think)
+* Replacing TableKit with something
 
 _**Please fork and contribute where possible!**_
