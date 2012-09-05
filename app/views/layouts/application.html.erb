@@ -6,7 +6,7 @@
     <%= stylesheet_link_tag 'application' %>
     <%= javascript_include_tag "application" %>
     <link rel="shortcut icon" type="image/vnd.microsoft.icon" href='<%= image_path("/favicon.ico") %>' />
-    
+
     <script type='text/javascript'>
       function disable_named(name){
           var arr = new Array();
@@ -15,7 +15,7 @@
               arr[i].disabled = true;
           }
       }
-            
+
       /*
         Copyright Robert Nyman, http://www.robertnyman.com
         Free to use if this text is included
@@ -40,14 +40,14 @@
 
       function onloadFunc() {
         // Scroll to bottom of history
-        var histDiv=document.getElementById('history'); 
+        var histDiv=document.getElementById('history');
         if (histDiv) {
           histDiv.scrollTop = histDiv.scrollHeight;
         }
-        
+
         // Scroll to bottom of chat
         $('chatbox').scrollTop = $('chatbox').scrollHeight;
-        
+
         // Enable all buttons
         var buttons = getElementsByAttribute(document.body, "input", "type", "button")
         buttons = buttons.concat(getElementsByAttribute(document.body, "input", "type", "submit"))
@@ -56,33 +56,35 @@
         }
       }
     </script>
+
+    <%= content_for :js_in_head %>
   </head>
   <body onload="onloadFunc();">
-    
+
     <div id="userInfo">
       <% if session[:user_id].nil? %>
         Welcome, Guest. Please <%= link_to "login", login_path -%> or <%= link_to "register", new_user_path -%>
       <% else %>
         <% user = User.find(session[:user_id]) %>
-        Welcome, <%= user.name -%> | <%= link_to_unless_current "Preferences", settings_path -%> | Not <%= user.name-%>? Please <%= link_to "logout", logout_path -%> 
+        Welcome, <%= user.name -%> | <%= link_to_unless_current "Preferences", settings_path -%> | Not <%= user.name-%>? Please <%= link_to "logout", logout_path -%>
       <% end %>
     </div>
-    
+
     <div id="contentWrap">
       <%= link_to(games_path, :id => "siteLogo") do %>
         <h1>FreeDom</h1>
         <h2>Free Dominion Game Server</h2>
       <% end %>
       <div id="flash">
-        <%= render :partial => 'flash_area' -%>        
+        <%= render :partial => 'flash_area' -%>
       </div>
       <div id="mainContent">
         <%= yield %>
       </div>
     </div>
-    
+
     <div id="footer">
-      <%= link_to "Home", games_path %> | <%= link_to "About", about_path%> | <%= link_to "Feedback", contact_path %> 
+      <%= link_to "Home", games_path %> | <%= link_to "About", about_path%> | <%= link_to "Feedback", contact_path %>
     </div>
   </body>
 </html>
