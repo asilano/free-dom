@@ -4,8 +4,8 @@
     <div id="playerPrefs">
       <%= render :partial => "player_settings" %>
     </div>
-  </div>        
-<% end %> 
+  </div>
+<% end %>
 
 <h2><%=h @game.name-%></h2>
   <% freq = @player ? @player.settings.update_interval : @user ? @user.settings.update_interval : 60 %>
@@ -16,10 +16,24 @@
                                :before => "$('spinner').show()",
                                :complete => "$('spinner').hide()",
                                :condition => "($('ended').innerHTML.include('false') && $('locked').innerHTML.include('false'))" ) %>
-                     
+
 <div id="game">
   <%= render :partial => 'game', :object => @game, :locals => {:player => @player, :controls => @controls} %>
 </div>
 
 <%= image_tag("start_game_spinner.gif", :id => "gameStartSpinner", :style => "display: none;") -%>
 <%= image_tag("spinner.gif", :id => "spinner", :style => "display: none;") -%>
+
+<% content_for :js_in_head do %>
+  // Scroll to bottom of history
+  $(function()
+  {
+    $('#history').scrollTop($('#history')[0].scrollHeight);
+
+    // Scroll to bottom of chat
+    $('#chatbox').scrollTop($('#chatbox')[0].scrollHeight);
+
+    // Enable all buttons
+    $('input[type=button], input[type=submit]').removeAttr('disabled');
+  });
+<% end %>

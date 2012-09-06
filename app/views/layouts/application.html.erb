@@ -38,28 +38,13 @@
         return arrReturnElements;
       }
 
-      function onloadFunc() {
-        // Scroll to bottom of history
-        var histDiv=document.getElementById('history');
-        if (histDiv) {
-          histDiv.scrollTop = histDiv.scrollHeight;
-        }
-
-        // Scroll to bottom of chat
-        $('chatbox').scrollTop = $('chatbox').scrollHeight;
-
-        // Enable all buttons
-        var buttons = getElementsByAttribute(document.body, "input", "type", "button")
-        buttons = buttons.concat(getElementsByAttribute(document.body, "input", "type", "submit"))
-        for (var i = 0; i < buttons.length; i++) {
-          buttons[i].disabled = false;
-        }
-      }
     </script>
 
-    <%= content_for :js_in_head %>
+    <%= javascript_tag do %>
+      <%= content_for :js_in_head %>
+    <% end %>
   </head>
-  <body onload="onloadFunc();">
+  <body>
 
     <div id="userInfo">
       <% if session[:user_id].nil? %>

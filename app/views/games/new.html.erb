@@ -119,20 +119,18 @@
 <%= link_to 'Back', games_path %>
 
 <% content_for :js_in_head do %>
-  <%= javascript_tag do %>
-    var choices = new Array();
+  var choices = new Array();
 
-    $(function()
+  $(function()
+  {
+    for (i = 1; i <= 10 ; i++)
     {
-      for (i = 1; i <= 10 ; i++)
-      {
-        value = $('#game_pile_' + i).val();
-        choices[i] = value;
-        $('#card_text_' + i).text(card_dict[value]);
-      }
+      value = $('#game_pile_' + i).val();
+      choices[i] = value;
+      $('#card_text_' + i).text(card_dict[value]);
     }
-    );
-  <% end %>
+  }
+  );
 <% end %>
 <%= javascript_tag do %>
   $('#game_random_select').change(function()
