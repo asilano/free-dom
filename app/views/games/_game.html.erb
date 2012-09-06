@@ -7,10 +7,10 @@
   </div>
   <div id="update_freq" class="lighter">
     <% if @player %>
-      Updating every <span id="update_freq_value"><%= @player.settings.update_interval %></span> 
-      <span id="update_freq_form" style="display: none;">                   
-        <%= text_field_tag :update_interval, @player.settings.update_interval, :size => 4 %> 
-        <%= submit_tag "Set", 
+      Updating every <span id="update_freq_value"><%= @player.settings.update_interval %></span>
+      <span id="update_freq_form" style="display: none;">
+        <%= text_field_tag :update_interval, @player.settings.update_interval, :size => 4 %>
+        <%= submit_tag "Set",
                        :onclick => remote_function(:update => nil,
                                                    :url => {:action => :update_player_settings,
                                                             :id => @game},
@@ -23,25 +23,25 @@
       <script>
         function enable_freq_form()
         {
-          $('update_freq').className = "";
-          $('update_freq_value').hide();
-          $('update_freq_form').show();
-          $('change_freq').hide();
-          $('cancel_freq').show();          
+          $('#update_freq').removeClass("lighter");
+          $('#update_freq_value').hide();
+          $('#update_freq_form').show();
+          $('#change_freq').hide();
+          $('#cancel_freq').show();
         }
         function disable_freq_form()
         {
-          $('update_freq').className = "lighter";
-          $('update_freq_value').show();
-          $('update_freq_form').hide();
-          $('change_freq').show();
-          $('cancel_freq').hide();          
-        }      
+          $('#update_freq').addClass("lighter");
+          $('#update_freq_value').show();
+          $('#update_freq_form').hide();
+          $('#change_freq').show();
+          $('#cancel_freq').hide();
+        }
       </script>
     <% else %>
       <% freq = @user ? @user.settings.update_interval : 60 %>
-      Updating every <%= freq %> seconds.      
-    <% end %> 
+      Updating every <%= freq %> seconds.
+    <% end %>
   </div>
   <div id="status">
     <div id="ended" style="display: none;"><%= game.state == 'ended' %></div>
@@ -88,8 +88,8 @@
     <div id="player_public">
       <table class="other_players" cellspacing="5">
         <% other_players = game.players.reject {|p| p == player} -%>
-        <% if player && player.seat             
-            other_players = other_players.sort_by {|p| (p.seat - player.seat) % game.players.length} 
+        <% if player && player.seat
+            other_players = other_players.sort_by {|p| (p.seat - player.seat) % game.players.length}
            end %>
         <% other_players.in_groups_of(2) do |chunk| %>
           <tr class="other_players">
@@ -129,7 +129,7 @@
         <td>
           <% if control[:nil_action] -%>
             <% case control[:type]
-               when :button -%>        
+               when :button -%>
               <%= form_remote_tag :url => {:action => control[:action]},
                                            :before => "$('spinner').show()",
                                           :complete => "$('spinner').hide()",
@@ -141,10 +141,10 @@
                   <% end %>
                 <% end %>
                 <%= submit_tag control[:nil_action], :name => control[:name] -%>
-              <% end -%>                
+              <% end -%>
             <% end -%>
           <% end -%>
-        </td>          
+        </td>
         <% end -%>
       </tr>
       <% end -%>
@@ -184,8 +184,8 @@
       <%= render :partial => 'chat_line', :object => chat_line %>
     <% end %>
   </div>
-  <%= form_remote_tag :url => speak_game_url, 
-                     :update => {:success => 'chatbox', :failure => 'flash'}, 
+  <%= form_remote_tag :url => speak_game_url,
+                     :update => {:success => 'chatbox', :failure => 'flash'},
                      :position => 'bottom',
                      :after => 'this.reset()',
                      :complete => '$(\'chatbox\').scrollTop = $(\'chatbox\').scrollHeight;' do %>
@@ -229,13 +229,10 @@
     <ul id="resultList">
       <li class="resultEntry winner">
         <span class="name"><%= h(ply_ordered[0].name) -%></span>
-        - Winner with <%= h(ply_ordered[0].score) -%> points! <%= link_to_function("(show deck)",
-        "$(this).hide(); $('hide_deck_0').show();" + visual_effect(:blind_down, 'deck_list_0', :duration => 0.5),
-        {:class => "showHideDeck", :id => "show_deck_0"}) -%>
-        <%= link_to_function("(hide deck)",
-        "$(this).hide(); $('show_deck_0').show();" + visual_effect(:blind_up, 'deck_list_0', :duration => 0.5),
-        {:class => "showHideDeck", :id => "hide_deck_0", :style => "display: none"}) -%>
-        <p class="deckList" style="display: none;" id="deck_list_0">
+        - Winner with <%= h(ply_ordered[0].score) -%> points!
+        <%= link_to("(show deck)", "#", {:class => "showHideDeck showDeck"}) -%>
+        <%= link_to("(hide deck)", "#", {:class => "showHideDeck hideDeck"}) -%>
+        <p class="deckList" style="display: none;">
           <%= raw ply_ordered[0].cards_for_decklist %>
         </p>
       </li>
@@ -243,14 +240,11 @@
       <% if ix != 0 %>
       <li class="resultEntry">
         <span class="name"><%= h(ply.name) -%></span>
-        -<%= %w<first second third fourth fifth sixth>[ix] + " with " + h(ply.score) -%> points <%= link_to_function("(show deck)",
-        "$(this).hide(); $('hide_deck_#{ix}').show();" + visual_effect(:blind_down, "deck_list_#{ix}", :duration => 0.5),
-        {:class => "showHideDeck", :id => "show_deck_#{ix}"}) -%>
-        <%= link_to_function("(hide deck)",
-        "$(this).hide(); $('show_deck_#{ix}').show();" + visual_effect(:blind_up, "deck_list_#{ix}", :duration => 0.5),
-        {:class => "showHideDeck", :id => "hide_deck_#{ix}", :style => "display: none"}) -%>
-        <p class="deckList" style="display: none;" id=<%= "deck_list_#{ix}" -%>>
-          <%= raw ply.cards_for_decklist -%>
+        -<%= %w<first second third fourth fifth sixth>[ix] + " with " + h(ply.score) -%> points
+        <%= link_to("(show deck)", "#", {:class => "showHideDeck showDeck"}) -%>
+        <%= link_to("(hide deck)", "#", {:class => "showHideDeck hideDeck"}) -%>
+        <p class="deckList" style="display: none;">
+          <%= raw ply_ordered[0].cards_for_decklist %>
         </p>
       </li>
       <% end %>
@@ -260,4 +254,17 @@
       <%= link_to "Back to Index", games_path -%>
     </p>
   </div>
+<% end %>
+<%= javascript_tag do %>
+  $('.resultEntry').on('click', '.showDeck', function()
+  {
+    $(this).hide();
+    $(this).siblings('.hideDeck').show();
+    $(this).siblings('.deckList').slideDown();
+  }).on('click', '.hideDeck', function()
+  {
+    $(this).hide();
+    $(this).siblings('.showDeck').show();
+    $(this).siblings('.deckList').slideUp();
+  });
 <% end %>
