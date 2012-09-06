@@ -11,7 +11,7 @@ Currently, ["master"](https://github.com/asilano/free-dom/) is the codebase as i
 This codebase now runs Rails 3.1, but is still using the Prototype javascript library. It's time to move on - this branch will handle the migration to jQuery.
 
 Tasks include:
-* Changing all `Effect` calls to jQuery equivalents
+* ~~Changing all `Effect` calls to jQuery equivalents~~
 * Changing all `Event` calls to jQuery equivalents
 * Ensuring remote forms are implemented and handled correctly
 * Updating any "loose" AJAX calls
