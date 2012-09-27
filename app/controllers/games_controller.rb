@@ -1,7 +1,7 @@
 class GamesController < ApplicationController
 
   include AgnosticGameController
-  
+
   # Filters:
   # * For every action relating to a game, find the game
   # * For every action which may make use of a user, pick up the user
@@ -11,9 +11,9 @@ class GamesController < ApplicationController
   before_filter :find_user, :except => [:card_text]
   before_filter :authorise, :except => [:index, :watch, :speak, :check_change, :card_text]
   before_filter :setup_title, :except => [:card_text]
-  
+
   around_filter :lock_player, :only => [:buy, :play_action, :resolve]
-  
+
   #around_filter do |ctrlr, act|
   #  Game.transaction do
   #    act.call
@@ -39,29 +39,29 @@ class GamesController < ApplicationController
     @controls = Hash.new([])
     @last_mod = @game.last_modified
     headers["Last-Modified"] = @last_mod.httpdate
-    
+
     @title = "Watching game '#{@game.name}'"
     render :action => :show
   end
-  
+
   # GET /games/1/play
-  # Play a game; that is, see all the public information, together with the 
+  # Play a game; that is, see all the public information, together with the
   # player-private information associated with the current session
-  def play      
+  def play
     @game.process_actions
-    @controls = (@player ? @player.determine_controls : Hash.new([]))    
+    @controls = (@player ? @player.determine_controls : Hash.new([]))
     @last_mod = @game.last_modified
     headers["Last-Modified"] = @last_mod.httpdate
-    
+
     setup_full_title
-    
+
     render :action => :show
     @unloadFunc = nil
   end
 
-  def join    
+  def join
     res = ag_join
-    
+
     case res
     when :already
       redirect_to :action => :play, :id => @game
@@ -78,20 +78,6 @@ class GamesController < ApplicationController
     end
   end
 
-#  def clear_player
-#    if params[:id] and session[:player]
-#      game = Game.find(params[:id])
-#      game.player_stands(session[:player])
-#    end
-#    
-#    session[:player] = nil
-#    if game
-#      redirect_to(:action => :watch, :id => game)
-#    else
-#      redirect_to(:action => :index)
-#    end
-#  end
-
   # GET /games/new
   # GET /games/new.xml
   def new
@@ -100,22 +86,22 @@ class GamesController < ApplicationController
     @game.random_select = 0
     @game.specify_distr = 1
     @game.plat_colony = "rules"
-    
+
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @game }
     end
   end
-  
+
   # POST /games
   # POST /games.xml
   def create
     res = ag_create(params[:game])
-  
+
     case res
     when :invalid, :tweak
-      render :action => 'new'            
-    when :created  
+      render :action => 'new'
+    when :created
       flash[:notice] &&= '<br/>' + flash[:notice]
       flash[:notice] ||= ""
       flash[:notice] += 'Game was successfully created.'
@@ -127,7 +113,7 @@ class GamesController < ApplicationController
     # Call through to the game's controller to start the game
     rc = nil
     Game.transaction {rc = @game.start_game}
-    process_result rc    
+    process_result rc
   end
 
   def play_action
@@ -137,7 +123,7 @@ class GamesController < ApplicationController
   def play_treasure
     handle_generic_ajax(:play_treasure)
   end
-  
+
   def buy
     handle_generic_ajax(:buy)
   end
@@ -149,7 +135,7 @@ class GamesController < ApplicationController
   def resolve
     handle_generic_ajax(:resolve)
   end
-  
+
   # POST /games/1/speak
   def speak
     non_ply_name = ((@user && @user.name) || params[:name]) if !@player
@@ -159,11 +145,11 @@ class GamesController < ApplicationController
                               :turn => @game.turn_count || 0,
                               :turn_player => @game.current_turn_player,
                               :statement => params[:say])
-    
+
     respond_to do |format|
       format.js {render :partial => 'chat_line', :object => line}
     end
-    
+
   end
 
   # DELETE /games/1
@@ -176,13 +162,13 @@ class GamesController < ApplicationController
       format.xml  { head :ok }
     end
   end
-  
-  # GET /games/1/check_change?since=<httpdate>  
+
+  # GET /games/1/check_change?since=<httpdate>
   def check_change
     # (XHR) request to update the page if anything has changed since the
     # specified time. Updates the last-checked element if no change
     @just_checking = true
-    since_time = Time.httpdate(params[:since])    
+    since_time = Time.httpdate(params[:since])
     if @game.last_modified >= since_time
       # Game state has changed. Call process_result to update the game state
       process_result("OK", false)
@@ -190,30 +176,35 @@ class GamesController < ApplicationController
       # No change. Render nothing, but do ensure the Last-Modified header is set
       @last_mod = @game.last_modified
       headers["Last-Modified"] = @last_mod.httpdate
-      respond_to do |format| 
-        #@flash_text = "no change" 
-        format.js { 
-          render :action => 'update_last_checked'
-          #render :action => 'update_flash'
-        }
+      respond_to do |format|
+        format.js { render :action => 'update_last_checked' }
       end
     end
   end
-  
+
   def update_player_settings
     @player.settings.update_attributes(params[:settings])
-    render :partial => 'player_settings', :locals => {:player => @player}         
+
+    respond_to do |format|
+      format.js do
+        if params[:settings].include?(:update_interval)
+          render :action => 'updated_refresh_interval'
+        end
+      end
+
+      format.html { redirect_to :back}
+    end
   end
-  
+
   def card_text
     card_class = params[:type].constantize
     respond_to do |format|
       format.js { render :text => card_class.text }
-    end  
+    end
   end
-  
+
 protected
-  def find_game    
+  def find_game
     @game = Game.find(params[:id])
     Game.current = @game
     @omit_onload = false
@@ -225,11 +216,11 @@ protected
   end
 
   def find_user
-    @user = User.find_by_id(session[:user_id])        
+    @user = User.find_by_id(session[:user_id])
     @player = @user.players.find_by_game_id(@game.id) if (@game and @user)
   end
-  
-  def authorise       
+
+  def authorise
     unless @user
       flash[:warning] = "Please log in"
       session[:original_uri] = request.url
@@ -244,7 +235,7 @@ protected
 private
   def handle_generic_ajax(sym)
     if @player
-      if @game == @player.game    
+      if @game == @player.game
         rc = nil
 #        begin
           Game.transaction do
@@ -272,29 +263,34 @@ private
   def process_result(rc, do_actions = true)
     if rc =~ /^OK ?(.*)?/
       flash[:warning] = $1 if $1 != ""
+
+      @game.process_actions if do_actions
+      if not @player.nil?
+        @controls = @player.determine_controls
+      else
+        @controls = Hash.new([])
+      end
+
+      @last_mod = @game.last_modified
+      setup_full_title
+      headers["Last-Modified"] = @last_mod.httpdate
+
       respond_to do |format|
-        @game.process_actions if do_actions
-        if not @player.nil?
-          @controls = @player.determine_controls
-        else
-          @controls = Hash.new([])
-        end
-        @last_mod = @game.last_modified
-        setup_full_title
-        headers["Last-Modified"] = @last_mod.httpdate
         format.js { render :action => 'update_game' }
+        format.html { render :back }
       end
     else
+      flash[:warning] = rc
       respond_to do |format|
-        flash[:warning] = rc
         format.js { render :action => 'update_flash' }
+        format.html { render :back }
       end
     end
   end
-  
+
   def setup_full_title
     @full_title = ""
-    
+
     if @game.state == 'running'
       waiting_players = @game.active_ply_actions.map {|a| a.player}
       if waiting_players.delete(@player)
@@ -309,7 +305,7 @@ private
     elsif @game.state == 'ended'
       @full_title += "Ended game '#{@game.name}' - "
     end
-    
+
     if @player
       @full_title += "#{@player.name} playing in Dominion game '#{@game.name}'"
     else
@@ -322,7 +318,7 @@ private
     if !@player
       process_result "You've lost your session details. Please log in again."
     end
-    
+
     if @player.reload.lock
       respond_to do |format|
         flash[:warning] = "Request outstanding"
@@ -333,7 +329,7 @@ private
       @player.lock = true
       @player.save!
       begin
-        yield   
+        yield
       ensure
         @player.lock = false
         @player.save!

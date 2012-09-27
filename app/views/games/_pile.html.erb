@@ -1,9 +1,9 @@
 <tr class="<%= 'emptyPile' if pile.cards.empty? and pile.game.state != "waiting" -%>">
     <td>
       <% classes = pile.card_class.varieties.join(" ") -%>
-      <% content = content_tag(:div, h(pile.card_class.readable_name), :class => "content") +    
+      <% content = content_tag(:div, h(pile.card_class.readable_name), :class => "content") +
              content_tag(:div, nil, :class => "bg left") +
-             content_tag(:div, nil, :class => "bg right") -%> 
+             content_tag(:div, nil, :class => "bg right") -%>
       <%= content_tag(:div, content, :class => "container " + classes, :title => pile.card_class.text) -%>
     </td>
     <td><%= h(pile.cost) -%></td>
@@ -18,26 +18,20 @@
       <%= raw pile_state(pile) %>
     </td>
   <% if controls.include?(:piles) -%>
-    <% controls[:piles].each do |control| -%>            
+    <% controls[:piles].each do |control| -%>
     <td>
       <% if control[:piles][pile.position] -%>
-          <% case control[:type] 
+          <% case control[:type]
                 when :button -%>
-            <%= form_remote_tag :url => {:action => control[:action]},
-                               :before => "$('spinner').show()",
-                               :complete => "$('spinner').hide()",
-                               :loading => "disable_named('#{control[:name]}')" do -%>
-              <%= hidden_field_tag :pile_index, pile.position, :id => "pile_index_#{pile.position}" -%>
-              <% if control[:params] -%>
-                <% control[:params].each do |key, value| -%>
-                  <%= hidden_field_tag key, value, :id => "#{key}_#{pile.position}_#{control.object_id}" -%>
-                <% end %>
-              <% end %>
-              <%= submit_tag control[:text], :name => control[:name], :confirm => (pile.card_class == BasicCards::Curse ? "Really choose Curse?" : nil)-%>
-            <% end -%>                 
+              <%= button_tag(control[:text], :type => 'submit',
+                                         :name => 'pile_index',
+                                         :value => pile.position,
+                                         :form => "form_#{control.object_id}",
+                                         :disable_with => control[:text],
+                                         :confirm => (pile.card_class == BasicCards::Curse ? "Really choose Curse?" : nil)) %>
           <% end -%>
-        <% end -%>  
-      </td>      
+        <% end -%>
+      </td>
     <% end -%>
   <% end -%>
 </tr>

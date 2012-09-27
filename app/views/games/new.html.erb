@@ -121,7 +121,7 @@
 <% content_for :js_in_head do %>
   var choices = new Array();
 
-  $(function()
+  function onLoadFunc()
   {
     for (i = 1; i <= 10 ; i++)
     {
@@ -130,7 +130,6 @@
       $('#card_text_' + i).text(card_dict[value]);
     }
   }
-  );
 <% end %>
 <%= javascript_tag do %>
   $('#game_random_select').change(function()

@@ -4,29 +4,29 @@ class Seaside::Treasury < Card
   costs 5
   action
   card_text "Action (cost: 5) - Draw 1 card, +1 Action, +1 Cash. When you discard this from play, if you didn't buy a Victory card this turn, you may put this on top of your deck."
-  
+
   def play(parent_act)
     super
-    
+
     # First, draw the cards.
     player.draw_cards(1)
-        
+
     # Now create the new Action
     player.add_actions(1, parent_act)
 
     # And add the coin
     player.add_cash(1)
-    
+
     return "OK"
   end
 
   def leave_play(parent_act)
-        
-    if (!player.state.bought_victory)      
+
+    if (!player.state.bought_victory)
       # Player bought no victory card this turn. Ask them where they want the Treasury.
       # Hang the action to do so off parent_act, which can't be nil
       raise "Need a non-nil parent act" if parent_act.nil?
-      
+
       if player.settings.autotreasury
         # Player has chosen to always put Treasuries on top when allowed
         return resolve_replace(player, {:choice => 'deck'}, parent_act)
@@ -38,9 +38,9 @@ class Seaside::Treasury < Card
       end
     else
       # Player did buy a victory this turn. Just discard the card.
-      super  
+      super
     end
-    
+
     return "OK"
   end
 
@@ -49,11 +49,10 @@ class Seaside::Treasury < Card
     when "replace"
       controls[:player] += [{:type => :buttons,
                              :action => :resolve,
-                             :name => "replace",
-                             :label => "Move #{readable_name}:",                             
+                             :label => "Move #{readable_name}:",
                              :params => {:card => "#{self.class}#{id}",
                                          :substep => "replace"},
-                             :options => [{:text => "Top of deck",            
+                             :options => [{:text => "Top of deck",
                                            :choice => "deck"},
                                           {:text => "Discard",
                                            :choice => "discard"}]
@@ -61,13 +60,13 @@ class Seaside::Treasury < Card
     end
   end
 
-  def resolve_replace(ply, params, parent_act)    
+  def resolve_replace(ply, params, parent_act)
     # We expect to have a :choice parameter, either "deck" or "discard"
     if (not params.include? :choice) or
        (not params[:choice].in? ["deck", "discard"])
       return "Invalid parameters"
     end
-    
+
     # All looks fine, process the choice
     if params[:choice] == "deck"
       # Return this card to the top of the deck
@@ -75,17 +74,17 @@ class Seaside::Treasury < Card
       self.location = "deck"
       self.position = -1
       save!
-      
+
       game.histories.create!(:event => "#{ply.name} chose to put their #{readable_name} on top of their deck.",
-                            :css_class => "player#{ply.seat}")                                                            
+                            :css_class => "player#{ply.seat}")
     else
       # Just discard the card.
       discard
-      
+
       game.histories.create!(:event => "#{ply.name} chose to put their #{readable_name} into their discard.",
                             :css_class => "player#{ply.seat}")
     end
-    
+
     return "OK"
   end
 

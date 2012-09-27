@@ -24,7 +24,7 @@ group :assets do
   gem 'uglifier'
 end
 
-gem 'jquery-rails'
+gem 'jquery-rails', :path => "vendor/gems/jquery-rails-1.0.19"
 #gem 'therubyracer'
 gem 'actionmailer-with-request'
 

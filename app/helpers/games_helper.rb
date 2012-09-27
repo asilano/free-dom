@@ -123,15 +123,15 @@ module GamesHelper
 
   def forge_calc(control)
     scr = <<EOS
-      elems = $("[name='#{control[:name]}[]'");
+      elems = $('[name=#{control[:name]}\\\\[\\\\]]');
       sum = 0;
-      for (i = 0; i < elems.length; i++)
+      elems.each(function()
       {
-        if (elems[i].id.startsWith('#{control.object_id}_') && elems[i].checked)
+        if ($(this).is('[id^=#{control.object_id}_]:checked'))
         {
-          sum += parseInt(elems[i].getAttribute('data-js'));
+          sum += parseInt($(this).data('js'));
         }
-      }
+      });
 
       $('##{control.object_id.to_s}_js').text('Total: ' + sum);
 EOS
@@ -139,11 +139,25 @@ EOS
   end
 
   def setting_checkbox(name, label)
-    str = check_box_tag name, 1, @player.settings.__send__(name),
-                    :onclick => remote_function(:update => 'playerPrefs',
-                    :url => {:action => :update_player_settings,
-                             :id => @game},
-                    :with => "'settings[#{name}]=' + escape($('#{name}').checked)")
+    str = check_box_tag name, 1, @player.settings.__send__(name)
     str << label_tag(name, label)
+  end
+
+  def control_form(control)
+    str = ''
+    if control[:params]
+      control[:params].each do |key, value|
+        str << raw(hidden_field_tag(key, value, :id => "#{key}_#{control[:name]}_#{control.object_id}"))
+      end
+    end
+
+    form = form_tag({:action => control[:action]},
+                        :remote => true,
+                        :id => "form_#{control.object_id}",
+                        :class => 'ajaxSpinSmall') do
+      raw(str)
+    end
+
+    content_for(:control_forms, raw(form))
   end
 end

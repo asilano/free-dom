@@ -297,7 +297,15 @@ $p5fgcol: #d0d;
 	padding: 3px 0;
 }
 
+#update_freq_form > form { display: inline; }
+
 .scoreRow
 {
   background-color: #efd;
+}
+
+#start_button
+{
+  clear: both;
+  margin-bottom: 5px;
 }
