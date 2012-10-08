@@ -13,13 +13,14 @@ This codebase now runs Rails 3.1, but is still using the Prototype javascript li
 Tasks include:
 * ~~Changing all `Effect` calls to jQuery equivalents~~
 * ~~Changing all `Event` calls to jQuery equivalents~~
-* Ensuring remote forms are implemented and handled correctly
-* Updating any "loose" AJAX calls
+* ~~Ensuring remote forms are implemented and handled correctly~~
+* ~~Updating any "loose" AJAX calls~~
 * ~~Updating existing .rjs files to .js.erb (I think)~~
 * ~~Replacing TableKit with something~~
 * Making any "loose" (without form) AJAX calls have non-JS versions (player settings per game only example?)
 * Updating supported browsers. IE is out, unless I can find a good shim.
-* Fix chat updating so it updates.
-* Check controls on Revealed / Peeked cards work
+* ~~Fix chat updating so it updates.~~
+* Fix start game button so it appears automatically (if possible)
+* ~~Check controls on Revealed / Peeked cards work~~
 
 _**Please fork and contribute where possible!**_

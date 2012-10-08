@@ -1,0 +1,2 @@
+$('#chatbox').html('<%= escape_javascript(render(:partial => 'chat_line', :collection => @game.chats))%>');
+$('#chatbox').scrollTop($('#chatbox')[0].scrollHeight);

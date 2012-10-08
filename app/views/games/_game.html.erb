@@ -170,26 +170,6 @@ if (@game.players.length >= 2 &&
     <% end %>
   </div>
 <% end %>
-<div id="chat">
-  <div id="chatbox">
-    <% game.chats.each do |chat_line| %>
-      <%= #render :partial => 'chat_line', :object => chat_line
-      %>
-    <% end %>
-  </div>
-  <%= form_tag(:url => speak_game_url) do
-      #               :update => {:success => 'chatbox', :failure => 'flash'},
-      #               :position => 'bottom',
-      #               :after => 'this.reset()',
-      #               :complete => '$(\'chatbox\').scrollTop = $(\'chatbox\').scrollHeight;' do
-      %>
-   <div>
-    <%= text_field_tag("name", nil, :placeholder => "Name?") if !@user%>
-    <%= text_field_tag("say", nil, :placeholder => "What do you want to say?", :autocomplete => 'off') %>
-    <%= submit_tag "Say", :class => 'input-hack' %>
-   </div>
-  <% end %>
-</div>
 <div id="history">
   <ul>
     <% game.histories.each do |history| %>

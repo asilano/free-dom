@@ -147,7 +147,8 @@ class GamesController < ApplicationController
                               :statement => params[:say])
 
     respond_to do |format|
-      format.js {render :partial => 'chat_line', :object => line}
+      format.html {redirect_to :back}
+      format.js {render :action => 'update_chat'}
     end
 
   end
@@ -169,6 +170,7 @@ class GamesController < ApplicationController
     # specified time. Updates the last-checked element if no change
     @just_checking = true
     since_time = Time.httpdate(params[:since])
+
     if @game.last_modified >= since_time
       # Game state has changed. Call process_result to update the game state
       process_result("OK", false)
@@ -277,13 +279,13 @@ private
 
       respond_to do |format|
         format.js { render :action => 'update_game' }
-        format.html { render :back }
+        format.html { redirect_to :back }
       end
     else
       flash[:warning] = rc
       respond_to do |format|
         format.js { render :action => 'update_flash' }
-        format.html { render :back }
+        format.html { redirect_to :back }
       end
     end
   end
