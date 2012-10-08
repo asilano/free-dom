@@ -139,7 +139,8 @@ EOS
   end
 
   def setting_checkbox(name, label)
-    str = check_box_tag name, 1, @player.settings.__send__(name)
+    str = hidden_field_tag("settings[#{name}]", 0)
+    str << check_box_tag(name, 1, @player.settings.__send__(name), :name => "settings[#{name}]")
     str << label_tag(name, label)
   end
 

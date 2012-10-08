@@ -4,14 +4,10 @@
     <div id="playerPrefs">
       <%= render :partial => "player_settings" %>
     </div>
-
     <%= javascript_tag do %>
-      $('#playerPrefs').on('click', 'input[type=checkbox]', function()
+      $('#playerPrefsHover').on('click', 'input[type=checkbox]', function()
       {
-        var data = {};
-        var propId = 'settings[' + this.name + ']';
-        data[propId] = this.checked;
-        $.post('<%= url_for(:action => :update_player_settings, :id => @game) -%>', data);
+        $(this).closest('form').submit();
       });
     <% end %>
   </div>

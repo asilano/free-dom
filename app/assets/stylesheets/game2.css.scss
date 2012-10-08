@@ -64,6 +64,8 @@ $p5fgcol: #d0d;
   padding: 5px 5px 0 10px;
   display: none;
   text-align: left;
+
+  .js & input[type=submit] { display: none; }
 }
 
 #playerPrefsHover:hover #playerPrefs {display: block;}
@@ -289,7 +291,9 @@ $p5fgcol: #d0d;
 
 #update_freq
 {
+  display: none;
 	margin-left: 1em;
+	.js & {display: block;}
 }
 
 #update_freq_value
