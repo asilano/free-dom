@@ -148,7 +148,7 @@ class GamesController < ApplicationController
 
     respond_to do |format|
       format.html {redirect_to :back}
-      format.js {render :action => 'update_chat'}
+      format.js {render :partial => 'update_chat'}
     end
 
   end
