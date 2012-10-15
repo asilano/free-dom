@@ -20,7 +20,7 @@ Tasks include:
 * ~~Making any "loose" (without form) AJAX calls have non-JS versions (player settings per game only example?)~~
 * Updating supported browsers. IE is out, unless I can find a good shim.
 * ~~Fix chat updating so it updates.~~
-* Fix start game button so it appears automatically (if possible)
+* ~~Fix start game button so it appears automatically (if possible)~~
 * ~~Check controls on Revealed / Peeked cards work~~
 
 _**Please fork and contribute where possible!**_

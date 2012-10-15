@@ -149,27 +149,26 @@
     <% end %>
   </div>
   <%= content_for :control_forms %>
+    <%
+  # Present a start button to the first-joined player,
+  # so long as there are more than 2 and the game is waiting
+  if (@game.players.length >= 2 &&
+      @player && @player == @game.players[0] &&
+      @game.state == 'waiting') %>
+    <div id="start_button">
+      <%= form_tag({:action => :start_game }, :remote => true, :id => 'start_form') do %>
+        <%= submit_tag "Start Game", :id => "start_game_btn" %>
+      <% end %>
+
+      <%= javascript_tag do %>
+        $('#start_form').on('ajax:beforeSend', function(){ $('#gameStartSpinner').show();
+                                                  $(this).attr('disabled', true).val('Please wait...'); })
+                            .on('ajax:complete', function(){ $('#gameStartSpinner').hide(); $('#start_button').remove(); })
+                            .on('ajax:error', function(){ alert('Sorry, something went wrong. Please refresh and try again'); });
+      <% end %>
+    </div>
+  <% end %>
 </div>
-
-<%
-# Present a start button to the first-joined player,
-# so long as there are more than 2 and the game is waiting
-if (@game.players.length >= 2 &&
-    @player && @player == @game.players[0] &&
-    @game.state == 'waiting') %>
-  <div id="start_button">
-    <%= form_tag({:action => :start_game }, :remote => true) do %>
-      <%= submit_tag "Start Game", :id => "start_game_btn" %>
-    <% end %>
-
-    <%= javascript_tag do %>
-      $('#start_game_btn').ajaxSend(function(){ $('#gameStartSpinner').show();
-                                                $(this).attr('disabled', true).val('Please wait...'); })
-                          .ajaxComplete(function(){ $('#gameStartSpinner').hide(); $('#start_button').remove(); })
-                          .ajaxError(function(){ alert('Sorry, something went wrong. Please refresh and try again'); });
-    <% end %>
-  </div>
-<% end %>
 <div id="history">
   <ul>
     <% game.histories.each do |history| %>
