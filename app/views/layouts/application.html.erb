@@ -7,45 +7,12 @@
     <%= javascript_include_tag "application" %>
     <link rel="shortcut icon" type="image/vnd.microsoft.icon" href='<%= image_path("/favicon.ico") %>' />
 
-    <script type='text/javascript'>
-      function disable_named(name){
-          var arr = new Array();
-          arr = document.getElementsByName(name);
-          for (var i = 0; i < arr.length; i++) {
-              arr[i].disabled = true;
-          }
-      }
-
-      /*
-        Copyright Robert Nyman, http://www.robertnyman.com
-        Free to use if this text is included
-      */
-      function getElementsByAttribute(oElm, strTagName, strAttributeName, strAttributeValue){
-        var arrElements = (strTagName == "*" && oElm.all)? oElm.all : oElm.getElementsByTagName(strTagName);
-        var arrReturnElements = new Array();
-        var oAttributeValue = (typeof strAttributeValue != "undefined")? new RegExp("(^|\\s)" + strAttributeValue + "(\\s|$)") : null;
-        var oCurrent;
-        var oAttribute;
-        for(var i=0; i<arrElements.length; i++){
-          oCurrent = arrElements[i];
-          oAttribute = oCurrent.getAttribute && oCurrent.getAttribute(strAttributeName);
-          if(typeof oAttribute == "string" && oAttribute.length > 0){
-            if(typeof strAttributeValue == "undefined" || (oAttributeValue && oAttributeValue.test(oAttribute))){
-              arrReturnElements.push(oCurrent);
-            }
-          }
-        }
-        return arrReturnElements;
-      }
-
-    </script>
-
     <%= javascript_tag do %>
       <%= "var AUTH_TOKEN = '#{form_authenticity_token}';" if protect_against_forgery? %>
 
       <%= content_for :js_in_head %>
 
-      if (onLoadFunc)
+      if (typeof(onLoadFunc) != "undefined")
         $(onLoadFunc);
     <% end %>
   </head>
