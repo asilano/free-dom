@@ -5,7 +5,7 @@ var supportForm = function()
   {
     input.setAttribute("form", "12345");
 
-    if (input.form == "12345")
+    if (input.getAttribute("form") == "12345")
       return true;
   }
 
