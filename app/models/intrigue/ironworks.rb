@@ -19,7 +19,6 @@ class Intrigue::Ironworks < Card
     when "take"
       controls[:piles] += [{:type => :button,
                             :action => :resolve,
-                            :name => "take",
                             :text => "Take",
                             :nil_action => "Take nothing",
                             :params => {:card => "#{self.class}#{id}",

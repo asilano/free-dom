@@ -2,7 +2,7 @@
 
 class Seaside::Ambassador < Card
   costs 3
-  action :attack => true, 
+  action :attack => true,
          :order_relevant => lambda { |params|
            pile = game.piles.find_by_card_type(params[:chosen])
            pile.cards.length < game.players.length - 1}
@@ -14,9 +14,9 @@ class Seaside::Ambassador < Card
   # Those are returned to the supply
   # And every other player then takes one (and we don't NEED another action for this, just touch the other players discard directly, like tribute does)
 
-  def play(parent_act)   
-    super    
-    
+  def play(parent_act)
+    super
+
     if player.cards.hand(true).map(&:class).uniq.length == 1
       # Only holding one type of card. Call resolve_reveal directly
       return resolve_reveal(player, {:card_index => 0}, parent_act)
@@ -31,7 +31,7 @@ class Seaside::Ambassador < Card
                                  :player => player,
                                  :game => game)
     end
-    
+
     return "OK"
   end
 
@@ -41,7 +41,6 @@ class Seaside::Ambassador < Card
     when "reveal"
       controls[:hand] += [{:type => :button,
                           :action => :resolve,
-                          :name => "reveal",
                           :text => "Reveal",
                           :nil_action => nil,
                           :params => {:card => "#{self.class}#{id}",
@@ -51,7 +50,6 @@ class Seaside::Ambassador < Card
     when "returncard"
       controls[:hand] += [{:type => :button,
                           :action => :resolve,
-                          :name => "returncard",
                           :text => "Return",
                           :nil_action => "Return no more",
                           :params => {:card => "#{self.class}#{id}",
@@ -71,15 +69,15 @@ class Seaside::Ambassador < Card
     if !params.include? :card_index
       return "Invalid parameters"
       end
-    
+
     # Processing is pretty much the same as a Play; code shamelessly yoinked from
     # Player.play_action.
     if ((params[:card_index].to_i < 0 or
-         params[:card_index].to_i > ply.cards.hand.length - 1))            
-      # Asked to reveal an invalid card (out of range)        
+         params[:card_index].to_i > ply.cards.hand.length - 1))
+      # Asked to reveal an invalid card (out of range)
       return "Invalid request - card index #{params[:card_index]} is out of range"
     end
-       
+
     card = ply.cards.hand[params[:card_index].to_i]
     game.histories.create!(:event => "#{ply.name} revealed a #{card.class.readable_name}.",
                           :css_class => "player#{ply.seat} card_reveal")
@@ -88,9 +86,9 @@ class Seaside::Ambassador < Card
                                             :text => "Return up to 2 cards with Ambassador",
                                             :player => player,
                                             :game => game)
-    
+
     return "OK"
-    
+
   end
 
   def resolve_returncard(ply, params, parent_act)
@@ -98,24 +96,24 @@ class Seaside::Ambassador < Card
     if (not params.include? :nil_action) and (not params.include? :card_index)
       return "Invalid parameters"
     end
-    
+
     # Processing is pretty much the same as a Play; code shamelessly yoinked from
     # Player.play_action.
-    if ((params.include? :card_index) and 
+    if ((params.include? :card_index) and
         (params[:card_index].to_i < 0 or
-         params[:card_index].to_i > ply.cards.hand.length - 1))            
-      # Asked to return an invalid card (out of range)        
-      return "Invalid request - card index #{params[:card_index]} is out of range"    
+         params[:card_index].to_i > ply.cards.hand.length - 1))
+      # Asked to return an invalid card (out of range)
+      return "Invalid request - card index #{params[:card_index]} is out of range"
     end
 
     if params.include? :card_index
       # Return this card to the supply
       card = ply.cards.hand[params[:card_index].to_i]
-      
+
       if (card.class.name != params[:chosen])
         return "Invalid request - returning a #{card.readable_name} when a #{params[:chosen]} was revealed"
       end
-      
+
       # Return the card to the pile
       pile = game.piles.find_by_card_type(params[:chosen])
       card.pile_id = pile.id
@@ -124,7 +122,7 @@ class Seaside::Ambassador < Card
       card.revealed = false
       card.player = nil
       card.save!
-      
+
       game.histories.create!(:event => "#{ply.name} returned a #{card.readable_name} to the supply.",
                             :css_class => "player#{ply.seat}")
       # Do we have more discards allowed?  Queue up an action for them
@@ -142,12 +140,12 @@ class Seaside::Ambassador < Card
     # Ok, we're done returning cards to the supply - now queue the attack to give everyone else one
     attack(parent_act, :chosen => params[:chosen])
   end
-  
+
   def attackeffect(params)
     # Effect of the attack succeeding - that is, give the player a copy of the returned card, if any remain
     target = Player.find(params[:target])
     parent_act = params[:parent_act]
-    
+
     pile = game.piles.find_by_card_type(params[:chosen])
     if pile.empty?
       game.histories.create!(:event => "#{target.name} could not gain a #{params[:chosen].readable_name}, as there are none left.",
@@ -159,7 +157,7 @@ class Seaside::Ambassador < Card
     end
 
     return "OK"
-    
+
   end
 
 end

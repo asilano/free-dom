@@ -1,1 +1,0 @@
-page.replace_html("last_refresh_value", html_escape(Time.new.httpdate))

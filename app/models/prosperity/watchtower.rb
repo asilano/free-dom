@@ -29,7 +29,6 @@ class Prosperity::Watchtower < Card
       card = Card.find(params[:gaining])
       controls[:player] += [{:type => :buttons,
                              :action => :resolve,
-                             :name => "choose",
                              :label => "Apply #{self} to #{card}?",
                              :params => {:card => "#{self.class}#{id}",
                                          :substep => "choose"}.merge(params),

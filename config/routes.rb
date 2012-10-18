@@ -5,7 +5,7 @@ Dominion::Application.routes.draw do
   match 'users/password_reset', :controller => 'users', :action => 'password_reset', :as => 'password_reset'
   match 'users/registered', :controller => 'users', :action => 'registered', :as => 'registered'
   resources :users, :except => [:edit]
-  
+
   match 'dominion/clear_player', :controller => 'games', :action => 'clear_player', :as => 'clear_player'
   match 'dominion/card_text', :controller => 'games', :action => 'card_text', :as => 'card_text'
   resources :dominion, :as => :games, :controller => 'games' do
@@ -23,18 +23,19 @@ Dominion::Application.routes.draw do
       get  :check_change
       post :update_player_settings
       post :speak
+      post :perform
     end
   end
   match 'dominion/:action', :controller => 'games'
-  
+
   match 'about', :controller => 'users', :action => 'about', :as => 'about'
   match 'contact', :controller => 'users', :action => 'contact', :as => 'contact'
 
   # Email interface
   match 'pbem', :controller => 'pbem', :action => 'handle' #,:method => :post, :as => 'pbem'
   match 'nop', :controller => 'pbem', :action => 'nop' #,:method => :post, :as => 'nop'
-  
-  
+
+
   root :to => "games#index"
 
   # See how all your routes lay out with "rake routes"

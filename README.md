@@ -1,25 +1,26 @@
 FreeDom
 ======
 
-This is the codebase for my free, online Dominion server.
+This is a branch of the codebase for my free, online Dominion server.
 
 Notes
 -----
 
-Currently, "master" is the codebase as it exists on heroku.
+Currently, ["master"](https://github.com/asilano/free-dom/) is the codebase as it exists on heroku.
 
-This codebase now runs Rails 3.1, but is still using the Prototype javascript library. It's time to move on - I'll be migrating to jQuery in my next release (which will mainly be to implement Hinterlands). However, the trickiest work - migrating to Rails 3.1 - is done.
+This codebase now runs Rails 3.1, but is still using the Prototype javascript library. It's time to move on - this branch will handle the migration to jQuery.
 
-This codebase is now open for outside contributions in certain areas. Branches exist or will be created for:
-
-* [Migration to jQuery](https://github.com/asilano/free-dom/tree/prototype-to-jquery)
-* Implementation of Hinterlands
-
-Additional features possibly up for implementation include:
-
-* Structural "bug fixes" that aren't fatal, but are large. Such as occasional loss of transactional integrity
-* Richer set of random-game options, a la [this randomiser](http://www.hiwiller.com/dominion/)
-* Front-end restyling
-* Ratings history
+Tasks include:
+* ~~Changing all `Effect` calls to jQuery equivalents~~
+* ~~Changing all `Event` calls to jQuery equivalents~~
+* ~~Ensuring remote forms are implemented and handled correctly~~
+* ~~Updating any "loose" AJAX calls~~
+* ~~Updating existing .rjs files to .js.erb (I think)~~
+* ~~Replacing TableKit with something~~
+* ~~Making any "loose" (without form) AJAX calls have non-JS versions (player settings per game only example?)~~
+* ~~Updating supported browsers. IE is out, unless I can find a good shim.~~
+* ~~Fix chat updating so it updates.~~
+* ~~Fix start game button so it appears automatically (if possible)~~
+* ~~Check controls on Revealed / Peeked cards work~~
 
 _**Please fork and contribute where possible!**_

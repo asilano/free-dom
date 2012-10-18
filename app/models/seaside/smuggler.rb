@@ -37,7 +37,6 @@ class Seaside::Smuggler < Card
       valid_piles = pile_validities.map {|pile, tf| tf}
       controls[:piles] += [{:type => :button,
                             :action => :resolve,
-                            :name => "take",
                             :text => "Take",
                             :nil_action => (valid_piles.any? ? nil : "Take nothing"),
                             :params => {:card => "#{self.class}#{id}",

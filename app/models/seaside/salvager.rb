@@ -4,7 +4,7 @@ class Seaside::Salvager < Card
   costs 4
   action
   card_text "Action (cost: 4) - +1 Buy. Trash a card from your hand. +Cash equal to its cost."
-  
+
   def play(parent_act)
     super
 
@@ -29,11 +29,10 @@ class Seaside::Salvager < Card
 
     return "OK"
   end
-  
+
   def determine_controls(player, controls, substep, params)
       controls[:hand] += [{:type => :button,
                           :action => :resolve,
-                          :name => "trash",
                           :text => "Trash",
                           :nil_action => nil,
                           :params => {:card => "#{self.class}#{id}",
@@ -47,17 +46,17 @@ class Seaside::Salvager < Card
     if !params.include? :card_index
       return "Invalid parameters"
     end
-    
+
     # Processing is pretty much the same as a Play; code shamelessly yoinked from
     # Player.play_action.
     if ((params[:card_index].to_i < 0 ||
-         params[:card_index].to_i > ply.cards.hand.length - 1))            
-      # Asked to trash an invalid card (out of range)        
-      return "Invalid request - card index #{params[:card_index]} is out of range"    
+         params[:card_index].to_i > ply.cards.hand.length - 1))
+      # Asked to trash an invalid card (out of range)
+      return "Invalid request - card index #{params[:card_index]} is out of range"
     end
-    
+
     # All checks out. Carry on
-    
+
     # Trash the selected card
     card = ply.cards.hand[params[:card_index].to_i]
     card.trash
@@ -68,7 +67,7 @@ class Seaside::Salvager < Card
     # And gain the coin for it
     player.cash += trashed_cost
     player.save!
-    
+
     return "OK"
   end
 
