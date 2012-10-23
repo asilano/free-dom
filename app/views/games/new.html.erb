@@ -44,7 +44,7 @@
           <td>
           	<div class="field">
 	           <%= f.grouped_collection_select("pile_#{ix}",
-	                                           [BaseGame, Intrigue, Seaside, Prosperity],
+	                                           [BaseGame, Intrigue, Seaside, Prosperity, Hinterlands],
 	                                           :kingdom_cards,
 	                                           :name,
 	                                           :name,
@@ -66,7 +66,7 @@
       <div id="set_distr" style=<%= (@game.specify_distr == 1) ? "" : "'display: none;'" %>>
         <p class="indented-left underlined">Set distribution:</p>
         <table>
-          <% ['Base Game', 'Intrigue', 'Seaside', 'Prosperity'].each do |set| %>
+          <% ['Base Game', 'Intrigue', 'Seaside', 'Prosperity', 'Hinterlands'].each do |set| %>
             <tr>
               <td>
               	<div class="field">
@@ -85,7 +85,7 @@
       <div id="set_presence" style=<%= (@game.specify_distr == 0) ? "" : "'display: none;'" %>>
         <p class="indented-left underlined">Sets to use:</p>
         <table>
-          <% ['Base Game', 'Intrigue', 'Seaside', 'Prosperity'].each do |set| %>
+          <% ['Base Game', 'Intrigue', 'Seaside', 'Prosperity', 'Hinterlands'].each do |set| %>
             <tr>
               <td>
               	<div class="field">
