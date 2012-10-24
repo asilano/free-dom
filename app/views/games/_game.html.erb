@@ -216,7 +216,7 @@
         <%= link_to("(show deck)", "#", {:class => "showHideDeck showDeck"}) -%>
         <%= link_to("(hide deck)", "#", {:class => "showHideDeck hideDeck"}) -%>
         <p class="deckList" style="display: none;">
-          <%= raw ply_ordered[0].cards_for_decklist %>
+          <%= raw ply_ordered[ix].cards_for_decklist %>
         </p>
       </li>
       <% end %>
