@@ -87,14 +87,15 @@ ActiveRecord::Schema.define(:version => 20120301170223) do
 
   create_table "player_states", :force => true do |t|
     t.integer  "player_id"
-    t.boolean  "outpost_queued",   :default => false
-    t.boolean  "outpost_prevent",  :default => false
-    t.integer  "pirate_coins",     :default => 0
+    t.boolean  "outpost_queued",    :default => false
+    t.boolean  "outpost_prevent",   :default => false
+    t.integer  "pirate_coins",      :default => 0
     t.text     "gained_last_turn"
-    t.boolean  "bought_victory",   :default => false
+    t.boolean  "bought_victory",    :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "played_treasure"
+    t.boolean  "played_crossroads", :default => false
   end
 
   create_table "players", :force => true do |t|
