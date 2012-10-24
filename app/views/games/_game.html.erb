@@ -247,7 +247,7 @@
 <%= image_tag("spinner.gif", :id => "spinner", :style => "display: none;") -%>
 
 <% content_for :js_in_head do %>
-  // Scroll to bottom of history
+  // Scroll to bottom of history & chat, and enable controls, every update
   function onLoadFunc()
   {
     $('#history').scrollTop($('#history')[0].scrollHeight);
@@ -258,7 +258,13 @@
     // Enable all buttons
     $('input[type=button], input[type=submit]').removeAttr('disabled');
 
-    // Enable the game refresh
+    $('.ajaxSpinSmall').on('ajax:beforeSend', function(){$('#spinner').show();})
+                       .on('ajax:complete', function(){$('#spinner').hide();});
+  }
+  
+  // Enable the game refresh on first load only
+  $(function()
+  {
     <% freq = @player ? @player.settings.update_interval : @user ? @user.settings.update_interval : 60 %>
     var inProgress = false;
     setInterval(function()
@@ -276,8 +282,5 @@
           })
       }
     }, <%= freq * 1000 -%>);
-
-    $('.ajaxSpinSmall').on('ajax:beforeSend', function(){$('#spinner').show();})
-                       .on('ajax:complete', function(){$('#spinner').hide();});
-  }
+  });
 <% end %>
