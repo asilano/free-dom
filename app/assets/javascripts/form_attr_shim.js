@@ -26,13 +26,8 @@ $(function()
 
     $(document).on('click', 'input[type=submit][form], button[form]', function() {
         var form = $('#' + $(this).attr('form'));
+        form.append($('input[form='+$(this).attr('form')+'][type!=submit]').clone());
         form.submit();
-      })
-      .on('submit', 'form', function() {
-        var form = $(this);
-        $('input[form='+form.attr('id')+'][type!=submit]').each(function() {
-          form.append('<input type="hidden" />').attr('name', $(this).attr('name')).val($(this).val());
-        });
       });
   }
 });
