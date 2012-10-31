@@ -1,7 +1,7 @@
 class Hinterlands::Duchess < Card
   action
   costs 2
-  card_text "+2 Cash. Each player (including you) looks at the top card of his deck, and discards it or puts it back. / When you gain a Duchy, you may gain a Duchess."
+  card_text "Action (cost: 2) - +2 Cash. Each player (including you) looks at the top card of his deck, and discards it or puts it back. / When you gain a Duchy, you may gain a Duchess."
 
   # The gain hook is located in Player#gain. It's processed in Duchess#resolve_gain, below.
 
