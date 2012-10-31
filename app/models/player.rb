@@ -439,6 +439,18 @@ class Player < ActiveRecord::Base
 
     asking = false
 
+    duchess = game.cards.pile.of_type("Hinterlands::Duchess")[0]
+    if duchess && pile.card_type == "BasicCards::Duchy"
+      # Game has Duchesses still in the pile, so once the primary gain is complete,
+      # we need to ask if the player wants one
+      parent_act = parent_act.children.create!(:expected_action => "resolve_#{duchess.class}#{duchess.id}_gain",
+                                               :text => "Choose whether to gain a #{duchess}",
+                                               :player => self,
+                                               :game => game)
+
+      # Asking about the Duchess doesn't affect the Duchy's gain in any way.
+    end
+
     seal = cards.in_play.of_type("Prosperity::RoyalSeal")[0]
     if seal
       # Player has a Royal Seal in play, so we need to ask if they want the
@@ -460,17 +472,6 @@ class Player < ActiveRecord::Base
                                  :player => self,
                                  :game => game)
       asking = true
-    end
-
-    duchess = game.cards.pile.of_type("Hinterlands::Duchess")[0]
-    if duchess && pile.card_type == "BasicCards::Duchy"
-      # Game has Duchesses still in the pile, so we need to ask if the player wants one
-      parent_act.children.create!(:expected_action => "resolve_#{duchess.class}#{duchess.id}_gain",
-                                  :text => "Choose whether to gain a #{duchess}",
-                                  :player => self,
-                                  :game => game)
-
-      # Asking about the Duchess doesn't affect the Duchy's gain in any way.
     end
 
     return if asking
