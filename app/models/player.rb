@@ -442,11 +442,19 @@ class Player < ActiveRecord::Base
     duchess = game.cards.pile.of_type("Hinterlands::Duchess")[0]
     if duchess && pile.card_type == "BasicCards::Duchy"
       # Game has Duchesses still in the pile, so once the primary gain is complete,
-      # we need to ask if the player wants one
-      parent_act = parent_act.children.create!(:expected_action => "resolve_#{duchess.class}#{duchess.id}_gain",
-                                               :text => "Choose whether to gain a #{duchess}",
-                                               :player => self,
-                                               :game => game)
+      # we need to work out if the player wants one
+      if settings.autoduchess == Settings::ALWAYS
+        # Player is always taking Duchessess
+        duchess.resolve_gain(self, {:choice => "accept"}, parent_act)
+      elsif settings.autoduchess == Settings::NEVER
+        # Player is never taking Duchessess. Still call resolve_gain, so we get the log
+        duchess.resolve_gain(self, {:choice => "decline"}, parent_act)
+      else
+        parent_act = parent_act.children.create!(:expected_action => "resolve_#{duchess.class}#{duchess.id}_gain",
+                                                 :text => "Choose whether to gain a #{duchess}",
+                                                 :player => self,
+                                                 :game => game)
+      end
 
       # Asking about the Duchess doesn't affect the Duchy's gain in any way.
     end

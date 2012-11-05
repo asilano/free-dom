@@ -8,6 +8,9 @@
       $('#playerPrefsHover').on('click', 'input[type=checkbox]', function()
       {
         $(this).closest('form').submit();
+      }).on('change keyup', 'select', function()
+      {
+        $(this).closest('form').submit();
       });
     <% end %>
   </div>

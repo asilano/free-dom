@@ -144,6 +144,11 @@ EOS
     str << label_tag(name, label)
   end
 
+  def setting_dropdown(name, label, options)
+    str = label_tag(name, label)
+    str << select_tag(name, options_for_select(options, @player.settings.__send__(name)), :name => "settings[#{name}]")
+  end
+
   def control_form(control)
     str = ''
     if control[:params]

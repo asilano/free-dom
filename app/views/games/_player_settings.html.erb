@@ -32,6 +32,11 @@
     <br/>
     <% flag = true %>
   <% end %>
+  <% if card_types.include?("Hinterlands::Duchess") %>
+    <%= setting_dropdown 'autoduchess', 'AutoDuchess?', Settings::AskAlwaysNever %>
+    <br/>
+    <% flag = true %>
+  <% end %>
 
   <% if flag %>
     <%= submit_tag "Update" %>

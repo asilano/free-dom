@@ -83,3 +83,28 @@ Feature: Duchess - Action: 2
     And the game checks actions
       Then I should have gained Duchy
       And it should be my Buy phase
+
+  Scenario: Gaining Duchy - autoduchess set to Always
+    Given my hand contains Silver, Remodel
+      And it is my Play Action phase
+      And I have setting autoduchess set to ALWAYS
+    When I play Remodel
+      Then I should have removed Silver from my hand
+    When I choose the Duchy pile
+    And the game checks actions
+      Then the following 2 steps should happen at once
+        Then I should have gained Duchy
+        And I should have gained Duchess
+      And it should be my Buy phase
+
+  Scenario: Gaining Duchy - autoduchess set to
+    Given my hand contains Silver, Remodel, Estate
+      And it is my Play Action phase
+      And I have setting autoduchess set to NEVER
+    When I play Remodel
+    And I choose Silver in my hand
+      Then I should have removed Silver from my hand
+    When I choose the Duchy pile
+    And the game checks actions
+      Then I should have gained Duchy
+      And it should be my Buy phase
