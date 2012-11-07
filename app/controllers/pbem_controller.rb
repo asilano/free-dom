@@ -318,7 +318,7 @@ private
     if @user
       if @game
         PbemMailer.game_error(@user, @game, @player, nil, "Sorry, something went wrong. The webmaster has been alerted", @message.body.to_s).deliver
-        PbemMailer.game_exception(@user, @game, error)
+        PbemMailer.game_exception(@user, @game, error).deliver
       else
         PbemMailer.game_not_found(@user, "unknown", @message).deliver
       end
