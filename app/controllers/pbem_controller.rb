@@ -218,13 +218,14 @@ private
             process_result "Didn't understand your choice #{choice} for PA #{pa_id}", nil, nil
             raise ActiveRecord::Rollback
           end
-          if value =~ /\s/
-            value = value.split(/\s/)
-            if value.all? {|v| v =~ /.*=>.*/}
-              value = value.inject({}) do |h, v|
+          if value =~ /^\[(.*)\]/
+            value = $1.split(/,\s*/)
+          elsif value =~ /^\{(.*)\}/
+            choices = $1.split(/,\s*/)
+            if choices.all? {|v| v =~ /.*=>.*/}
+              value = choices.each_with_object({}) do |v, h|
                 v =~ /(.*)=>(.*)/
-                h[$1] = $2
-                h
+                h[$1.strip] = $2.strip
               end
             end
           end
