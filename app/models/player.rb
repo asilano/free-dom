@@ -459,6 +459,14 @@ class Player < ActiveRecord::Base
       # Asking about the Duchess doesn't affect the Duchy's gain in any way.
     end
 
+    if other_players.any? {|ply| ply.cards.hand.of_type("Hinterlands::FoolsGold").present?}
+      # Add a Game-level action to ask all other Fool's Gold holders if they wish to trash
+      sample_fg = game.cards.of_type("Hinterlands::FoolsGold").first
+      parent_act = parent_act.children.create(
+          :expected_action => "resolve_#{sample_fg.class}#{sample_fg.id}_react;gainer=#{self.id}",
+          :game => game)
+    end
+
     seal = cards.in_play.of_type("Prosperity::RoyalSeal")[0]
     if seal
       # Player has a Royal Seal in play, so we need to ask if they want the

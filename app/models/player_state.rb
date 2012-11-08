@@ -17,6 +17,7 @@ class PlayerState < ActiveRecord::Base
     self.bought_victory = false
     self.played_treasure = false
     self.played_crossroads = false
+    self.played_fools_gold = false
     save!
   end
 end

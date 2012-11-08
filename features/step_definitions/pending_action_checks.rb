@@ -19,7 +19,7 @@ Then(/it should be (.*?)(?:'s)? (.*) phase/) do |name, phase|
 end
 
 # Check for the readable text of a pending action
-Then(/(.*) should (not )?need to (.*)/) do |name, negate, action|
+Then(/(.*) should (not )?need to (?!act)(.*)/) do |name, negate, action|
   name = "Alan" if name == "I"
   actions = @players[name].active_actions(true).map(&:text)
 

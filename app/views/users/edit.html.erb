@@ -119,6 +119,17 @@
                            will never gain a Duchess when you gain a Duchy. If AutoDuchess
                            is set to "Ask", the game will ask whether you want to gain a
                            Duchess each time you gain a Duchy.</p>
+        <div class="field">
+          <%= sf.label :autofoolsgold, "AutoFool'sGold choice: "%>
+          <%= sf.select :autofoolsgold, Settings::AskAlwaysNever%>
+        </div>
+        <p class="explain">If AutoFool'sGold is set to "Always", you will always trash all
+                           Fool's Gold cards in hand whenever another player gains a Province.
+                           If AutoFool'sGold is set to "Never", you will never trash any
+                           Fool's Gold cards in hand when another player gains a Province.
+                           If AutoFool'sGold is set to "Ask", the game will ask whether you
+                           want to trash each Fool's Gold card in hand whenever another player
+                           gains a Province.</p>
       </div>
     <% end %>
   </fieldset>

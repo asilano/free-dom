@@ -34,7 +34,10 @@ When(/^(\w*)(?:'s)? next turn starts$/) do |name|
     steps "When #{current_name} stops playing actions
       And the game checks actions"
   end
-  assert_match /buy/, @game.current_turn_player.active_actions[0].expected_action
+  if @game.current_turn_player.active_actions(true)[0].expected_action =~ /play_treasure/
+    steps "When #{current_name} stops playing treasures"
+  end
+  assert_match /buy/, @game.current_turn_player.active_actions(true)[0].expected_action
 
   # Upon stopping buying, expect to have discarded everything from play
   @discard_contents[current_name].concat @play_contents[current_name]

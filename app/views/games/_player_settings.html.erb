@@ -37,6 +37,11 @@
     <br/>
     <% flag = true %>
   <% end %>
+  <% if card_types.include?("Hinterlands::FoolsGold") %>
+    <%= setting_dropdown 'autofoolsgold', 'AutoFool\'sGold?', Settings::AskAlwaysNever %>
+    <br/>
+    <% flag = true %>
+  <% end %>
 
   <% if flag %>
     <%= submit_tag "Update" %>

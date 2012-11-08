@@ -10,6 +10,7 @@ class Settings < ActiveRecord::Base
 
   validates :update_interval, :numericality => {:greater_than_or_equal_to => 60}
   validates :autoduchess, :inclusion => {:in => [ASK, ALWAYS, NEVER]}
+  validates :autofoolsgold, :inclusion => {:in => [ASK, ALWAYS, NEVER]}
 
   alias_attribute :autocrat, :autocrat_victory
 
