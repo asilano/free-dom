@@ -45,7 +45,8 @@ class Intrigue::SecretChamber < Card
                           :nil_action =>
                               (player.cards.hand.empty? ? "Place nothing" : nil),
                           :params => {:card => "#{self.class}#{id}",
-                                      :substep => "place"},
+                                      :substep => "place",
+                                      :last => params[:last]},
                           :cards => [true] * player.cards.hand.size
                          }]
     end
@@ -93,12 +94,12 @@ class Intrigue::SecretChamber < Card
     player.draw_cards(2)
 
     # Now, create a pair of actions to put a card back
-    act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_place",
+    act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_place;last=true",
                                      :text => "Place a card on top of deck with Secret Chamber",
                                      :player => player,
                                      :game => game)
 
-    act = act.children.create!(:expected_action => "resolve_#{self.class}#{id}_place",
+    act = act.children.create!(:expected_action => "resolve_#{self.class}#{id}_place;last=false",
                               :text => "Place a card second-from-top of deck with Secret Chamber",
                               :player => player,
                               :game => game)
@@ -134,6 +135,16 @@ class Intrigue::SecretChamber < Card
       ply.renum(:deck)
       game.histories.create!(:event => "#{ply.name} put a [#{ply.id}?#{card.class.readable_name}|card] on top of his or her deck.",
                             :css_class => "player#{ply.seat}")
+    end
+
+    # If that was the last place action, see if we are now holding any reactions. If not
+    # we need to remove the Pending Action asking us to react!
+    if params[:last] == "true" && ply.cards.hand.none?(&:is_reaction?)
+      react_acts = ply.pending_actions.select {|act| act.expected_action =~ /_react/}
+      raise "Expected a reaction action to still exist" if react_acts.empty?
+      raise "Expected a single reaction action" if react_acts.length != 1
+
+      react_acts[0].destroy
     end
 
     return "OK"
