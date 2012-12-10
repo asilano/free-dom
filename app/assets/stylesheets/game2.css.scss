@@ -5,7 +5,7 @@ $treasure: #ffd700;
 $victory: lime;
 $curse: #ba55d3;
 
-$reaction-blue: #337; 
+$reaction-blue: #337;
 $buy-gold: $treasure * 0.75;
 
 $p0col: #fcc;
@@ -24,21 +24,21 @@ $p5fgcol: #d0d;
 
 @mixin card_grad($from, $to, $fstop: 30%, $tstop: 70%) {
   background-color: $from;
-  background-image: -webkit-gradient(linear, left top, right top, stop($fstop, $from), stop($fstop, $to)); 
-  background-image: -webkit-linear-gradient(left, $from $fstop, $to $tstop); 
-  background-image:    -moz-linear-gradient(left, $from $fstop, $to $tstop); 
-  background-image:     -ms-linear-gradient(left, $from $fstop, $to $tstop); 
-  background-image:      -o-linear-gradient(left, $from $fstop, $to $tstop); 
+  background-image: -webkit-gradient(linear, left top, right top, stop($fstop, $from), stop($fstop, $to));
+  background-image: -webkit-linear-gradient(left, $from $fstop, $to $tstop);
+  background-image:    -moz-linear-gradient(left, $from $fstop, $to $tstop);
+  background-image:     -ms-linear-gradient(left, $from $fstop, $to $tstop);
+  background-image:      -o-linear-gradient(left, $from $fstop, $to $tstop);
   background-image:         linear-gradient(left, $from $fstop, $to $tstop);
 }
 
 @mixin candy_stripe($col1, $col2) {
   background-color: $col1;
-  background-image: -webkit-gradient(linear, left top, right bottom, from($col1), stop(25%, $col2), stop(50%, $col1), stop(75%, col2), stop(100%, $col1)); 
-  background-image: -webkit-linear-gradient(-45deg, $col1, $col2, $col1, $col2, $col1); 
-  background-image:    -moz-linear-gradient(-45deg, $col1, $col2, $col1, $col2, $col1); 
-  background-image:     -ms-linear-gradient(-45deg, $col1, $col2, $col1, $col2, $col1); 
-  background-image:      -o-linear-gradient(-45deg, $col1, $col2, $col1, $col2, $col1); 
+  background-image: -webkit-gradient(linear, left top, right bottom, from($col1), stop(25%, $col2), stop(50%, $col1), stop(75%, col2), stop(100%, $col1));
+  background-image: -webkit-linear-gradient(-45deg, $col1, $col2, $col1, $col2, $col1);
+  background-image:    -moz-linear-gradient(-45deg, $col1, $col2, $col1, $col2, $col1);
+  background-image:     -ms-linear-gradient(-45deg, $col1, $col2, $col1, $col2, $col1);
+  background-image:      -o-linear-gradient(-45deg, $col1, $col2, $col1, $col2, $col1);
   background-image:         linear-gradient(-45deg, $col1, $col2, $col1, $col2, $col1);
   background-size: 50px 50px;
 }
@@ -55,27 +55,29 @@ $p5fgcol: #d0d;
      -moz-border-radius-bottomleft: 1em;
   -webkit-border-bottom-left-radius: 1em;
           border-bottom-left-radius: 1em;
-          
+
   span {text-decoration: underline;}
 }
 
 #playerPrefs
-{ 
+{
   padding: 5px 5px 0 10px;
   display: none;
   text-align: left;
+
+  .js & input[type=submit] { display: none; }
 }
 
 #playerPrefsHover:hover #playerPrefs {display: block;}
 
 #game_state {width: 65%; float: left; overflow: auto; margin-bottom: 1em;}
 
-/* Card background styling classes */  
+/* Card background styling classes */
   td div.container {position: relative;}
   td div.content {position: relative; z-index: 1}
-  
+
   /* For browsers without CSS gradient support */
-  td div.bg 
+  td div.bg
   {
      position: absolute;
      top: 0;
@@ -94,7 +96,7 @@ $p5fgcol: #d0d;
   .victory  {background-color: $victory}
 	.curse  {background-color: $curse}
   .attack {color: red; font-weight: bold;}
-  
+
   .victory .right {background-color: $victory}
   .treasure .right {background-color: $treasure}
   .action .right {background-color: $action}
@@ -103,63 +105,64 @@ $p5fgcol: #d0d;
 	.curse .right {background-color: $curse}
 
   /* For browsers with CSS gradient support */
-  .cssgradients 
+  .cssgradients
   {
     td div.bg { display: none; }
     .victory.action {@include card_grad($victory, $action);}
     .victory.treasure {@include card_grad($victory, $treasure);}
+    .treasure.reaction {@include card_grad($treasure, $reaction);}
   }
-  
+
   /* Empty piles get a thick red border - but it can't be applied to trs. */
   #piles div.container {margin: 1px 0;}
   .emptyPile
-	{   
-    td 
-    { 
-      border-style: solid; 
+	{
+    td
+    {
+      border-style: solid;
       border-color: red;
       border-width: 2px 0;
     }
     td:first-child { border-left-width: 2px; }
     td:last-child  { border-right-width: 2px; }
 	}
-  
+
 /* Candystripe players */
 .cssgradients
 {
-  #history 
+  #history
   {
     .player0.player1 {@include candy_stripe($p0col, $p1col);}
     .player0.player2 {@include candy_stripe($p0col, $p2col);}
     .player0.player3 {@include candy_stripe($p0col, $p3col);}
     .player0.player4 {@include candy_stripe($p0col, $p4col);}
     .player0.player5 {@include candy_stripe($p0col, $p5col);}
-    
+
     .player1.player2 {@include candy_stripe($p1col, $p2col);}
     .player1.player3 {@include candy_stripe($p1col, $p3col);}
     .player1.player4 {@include candy_stripe($p1col, $p4col);}
     .player1.player5 {@include candy_stripe($p1col, $p5col);}
-    
+
     .player2.player3 {@include candy_stripe($p2col, $p3col);}
     .player2.player4 {@include candy_stripe($p2col, $p4col);}
     .player2.player5 {@include candy_stripe($p2col, $p5col);}
-        
+
     .player3.player4 {@include candy_stripe($p3col, $p4col);}
     .player3.player5 {@include candy_stripe($p3col, $p5col);}
-    
+
     .player4.player5 {@include candy_stripe($p4col, $p5col);}
   }
 }
-  
+
 #history
 {
 	height: 350px;
-  li 
-  { 
-    position: relative; 
+  li
+  {
+    position: relative;
 		list-style-type: none;
   }
-  
+
   .play_action { font-weight: bold; }
   .play_attack { color: red; }
   .play_reaction { color: $reaction-blue }
@@ -173,40 +176,40 @@ $p5fgcol: #d0d;
 	.player5 { background-color: $p5col; }
 	.self:before {content: "->";}
   .score { color: #006e2e; }
-  
+
   .start_turn
   {
 		overflow: hidden;
     border-top: 2px solid black;
 		font-style: italic;
-  } 
+  }
 }
 
-#chat, #history 
-{  
+#chat, #history
+{
   position: relative;
   z-index: 1500;
   overflow: auto;
 }
-#chat 
+#chat
 {
-  height:250px; 
-  margin-bottom: 5px; 
+  height:250px;
+  margin-top: 5px;
   position: relative;
 }
 #history ul {padding-left: 40px;}
-#chatbox 
+#chatbox
 {
 	position: absolute;
 	top: 0;
 	left: 40px;
 	right: 10%;
 	bottom: 2em;
-	border: 1px solid #f0f0f0; 
-	overflow: auto; 	
+	border: 1px solid #f0f0f0;
+	overflow: auto;
 }
 #chatbox, #say, #name {padding: 2px;}
-#chat form 
+#chat form
 {
 	position: absolute;
 	bottom: 0;
@@ -232,14 +235,14 @@ $p5fgcol: #d0d;
   margin: 5px 0px;
   padding: 0px;
   border: 1px dashed black;
-  
+
   tr, td
   {
     margin: 0px;
     padding: 0px 5px;
     vertical-align: top;
   }
-    
+
   ul
   {
     margin: 0px 1.5em;
@@ -265,19 +268,33 @@ $p5fgcol: #d0d;
 {
 	margin: 0px 5px;
 	padding: 2px;
-	border: 1px solid black;	
+	border: 1px solid black;
+}
+
+
+.showHideDeck
+{
+  color: grey;
+}
+
+.hideDeck
+{
+  display: none;
 }
 
 .deckList
 {
 	color: grey;
+	display: none;
 	span.victory-text {color: #0a0;}
 	span.curse-text {color: $curse;}
 }
 
 #update_freq
 {
+  display: none;
 	margin-left: 1em;
+	.js & {display: block;}
 }
 
 #update_freq_value
@@ -285,7 +302,15 @@ $p5fgcol: #d0d;
 	padding: 3px 0;
 }
 
+#update_freq_form > form { display: inline; }
+
 .scoreRow
 {
   background-color: #efd;
+}
+
+#start_button
+{
+  clear: both;
+  margin-bottom: 5px;
 }

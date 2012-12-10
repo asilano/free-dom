@@ -1,5 +1,0 @@
-page.replace_html("flash", :partial => "flash_area")
-
-if !@omit_onload
-  page << "onloadFunc();"
-end

@@ -7,41 +7,37 @@
   </div>
   <div id="update_freq" class="lighter">
     <% if @player %>
-      Updating every <span id="update_freq_value"><%= @player.settings.update_interval %></span> 
-      <span id="update_freq_form" style="display: none;">                   
-        <%= text_field_tag :update_interval, @player.settings.update_interval, :size => 4 %> 
-        <%= submit_tag "Set", 
-                       :onclick => remote_function(:update => nil,
-                                                   :url => {:action => :update_player_settings,
-                                                            :id => @game},
-                                                   :with => "'settings[update_interval]=' + escape($('update_interval').value)",
-                                                   :success => "$('cancel_freq').innerHTML = 'Please refresh to enable change'")
-                                   %>
+      Updating every <span id="update_freq_value"><%= @player.settings.update_interval %></span>
+      <span id="update_freq_form" style="display: none;">
+        <%= form_tag({:action => :update_player_settings, :id => @game}, :remote => true) do %>
+          <%= text_field_tag "settings[update_interval]", @player.settings.update_interval, :size => 4 %>
+          <%= submit_tag "Set" -%>
+        <% end %>
       </span>
       seconds. <span id="change_freq"><%= link_to_function "Change.", "enable_freq_form()" %></span>
                <span id="cancel_freq" style="display: none;"><%= link_to_function "Cancel.", "disable_freq_form()" %></span>
       <script>
         function enable_freq_form()
         {
-          $('update_freq').className = "";
-          $('update_freq_value').hide();
-          $('update_freq_form').show();
-          $('change_freq').hide();
-          $('cancel_freq').show();          
+          $('#update_freq').removeClass("lighter");
+          $('#update_freq_value').hide();
+          $('#update_freq_form').show();
+          $('#change_freq').hide();
+          $('#cancel_freq').show();
         }
         function disable_freq_form()
         {
-          $('update_freq').className = "lighter";
-          $('update_freq_value').show();
-          $('update_freq_form').hide();
-          $('change_freq').show();
-          $('cancel_freq').hide();          
-        }      
+          $('#update_freq').addClass("lighter");
+          $('#update_freq_value').show();
+          $('#update_freq_form').hide();
+          $('#change_freq').show();
+          $('#cancel_freq').hide();
+        }
       </script>
     <% else %>
       <% freq = @user ? @user.settings.update_interval : 60 %>
-      Updating every <%= freq %> seconds.      
-    <% end %> 
+      Updating every <%= freq %> seconds.
+    <% end %>
   </div>
   <div id="status">
     <div id="ended" style="display: none;"><%= game.state == 'ended' %></div>
@@ -88,8 +84,8 @@
     <div id="player_public">
       <table class="other_players" cellspacing="5">
         <% other_players = game.players.reject {|p| p == player} -%>
-        <% if player && player.seat             
-            other_players = other_players.sort_by {|p| (p.seat - player.seat) % game.players.length} 
+        <% if player && player.seat
+            other_players = other_players.sort_by {|p| (p.seat - player.seat) % game.players.length}
            end %>
         <% other_players.in_groups_of(2) do |chunk| %>
           <tr class="other_players">
@@ -126,47 +122,23 @@
         </td>
         <td></td>
         <% controls[:piles].each do |control| -%>
-        <td>
-          <% if control[:nil_action] -%>
-            <% case control[:type]
-               when :button -%>        
-              <%= form_remote_tag :url => {:action => control[:action]},
-                                           :before => "$('spinner').show()",
-                                          :complete => "$('spinner').hide()",
-                                          :loading => "disable_named('#{control[:name]}')" do -%>
-                <%= hidden_field_tag :nil_action, control[:nil_action], :id => "#{control[:action]}_nil_action" -%>
-                <% if control[:params] -%>
-                  <% control[:params].each do |key, value| -%>
-                    <%= hidden_field_tag key, value, :id => "#{key}_nil}" -%>
-                  <% end %>
-                <% end %>
-                <%= submit_tag control[:nil_action], :name => control[:name] -%>
-              <% end -%>                
+          <% control_form(control) %>
+          <td>
+            <% if control[:nil_action] -%>
+              <% case control[:type]
+                 when :button -%>
+                  <%= submit_tag(control[:nil_action],
+                        :name => "nil_action",
+                        :form => "form_#{control.object_id}",
+                        :disable_with => control[:nil_action]) %>
+              <% end -%>
             <% end -%>
-          <% end -%>
-        </td>          
+          </td>
         <% end -%>
       </tr>
       <% end -%>
       <%= render :partial => 'pile', :collection => game.piles, :locals => {:controls => controls, :num_players => game.players.length} %>
     </table>
-  </div>
-  <div id="start_button">
-    <%
-    # Present a start button to the first-joined player,
-    # so long as there are more than 2 and the game is waiting
-    if (game.players.length >= 2 and
-    player and
-    player == game.players[0] and
-    game.state == 'waiting') %>
-      <%= form_remote_tag(:url => { :action => :start_game },
-                                    :before => "$('gameStartSpinner').show()",
-                                    :after => "$('start_game_btn').disabled = true",
-                                    :complete => "$('gameStartSpinner').hide()",
-                                    :failure => "alert('Sorry, something went wrong. Please refresh and try again');") do %>
-        <%= submit_tag "Start Game", :onclick => "this.value = 'Please Wait...';", :id => "start_game_btn" %>
-      <% end %>
-    <% end %>
   </div>
   <div id="join_button">
     <% if !player && @user &&
@@ -176,24 +148,25 @@
       <%= button_to "Join Game", join_game_path(game) %>
     <% end %>
   </div>
-  <%= link_to 'Lobby', games_path %>
-</div>
-<div id="chat">
-  <div id="chatbox">
-    <% game.chats.each do |chat_line| %>
-      <%= render :partial => 'chat_line', :object => chat_line %>
-    <% end %>
-  </div>
-  <%= form_remote_tag :url => speak_game_url, 
-                     :update => {:success => 'chatbox', :failure => 'flash'}, 
-                     :position => 'bottom',
-                     :after => 'this.reset()',
-                     :complete => '$(\'chatbox\').scrollTop = $(\'chatbox\').scrollHeight;' do %>
-   <div>
-    <%= text_field_tag("name", nil, :placeholder => "Name?") if !@user%>
-    <%= text_field_tag("say", nil, :placeholder => "What do you want to say?", :autocomplete => 'off') %>
-    <%= submit_tag "Say", :class => 'input-hack' %>
-   </div>
+  <%= content_for :control_forms %>
+    <%
+  # Present a start button to the first-joined player,
+  # so long as there are more than 2 and the game is waiting
+  if (@game.players.length >= 2 &&
+      @player && @player == @game.players[0] &&
+      @game.state == 'waiting') %>
+    <div id="start_button">
+      <%= form_tag({:action => :start_game }, :remote => true, :id => 'start_form') do %>
+        <%= submit_tag "Start Game", :id => "start_game_btn" %>
+      <% end %>
+
+      <%= javascript_tag do %>
+        $('#start_form').on('ajax:beforeSend', function(){ $('#gameStartSpinner').show();
+                                                  $(this).attr('disabled', true).val('Please wait...'); })
+                            .on('ajax:complete', function(){ $('#gameStartSpinner').hide(); $('#start_button').remove(); })
+                            .on('ajax:error', function(){ alert('Sorry, something went wrong. Please refresh and try again'); });
+      <% end %>
+    </div>
   <% end %>
 </div>
 <div id="history">
@@ -216,7 +189,6 @@
   </ul>
   <% end -%>
 </div>
-
 <% if game.state == "ended" %>
   <div id="resultOverlay" class="overlay">
   </div>
@@ -229,13 +201,10 @@
     <ul id="resultList">
       <li class="resultEntry winner">
         <span class="name"><%= h(ply_ordered[0].name) -%></span>
-        - Winner with <%= h(ply_ordered[0].score) -%> points! <%= link_to_function("(show deck)",
-        "$(this).hide(); $('hide_deck_0').show();" + visual_effect(:blind_down, 'deck_list_0', :duration => 0.5),
-        {:class => "showHideDeck", :id => "show_deck_0"}) -%>
-        <%= link_to_function("(hide deck)",
-        "$(this).hide(); $('show_deck_0').show();" + visual_effect(:blind_up, 'deck_list_0', :duration => 0.5),
-        {:class => "showHideDeck", :id => "hide_deck_0", :style => "display: none"}) -%>
-        <p class="deckList" style="display: none;" id="deck_list_0">
+        - Winner with <%= h(ply_ordered[0].score) -%> points!
+        <%= link_to("(show deck)", "#", {:class => "showHideDeck showDeck"}) -%>
+        <%= link_to("(hide deck)", "#", {:class => "showHideDeck hideDeck"}) -%>
+        <p class="deckList" style="display: none;">
           <%= raw ply_ordered[0].cards_for_decklist %>
         </p>
       </li>
@@ -243,14 +212,11 @@
       <% if ix != 0 %>
       <li class="resultEntry">
         <span class="name"><%= h(ply.name) -%></span>
-        -<%= %w<first second third fourth fifth sixth>[ix] + " with " + h(ply.score) -%> points <%= link_to_function("(show deck)",
-        "$(this).hide(); $('hide_deck_#{ix}').show();" + visual_effect(:blind_down, "deck_list_#{ix}", :duration => 0.5),
-        {:class => "showHideDeck", :id => "show_deck_#{ix}"}) -%>
-        <%= link_to_function("(hide deck)",
-        "$(this).hide(); $('show_deck_#{ix}').show();" + visual_effect(:blind_up, "deck_list_#{ix}", :duration => 0.5),
-        {:class => "showHideDeck", :id => "hide_deck_#{ix}", :style => "display: none"}) -%>
-        <p class="deckList" style="display: none;" id=<%= "deck_list_#{ix}" -%>>
-          <%= raw ply.cards_for_decklist -%>
+        -<%= %w<first second third fourth fifth sixth>[ix] + " with " + h(ply.score) -%> points
+        <%= link_to("(show deck)", "#", {:class => "showHideDeck showDeck"}) -%>
+        <%= link_to("(hide deck)", "#", {:class => "showHideDeck hideDeck"}) -%>
+        <p class="deckList" style="display: none;">
+          <%= raw ply_ordered[ix].cards_for_decklist %>
         </p>
       </li>
       <% end %>
@@ -260,4 +226,61 @@
       <%= link_to "Back to Index", games_path -%>
     </p>
   </div>
+
+  <%= javascript_tag do %>
+    $('.resultEntry').on('click', '.showDeck', function()
+    {
+      $(this).hide();
+      $(this).siblings('.hideDeck').show();
+      $(this).siblings('.deckList').slideDown();
+    }).on('click', '.hideDeck', function()
+    {
+      $(this).hide();
+      $(this).siblings('.showDeck').show();
+      $(this).siblings('.deckList').slideUp();
+    });
+  <% end %>
+<% end %>
+
+
+<%= image_tag("start_game_spinner.gif", :id => "gameStartSpinner", :style => "display: none;") -%>
+<%= image_tag("spinner.gif", :id => "spinner", :style => "display: none;") -%>
+
+<% content_for :js_in_head do %>
+  // Scroll to bottom of history & chat, and enable controls, every update
+  function onLoadFunc()
+  {
+    $('#history').scrollTop($('#history')[0].scrollHeight);
+
+    // Scroll to bottom of chat
+    $('#chatbox').scrollTop($('#chatbox')[0].scrollHeight);
+
+    // Enable all buttons
+    $('input[type=button], input[type=submit]').removeAttr('disabled');
+
+    $('.ajaxSpinSmall').on('ajax:beforeSend', function(){$('#spinner').show();})
+                       .on('ajax:complete', function(){$('#spinner').hide();});
+  }
+  
+  // Enable the game refresh on first load only
+  $(function()
+  {
+    <% freq = @player ? @player.settings.update_interval : @user ? @user.settings.update_interval : 60 %>
+    var inProgress = false;
+    setInterval(function()
+    {
+      if (!inProgress &&
+          $('#ended').html().indexOf('false') != -1 &&
+          $('#locked').html().indexOf('false') != -1)
+      {
+        $.ajax({
+          url: '<%= url_for 'check_change'%>',
+          beforeSend: function(){$('#spinner').show(); inProgress = true},
+          complete: function(){$('#spinner').hide(); inProgress = false},
+          data: {since: $('#last_refresh_value').html()}
+
+          })
+      }
+    }, <%= freq * 1000 -%>);
+  });
 <% end %>

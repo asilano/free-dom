@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120301170223) do
+ActiveRecord::Schema.define(:version => 20121106124609) do
 
   create_table "cards", :force => true do |t|
     t.integer "game_id"
@@ -87,14 +87,16 @@ ActiveRecord::Schema.define(:version => 20120301170223) do
 
   create_table "player_states", :force => true do |t|
     t.integer  "player_id"
-    t.boolean  "outpost_queued",   :default => false
-    t.boolean  "outpost_prevent",  :default => false
-    t.integer  "pirate_coins",     :default => 0
+    t.boolean  "outpost_queued",    :default => false
+    t.boolean  "outpost_prevent",   :default => false
+    t.integer  "pirate_coins",      :default => 0
     t.text     "gained_last_turn"
-    t.boolean  "bought_victory",   :default => false
+    t.boolean  "bought_victory",    :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "played_treasure"
+    t.boolean  "played_crossroads", :default => false
+    t.boolean  "played_fools_gold"
   end
 
   create_table "players", :force => true do |t|
@@ -144,6 +146,8 @@ ActiveRecord::Schema.define(:version => 20120301170223) do
     t.boolean "autotorture_curse", :default => false
     t.boolean "automountebank",    :default => true
     t.boolean "autotreasury",      :default => true
+    t.integer "autoduchess",       :default => 0
+    t.integer "autofoolsgold",     :default => 1
   end
 
   create_table "users", :force => true do |t|

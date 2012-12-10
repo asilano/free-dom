@@ -1,20 +1,13 @@
-free-dom/improve-testing
-=======
+FreeDom
+======
 
-This is a branch of the [main codebase](https://github.com/asilano/free-dom) for my free, online Dominion server.
+This is a branch of the codebase for my free, online Dominion server.
 
-FreeDom's tests aren't complete. The following are definitely needed:
+Notes
+-----
 
-* **Integration tests**, to automatically test the web front-end
-* **Per-card unit tests**, to test that each card does what it should. Using [Cucumber](http://cukes.info). See the README under [the features/ folder][feat-code] for more information.
+Currently, "master" is the codebase as it exists on heroku.
 
-... and I may well be missing something else.
+This branch is for the development of Cucumber tests and implementation (in that order) of Hinterlands.
 
-Note
-----
-Please fork and contribute to this branch - _**especially the per-card tests**_! I need features defined for all the cards in [Intrigue][int-code], [Seaside][sea-code] and [Prosperity][pros-code]. If you want to define tests for Hinterlands cards, that would be cool too - they need to be in place before we start implementation.
-
-[feat-code]: https://github.com/asilano/free-dom/tree/improve-testing/features
-[int-code]: https://github.com/asilano/free-dom/tree/improve-testing/app/models/intrigue
-[sea-code]: https://github.com/asilano/free-dom/tree/improve-testing/app/models/seaside
-[pros-code]: https://github.com/asilano/free-dom/tree/improve-testing/app/models/prosperity
+_**Please fork and contribute where possible!**_

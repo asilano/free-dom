@@ -33,11 +33,11 @@ table.tablekit {
   }
   .sortasc {
     background-color: #DDFFAC;
-    background-image: url(/images/up.gif);
+    background-image: image-url('up.gif');
   }
   .sortdesc {
     background-color: #B9DDFF;
-    background-image: url(/images/down.gif);
+    background-image: image-url('down.gif');
   }
   .nosort {
     cursor: default;

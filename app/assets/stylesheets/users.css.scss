@@ -4,15 +4,18 @@
 	font-style: italic;
 }
 
+
+dl {margin: 0;}
+dt {font-weight: bold;}
+
 #explain_ranking
 {
 	padding-left: 1em;
 	width: 70em;
 	text-align: justify;
+
+	p {margin-top: 5px; line-height: 15px;}
+	dl {margin-top: 5px;}
 }
 
-#explain_ranking p {margin-top: 5px; line-height: 15px;}
-
-dl {margin: 0;}
-#explain_ranking dl {margin-top: 5px;}
-dt {font-weight: bold;}
+.field { margin-top: 10px; }

@@ -1,7 +1,7 @@
-File.open("#{Rails.root}/public/javascripts/card_dict.js", "w") do |f|
+File.open("#{Rails.root}/app/assets/javascripts/card_dict.js", "w") do |f|
   f.write("card_dict = ")
   dict = Card.all_card_types.inject({}) {|h, ty| h[ty] = ty.text; h}.to_json
-  f.write(dict)  
+  f.write(dict)
 end
 
 File.open("#{Rails.root}/features/support/card_types.rb", "w") do |f|

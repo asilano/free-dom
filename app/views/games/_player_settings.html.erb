@@ -1,36 +1,51 @@
 <% card_types = @game.pile_types %>
 <% flag = false %>
-<% if card_types.include?("BaseGame::Moat") %>
-  <%= setting_checkbox 'automoat', 'AutoMoat?' %>
-  <br/>
-  <% flag = true %>
-<% end %>
-<% if card_types.include?("BaseGame::Bureaucrat") %>
-  <%= setting_checkbox 'autocrat_victory', 'AutoCrat?' %>
-  <br/>
-  <% flag = true %>
-<% end %>
-<% if card_types.include?("Intrigue::Baron") %>
-  <%= setting_checkbox 'autobaron', 'AutoBaron?' %>
-  <br/>
-  <% flag = true %>
-<% end %>
-<% if card_types.include?("Intrigue::Torturer") %>
-  <%= setting_checkbox 'autotorture_curse', 'AutoTorturer for Curse?' %>
-  <br/>
-  <% flag = true %>
-<% end %>
-<% if card_types.include?("Seaside::Treasury") %>
-  <%= setting_checkbox 'autotreasury', 'AutoTreasury?' %>
-  <br/>
-  <% flag = true %>
-<% end %>
-<% if card_types.include?("Prosperity::Mountebank") %>
-  <%= setting_checkbox 'automountebank', 'AutoMountebank?' %>
-  <br/>
-  <% flag = true %>
-<% end %>
 
-<% if !flag %>
-  No settings apply to this game
+<%= form_tag({:action => :update_player_settings, :id => @game}, :remote => true) do %>
+  <% if card_types.include?("BaseGame::Moat") %>
+    <%= setting_checkbox 'automoat', 'AutoMoat?' %>
+    <br/>
+    <% flag = true %>
+  <% end %>
+  <% if card_types.include?("BaseGame::Bureaucrat") %>
+    <%= setting_checkbox 'autocrat_victory', 'AutoCrat?' %>
+    <br/>
+    <% flag = true %>
+  <% end %>
+  <% if card_types.include?("Intrigue::Baron") %>
+    <%= setting_checkbox 'autobaron', 'AutoBaron?' %>
+    <br/>
+    <% flag = true %>
+  <% end %>
+  <% if card_types.include?("Intrigue::Torturer") %>
+    <%= setting_checkbox 'autotorture_curse', 'AutoTorturer for Curse?' %>
+    <br/>
+    <% flag = true %>
+  <% end %>
+  <% if card_types.include?("Seaside::Treasury") %>
+    <%= setting_checkbox 'autotreasury', 'AutoTreasury?' %>
+    <br/>
+    <% flag = true %>
+  <% end %>
+  <% if card_types.include?("Prosperity::Mountebank") %>
+    <%= setting_checkbox 'automountebank', 'AutoMountebank?' %>
+    <br/>
+    <% flag = true %>
+  <% end %>
+  <% if card_types.include?("Hinterlands::Duchess") %>
+    <%= setting_dropdown 'autoduchess', 'AutoDuchess?', Settings::AskAlwaysNever %>
+    <br/>
+    <% flag = true %>
+  <% end %>
+  <% if card_types.include?("Hinterlands::FoolsGold") %>
+    <%= setting_dropdown 'autofoolsgold', 'AutoFool\'sGold?', Settings::AskAlwaysNever %>
+    <br/>
+    <% flag = true %>
+  <% end %>
+
+  <% if flag %>
+    <%= submit_tag "Update" %>
+  <% else %>
+    No settings apply to this game
+  <% end %>
 <% end %>
