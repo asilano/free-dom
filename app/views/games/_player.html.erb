@@ -3,14 +3,14 @@
     <tr><th><%= h player.name -%></th>
         <td><span class="lighter">Updating: <%= player.settings.update_interval %>s </span></td>
     </tr>
-    <tr><th>Deck:</th><td><%= h player.cards.deck.count -%></td></tr>  
+    <tr><th>Deck:</th><td><%= h player.cards.deck.count -%></td></tr>
        <tr><th>Hand:</th><td><%= h player.cards.hand.count -%></td></tr>
       <tr><th>Play:</th><td>
         <% if (!player.cards.in_play.empty?) %>
           <table class="play">
             <% player.cards.in_play.in_groups_of(5) do |chunk| -%>
               <tr>
-                <%= render :partial => 'card', :collection => chunk.compact -%>  
+                <%= render :partial => 'card', :collection => chunk.compact -%>
               </tr>
             <% end -%>
           </table>
@@ -21,7 +21,7 @@
           <td><table class="play">
             <% player.cards.enduring.in_groups_of(5) do |chunk| -%>
               <tr>
-                <%= render :partial => 'card', :collection => chunk.compact -%>  
+                <%= render :partial => 'card', :collection => chunk.compact -%>
               </tr>
             <% end -%>
           </table></td>
@@ -39,23 +39,47 @@
       <th>Revealed:</th><td>
         <%= form_tag('javascript:void(0)') do -%>
           <table class="revealed">
-             <tr> 
-          
-              <%= render :partial => 'card', :collection => player.cards.revealed -%>            
-            </tr>        
-            <%= render :partial => 'control', 
+             <tr>
+
+              <%= render :partial => 'card', :collection => player.cards.revealed -%>
+            </tr>
+            <%= render :partial => 'control',
                    :collection => controls[:revealed].select {|c| c[:player_id] == player.id} -%>
           </table>
         <% end -%>
         </td>
       </tr>
-    <% end -%>  
+    <% end -%>
     <% if !player.cards.of_type("Seaside::PirateShip").empty?%>
       <tr><th>Pirate Coins:</th><td><%= player.state.pirate_coins %></td></tr>
-    <% end %>    
+    <% end %>
     <%= raw set_aside_area(player) %>
     <% if player.score && player.score != 0%>
       <tr class="scoreRow"><th>Score:</th><td><%= player.score %></td></tr>
     <% end %>
-  </table>               
-</td>        
+
+    <% if !controls[:other_players].select {|c| c[:player_id].to_i == player.id}.empty? -%>
+      <tr><td colspan="2"><table>
+      <% controls[:other_players].select {|c| c[:player_id].to_i == player.id}.each do |control| -%>
+        <% control_form(control) %>
+        <tr>
+        <% case control[:type]
+           when :buttons -%>
+            <td><%= control[:label] %></td>
+            <% control[:options].each do |opt| %>
+              <td>
+                  <% key = opt.keys.detect{|k| k != :text} %>
+                  <%= button_tag opt[:text], :type => 'submit',
+                                             :name => key,
+                                             :value => opt[key],
+                                             :form => "form_#{control.object_id}",
+                                             :disable_with => opt[:text] -%>
+              </td>
+            <% end %>
+        <% end %>
+        </tr>
+      <% end %>
+      </table></td></tr>
+    <% end %>
+  </table>
+</td>

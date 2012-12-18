@@ -106,7 +106,7 @@
   <% end -%>
 
   <% if !controls[:player].empty? -%>
-   <td colspan="2"><table>
+   <tr><td colspan="2"><table>
     <% controls[:player].each do |control| -%>
       <% control_form(control) %>
       <tr>
@@ -159,7 +159,7 @@
         <% end -%>
       </tr>
     <% end -%>
-   </table></td>
+   </table></td></tr>
   <% end -%>
 </table>
 </div>
