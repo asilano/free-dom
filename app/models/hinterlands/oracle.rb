@@ -89,6 +89,9 @@ class Hinterlands::Oracle < Card
       game.histories.create!(:event => "#{ply.name} chose not to discard #{target.name}'s revealed #{revealed_names}.",
                              :css_class => "player#{ply.seat} player#{target.seat}")
 
+      raise "Nothing revealed to #{self.class}" if target.cards.revealed.empty?
+      raise "More than 2 cards revealed to #{self.class}" if target.cards.revealed.length > 2
+
       if target.cards.revealed.length == 1
         # Only one card - it has to go on top. In fact, it already is, so just log and unreveal it.
         card = target.cards.revealed[0]
@@ -96,7 +99,13 @@ class Hinterlands::Oracle < Card
                                :css_class => "player#{target.seat}")
         card.revealed = false
         card.save!
-      elsif target.cards.revealed.length > 1
+      elsif target.settings.autooracle
+        # Target has autooracle on, so the cards can just go back in the same order.
+        # Easiest way to do this - and ensure the logs are right - is to call resolve_place
+        # directly, with the correct card index.
+        ix = target.cards.revealed.index(target.cards.deck[1])
+        resolve_place(target, {:card_index => ix, :posn => 2}, parent_act)
+      else
         # Create pending actions to put the remaining cards back in any
         # order. We don't need an action for the last one.
         (2..target.cards.revealed.length).each do |ix|

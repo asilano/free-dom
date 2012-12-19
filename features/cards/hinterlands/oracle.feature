@@ -76,3 +76,35 @@ Feature: Oracle
     When the game checks actions
       Then I should have drawn 2 cards
       And it should be my Play Treasure phase
+
+  Scenario: autooracle settings
+    Given my hand contains Oracle, Bank
+      And my deck contains Gold, Silver
+      And Bob's deck contains Platinum, Market
+      And Charlie's deck contains Curse, Estate
+      And it is my Play Action phase
+      And I have setting autooracle on
+      And Bob has setting autooracle on
+      And Charlie has setting autooracle off
+    When I play Oracle
+    And the game checks actions
+      Then I should be revealing Gold, Silver
+      And Bob should be revealing Platinum, Market
+      And Charlie should be revealing Curse, Estate
+      And I should need to Choose Oracle effect for Alan's revealed cards
+      And I should need to Choose Oracle effect for Bob's revealed cards
+      And I should need to Choose Oracle effect for Charlie's revealed cards
+    When I choose the option Put back
+      Then I should have Gold, Silver in my deck
+      And I should be revealing nothing
+    When I choose for Bob the option Put back
+      Then Bob should not need to act
+      And Bob should have Platinum, Market in his deck
+      And Bob should be revealing nothing
+    When I choose for Charlie the option Put back
+      Then Charlie should need to Put a card 2nd from top with Oracle
+    When Charlie chooses Put on deck for his revealed Estate
+      Then Charlie should have Curse, Estate in his deck
+    When the game checks actions
+      Then I should have drawn 2 cards
+      And it should be my Play Treasure phase

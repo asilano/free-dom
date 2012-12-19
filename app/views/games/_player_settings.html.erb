@@ -42,7 +42,11 @@
     <br/>
     <% flag = true %>
   <% end %>
-
+    <% if card_types.include?("Hinterlands::Oracle") %>
+    <%= setting_checkbox 'autooracle', 'AutoOracle?' %>
+    <br/>
+    <% flag = true %>
+  <% end %>
   <% if flag %>
     <%= submit_tag "Update" %>
   <% else %>

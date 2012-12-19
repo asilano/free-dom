@@ -130,6 +130,13 @@
                            If AutoFool'sGold is set to "Ask", the game will ask whether you
                            want to trash each Fool's Gold card in hand whenever another player
                            gains a Province.</p>
+        <div class="field">
+          <%= sf.check_box :autooracle %>
+          <%= sf.label :autooracle, "Enable AutoOracle" %>
+        </div>
+        <p class="explain">If AutoOracle is enabled, when you are attacked by the Oracle
+                           and the attacker chooses to leave your cards on your deck,
+                           they will automatically be replaced in the same order.</p>
       </div>
     <% end %>
   </fieldset>
