@@ -518,7 +518,14 @@ class Player < ActiveRecord::Base
                                                :game => game)
     end
 
-    # Before that, discard in-Play cards and draw a new hand
+    # Before that, discard in-Play cards and draw a new hand. Before /that/,
+    # see if any Schemes need to go off
+    cards.in_play.of_type("Hinterlands::Scheme").each do |c|
+      parent_act.queue(:expected_action => "resolve_#{c.class}#{c.id}_return",
+                       :text => "Choose an Action card to return with Scheme",
+                       :player => self,
+                       :game => game)
+    end
     parent_act.queue(:expected_action => "player_clean_up;player=#{id}",
                      :game => game)
     parent_act.queue(:expected_action => "player_draw_hand;player=#{id}",

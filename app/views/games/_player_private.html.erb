@@ -35,6 +35,7 @@
         <tr>
           <%= render :partial => 'card', :collection => player_private.cards.in_play -%>
         </tr>
+        <%= render :partial => 'control', :collection => controls[:play] -%>
       </table>
     </td>
   </tr><% end -%>
