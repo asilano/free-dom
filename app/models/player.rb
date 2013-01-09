@@ -164,6 +164,7 @@ class Player < ActiveRecord::Base
     rc = "OK"
     this_act = active_actions.detect {|act| act.expected_action == "play_action"}
     parent_act = this_act.parent
+    params[:this_act_id] = this_act.id
     this_act.destroy
 
     # Now process the action played
@@ -908,7 +909,9 @@ class Player < ActiveRecord::Base
 
     # All good - remove the action and call through
     parent_act = this_act.parent
+    params[:this_act_id] = this_act.id
     this_act.destroy
+
     return card.method(meth).untaint.call(self, params, parent_act)
   end
 

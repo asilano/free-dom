@@ -140,6 +140,7 @@ class Game < ActiveRecord::Base
           params = {}
           param_string.scan(/;([^;=]*)=([^;=]*)/) {|m| params[m[0].to_sym] = m[1]}
           params[:parent_act] = action.parent
+          params[:this_act_id] = action.id
           action.destroy
 
           if not card.respond_to? substep.to_sym
@@ -150,7 +151,7 @@ class Game < ActiveRecord::Base
           player = Player.find($2)
           task = $1
           param_string = $3 || ""
-          params = {:parent_act => action.parent}
+          params = {:parent_act => action.parent, :this_act_id => action.id}
           param_string.scan(/;([^;=]*)=([^;=]*)/) {|m| params[m[0].to_sym] = m[1]}
           action.destroy
           player.method(task.to_sym).call(params)
