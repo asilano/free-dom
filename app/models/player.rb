@@ -445,7 +445,9 @@ class Player < ActiveRecord::Base
       # Player has a Royal Seal in play, so we need to ask if they want the
       # card on top of their deck (unless it's going there, of course).
       if location != "deck" || position > 0
-        parent_act.children.create!(:expected_action => "resolve_#{seal.class}#{seal.id}_choose;gaining=#{pile.cards[0].id};location=#{location || 'discard'};position=#{position || 0}",
+        parent_act.children.create!(:expected_action => "resolve_#{seal.class}#{seal.id}_choose;" +
+                                      "gain_pile=#{pile.id};location=#{location || 'discard'};" +
+                                      "position=#{position || 0};gain_id=#{params[:this_act_id]}",
                                    :text => "Choose whether to place #{pile.cards[0]} on top of deck.",
                                    :player => self,
                                    :game => game)
@@ -456,7 +458,9 @@ class Player < ActiveRecord::Base
     tower = cards.hand.of_type("Prosperity::Watchtower")[0]
     if tower
       # Player has a Watchtower in hand, so we need to ask where they want the card.
-      parent_act.children.create!(:expected_action => "resolve_#{tower.class}#{tower.id}_choose;gaining=#{pile.cards[0].id};location=#{location || 'discard'};position=#{position || 0}",
+      parent_act.children.create!(:expected_action => "resolve_#{tower.class}#{tower.id}_choose;"+
+                                    "gain_pile=#{pile.id};location=#{location || 'discard'};" +
+                                    "position=#{position || 0};gain_id=#{params[:this_act_id]}",
                                  :text => "Decide on destination for #{pile.cards[0]}.",
                                  :player => self,
                                  :game => game)

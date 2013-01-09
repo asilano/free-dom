@@ -139,6 +139,8 @@ When(/(.*) chooses? the option (.*)/) do |name, choice|
       params[:choice] = matching_controls[:choice]
       player.resolve(params)
       break
+    else
+      flunk "Couldn't find #{choice} in #{ctrl[:options].inspect}"
     end
   end
 

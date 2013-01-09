@@ -26,17 +26,17 @@ class Prosperity::Watchtower < Card
     case substep
     when "choose"
       # Reaction controls
-      card = Card.find(params[:gaining])
+      pile = Pile.find(params[:gain_pile].to_i)
       controls[:player] += [{:type => :buttons,
                              :action => :resolve,
-                             :label => "Apply #{self} to #{card}?",
+                             :label => "Apply #{self} to #{pile.card_type.readable_name}?",
                              :params => {:card => "#{self.class}#{id}",
                                          :substep => "choose"}.merge(params),
-                             :options => [{:text => "No - #{card} to #{params[:location]}",
+                             :options => [{:text => "No - #{pile.card_type.readable_name} to #{params[:location]}",
                                            :choice => "normal"},
-                                          ({:text => "Yes - #{card} on deck",
+                                          ({:text => "Yes - #{pile.card_type.readable_name} on deck",
                                            :choice => "deck"} unless params[:location] == "deck"),
-                                          {:text => "Yes - trash #{card}",
+                                          {:text => "Yes - trash #{pile.card_type.readable_name}",
                                            :choice => "trash"}].compact
                             }]
     end
@@ -49,10 +49,10 @@ class Prosperity::Watchtower < Card
       return "Invalid parameters"
     end
 
-    gaining_id = params[:gaining]
-    to_del = game.pending_actions.select {|pa| pa.expected_action =~ /;gaining=#{gaining_id}/}
+    gain_pile_id = params[:gain_pile].to_i
+    to_del = game.pending_actions.where(:player_id => ply).select {|pa| pa.expected_action =~ /;gain_id=#{params[:this_act_id]}/}
 
-    card = Card.find(gaining_id)
+    card = Pile.find(gain_pile_id).cards.first
     if params[:choice] == "normal"
       # If no-one else is trying to replace the gain, perform the default action here.
       if to_del.empty?
