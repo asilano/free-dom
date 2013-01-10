@@ -20,7 +20,7 @@ class Seaside::Treasury < Card
     return "OK"
   end
 
-  def leave_play(parent_act)
+  def discard_from_play(parent_act)
 
     if (!player.state.bought_victory)
       # Player bought no victory card this turn. Ask them where they want the Treasury.

@@ -86,6 +86,56 @@ Then /(.*) should (not )?be able to choose a nil action in (?:my|his) hand/ do |
   end
 end
 
+# Verify that the stated cards in play are (not) choosable
+#
+# Matches:
+#   I should be able to choose Silver, Gold, Village in play
+#   Bob should not be able to choose Province in play
+Then(/(.*) should (not )?be able to choose #{CardListNoRep} in play/) do |name, negate, kinds|
+  name = "Alan" if name == "I"
+  player = @players[name]
+
+  # We want to check the valid options for a play-based action.
+  # These are encoded in the control that that action produces.
+  all_controls = player.determine_controls
+  controls = all_controls[:play]
+  flunk "No controls found in #{name}'s in-play" if controls.length == 0
+  flunk "Too many controls in #{name}'s in-play" unless controls.length == 1
+
+  ctrl = controls[0]
+  acceptable = ctrl[:cards].map.with_index {|valid, ix| player.cards.in_play[ix].readable_name if valid}.compact
+
+  unless negate
+    assert_subset kinds.split(/,\s*/), acceptable
+  else
+    assert_disjoint kinds.split(/,\s*/), acceptable
+  end
+end
+
+# Verify that there is (not) a nil action in play
+#
+# Matches:
+#   I should be able to choose a nil action in play
+#   Bob should not be able to choose a nil action in play
+Then /(.*) should (not )?be able to choose a nil action in play/ do |name, negate|
+  name = "Alan" if name == "I"
+  player = @players[name]
+
+  # We want to check the valid options for a play-based action.
+  # These are encoded in the control that that action produces.
+  all_controls = player.determine_controls
+  controls = all_controls[:play]
+  flunk "Unimplemented multi-play controls in testbed" unless controls.length == 1
+
+  ctrl = controls[0]
+
+  unless negate
+    assert_not_nil ctrl[:nil_action]
+  else
+    assert_nil ctrl[:nil_action]
+  end
+end
+
 # Verify that the stated piles are (not) choosable
 #
 # Matches:

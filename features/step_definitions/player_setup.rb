@@ -71,7 +71,9 @@ Given(/^(\w*) ha(?:ve|s) setting (.*) (on|off)/) do |name, setting, value|
              "autobaron" => :autobaron=,
              "autotorture" => :autotorture_curse=,
              "automountebank" => :automountebank=,
-             "autotreasury" => :autotreasury=}[setting]
+             "autotreasury" => :autotreasury=,
+             "autooracle" => :autooracle=,
+             "autoscheme" => :autoscheme=}[setting]
 
   @players[name].settings.send(set_sym, value == "on")
   @players[name].settings.save!

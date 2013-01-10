@@ -518,7 +518,6 @@ class Player < ActiveRecord::Base
                                                :game => game)
     end
 
-    # Before that, discard in-Play cards and draw a new hand
     parent_act.queue(:expected_action => "player_clean_up;player=#{id}",
                      :game => game)
     parent_act.queue(:expected_action => "player_draw_hand;player=#{id}",
@@ -536,7 +535,7 @@ class Player < ActiveRecord::Base
       card.discard
     end
     cards.in_play(true).each do |card|
-      card.leave_play(params[:parent_act])
+      card.discard_from_play(params[:parent_act])
     end
   end
 

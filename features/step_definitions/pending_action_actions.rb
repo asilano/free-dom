@@ -114,6 +114,69 @@ When(/^(\w*?)(?:'s)? chooses? (?:his|my) (revealed|peeked) (.*)$/) do |name, loc
   @skip_card_checking = 1 if @skip_card_checking == 0
 end
 
+# Step for any control that requires you to make a choice of a card in play; 
+# that is, process any controls[:play] control
+#
+# Matches
+#   I choose Estate in play
+#   Bob chooses Estate, Copper in play
+#   I choose Don't trash in play  // (Where "Don't trash" is the nil-action text)
+When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in play/) do |name, choices|
+  name = "Alan" if name == "I"
+  player = @players[name]
+
+  # We have to call resolve for the appropriate action with appropriate params.
+  # So, really, we need to duplicate the logic of what to do with a control
+  all_controls = player.determine_controls
+  controls = all_controls[:play]
+  flunk "No controls found in #{name}'s in-play" if controls.length == 0
+  flunk "Unimplemented multi-in-play controls in testbed" unless controls.length == 1
+
+  ctrl = controls[0]
+  params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
+
+  key = if ctrl[:type] == :button
+    :card_index
+  else
+    ctrl[:name].to_sym
+  end
+
+  if ctrl[:nil_action].andand == choices
+    params[:nil_action] = true
+  else
+    possibilities = player.cards.in_play.map(&:readable_name)
+    assert_not_empty possibilities
+
+    kinds = choices.split(/,\s*/)
+    if kinds.length == 1 && kinds[0] !~ /.* ?x ?\d*/
+      params[key] = possibilities.index(kinds[0])
+      assert_not_nil params[key], "Couldn't find #{kinds[0]} in play (#{possibilities.inspect})"
+    else
+      params[key] = []
+      kinds.each do |kind|
+        num = 1
+        card_name = kind
+        if /(.*) ?x ?(\d+)/ =~ kind
+          card_name = $1.rstrip
+          num = $2.to_i
+        end
+
+        num.times do
+          ix = possibilities.index(card_name)
+          possibilities[ix] = nil
+
+          params[key] << ix
+        end
+      end
+    end
+  end
+
+  player.resolve(params)
+
+  # Probably chosen the card for a reason
+  @skip_card_checking = 1 if @skip_card_checking == 0
+end
+
 # Step for any control that requires you to make a single unattached choice; that is, process any button-type
 # controls[:player] control
 #
@@ -129,12 +192,48 @@ When(/(.*) chooses? the option (.*)/) do |name, choice|
   all_controls = player.determine_controls
   controls = all_controls[:player]
 
-  flunk "No controls found in hand" if controls.length == 0
+  flunk "No controls found on player" if controls.length == 0
   # Look for an option of the chosen name anywhere in the controls
   controls.each do |ctrl|
     params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
 
     matching_controls = ctrl[:options].detect {|opt| opt[:text] =~ Regexp.new(Regexp.escape(choice), Regexp::IGNORECASE)}
+    if matching_controls
+      params[:choice] = matching_controls[:choice]
+      player.resolve(params)
+      break
+    end
+  end
+
+  # Probably chosen the option for a reason
+  @skip_card_checking = 1 if @skip_card_checking == 0
+end
+
+# Step for any control that requires you to make a single unattached choice for another player;
+# that is, process any button-type controls[:other_players] control
+#
+# Matches
+#   I choose for Bob the option Don't discard
+#   I choose for Charlie the option Top of deck
+When(/(.*) chooses? for (.*) the option (.*)/) do |name, target, choice|
+  name = "Alan" if name == "I"
+  target = "Alan" if target == "me"
+  player = @players[name]
+
+  # We have to call resolve for the appropriate action with appropriate params.
+  # So, really, we need to duplicate the logic of what to do with a control
+  all_controls = player.determine_controls
+  controls = all_controls[:other_players]
+
+  flunk "No controls found on player" if controls.length == 0
+  # Look for an option of the chosen name anywhere in the controls
+  controls.each do |ctrl|
+    params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
+    next unless params[:target] == @players[target].id.to_s
+
+    matching_controls = ctrl[:options].detect do |opt|
+      opt[:text] =~ Regexp.new(Regexp.escape(choice), Regexp::IGNORECASE)
+    end
     if matching_controls
       params[:choice] = matching_controls[:choice]
       player.resolve(params)
@@ -288,6 +387,7 @@ When(/^(\w*?) chooses? (.*?) for (\w*?)(?:'s)? revealed (#{SingleCardNoCapture}|
   controls = all_controls[:revealed]
 
   tgt_name = "Alan" if tgt_name == "my"
+  tgt_name = name if tgt_name == "his"
   target = @players[tgt_name]
 
   ctrl = controls.detect {|c| c[:player_id] == target.id}
@@ -305,7 +405,6 @@ When(/^(\w*?) chooses? (.*?) for (\w*?)(?:'s)? revealed (#{SingleCardNoCapture}|
       params[:card_index] = card_ix;
     end
   end
-  Rails.logger.info(params.inspect)
   player.resolve(params)
 
   # Probably expect something to happen to the chosen card

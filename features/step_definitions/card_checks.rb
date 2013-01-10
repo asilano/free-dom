@@ -40,7 +40,14 @@ Then /(.*) should have #{CardList} [io]n (?:my |his )?(.*)/ do |name, kinds, loc
   name = 'Alan' if name == 'I'
   exp = instance_variable_get("@#{location}_contents")[name]
 
-  exp.replace(kinds.split(/,\s*/))
+  exp.replace([])
+  kinds.split(/,\s*/).each do |kind|
+    /(.*) ?x ?(\d+)/ =~ kind
+    kind = $1.rstrip if $1
+    num = $2.andand.to_i || 1
+    
+    num.times {exp << kind}
+  end    
 end
 
 # Matches
@@ -120,6 +127,26 @@ Then(/(.*) should have discarded #{CardList}$/) do |name, kinds|
 end
 
 # Matches
+#   I should have discarded Copper, Curse from in play
+#   Bob should have discarded Copper from in play
+Then(/(.*) should have discarded #{CardList} from in play$/) do |name, kinds|
+  name = "Alan" if name == "I"
+  player = @players[name]
+    
+  kinds.split(/,\s*/).each do |kind|
+    /(.*) ?x ?(\d+)/ =~ kind
+    kind = $1.rstrip if $1
+    num = $2.andand.to_i || 1
+    
+    num.times do
+      @discard_contents[name].unshift(kind)
+      assert_contains @play_contents[name], kind
+      @play_contents[name].delete_first(kind)
+    end
+  end
+end
+
+# Matches
 #   I should have discarded the cards named "rest of hand"
 Then(/(.*) should have discarded the cards named "([^"]*)"/) do |name, grp_name|
   name = "Alan" if name == "I"
@@ -135,7 +162,29 @@ Then(/(.*) should have discarded the cards named "([^"]*)"/) do |name, grp_name|
   end
 end
 
-# This step is occasionally used in templated lists of steps, such as 
+# Checks for the discard of all cards in hand
+# Matches:
+#   I should have discarded my hand
+Then /^(.*) should have discarded (?:my|his) hand$/ do |name|
+  name = "Alan" if name == "I"
+  player_hand = @hand_contents[name].join(", ")
+  player_hand = "nothing" if player_hand == ""
+  
+  steps "Then I should have discarded #{player_hand}"
+end
+
+# Checks for the discard of all in-play cards
+# Matches
+#   I should have discarded my in-play cards
+Then /^(.*) should have discarded (?:my|his) in-play cards$/ do |name|
+  name = "Alan" if name == "I"
+  player_hand = @play_contents[name].join(", ")
+  player_hand = "nothing" if player_hand == ""
+  
+  steps "Then I should have discarded #{player_hand} from in play"
+end
+
+# These steps are occasionally used in templated lists of steps, such as 
 # in Adventurer, where there's a Scenario Outline, and in the "next turn starts"
 # meta-step, which makes players discard whatever's in their hand.
 # Matches
@@ -143,6 +192,10 @@ end
 Then /^(.*) should have discarded nothing$/ do |_|
 end
 
+# Matches
+#   I should have discarded nothing from in play
+Then /^(.*) should have discarded nothing from in play$/ do |_|
+end
 # Matches
 #   I should have gained Copper
 #   Bob should have gained Curse, Curse
