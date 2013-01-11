@@ -5,7 +5,7 @@
     <title><%= @full_title ? @full_title : ("Dominion - " + (@title ? @title : controller.action_name.capitalize)) -%></title>
     <%= stylesheet_link_tag 'application' %>
     <%= javascript_include_tag "application" %>
-    <link rel="shortcut icon" type="image/vnd.microsoft.icon" href='<%= image_path("/favicon.ico") %>' />
+    <%= favicon_link_tag %>
 
     <%= javascript_tag do %>
       <%= "var AUTH_TOKEN = '#{form_authenticity_token}';" if protect_against_forgery? %>

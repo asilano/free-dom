@@ -1,7 +1,7 @@
 source 'http://rubygems.org'
 source 'http://gems.github.com'
 
-gem 'rails', '3.1.0'
+gem 'rails', '3.1.10'
 gem 'i18n'
 
 # Bundle edge Rails instead:
