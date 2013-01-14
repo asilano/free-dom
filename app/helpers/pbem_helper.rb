@@ -1,23 +1,23 @@
 module PbemHelper
 
   def hidden_line(player, zone, descr)
-    "#{descr}: " + pluralize(player.cards.send(zone).length, "card")
+    ("#{descr}: " + pluralize(player.cards.send(zone).length, "card")).html_safe
   end
-  
+
   def control_line(player, zone, descr)
     if !player.cards.send(zone).empty?
       "#{descr}: " + player.cards.send(zone).each_with_index.map {|card, ix| "#{ix}. #{card}"}.join(' | ')
     else
       "#{descr}: None"
-    end
+    end.html_safe
   end
-  
+
   def public_zone_line(player, zone, descr)
     if !player.cards.send(zone).empty?
       "#{descr}: " + player.cards.send(zone).join(', ')
     else
       "#{descr}: None"
-    end
+    end.html_safe
   end
 
   def extra_info(player, *opts)
@@ -35,9 +35,9 @@ module PbemHelper
         info << "Set Aside with #{kind.to_s}: #{player.cards.in_location(kind.to_s.demodulize.underscore).join(', ')}\n"
       end
     end
-    info
+    info.html_safe
   end
-  
+
   def opts_for_buttons_from_valid(control, key, prompt, opts = {})
     opt_str = ""
     if control[key].any?
@@ -49,16 +49,16 @@ module PbemHelper
     if control[:nil_action]
       opt_str << "'None' for #{control[:nil_action]}."
     end
-     
-    return opt_str
+
+    return opt_str.html_safe
   end
-  
-  def opts_for_buttons_from_options(control, key, prompt, opts = {})       
+
+  def opts_for_buttons_from_options(control, key, prompt, opts = {})
     opt_str = control[key].map do |opt|
       "'#{prompt} #{opt[:choice]}' for #{opt[:text]}"
     end.join(', ')
-    
-    return opt_str
+
+    return opt_str.html_safe
   end
-  
+
 end

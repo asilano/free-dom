@@ -1,9 +1,9 @@
 <% control = revealed_control -%>
-<%= PendingAction.find(control[:pa_id]).text -%> (PA <%= control[:pa_id] -%>): <% 
+<%= PendingAction.find(control[:pa_id]).text -%> (PA <%= control[:pa_id] -%>): <%
    case control[:type]
    when :button -%>
-Choose one from <%= control[:player_id] == @player.id ? 'your' : Player.find(control[:player_id]).name + "'s" -%> revealed cards. Valid choices: <%= opts_for_buttons_from_valid(control, :cards, "Card") %>
+Choose one from <%= (control[:player_id] == @player.id ? 'your' : Player.find(control[:player_id]).name + "'s").html_safe -%> revealed cards. Valid choices: <%= opts_for_buttons_from_valid(control, :cards, "Card") %>
 <% when :two_d_radio -%>
-Choose a revealed card belonging to <%= Player.find(control[:player_id]).name -%> and an action to apply to it. Reply in the form 'Choose <Card>.<Option>', where Card is one of <%=  control[:cards].each_with_index.map {|valid, ix| ix.to_s if valid}.compact.join(', ') -%>
- and Option is one of <%=  control[:options].each_with_index.map {|opt, ix| "#{ix} for '#{opt}'"}.join(', ') -%>
+Choose a revealed card belonging to <%= Player.find(control[:player_id]).name.html_safe -%> and an action to apply to it. Reply in the form 'Choose <Card>.<Option>', where Card is one of <%=  control[:cards].each_with_index.map {|valid, ix| ix.to_s if valid}.compact.join(', ') -%>
+ and Option is one of <%=  control[:options].each_with_index.map {|opt, ix| "#{ix} for '#{opt}'"}.join(', ').html_safe -%>
 <% end %>

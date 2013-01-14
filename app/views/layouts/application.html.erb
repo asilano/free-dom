@@ -8,7 +8,7 @@
     <%= favicon_link_tag %>
 
     <%= javascript_tag do %>
-      <%= "var AUTH_TOKEN = '#{form_authenticity_token}';" if protect_against_forgery? %>
+      <%= "var AUTH_TOKEN = '#{form_authenticity_token}';".html_safe if protect_against_forgery? %>
 
       <%= content_for :js_in_head %>
 

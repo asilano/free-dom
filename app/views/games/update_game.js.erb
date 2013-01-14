@@ -5,6 +5,6 @@
   onLoadFunc();
 
   <% if @full_title -%>
-    document.title = "<%= escape_javascript(@full_title) -%>";
+    document.title = "<%= escape_javascript(@full_title).html_safe -%>";
   <% end %>
 <% end %>

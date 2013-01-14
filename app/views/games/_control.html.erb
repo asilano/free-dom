@@ -78,7 +78,7 @@
     <% if control[:on_update] %>
       <span id='<%= control.object_id.to_s + "_js" -%>'></span>
       <%= javascript_tag do %>
-        <%= "changed_#{control.object_id}()" %>
+        <%= "changed_#{control.object_id}()".html_safe %>
       <% end %>
     <% end %>
   </td>

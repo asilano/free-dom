@@ -34,7 +34,7 @@
       <%= f.label :random_select, (tweaking ? "Generate another random set of Kingdom Cards" : "Select Kingdom Cards randomly?") %>
       <%= f.check_box :random_select %>
     </div>
-    <div id="card_selects" style=<%= (@game.random_select == 1) ? "'display: none;'" : "" %> >
+    <div id="card_selects" style=<%= ((@game.random_select == 1) ? "'display: none;'" : "").html_safe %> >
       <table>
         <% (1..10).each do |ix| %>
         <tr class='row<%= (ix % 2 == 0) ? "Even" : "Odd" -%>'>
@@ -60,10 +60,9 @@
         <% end %>
       </table>
     </div>
-    <div id="random_options" style=<%= (@game.random_select == 1) ? "" : "'display: none;'" %>>
+    <div id="random_options" style=<%= ((@game.random_select == 1) ? "" : "'display: none;'").html_safe %>>
       <%= f.label :specify_distr, "Specify set distibution?" %>
-      <%= f.check_box :specify_distr, {:onclick => "show_hide_distr()"} %>
-      <div id="set_distr" style=<%= (@game.specify_distr == 1) ? "" : "'display: none;'" %>>
+      <div id="set_distr" style=<%= ((@game.specify_distr == 1) ? "" : "'display: none;'").html_safe %>>
         <p class="indented-left underlined">Set distribution:</p>
         <table>
           <% ['Base Game', 'Intrigue', 'Seaside', 'Prosperity'].each do |set| %>
@@ -82,7 +81,7 @@
           <% end %>
         </table>
       </div>
-      <div id="set_presence" style=<%= (@game.specify_distr == 0) ? "" : "'display: none;'" %>>
+      <div id="set_presence" style=<%= ((@game.specify_distr == 0) ? "" : "'display: none;'").html_safe %>>
         <p class="indented-left underlined">Sets to use:</p>
         <table>
           <% ['Base Game', 'Intrigue', 'Seaside', 'Prosperity'].each do |set| %>

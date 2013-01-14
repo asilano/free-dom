@@ -1,4 +1,4 @@
-<%= @player.name %>:
+<%= @player.name.html_safe %>:
 <%= "-" * @player.name.length %>
   <%= hidden_line @player, :deck, "Deck" %>
   <%= control_line @player, :hand, "Hand" %>
@@ -9,8 +9,8 @@
   <%= control_line @player, :peeked, "Looked at" %>
 <%= extra_info @player %>
 <% if @player.cash -%>
-  
+
   Actions: <%= h @player.actions %>
-  Buys: <%= h @player.buys %>      
+  Buys: <%= h @player.buys %>
   Cash: <%= h @player.cash %>
 <% end -%>
