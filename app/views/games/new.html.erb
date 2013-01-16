@@ -62,6 +62,7 @@
     </div>
     <div id="random_options" style=<%= ((@game.random_select == 1) ? "" : "'display: none;'").html_safe %>>
       <%= f.label :specify_distr, "Specify set distibution?" %>
+      <%= f.check_box :specify_distr %>
       <div id="set_distr" style=<%= ((@game.specify_distr == 1) ? "" : "'display: none;'").html_safe %>>
         <p class="indented-left underlined">Set distribution:</p>
         <table>
