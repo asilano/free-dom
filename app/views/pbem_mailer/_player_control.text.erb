@@ -1,5 +1,5 @@
 <% control = player_control -%>
-<%= PendingAction.find(control[:pa_id]).text -%> (PA <%= control[:pa_id] -%>): <% -%>
+(PA <%= control[:pa_id] -%>) <%= PendingAction.find(control[:pa_id]).text.html_safe -%>: <% -%>
 <% case control[:type]
    when :buttons -%>
 Choose one. Valid choices: <%= opts_for_buttons_from_options(control, :options, "Choose").html_safe -%>
