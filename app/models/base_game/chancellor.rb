@@ -47,7 +47,8 @@ class BaseGame::Chancellor < Card
                             :css_class => "player#{ply.seat}")
     else
       ply.cards.deck(true).each do |card|
-        card.discard
+        # Move card to discard _without tripping callbacks_
+        card.update_column(:location, 'discard')
       end
 
       # And create a history

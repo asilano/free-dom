@@ -8,6 +8,11 @@ class Game < ActiveRecord::Base
     self.current_act_parent
   end
 
+  def self.parent_act=(act)
+    raise "ID mismatch on setting parent_act" if self.current.id != act.game.id
+    self.current_act_parent = act
+  end
+
   has_many :piles, :order => "position", :dependent => :destroy
   #accepts_nested_attributes_for :piles
   has_many :cards, :dependent => :delete_all
@@ -137,7 +142,7 @@ class Game < ActiveRecord::Base
       active_actions(true).each do |action|
         check_game_end
         case action.expected_action
-        when /^resolve_([[:alpha:]]+::[[:alpha:]]+)([0-9]+)(?:_([[:alnum:]]*))?(;.*)?/
+        when /^resolve_([[:alpha:]]+::[[:alpha:]]+)([0-9]+)(?:_([[:alnum:]_]*))?(;.*)?/
           card_type = $1
           card_id = $2
           substep = $3
@@ -153,7 +158,7 @@ class Game < ActiveRecord::Base
           if not card.respond_to? substep.to_sym
             return "Unexpected substep #{substep} for #{card_type}"
           end
-          
+
           card.method(substep.to_sym).call(params)
         when /^player_([[:alpha:]_]+);player=([0-9]+)(;.*)?$/
           player = Player.find($2)
@@ -162,8 +167,8 @@ class Game < ActiveRecord::Base
           params = {:parent_act => action.parent}
           Game.current_act_parent = action.parent
           param_string.scan(/;([^;=]*)=([^;=]*)/) {|m| params[m[0].to_sym] = m[1]}
-          action.destroy      
-          
+          action.destroy
+
           player.method(task.to_sym).call(params)
         when /^end_game$/
           action.destroy

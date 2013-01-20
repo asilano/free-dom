@@ -126,7 +126,7 @@ module CardDecorators
       end
     end
 
-    before_save meth, :if => condition
+    before_update meth, :if => condition
   end
 
   module AttackMethods
