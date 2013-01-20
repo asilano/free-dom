@@ -59,6 +59,8 @@ class BaseGame::Chapel < Card
         parent_act = parent_act.parent
         act.destroy
       end
+
+      Game.current_act_parent = parent_act
     else
       # Trash the selected card
       card = ply.cards.hand[params[:card_index].to_i]

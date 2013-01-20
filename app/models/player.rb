@@ -164,6 +164,7 @@ class Player < ActiveRecord::Base
     rc = "OK"
     this_act = active_actions.detect {|act| act.expected_action == "play_action"}
     parent_act = this_act.parent
+    Game.current_act_parent = parent_act
     this_act.destroy
 
     # Now process the action played
@@ -268,6 +269,7 @@ class Player < ActiveRecord::Base
       return "Special treasure not defining how to play itself - please report to site owner" if (card.is_special? && !card.class.implements_instance_method?(:play_treasure))
       game.histories.create!(:event => "#{name} played #{card.class.readable_name}.",
                             :css_class => "player#{seat} play_treasure")
+      Game.current_act_parent = this_act
       rc = card.play_treasure(this_act)
 
       if !card.is_special?
@@ -352,6 +354,7 @@ class Player < ActiveRecord::Base
     # Find the Buy action, and remove it noting the parent
     this_act = active_actions.detect {|act| act.expected_action == "buy"}
     parent_act = this_act.parent
+    Game.current_act_parent = parent_act
     this_act.destroy
 
     # Now process the Buy
@@ -935,6 +938,7 @@ class Player < ActiveRecord::Base
 
     # All good - remove the action and call through
     parent_act = this_act.parent
+    Game.current_act_parent = parent_act
     this_act.destroy
     return card.method(meth).untaint.call(self, params, parent_act)
   end
