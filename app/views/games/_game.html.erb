@@ -130,7 +130,8 @@
                   <%= submit_tag(control[:nil_action],
                         :name => "nil_action",
                         :form => "form_#{control.object_id}",
-                        :disable_with => control[:nil_action]) %>
+                        :disable_with => control[:nil_action],
+                        :class => control[:css_class]) %>
               <% end -%>
             <% end -%>
           </td>
@@ -261,7 +262,7 @@
     $('.ajaxSpinSmall').on('ajax:beforeSend', function(){$('#spinner').show();})
                        .on('ajax:complete', function(){$('#spinner').hide();});
   }
-  
+
   // Enable the game refresh on first load only
   $(function()
   {

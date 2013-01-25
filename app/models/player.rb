@@ -76,7 +76,8 @@ class Player < ActiveRecord::Base
                              :text => "Play",
                              :nil_action => "Leave Action Phase",
                              :cards => cards.hand.map{|card| card.is_action?},
-                             :pa_id => action.id
+                             :pa_id => action.id,
+                             :css_class => 'play'
                             }]
       when 'play_treasure'
         controls[:hand] += [{:type => :button,
