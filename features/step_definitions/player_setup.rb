@@ -55,6 +55,8 @@ Given /I am a player in a (?:([2-6])-player )?standard game(?: with (.*))?/ do |
 
   @game.start_game
 
+  Game.current = @game
+
   # Setup records of the current state of everybody's zones
   @hand_contents = Hash[names.map {|n| [n, @players[n].cards.hand.map(&:readable_name)]}]
   @deck_contents = Hash[names.map {|n| [n, @players[n].cards.deck.map(&:readable_name)]}]
@@ -82,7 +84,8 @@ end
 Given(/^(\w*) ha(?:ve|s) setting (.*) set to (.*)/) do |name, setting, value|
   name = "Alan" if name == "I"
   set_sym = {"autoduchess" => :autoduchess=,
-             "autofoolsgold" => :autofoolsgold=}[setting]
+             "autofoolsgold" => :autofoolsgold=,
+             "autotunnel" => :autotunnel=}[setting]
   if Settings.constants.include?(value.to_sym)
     value = Settings.const_get(value)
   end

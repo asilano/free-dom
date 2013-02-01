@@ -152,15 +152,24 @@ class Prosperity::Vault < Card
     end
 
     # All looks good - process the request
+
+    # Queue up the draw action in case discarding causes anything to trigger
+    # (such as Hinterlands::Tunnel)
+    Game.parent_act = parent_act.children.create!(
+            :expected_action => "resolve_#{self.class}#{id}_draw_1;ply=#{ply.id}",
+            :game => game)
+
     # Discard the specified card
     card = ply.cards.hand[params[:card_index].to_i]
     card.discard
     game.histories.create!(:event => "#{ply.name} discarded a #{card}.",
                           :css_class => "player#{ply.seat} card_discard")
 
-    # And draw a replacement
-    ply.draw_cards(1)
-
     return "OK"
+  end
+
+  def draw_1(params)
+    ply = Player.find(params[:ply])
+    ply.draw_cards(1)
   end
 end

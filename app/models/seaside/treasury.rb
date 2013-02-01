@@ -5,6 +5,10 @@ class Seaside::Treasury < Card
   action
   card_text "Action (cost: 5) - Draw 1 card, +1 Action, +1 Cash. When you discard this from play, if you didn't buy a Victory card this turn, you may put this on top of your deck."
 
+  serialize :state, Hash
+
+  trigger :handle_on_discard, :on => {:location => ['play', 'discard']}
+
   def play(parent_act)
     super
 
@@ -20,9 +24,13 @@ class Seaside::Treasury < Card
     return "OK"
   end
 
-  def discard_from_play(parent_act)
+  def handle_on_discard
+    parent_act = Game.parent_act
 
-    if (!player.state.bought_victory)
+    if (state && state[:skip_callback])
+      # Let the discard happen, and clear the state for next time around
+      self.state[:skip_callback] = false
+    elsif (!player.state.bought_victory)
       # Player bought no victory card this turn. Ask them where they want the Treasury.
       # Hang the action to do so off parent_act, which can't be nil
       raise "Need a non-nil parent act" if parent_act.nil?
@@ -36,9 +44,11 @@ class Seaside::Treasury < Card
                                    :player => player,
                                    :game => game)
       end
+
+      # Prevent this set of changes from happening
+      changed.each {|att| method("reset_#{att}!").call}
     else
-      # Player did buy a victory this turn. Just discard the card.
-      super
+      # Player did buy a victory this turn. Let the discard happen.
     end
 
     return "OK"
@@ -78,7 +88,9 @@ class Seaside::Treasury < Card
       game.histories.create!(:event => "#{ply.name} chose to put their #{readable_name} on top of their deck.",
                             :css_class => "player#{ply.seat}")
     else
-      # Just discard the card.
+      # Just discard the card, noting that we shouldn't enter an infinite loop
+      self.state ||= {}
+      self.state[:skip_callback] = true
       discard
 
       game.histories.create!(:event => "#{ply.name} chose to put their #{readable_name} into their discard.",

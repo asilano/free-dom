@@ -1,5 +1,17 @@
 class Game < ActiveRecord::Base
   class_attribute :current
+  class_attribute :current_act_parent
+
+  def self.parent_act
+    return nil unless self.current_act_parent
+    raise "ID mismatch on parent_act" if self.current_act_parent.game.id != self.current.id
+    self.current_act_parent
+  end
+
+  def self.parent_act=(act)
+    raise "ID mismatch on setting parent_act" if self.current.id != act.game.id
+    self.current_act_parent = act
+  end
 
   has_many :piles, :order => "position", :dependent => :destroy
   #accepts_nested_attributes_for :piles
@@ -130,7 +142,7 @@ class Game < ActiveRecord::Base
       active_actions(true).each do |action|
         check_game_end
         case action.expected_action
-        when /^resolve_([[:alpha:]]+::[[:alpha:]]+)([0-9]+)(?:_([[:alnum:]]*))?(;.*)?/
+        when /^resolve_([[:alpha:]]+::[[:alpha:]]+)([0-9]+)(?:_([[:alnum:]_]*))?(;.*)?/
           card_type = $1
           card_id = $2
           substep = $3
@@ -140,19 +152,23 @@ class Game < ActiveRecord::Base
           params = {}
           param_string.scan(/;([^;=]*)=([^;=]*)/) {|m| params[m[0].to_sym] = m[1]}
           params[:parent_act] = action.parent
+          Game.current_act_parent = action.parent
           action.destroy
 
           if not card.respond_to? substep.to_sym
             return "Unexpected substep #{substep} for #{card_type}"
           end
+
           card.method(substep.to_sym).call(params)
         when /^player_([[:alpha:]_]+);player=([0-9]+)(;.*)?$/
           player = Player.find($2)
           task = $1
           param_string = $3 || ""
           params = {:parent_act => action.parent}
+          Game.current_act_parent = action.parent
           param_string.scan(/;([^;=]*)=([^;=]*)/) {|m| params[m[0].to_sym] = m[1]}
           action.destroy
+
           player.method(task.to_sym).call(params)
         when /^end_game$/
           action.destroy

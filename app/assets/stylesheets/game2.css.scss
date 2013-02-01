@@ -111,6 +111,7 @@ $p5fgcol: #d0d;
     .victory.action {@include card_grad($victory, $action);}
     .victory.treasure {@include card_grad($victory, $treasure);}
     .treasure.reaction {@include card_grad($treasure, $reaction);}
+    .victory.reaction {@include card_grad($victory, $reaction);}
   }
 
   /* Empty piles get a thick red border - but it can't be applied to trs. */

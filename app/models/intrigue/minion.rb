@@ -63,16 +63,26 @@ class Intrigue::Minion < Card
       game.histories.create!(:event => "#{ply.name} discarded their hand.",
                             :css_class => "player#{ply.seat} card_discard")
 
+      # Queue up the draw action in case discarding causes anything to trigger
+      # (such as, Hinterlands::Tunnel)
+      Game.parent_act = parent_act.children.create!(
+              :expected_action => "resolve_#{self.class}#{id}_draw_4;tgt=#{player.id}",
+              :game => game)
+
       ply.cards.hand(true).each do |card|
         card.discard
       end
-      ply.draw_cards(4)
     end
 
     # Create the attack framework
     attack(parent_act, :attack_type => attack_type)
 
     return "OK"
+  end
+
+  def draw_4(params)
+    target = Player.find(params[:tgt])
+    target.draw_cards(4)
   end
 
   def attackeffect(params)
@@ -86,16 +96,22 @@ class Intrigue::Minion < Card
     # Effect of the attack succeeding - that is, check whether the target has
     # at least 5 cards in hand, then discarding and drawing 4 if so.
     target = Player.find(params[:target])
-    # parent_act = params[:parent_act]
+    parent_act = params[:parent_act]
+
 
     if target.cards.hand(true).length > 4
+      # Queue up the draw action in case discarding causes anything to trigger
+      # (such as Hinterlands::Tunnel)
+      Game.parent_act = parent_act.children.create!(
+              :expected_action => "resolve_#{self.class}#{id}_draw_4;tgt=#{target.id}",
+              :game => game)
+
       target.cards.hand.each do |card|
         card.discard
       end
 
       game.histories.create!(:event => "#{target.name} discarded their hand.",
                             :css_class => "player#{target.seat} card_discard")
-      target.draw_cards(4)
     else
       game.histories.create!(:event => "#{target.name} had #{target.cards.hand.length} cards, and was unaffected by Minion.",
                             :css_class => "player#{target.seat}")

@@ -106,6 +106,28 @@ module CardDecorators
     end
   end
 
+  def trigger(meth, opts)
+    raise "No condition provided" unless opts.include?(:on)
+    unless opts[:on].is_a?(Hash)
+      raise "Options not a hash"
+    end
+    opts[:on].each {|key, val| raise "#{key.inspect} not a field" unless self.new.respond_to?("#{key}_was")}
+
+    condition = lambda do |object|
+      opts[:on].all? do |field, change|
+        changed = method("#{field}_changed?").call
+        if (change[0] != :any)
+          changed &&= method("#{field}_was").call == change[0]
+        end
+        if (change[1] != :any)
+          changed &&= method(field).call == change[1]
+        end
+        changed
+      end
+    end
+
+    before_update meth, :if => condition
+  end
 
   module AttackMethods
     ######
