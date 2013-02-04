@@ -6,6 +6,7 @@ Feature: Tunnel
     Given I am a player in a <num>-player standard game with Tunnel
     Then there should be <pile count> Tunnel cards in piles
       And there should be 0 Tunnel cards not in piles
+      And the Tunnel pile should cost 3
 
     Examples:
       | num | pile count |
@@ -96,3 +97,45 @@ Feature: Tunnel
       Then I should have discarded Tunnel, Tunnel
     When the game checks actions
       Then I should have drawn 2 cards
+
+  Scenario: Tunnel trips on enemy action
+    Given I am a player in a standard game
+      And my hand contains Militia
+      And Bob's hand contains Tunnel, Estate x3
+      And Charlie's hand is empty
+    When I play Militia
+    And the game checks actions
+    And Bob chooses Tunnel in his hand
+      Then Bob should have discarded Tunnel
+    When the game checks actions
+      Then Bob should have gained Gold
+      And it should be my Buy phase
+
+  Scenario: Tunnel doesn't trip on gain or buy
+    Given I am a player in a standard game with Tunnel
+      And my hand contains Copper x3, Moat, Remodel
+    When I play Remodel
+    And I choose Moat in my hand
+      Then I should have removed Moat from my hand
+    And I choose the Tunnel pile
+    And the game checks actions
+      Then the following 2 steps should happen at once
+        Then I should have gained Tunnel
+        And I should have played Copper x3
+    When I buy Tunnel
+    And the game checks actions
+      Then the following 3 steps should happen at once
+        Then I should have gained Tunnel
+        And I should have moved Copper x3, Remodel from play to discard
+        And I should have drawn 5 cards
+
+  Scenario: Tunnel doesn't trip during clean-up
+    Given I am a player in a standard game
+      And my hand contains Tunnel
+    When I stop playing actions
+    And the game checks actions
+    And I stop buying cards
+    And the game checks actions
+      Then the following 2 steps should happen at once
+        Then I should have discarded Tunnel
+        And I should have drawn 5 cards
