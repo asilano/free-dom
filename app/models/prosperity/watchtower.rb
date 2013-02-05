@@ -50,7 +50,7 @@ class Prosperity::Watchtower < Card
     end
 
     gain_pile_id = params[:gain_pile].to_i
-    to_del = game.pending_actions.where(:player_id => ply).select {|pa| pa.expected_action =~ /;gain_id=#{params[:this_act_id]}/}
+    to_del = game.pending_actions.where(:player_id => ply).select {|pa| pa.expected_action =~ /;gain_id=#{params[:gain_id]}/}
 
     card = Pile.find(gain_pile_id).cards.first
     if params[:choice] == "normal"
