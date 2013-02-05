@@ -462,7 +462,8 @@ class Player < ActiveRecord::Base
       # Asking about the Duchess doesn't affect the Duchy's gain in any way.
     end
 
-    if other_players.any? {|ply| ply.cards.hand.of_type("Hinterlands::FoolsGold").present?}
+    if other_players.any? {|ply| ply.cards.hand.of_type("Hinterlands::FoolsGold").present?} &&
+        pile.card_type == "BasicCards::Province"
       # Add a Game-level action to ask all other Fool's Gold holders if they wish to trash
       sample_fg = game.cards.of_type("Hinterlands::FoolsGold").first
       parent_act = parent_act.children.create(
