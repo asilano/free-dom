@@ -11,7 +11,7 @@ class Prosperity::RoyalSeal < Card
       pile = Pile.find(params[:gain_pile].to_i)
       controls[:player] += [{:type => :buttons,
                              :action => :resolve,
-                             :label => "#{self}: Place #{pile.card_class}...:",
+                             :label => "#{self}: Place #{pile.card_class.readable_name}...:",
                              :params => {:card => "#{self.class}#{id}",
                                          :substep => "choose"}.merge(params),
                              :options => [{:text => "#{params[:location].titleize}",
