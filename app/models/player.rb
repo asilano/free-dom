@@ -369,40 +369,16 @@ class Player < ActiveRecord::Base
     else
       # Process the Buy.
 
-      # Subtract the cost from the player's cash, and decrement the number of buys
+      # Subtract the cost from the player's cash
       self.cash -= pile.cost
 
-      # Check whether the pile was embargoed
-      if pile.state && pile.state[:embargo] && pile.state[:embargo] > 0
-        Seaside::Embargo.handle_embargoed_buy(self, pile, parent_act)
-      end
-
-      # Check whether the player owns a Treasury, and if so whether this card was a Victory
-      if cards.any?{|c| c.type == "Seaside::Treasury"} && pile.card_class.is_victory?
-        state.bought_victory = true
-        state.save!
-      end
-
-      # Check whether the player has any Goons in play
-      goons = cards.in_play.of_type("Prosperity::Goons").length
-      if goons > 0
-        self.score ||= 0
-        self.score += goons
-        game.histories.create!(:event => "#{name} gained #{goons} point#{goons == 1 ? '' : 's'} from Goons.",
-                              :css_class => "player#{seat} score")
-      end
-
-      # Check whether the player has any Hoards in play, and if so whether this card was a Victory
-      hoards = cards.in_play.of_type("Prosperity::Hoard").length
-      if hoards > 0 && pile.card_class.is_victory?
-        Prosperity::Hoard.bought_victory(self, hoards, parent_act)
-      end
-
-      # Check whether the player has any Talismans in play, and if so whether this card is cheap
-      # and not a Victory
-      talismans = cards.in_play.of_type("Prosperity::Talisman").length
-      if talismans > 0 && !pile.card_class.is_victory? && pile.cost <= 4
-        parent_act = Prosperity::Talisman.bought_card(self, talismans, pile, parent_act)
+      # Trip any cards that need to trigger on buy
+      card_types = game.cards.select('distinct type').map(&:type).map(&:constantize)
+      buy_params = {:buyer => self, :pile => pile, :parent_act => parent_act}
+      card_types.each do |type|
+        if type.respond_to?(:witness_buy)
+          type.witness_buy(buy_params)
+        end
       end
 
       # Check whether the card was a Mint, and if so trash all the player's in-play treasures
