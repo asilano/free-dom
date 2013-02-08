@@ -5,20 +5,26 @@ class Prosperity::Hoard < Card
   costs 6
   card_text "Treasure (cost: 6) - 2 Cash. / While this is in play, when you buy a Victory card, gain a Gold."
 
-  # Player#buy catches the case of buying a Victory with a Hoard in play, and calls here.
-  def self.bought_victory(ply, num_hoards, parent_act)
+  def self.witness_buy(params)
+    ply = params[:buyer]
+    pile = params[:pile]
+    parent_act = params[:parent_act]
+
+    num_hoards = ply.cards.in_play.of_type(self.to_s).length
     return if num_hoards < 1
-    
-    game = ply.game
-    
-    # Player bought a victory with at least one Hoard in play. Give the player that many Golds
-    gold_pile = game.piles.find_by_card_type("BasicCards::Gold")
-        
-    game.histories.create!(:event => "#{ply.name} gained #{num_hoards} Gold#{'s' if num_hoards > 1} from #{readable_name}.", 
-                          :css_class => "player#{ply.seat} card_gain")
-    
-    num_hoards.times do |ix|
-      ply.gain(parent_act, gold_pile.id)      
-    end       
+
+    if pile.card_class.is_victory?
+      game = ply.game
+
+      # Player bought a victory with at least one Hoard in play. Give the player that many Golds
+      gold_pile = game.piles.find_by_card_type("BasicCards::Gold")
+
+      game.histories.create!(:event => "#{ply.name} gained #{num_hoards} Gold#{'s' if num_hoards > 1} from #{readable_name}.",
+                            :css_class => "player#{ply.seat} card_gain")
+
+      num_hoards.times do |ix|
+        ply.gain(parent_act, gold_pile.id)
+      end
+    end
   end
 end
