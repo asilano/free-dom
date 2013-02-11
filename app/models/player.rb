@@ -382,14 +382,6 @@ class Player < ActiveRecord::Base
         end
       end
 
-      # Check whether the card was a Mint, and if so trash all the player's in-play treasures
-      if pile.card_type == "Prosperity::Mint"
-        trashed = []
-        cards.in_play.select {|c| c.is_treasure?}.each {|c| trashed << c.class; c.trash}
-        game.histories.create!(:event => "#{name} trashed #{trashed.map {|c| c.readable_name}.join(', ')} buying Mint.",
-                              :css_class => "player#{seat} card_trash")
-      end
-
       # Queue up a request for the player to gain the chosen card (assuming it's still there)
       if !pile.cards(true).empty?
         gain(parent_act, pile.id)
