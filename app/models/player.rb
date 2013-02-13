@@ -378,7 +378,10 @@ class Player < ActiveRecord::Base
       buy_params = {:buyer => self, :pile => pile, :parent_act => parent_act}
       card_types.each do |type|
         if type.respond_to?(:witness_buy)
-          type.witness_buy(buy_params)
+          new_pa = type.witness_buy(buy_params)
+          if new_pa.instance_of?(PendingAction)
+            parent_act = new_pa
+          end
         end
       end
 
@@ -411,56 +414,18 @@ class Player < ActiveRecord::Base
 
     asking = false
 
-    duchess = game.cards.pile.of_type("Hinterlands::Duchess")[0]
-    if duchess && pile.card_type == "BasicCards::Duchy"
-      # Game has Duchesses still in the pile, so once the primary gain is complete,
-      # we need to work out if the player wants one
-      if settings.autoduchess == Settings::ALWAYS
-        # Player is always taking Duchessess
-        duchess.resolve_gain(self, {:choice => "accept"}, parent_act)
-      elsif settings.autoduchess == Settings::NEVER
-        # Player is never taking Duchessess. Still call resolve_gain, so we get the log
-        duchess.resolve_gain(self, {:choice => "decline"}, parent_act)
-      else
-        parent_act = parent_act.children.create!(:expected_action => "resolve_#{duchess.class}#{duchess.id}_gain",
-                                                 :text => "Choose whether to gain a #{duchess}",
-                                                 :player => self,
-                                                 :game => game)
+    # Trip any cards that need to trigger on gain
+    card_types = game.cards.select('distinct type').map(&:type).map(&:constantize)
+    gain_params = {:gainer => self,
+                   :pile => pile,
+                   :parent_act => parent_act,
+                   :location => location,
+                   :position => position}
+    card_types.each do |type|
+      if type.respond_to?(:witness_gain)
+        ask = type.witness_gain(gain_params)
+        asking ||= ask
       end
-
-      # Asking about the Duchess doesn't affect the Duchy's gain in any way.
-    end
-
-    if other_players.any? {|ply| ply.cards.hand.of_type("Hinterlands::FoolsGold").present?} &&
-        pile.card_type == "BasicCards::Province"
-      # Add a Game-level action to ask all other Fool's Gold holders if they wish to trash
-      sample_fg = game.cards.of_type("Hinterlands::FoolsGold").first
-      parent_act = parent_act.children.create(
-          :expected_action => "resolve_#{sample_fg.class}#{sample_fg.id}_react;gainer=#{self.id}",
-          :game => game)
-    end
-
-    seal = cards.in_play.of_type("Prosperity::RoyalSeal")[0]
-    if seal
-      # Player has a Royal Seal in play, so we need to ask if they want the
-      # card on top of their deck (unless it's going there, of course).
-      if location != "deck" || position > 0
-        parent_act.children.create!(:expected_action => "resolve_#{seal.class}#{seal.id}_choose;gaining=#{pile.cards[0].id};location=#{location || 'discard'};position=#{position || 0}",
-                                   :text => "Choose whether to place #{pile.cards[0]} on top of deck.",
-                                   :player => self,
-                                   :game => game)
-        asking = true
-      end
-    end
-
-    tower = cards.hand.of_type("Prosperity::Watchtower")[0]
-    if tower
-      # Player has a Watchtower in hand, so we need to ask where they want the card.
-      parent_act.children.create!(:expected_action => "resolve_#{tower.class}#{tower.id}_choose;gaining=#{pile.cards[0].id};location=#{location || 'discard'};position=#{position || 0}",
-                                 :text => "Decide on destination for #{pile.cards[0]}.",
-                                 :player => self,
-                                 :game => game)
-      asking = true
     end
 
     return if asking
