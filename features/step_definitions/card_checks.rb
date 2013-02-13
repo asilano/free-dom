@@ -14,12 +14,12 @@ end
 #   Bob should have played Copper, Silver
 Then(/(.*) should have played #{CardList}/) do |name, kinds|
   name = 'Alan' if name == 'I'
-  
+
   kinds.split(/,\s*/).each do |kind|
     /(.*) ?x ?(\d+)/ =~ kind
     kind = $1.rstrip if $1
     num = $2.andand.to_i || 1
-    
+
     num.times do
       @hand_contents[name].delete_first(kind)
       if CARD_TYPES[kind].is_duration?
@@ -30,7 +30,7 @@ Then(/(.*) should have played #{CardList}/) do |name, kinds|
     end
   end
 end
-  
+
 # Matches
 #   I should have Gold in play
 #   Bob should have Copper, Gold in play
@@ -45,9 +45,9 @@ Then /(.*) should have #{CardList} [io]n (?:my |his )?(.*)/ do |name, kinds, loc
     /(.*) ?x ?(\d+)/ =~ kind
     kind = $1.rstrip if $1
     num = $2.andand.to_i || 1
-    
+
     num.times {exp << kind}
-  end    
+  end
 end
 
 # Matches
@@ -57,18 +57,18 @@ Then /(.*) should have drawn (\d+|a) cards?/ do |name, num|
   name = 'Alan' if name == 'I'
   num = 1 if num == 'a'
   deck = @deck_contents[name]
-  
+
   num.to_i.times do
     if deck.empty?
       # Deck is empty. "Shuffle" discards - which should get the same order as the main program
       deck.concat(@discard_contents[name].shuffle)
-      @discard_contents[name] = []      
+      @discard_contents[name] = []
     end
-    
+
     unless deck.empty?
-      # Still cards in deck. Move the topmost into the hand.      
+      # Still cards in deck. Move the topmost into the hand.
       @hand_contents[name] << deck.shift
-    end    
+    end
   end
 end
 
@@ -86,17 +86,17 @@ end
 Then(/(.*) should have put #{CardList} (?:from (?:his|my) (.*) )?on top of (?:his|my) deck/) do |name, kinds, from_loc|
   name = "Alan" if name == "I"
   player = @players[name]
-  
+
   deck = @deck_contents[name]
-  
+
   kinds.split(/,\s*/).each do |kind|
     /(.*) ?x ?(\d+)/ =~ kind
     kind = $1.rstrip if $1
     num = $2.andand.to_i || 1
-    
+
     num.times do
       deck.unshift(kind)
-      
+
       if from_loc
         from = instance_variable_get("@#{from_loc}_contents")[name]
         assert_contains from, kind
@@ -112,12 +112,12 @@ end
 Then(/(.*) should have discarded #{CardList}$/) do |name, kinds|
   name = "Alan" if name == "I"
   player = @players[name]
-    
+
   kinds.split(/,\s*/).each do |kind|
     /(.*) ?x ?(\d+)/ =~ kind
     kind = $1.rstrip if $1
     num = $2.andand.to_i || 1
-    
+
     num.times do
       @discard_contents[name].unshift(kind)
       assert_contains @hand_contents[name], kind
@@ -132,12 +132,12 @@ end
 Then(/(.*) should have discarded #{CardList} from in play$/) do |name, kinds|
   name = "Alan" if name == "I"
   player = @players[name]
-    
+
   kinds.split(/,\s*/).each do |kind|
     /(.*) ?x ?(\d+)/ =~ kind
     kind = $1.rstrip if $1
     num = $2.andand.to_i || 1
-    
+
     num.times do
       @discard_contents[name].unshift(kind)
       assert_contains @play_contents[name], kind
@@ -151,10 +151,10 @@ end
 Then(/(.*) should have discarded the cards named "([^"]*)"/) do |name, grp_name|
   name = "Alan" if name == "I"
   player = @players[name]
-  
+
   cards = @named_cards[grp_name]
   assert_not_nil cards
-    
+
   cards.each do |kind|
     @discard_contents[name].unshift(kind)
     assert_contains @hand_contents[name], kind
@@ -169,8 +169,8 @@ Then /^(.*) should have discarded (?:my|his) hand$/ do |name|
   name = "Alan" if name == "I"
   player_hand = @hand_contents[name].join(", ")
   player_hand = "nothing" if player_hand == ""
-  
-  steps "Then I should have discarded #{player_hand}"
+
+  steps "Then #{name} should have discarded #{player_hand}"
 end
 
 # Checks for the discard of all in-play cards
@@ -180,11 +180,11 @@ Then /^(.*) should have discarded (?:my|his) in-play cards$/ do |name|
   name = "Alan" if name == "I"
   player_hand = @play_contents[name].join(", ")
   player_hand = "nothing" if player_hand == ""
-  
-  steps "Then I should have discarded #{player_hand} from in play"
+
+  steps "Then #{name} should have discarded #{player_hand} from in play"
 end
 
-# These steps are occasionally used in templated lists of steps, such as 
+# These steps are occasionally used in templated lists of steps, such as
 # in Adventurer, where there's a Scenario Outline, and in the "next turn starts"
 # meta-step, which makes players discard whatever's in their hand.
 # Matches
@@ -205,7 +205,7 @@ Then(/^(.*) should have gained #{CardList}$/) do |name, kinds|
     /(.*) ?x ?(\d+)/ =~ kind
     kind = $1.rstrip if $1
     num = $2.andand.to_i || 1
-    
+
     num.times do
       @discard_contents[name] << kind
     end
@@ -217,24 +217,24 @@ end
 Then(/^(.*) should have moved #{CardList} from (?:my |his )?(.*) to (?:my |his )?(.*)/) do |name, kinds, from, to|
   name = "Alan" if name == "I"
   player = @players[name]
-  
+
   kinds.split(/,\s*/).each do |kind|
     /(.*) ?x ?(\d+)/ =~ kind
     kind = $1.rstrip if $1
     num = $2.andand.to_i || 1
-    
-    num.times do  
+
+    num.times do
       # First, remove the cards from whence they came
       if from == "deck"
-        # The named cards should be on top in order     
+        # The named cards should be on top in order
         assert_equal kind, @deck_contents[name][0]
-        
+
         @deck_contents[name].shift
       else
-        from_cont = instance_variable_get("@#{from}_contents")[name]    
+        from_cont = instance_variable_get("@#{from}_contents")[name]
         from_cont.delete_first(kind)
       end
-      
+
       # Now, put them onto the target
       to_cont = instance_variable_get("@#{to}_contents")[name]
       to_cont.unshift kind
@@ -247,22 +247,22 @@ end
 Then(/(.*) should have moved the cards named "([^"]*)" from (.*) to (.*)/) do |name, grp_name, from, to|
   name = "Alan" if name == "I"
   player = @players[name]
-  
+
   cards = @named_cards[grp_name]
   assert_not_nil cards
-  
+
   # First, remove the cards from whence they came
   if from == "deck"
     # The named cards should be on top in order
     assert_operator @deck_contents[name].length, :>=, cards.length
     assert_equal cards, @deck_contents[name][0, cards.length]
-    
+
     @deck_contents[name].shift(cards.length)
   else
-    from_cont = instance_variable_get("@#{from}_contents")[name]    
+    from_cont = instance_variable_get("@#{from}_contents")[name]
     cards.each {|card| from_cont.delete_first(card)}
   end
-  
+
   # Now, put them onto the target
   to_cont = instance_variable_get("@#{to}_contents")[name]
   cards.each {|card| to_cont.unshift card}
@@ -274,22 +274,22 @@ end
 Then /(.*) should have moved cards? ((?:\d+,? ?)*) from deck to (.*)/ do |name, list, to|
   name = "Alan" if name == "I"
   player = @players[name]
-  
+
   indices = list.split(/,\s*/).map(&:to_i)
 
   # First, remove the cards from the deck
   assert_operator @deck_contents[name].length, :>, indices.max
   cards = []
-  indices.each do |ix| 
-    cards << @deck_contents[name][ix] 
+  indices.each do |ix|
+    cards << @deck_contents[name][ix]
     @deck_contents[name][ix]= nil
   end
   @deck_contents[name].compact!
-    
+
   # Now, put them onto the target
   to_cont = instance_variable_get("@#{to}_contents")[name]
   cards.each {|card| to_cont.unshift card}
-end 
+end
 
 # Used to note that a card has moved from a tracked zone to anywhere else
 #
@@ -299,13 +299,13 @@ end
 Then(/(.*) should have removed #{CardList} from (?:his |my )?(.*)/) do |name, kinds, location|
   name = "Alan" if name == "I"
   player = @players[name]
-  
+
   from = instance_variable_get("@#{location}_contents")[name]
-  kinds.split(/,\s*/).each do |kind| 
+  kinds.split(/,\s*/).each do |kind|
     /(.*) ?x ?(\d+)/ =~ kind
     kind = $1.rstrip if $1
     num = $2.andand.to_i || 1
-    
+
     num.times do
       from.delete_first(kind)
     end
@@ -320,13 +320,13 @@ end
 Then(/(.*) should have (?:placed|gained) #{CardList} (?:in|to|into) (?:his |my )?(.*)/) do |name, kinds, location|
   name = "Alan" if name == "I"
   player = @players[name]
-  
+
   to = instance_variable_get("@#{location}_contents")[name]
-  kinds.split(/,\s*/).each do |kind| 
+  kinds.split(/,\s*/).each do |kind|
     /(.*) ?x ?(\d+)/ =~ kind
     kind = $1.rstrip if $1
     num = $2.andand.to_i || 1
-    
+
     num.times do
       to.unshift kind
     end
@@ -366,7 +366,7 @@ end
 Then /^(.*) should have seen (#{CardListNoCapture}|nothing)/ do |name, kinds|
   name = "Alan" if name == "I"
   player = @players[name]
-  
+
   if kinds == "nothing"
     assert_empty player.cards.peeked(true)
   else
@@ -388,9 +388,9 @@ end
 Then /^(\w*?)(?:'s)? deck should contain #{CardList}$/ do |name, deck|
   name = "Alan" if name == "my"
   player = @players[name]
-  
+
   deck_actual = player.cards.deck(true).map &:readable_name
-  
+
   deck_expected = []
   deck.split(/,\s*/).each do |kind|
     /(.*) ?x ?(\d+)/ =~ kind
@@ -399,5 +399,5 @@ Then /^(\w*?)(?:'s)? deck should contain #{CardList}$/ do |name, deck|
     num.times {deck_expected << kind}
   end
   assert_equal deck_actual, deck_expected
-  
+
 end

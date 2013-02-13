@@ -25,5 +25,7 @@ class Prosperity::Talisman < Card
     num_talismans.times do |ix|
       parent_act = ply.gain(parent_act, pile.id)
     end
+
+    return parent_act
   end
 end
