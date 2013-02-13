@@ -24,6 +24,17 @@ class Seaside::Treasury < Card
     return "OK"
   end
 
+  # A Buy has occurred. See if it's a Victory card, and mark the buying player if so
+  def self.witness_buy(params)
+    ply = params[:buyer]
+    pile = params[:pile]
+
+    if pile.card_class.is_victory?
+      ply.state.bought_victory = true
+      ply.state.save!
+    end
+  end
+
   def handle_on_discard
     parent_act = Game.parent_act
 

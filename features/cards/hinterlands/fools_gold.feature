@@ -144,3 +144,17 @@ Feature: Fool's Gold - Treasure/Reaction: 2
       Then Bob should have gained Province
       And I should not need to act
       And it should be Bob's Buy phase
+
+  Scenario: Doesn't trigger if gain isn't a Province
+    Given my hand contains Fool's Gold x2
+      And Bob's hand contains Bridge, Gold x3
+      And I have setting autofoolsgold set to ALWAYS
+      And it is Bob's Play Action phase
+    When Bob plays Bridge
+    And the game checks actions
+      Then Bob should have played Gold x3 as treasure
+    When Bob buys Duchy
+    And the game checks actions
+      Then Bob should have gained Duchy
+      And I should not need to act
+      And it should be Bob's Buy phase

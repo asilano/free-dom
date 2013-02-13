@@ -13,22 +13,26 @@ class Hinterlands::Tunnel < Card
             "When you discard this other than during a Clean-up phase, you may reveal it. If you do, gain a Gold." +
             " / 2 points"
 
-  trigger :handle_on_discard, :on => {:location => [:any, 'discard']}
+  # Override Card#discard to handle the Gold-giving
+  def discard
+    super
 
-  def handle_on_discard
     parent_act = Game.parent_act
 
-    if player.settings.autotunnel == Settings::ASK
-      # Enquire if the user wants the gold
-      parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_choose",
-                                  :text => "Choose whether to gain a Gold from #{self}",
-                                  :player => player,
-                                  :game => game)
-    elsif player.settings.autotunnel == Settings::ALWAYS
-      # Just give the gold without question
-      resolve_choose(player, {:choice => 'yes'}, parent_act)
-    else
-      # Never giving Gold. Silently do nothing
+    # If in clean-up, the parent action would be player_draw_hand
+    unless parent_act.expected_action =~ /^player_draw_hand/
+      if player.settings.autotunnel == Settings::ASK
+        # Enquire if the user wants the gold
+        parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_choose",
+                                    :text => "Choose whether to gain a Gold from #{self}",
+                                    :player => player,
+                                    :game => game)
+      elsif player.settings.autotunnel == Settings::ALWAYS
+        # Just give the gold without question
+        resolve_choose(player, {:choice => 'yes'}, parent_act)
+      else
+        # Never giving Gold. Silently do nothing
+      end
     end
   end
 

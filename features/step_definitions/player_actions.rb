@@ -27,7 +27,7 @@ When(/^(\w*)(?:'s)? next turn starts$/) do |name|
   # Assumes we're in either an Action or a Buy phase
   # May also assume treasure-playing is automatic (i.e. no Venture, Mint, Grand Market etc)
 
-  current_name = @game.current_turn_player.name  
+  current_name = @game.current_turn_player.name
   if @game.current_turn_player.active_actions[0].expected_action =~ /play_action/
     steps "When #{current_name} stops playing actions
       And the game checks actions"
@@ -42,10 +42,11 @@ When(/^(\w*)(?:'s)? next turn starts$/) do |name|
   @play_contents[current_name] = []
   steps "When #{current_name} stops buying cards
       And the game checks actions
-      Then #{current_name} have ended his turn"
+      Then #{current_name} should have ended his turn"
 
   # Now if we're not at the desired player's turn, do the same again until we are
   loops=0
+
   while @game.current_turn_player.name != name
     this_name = @game.current_turn_player.name
     steps "Then it should be #{this_name}'s Play Action phase

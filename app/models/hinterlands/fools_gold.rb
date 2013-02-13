@@ -37,8 +37,10 @@ class Hinterlands::FoolsGold < Card
     end
   end
 
-  def react(params)
-    # This game-level action queues up appropriate actions for each Fool's Gold held by other players
+  def self.witness_gain(params)
+    return false unless params[:pile].card_type == 'BasicCards::Province'
+
+    # Queue up appropriate actions for each Fool's Gold held by other players
     gainer = Player.find(params[:gainer])
     parent_act = params[:parent_act]
 
@@ -55,11 +57,14 @@ class Hinterlands::FoolsGold < Card
         else
           parent_act.children.create(:expected_action => "resolve_#{fg.class}#{fg.id}_exchange",
                                      :text => "Decide whether to exchange #{fg.readable_name} for Gold",
-                                     :game => game,
+                                     :game => ply.game,
                                      :player => ply)
         end
       end
     end
+
+    # Fool's Gold does not impact the Province's gain
+    return false
   end
 
   def resolve_exchange(ply, params, parent_act)
