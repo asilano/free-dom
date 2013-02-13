@@ -1015,8 +1015,17 @@ class Player < ActiveRecord::Base
   def gain(parent_act, pile_id, opts = {})
     action = "player_do_gain;player=#{id};pile=#{pile_id}"
     action += ";" + opts.map {|k,v| "#{k}=#{v}"}.join(';') unless opts.empty?
-    parent_act.children.create!(:expected_action => action,
-                                :game => game)
+    parent_act = parent_act.children.create!(:expected_action => action,
+                                             :game => game)
+
+    # Trip any cards that need to trigger before the gain (as, say, Trader)
+    card_types = game.cards.select('distinct type').map(&:type).map(&:constantize)
+    gain_params = {:gainer => self, :pile_id => pile_id, :parent_act => parent_act}
+    card_types.each do |type|
+      if type.respond_to?(:witness_pre_gain)
+        type.witness_pre_gain(gain_params)
+      end
+    end
   end
 
   def emailed
