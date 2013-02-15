@@ -3,7 +3,7 @@ rvm:
   - "1.9.2"
 script:
   - RAILS_ENV=test bundle exec rake db:migrate --trace
-  - bundle exec cucumber
+  - for D in features/cards/*/ do; bundle exec cucumber -r features $D; done
 before_script:
   - cp config/database.travis.yml config/database.yml
   - psql -c 'create database dominion_test' -U postgres
