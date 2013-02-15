@@ -94,12 +94,12 @@ class Prosperity::Mint < Card
 
     # Check whether the card bought was a Mint, and if so queue to trash all the player's in-play treasures
     if pile.card_class == self
-      parent_act.children.create!(:expected_action => "resolve_#{self}#{pile.cards[0].id}_trash;ply=#{ply.id}",
+      parent_act.children.create!(:expected_action => "resolve_#{self}#{pile.cards[0].id}_trashothers;ply=#{ply.id}",
                                   :game => ply.game)
     end
   end
 
-  def trash(params)
+  def trashothers(params)
     ply = Player.find(params[:ply])
 
     trashed = []
