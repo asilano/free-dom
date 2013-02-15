@@ -373,7 +373,12 @@ class Player < ActiveRecord::Base
       # Subtract the cost from the player's cash
       self.cash -= pile.cost
 
-      # Trip any cards that need to trigger on buy
+      # Queue up a request for the player to gain the chosen card (assuming it's still there)
+      if !pile.cards(true).empty?
+        parent_act = gain(parent_act, pile.id)
+      end
+
+      # Trip any cards that need to trigger on buy, to occur before the gain
       card_types = game.cards.select('distinct type').map(&:type).map(&:constantize)
       buy_params = {:buyer => self, :pile => pile, :parent_act => parent_act}
       card_types.each do |type|
@@ -385,10 +390,6 @@ class Player < ActiveRecord::Base
         end
       end
 
-      # Queue up a request for the player to gain the chosen card (assuming it's still there)
-      if !pile.cards(true).empty?
-        gain(parent_act, pile.id)
-      end
     end
 
     save!
@@ -1026,6 +1027,8 @@ class Player < ActiveRecord::Base
         type.witness_pre_gain(gain_params)
       end
     end
+
+    return parent_act
   end
 
   def emailed
