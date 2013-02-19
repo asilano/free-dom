@@ -3,12 +3,12 @@ rvm:
   - "1.9.2"
 script:
   - RAILS_ENV=test bundle exec rake db:migrate --trace
-  - bundle exec cucumber -r features features/cards/base_game
-  - bundle exec cucumber -r features features/cards/basic_cards
-  - bundle exec cucumber -r features features/cards/intrigue
-  - bundle exec cucumber -r features features/cards/seaside
-  - bundle exec cucumber -r features features/cards/prosperity
-  - bundle exec cucumber -r features features/cards/interactions
+  - bundle exec cucumber -f progress -r features features/cards/base_game
+  - bundle exec cucumber -f progress -r features features/cards/basic_cards
+  - bundle exec cucumber -f progress -r features features/cards/intrigue
+  - bundle exec cucumber -f progress -r features features/cards/seaside
+  - bundle exec cucumber -f progress -r features features/cards/prosperity
+  - bundle exec cucumber -f progress -r features features/cards/interactions
 before_script:
   - cp config/database.travis.yml config/database.yml
   - psql -c 'create database dominion_test' -U postgres
