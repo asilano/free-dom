@@ -325,7 +325,7 @@ Then /^(.*) should have seen (#{CardListNoCapture}|nothing)/ do |name, kinds|
 
       num.times {expected << kind}
     end
-    assert_equal expected, player.cards.peeked(true).map(&:readable_name)
+    assert_same_elements expected, player.cards.peeked(true).map(&:readable_name)
   end
 end
 

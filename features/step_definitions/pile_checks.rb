@@ -10,5 +10,5 @@ end
 
 Then /the #{SingleCard} pile should have no "(.*)" state/ do |kind, key|
   pile = @game.piles.find(:first, :conditions => {:card_type => CARD_TYPES[kind]})
-  assert_not_include pile.reload.state, key.gsub(/\s/, '_').to_sym
+  refute_includes pile.reload.state, key.gsub(/\s/, '_').to_sym
 end
