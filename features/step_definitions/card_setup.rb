@@ -19,6 +19,7 @@ Given(/^(\w*?)(?:'s)? hand contains #{CardList}(?: and )?#{NamedRandCards}?/) do
 
   fixed_list ||= ""
   @hand_contents[name] = []
+  position = 0
   fixed_list.split(/,\s*/).each do |kind|
     num = 1
     card_name = kind
@@ -26,25 +27,27 @@ Given(/^(\w*?)(?:'s)? hand contains #{CardList}(?: and )?#{NamedRandCards}?/) do
       card_name = $1.rstrip
       num = $2.to_i
     end
-    
+
     num.times do
       @hand_contents[name] << card_name
-      CARD_TYPES[card_name].create(:location => 'hand', :player => player, :game => player.game)
+      CARD_TYPES[card_name].create(:location => 'hand', :player => player, :game => player.game, :position => position)
+      position += 1
     end
   end
-  
+
   @named_cards[rand_name] = [] if rand_name
   num_rand.to_i.times do |i|
     type = CARD_TYPES.keys[rand(CARD_TYPES.length)]
-    # Watchtower in hand messes up any test that wants to gain a card;    
+    # Watchtower in hand messes up any test that wants to gain a card;
     redo if type == "Watchtower"
     redo if CARD_TYPES[type].is_treasure? && CARD_TYPES[type].is_special?
     @hand_contents[name] << type
     @named_cards[rand_name].andand << type
-    CARD_TYPES[type].create(:location => 'hand', :player => player, :game => player.game)
+    CARD_TYPES[type].create(:location => 'hand', :player => player, :game => player.game, :position => position)
+    position += 1
   end
-  
-  player.renum(:hand)  
+
+  player.renum(:hand)
 end
 
 # Matches:
@@ -57,15 +60,15 @@ Given(/^(\w*?)(?:'s)? deck is empty/) do |name|
 end
 
 # Matches "my deck contains <top> then <middle> then <bottom>". Either of the middle and bottom sections may be missing
-# Each section may be like "Smithy, Witch" or like "4 other cards (named "rest of deck")"                                         
+# Each section may be like "Smithy, Witch" or like "4 other cards (named "rest of deck")"
 Given(/^(\w*?)(?:'s)?? deck contains (?:(#{NamedRandCardsNoMatch}|#{CardListNoCapture}) then )?(?:(#{NamedRandCardsNoMatch}|#{CardListNoCapture}) then )?(?:(#{NamedRandCardsNoMatch}|#{CardListNoCapture}))?/) do |name, top, middle, bottom|
   name = 'Alan' if name == 'my'
   player = @players[name]
-  
+
   player.cards.deck.destroy_all
   @deck_contents[name] = []
   rand_top = rand_mid = fixed_bottom = false
-  
+
   rand_top = (top =~ /(\d+) cards?(?: named "(.*)")?/)
   num_rand_top = $1
   name_rand_top = $2
@@ -75,18 +78,18 @@ Given(/^(\w*?)(?:'s)?? deck contains (?:(#{NamedRandCardsNoMatch}|#{CardListNoCa
   rand_bottom = (bottom =~ /(\d+) (?:other )?cards?(?: named "(.*)")?/)
   num_rand_bottom = $1
   name_rand_bottom = $2
-  
+
   position = 0
-    
+
   @named_cards[name_rand_top] = [] if name_rand_top
-  if rand_top    
+  if rand_top
     num_rand_top.to_i.times do |i|
       type = CARD_TYPES.keys[rand(CARD_TYPES.length)]
       @deck_contents[name] << type
       @named_cards[name_rand_top].andand << type
-      CARD_TYPES[type].create(:location => 'deck', 
+      CARD_TYPES[type].create(:location => 'deck',
                               :player => player,
-                              :position => position, 
+                              :position => position,
                               :game => player.game)
       position += 1
     end
@@ -98,27 +101,27 @@ Given(/^(\w*?)(?:'s)?? deck contains (?:(#{NamedRandCardsNoMatch}|#{CardListNoCa
         card_name = $1.rstrip
         num = $2.to_i
       end
-      
+
       num.times do
         @deck_contents[name] << card_name
-        CARD_TYPES[card_name].create(:location => 'deck', 
+        CARD_TYPES[card_name].create(:location => 'deck',
                                 :player => player,
-                                :position => position, 
+                                :position => position,
                                 :game => player.game)
-        position += 1                             
+        position += 1
       end
     end
   end
-  
+
   @named_cards[name_rand_mid] = [] if name_rand_mid
   if rand_mid
     num_rand_mid.to_i.times do |i|
       type = CARD_TYPES.keys[rand(CARD_TYPES.length)]
       @deck_contents[name] << type
       @named_cards[name_rand_mid].andand << type
-      CARD_TYPES[type].create(:location => 'deck', 
+      CARD_TYPES[type].create(:location => 'deck',
                               :player => player,
-                              :position => position, 
+                              :position => position,
                               :game => player.game)
       position += 1
     end
@@ -130,27 +133,27 @@ Given(/^(\w*?)(?:'s)?? deck contains (?:(#{NamedRandCardsNoMatch}|#{CardListNoCa
         card_name = $1.rstrip
         num = $2.to_i
       end
-      
+
       num.times do
         @deck_contents[name] << card_name
-        CARD_TYPES[card_name].create(:location => 'deck', 
+        CARD_TYPES[card_name].create(:location => 'deck',
                                 :player => player,
-                                :position => position, 
+                                :position => position,
                                 :game => player.game)
-        position += 1                             
-      end                            
+        position += 1
+      end
     end
   end
-  
+
   @named_cards[name_rand_bottom] = [] if name_rand_bottom
   if rand_bottom
     num_rand_bottom.to_i.times do |i|
       type = CARD_TYPES.keys[rand(CARD_TYPES.length)]
       @deck_contents[name] << type
       @named_cards[name_rand_bottom].andand << type
-      CARD_TYPES[type].create(:location => 'deck', 
+      CARD_TYPES[type].create(:location => 'deck',
                               :player => player,
-                              :position => position, 
+                              :position => position,
                               :game => player.game)
       position += 1
     end
@@ -162,21 +165,21 @@ Given(/^(\w*?)(?:'s)?? deck contains (?:(#{NamedRandCardsNoMatch}|#{CardListNoCa
         card_name = $1.rstrip
         num = $2.to_i
       end
-      
+
       num.times do
         @deck_contents[name] << card_name
-        CARD_TYPES[card_name].create(:location => 'deck', 
+        CARD_TYPES[card_name].create(:location => 'deck',
                                 :player => player,
-                                :position => position, 
+                                :position => position,
                                 :game => player.game)
-        position += 1                             
+        position += 1
       end
     end
   end
-  
+
   player.renum(:deck)
 end
-  
+
 # Matches:
 #   I have nothing in play
 #   Bob has nothing in play
@@ -204,13 +207,13 @@ Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? in play/) do |n
       card_name = $1.rstrip
       num = $2.to_i
     end
-    
+
     num.times do
       @play_contents[name] << card_name
       CARD_TYPES[card_name].create(:location => 'play', :player => player, :game => player.game)
     end
   end
-  
+
   @named_cards[rand_name] = [] if rand_name
   num_rand.to_i.times do |i|
     type = CARD_TYPES.keys[rand(CARD_TYPES.length)]
@@ -219,7 +222,7 @@ Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? in play/) do |n
     @named_cards[rand_name].andand << type
     CARD_TYPES[type].create(:location => 'play', :player => player, :game => player.game)
   end
-  
+
   player.renum(:play)
 end
 
@@ -250,13 +253,13 @@ Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? in (?:my |his )
       card_name = $1.rstrip
       num = $2.to_i
     end
-    
+
     num.times do
       @discard_contents[name] << card_name
       CARD_TYPES[card_name].create(:location => 'discard', :player => player, :game => player.game)
     end
   end
-  
+
   @named_cards[rand_name] = [] if rand_name
   num_rand.to_i.times do |i|
     type = CARD_TYPES.keys[rand(CARD_TYPES.length)]
@@ -264,7 +267,7 @@ Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? in (?:my |his )
     @named_cards[rand_name].andand << type
     CARD_TYPES[type].create(:location => 'discard', :player => player, :game => player.game)
   end
-  
+
   player.renum(:discard)
 end
 
@@ -286,13 +289,13 @@ Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? as (?:a )?durat
       card_name = $1.rstrip
       num = $2.to_i
     end
-    
+
     num.times do
       @enduring_contents[name] << card_name
       CARD_TYPES[card_name].create(:location => 'enduring', :player => player, :game => player.game)
     end
   end
-  
+
   @named_cards[rand_name] = [] if rand_name
   num_rand.to_i.times do |i|
     type = CARD_TYPES.keys[rand(CARD_TYPES.length)]
@@ -301,7 +304,7 @@ Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? as (?:a )?durat
     @named_cards[rand_name].andand << type
     CARD_TYPES[type].create(:location => 'enduring', :player => player, :game => player.game)
   end
-  
+
   player.renum(:enduring)
 end
 
@@ -318,7 +321,7 @@ Given(/the (.*) piles? contains? (\d+) cards?/) do |kinds, number|
     if pile.cards.count < number
       flunk "Don't support growing pile yet"
     end
-    
+
     pile.cards[number..-1].each(&:delete)
   end
 end
