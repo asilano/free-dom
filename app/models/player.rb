@@ -956,8 +956,8 @@ class Player < ActiveRecord::Base
   def shuffle_discard_under_deck(options = {})
     options = {:log => true}.merge(options)
     # Take all the cards in the discard pile and put them, in random order,
-    # at the end of the deck array.
-    cards.deck(true)
+    # at the end of the deck array. Make sure the deck is correctly numbered first
+    renum(:deck)
     cards.in_discard(true).shuffle.each do |card|
       cards.deck << card
       card.location = "deck"
