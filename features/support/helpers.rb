@@ -12,7 +12,7 @@ AfterStep do |scenario|
       assert_same_elements @play_contents[name], player.cards.in_play(true).map(&:readable_name), "#{name}'s cards in play didn't match"
       assert_same_elements @enduring_contents[name], player.cards.enduring(true).map(&:readable_name), "#{name}'s enduring cards didn't match"
 
-      assert_equal @deck_contents[name], player.cards.deck(true).map(&:readable_name), "#{name}'s deck didn't match. DB position array: #{player.cards.deck(true).map(&:position)}"
+      assert_equal @deck_contents[name], player.cards.deck(true).map(&:readable_name), "#{name}'s deck didn't match."
     end
   else
     @skip_card_checking -= 1
