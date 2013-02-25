@@ -15,8 +15,6 @@ class Prosperity::Goons < Card
     # Then conduct the attack
     attack(parent_act)
 
-    # The "VP on buy" effect is handled in Player#buy
-
     return "OK"
   end
 
@@ -81,5 +79,19 @@ class Prosperity::Goons < Card
                             :css_class => "player#{ply.seat} card_discard")
 
     return "OK"
+  end
+
+  # A Buy has occurred. See if the buyer has any Goons in play, and give VP accordingly
+  def self.witness_buy(params)
+    ply = params[:buyer]
+
+    goons = ply.cards.in_play.of_type(self.to_s).length
+    if goons > 0
+      ply.score ||= 0
+      ply.score += goons
+      ply.save!
+      ply.game.histories.create!(:event => "#{ply.name} gained #{goons} point#{goons == 1 ? '' : 's'} from Goons.",
+                                 :css_class => "player#{ply.seat} score")
+    end
   end
 end

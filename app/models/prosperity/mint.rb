@@ -85,4 +85,26 @@ class Prosperity::Mint < Card
     end
   end
 
+  # Notice a buy action. If it's Mint itself, queue up an action to trash treasures
+  # (it needs to be queued so that other buy-triggered treasures can still trigger)
+  def self.witness_buy(params)
+    ply = params[:buyer]
+    pile = params[:pile]
+    parent_act = params[:parent_act]
+
+    # Check whether the card bought was a Mint, and if so queue to trash all the player's in-play treasures
+    if pile.card_class == self
+      parent_act.children.create!(:expected_action => "resolve_#{self}#{pile.cards[0].id}_trashothers;ply=#{ply.id}",
+                                  :game => ply.game)
+    end
+  end
+
+  def trashothers(params)
+    ply = Player.find(params[:ply])
+
+    trashed = []
+    ply.cards.in_play.select {|c| c.is_treasure?}.each {|c| trashed << c.class; c.trash}
+    game.histories.create!(:event => "#{ply.name} trashed #{trashed.map {|c| c.readable_name}.join(', ')} buying Mint.",
+                           :css_class => "player#{ply.seat} card_trash")
+  end
 end

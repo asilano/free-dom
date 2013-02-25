@@ -170,7 +170,7 @@ Then /^(.*) should have discarded (?:my|his) hand$/ do |name|
   player_hand = @hand_contents[name].join(", ")
   player_hand = "nothing" if player_hand == ""
 
-  steps "Then I should have discarded #{player_hand}"
+  steps "Then #{name} should have discarded #{player_hand}"
 end
 
 # Checks for the discard of all in-play cards
@@ -181,7 +181,7 @@ Then /^(.*) should have discarded (?:my|his) in-play cards$/ do |name|
   player_hand = @play_contents[name].join(", ")
   player_hand = "nothing" if player_hand == ""
 
-  steps "Then I should have discarded #{player_hand} from in play"
+  steps "Then #{name} should have discarded #{player_hand} from in play"
 end
 
 # These steps are occasionally used in templated lists of steps, such as
