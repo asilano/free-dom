@@ -370,54 +370,26 @@ class Player < ActiveRecord::Base
     else
       # Process the Buy.
 
-      # Subtract the cost from the player's cash, and decrement the number of buys
+      # Subtract the cost from the player's cash
       self.cash -= pile.cost
-
-      # Check whether the pile was embargoed
-      if pile.state && pile.state[:embargo] && pile.state[:embargo] > 0
-        Seaside::Embargo.handle_embargoed_buy(self, pile, parent_act)
-      end
-
-      # Check whether the player owns a Treasury, and if so whether this card was a Victory
-      if cards.any?{|c| c.type == "Seaside::Treasury"} && pile.card_class.is_victory?
-        state.bought_victory = true
-        state.save!
-      end
-
-      # Check whether the player has any Goons in play
-      goons = cards.in_play.of_type("Prosperity::Goons").length
-      if goons > 0
-        self.score ||= 0
-        self.score += goons
-        game.histories.create!(:event => "#{name} gained #{goons} point#{goons == 1 ? '' : 's'} from Goons.",
-                              :css_class => "player#{seat} score")
-      end
-
-      # Check whether the player has any Hoards in play, and if so whether this card was a Victory
-      hoards = cards.in_play.of_type("Prosperity::Hoard").length
-      if hoards > 0 && pile.card_class.is_victory?
-        Prosperity::Hoard.bought_victory(self, hoards, parent_act)
-      end
-
-      # Check whether the player has any Talismans in play, and if so whether this card is cheap
-      # and not a Victory
-      talismans = cards.in_play.of_type("Prosperity::Talisman").length
-      if talismans > 0 && !pile.card_class.is_victory? && pile.cost <= 4
-        parent_act = Prosperity::Talisman.bought_card(self, talismans, pile, parent_act)
-      end
-
-      # Check whether the card was a Mint, and if so trash all the player's in-play treasures
-      if pile.card_type == "Prosperity::Mint"
-        trashed = []
-        cards.in_play.select {|c| c.is_treasure?}.each {|c| trashed << c.class; c.trash}
-        game.histories.create!(:event => "#{name} trashed #{trashed.map {|c| c.readable_name}.join(', ')} buying Mint.",
-                              :css_class => "player#{seat} card_trash")
-      end
 
       # Queue up a request for the player to gain the chosen card (assuming it's still there)
       if !pile.cards(true).empty?
-        gain(parent_act, pile.id)
+        parent_act = gain(parent_act, pile.id)
       end
+
+      # Trip any cards that need to trigger on buy, to occur before the gain
+      card_types = game.cards.select('distinct type').map(&:type).map(&:constantize)
+      buy_params = {:buyer => self, :pile => pile, :parent_act => parent_act}
+      card_types.each do |type|
+        if type.respond_to?(:witness_buy)
+          new_pa = type.witness_buy(buy_params)
+          if new_pa.instance_of?(PendingAction)
+            parent_act = new_pa
+          end
+        end
+      end
+
     end
 
     save!
@@ -443,56 +415,18 @@ class Player < ActiveRecord::Base
 
     asking = false
 
-    duchess = game.cards.pile.of_type("Hinterlands::Duchess")[0]
-    if duchess && pile.card_type == "BasicCards::Duchy"
-      # Game has Duchesses still in the pile, so once the primary gain is complete,
-      # we need to work out if the player wants one
-      if settings.autoduchess == Settings::ALWAYS
-        # Player is always taking Duchessess
-        duchess.resolve_gain(self, {:choice => "accept"}, parent_act)
-      elsif settings.autoduchess == Settings::NEVER
-        # Player is never taking Duchessess. Still call resolve_gain, so we get the log
-        duchess.resolve_gain(self, {:choice => "decline"}, parent_act)
-      else
-        parent_act = parent_act.children.create!(:expected_action => "resolve_#{duchess.class}#{duchess.id}_gain",
-                                                 :text => "Choose whether to gain a #{duchess}",
-                                                 :player => self,
-                                                 :game => game)
+    # Trip any cards that need to trigger on gain
+    card_types = game.cards.select('distinct type').map(&:type).map(&:constantize)
+    gain_params = {:gainer => self,
+                   :pile => pile,
+                   :parent_act => parent_act,
+                   :location => location,
+                   :position => position}
+    card_types.each do |type|
+      if type.respond_to?(:witness_gain)
+        ask = type.witness_gain(gain_params)
+        asking ||= ask
       end
-
-      # Asking about the Duchess doesn't affect the Duchy's gain in any way.
-    end
-
-    if other_players.any? {|ply| ply.cards.hand.of_type("Hinterlands::FoolsGold").present?} &&
-        pile.card_type == "BasicCards::Province"
-      # Add a Game-level action to ask all other Fool's Gold holders if they wish to trash
-      sample_fg = game.cards.of_type("Hinterlands::FoolsGold").first
-      parent_act = parent_act.children.create(
-          :expected_action => "resolve_#{sample_fg.class}#{sample_fg.id}_react;gainer=#{self.id}",
-          :game => game)
-    end
-
-    seal = cards.in_play.of_type("Prosperity::RoyalSeal")[0]
-    if seal
-      # Player has a Royal Seal in play, so we need to ask if they want the
-      # card on top of their deck (unless it's going there, of course).
-      if location != "deck" || position > 0
-        parent_act.children.create!(:expected_action => "resolve_#{seal.class}#{seal.id}_choose;gaining=#{pile.cards[0].id};location=#{location || 'discard'};position=#{position || 0}",
-                                   :text => "Choose whether to place #{pile.cards[0]} on top of deck.",
-                                   :player => self,
-                                   :game => game)
-        asking = true
-      end
-    end
-
-    tower = cards.hand.of_type("Prosperity::Watchtower")[0]
-    if tower
-      # Player has a Watchtower in hand, so we need to ask where they want the card.
-      parent_act.children.create!(:expected_action => "resolve_#{tower.class}#{tower.id}_choose;gaining=#{pile.cards[0].id};location=#{location || 'discard'};position=#{position || 0}",
-                                 :text => "Decide on destination for #{pile.cards[0]}.",
-                                 :player => self,
-                                 :game => game)
-      asking = true
     end
 
     return if asking
@@ -1082,8 +1016,19 @@ class Player < ActiveRecord::Base
   def gain(parent_act, pile_id, opts = {})
     action = "player_do_gain;player=#{id};pile=#{pile_id}"
     action += ";" + opts.map {|k,v| "#{k}=#{v}"}.join(';') unless opts.empty?
-    parent_act.children.create!(:expected_action => action,
-                                :game => game)
+    parent_act = parent_act.children.create!(:expected_action => action,
+                                             :game => game)
+
+    # Trip any cards that need to trigger before the gain (as, say, Trader)
+    card_types = game.cards.select('distinct type').map(&:type).map(&:constantize)
+    gain_params = {:gainer => self, :pile_id => pile_id, :parent_act => parent_act}
+    card_types.each do |type|
+      if type.respond_to?(:witness_pre_gain)
+        type.witness_pre_gain(gain_params)
+      end
+    end
+
+    return parent_act
   end
 
   def emailed

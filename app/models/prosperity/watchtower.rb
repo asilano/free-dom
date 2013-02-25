@@ -22,6 +22,29 @@ class Prosperity::Watchtower < Card
     return "OK"
   end
 
+  def self.witness_gain(params)
+    ply = params[:gainer]
+    pile = params[:pile]
+    parent_act = params[:parent_act]
+    location = params[:location]
+    position = params[:position]
+
+    tower = ply.cards.hand.of_type(to_s)[0]
+    if tower
+      # Player has a Watchtower in hand, so we need to ask where they want the card.
+      parent_act.children.create!(:expected_action => "resolve_#{self}#{tower.id}_choose;gaining=#{pile.cards[0].id};location=#{location || 'discard'};position=#{position || 0}",
+                                  :text => "Decide on destination for #{pile.cards[0]}.",
+                                  :player => ply,
+                                  :game => ply.game)
+
+      # Watchtower prevents the gain from just occurring
+      return true
+    end
+
+    # No action from tower
+    return false
+  end
+
   def determine_controls(ply, controls, substep, params)
     case substep
     when "choose"

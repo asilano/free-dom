@@ -35,7 +35,7 @@ end
 Then(/^(.*) should have ended (?:my|his) turn$/) do |name|
   name = "Alan" if name == "I"
 
-  steps "Then #{name} should have discarded my hand
-         And #{name} should have discarded my in-play cards
+  steps "Then #{name} should have discarded his hand
+         And #{name} should have discarded his in-play cards
          And #{name} should have drawn 5 cards"
 end

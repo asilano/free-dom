@@ -70,23 +70,30 @@ class Seaside::Embargo < Card
     return "OK"
   end
 
-  def self.handle_embargoed_buy(ply, pile, parent_act)
-    # Pile from which the player bought was embargoed. Give the player that many Curses.
-    game = ply.game
-    curses_pile = game.piles.find_by_card_type("BasicCards::Curse")
+  # A Buy has occurred. See if it's of an Embargo'd pile, and dole out Curses if so
+  def self.witness_buy(params)
+    ply = params[:buyer]
+    pile = params[:pile]
+    parent_act = params[:parent_act]
 
-    num_to_gain = [curses_pile.cards.count, pile.state[:embargo]].min
-    game.histories.create!(:event => "#{ply.name} gained #{num_to_gain} Curse#{'s' if num_to_gain > 1} from Embargo.",
-                          :css_class => "player#{ply.seat} card_gain") unless num_to_gain == 0
+    if pile.state && pile.state[:embargo] && pile.state[:embargo] > 0
+      # Pile from which the player bought was embargoed. Give the player that many Curses.
+      game = ply.game
+      curses_pile = game.piles.find_by_card_type("BasicCards::Curse")
 
-    num_to_gain.times do |ix|
-      ply.gain(parent_act, curses_pile.id)
-    end
+      num_to_gain = [curses_pile.cards.count, pile.state[:embargo]].min
+      game.histories.create!(:event => "#{ply.name} gained #{num_to_gain} Curse#{'s' if num_to_gain > 1} from Embargo.",
+                            :css_class => "player#{ply.seat} card_gain") unless num_to_gain == 0
 
-    if num_to_gain < pile.state[:embargo]
-      diff = pile.state[:embargo] - num_to_gain
-      game.histories.create!(:event => "#{ply.name} should have gained #{diff} more Curse#{'s' if diff != 1} from Embargo, but the Curse pile was empty.",
-                            :css_class => "player#{ply.seat}")
+      num_to_gain.times do |ix|
+        ply.gain(parent_act, curses_pile.id)
+      end
+
+      if num_to_gain < pile.state[:embargo]
+        diff = pile.state[:embargo] - num_to_gain
+        game.histories.create!(:event => "#{ply.name} should have gained #{diff} more Curse#{'s' if diff != 1} from Embargo, but the Curse pile was empty.",
+                              :css_class => "player#{ply.seat}")
+      end
     end
   end
 

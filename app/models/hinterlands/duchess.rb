@@ -3,8 +3,6 @@ class Hinterlands::Duchess < Card
   costs 2
   card_text "Action (cost: 2) - +2 Cash. Each player (including you) looks at the top card of his deck, and discards it or puts it back. / When you gain a Duchy, you may gain a Duchess."
 
-  # The gain hook is located in Player#gain. It's processed in Duchess#resolve_gain, below.
-
   def play(parent_act)
     super
 
@@ -77,6 +75,34 @@ class Hinterlands::Duchess < Card
 
     return "OK"
 
+  end
+
+  def self.witness_gain(params)
+    ply = params[:gainer]
+    pile = params[:pile]
+    parent_act = params[:parent_act]
+    game = ply.game
+
+    duchess = game.cards.pile.of_type(self.to_s).first
+    if duchess && pile.card_type == "BasicCards::Duchy"
+      # Game has Duchesses still in the pile, so once the primary gain is complete,
+      # we need to work out if the player wants one
+      if ply.settings.autoduchess == Settings::ALWAYS
+        # Player is always taking Duchessess
+        duchess.resolve_gain(ply, {:choice => "accept"}, parent_act)
+      elsif ply.settings.autoduchess == Settings::NEVER
+        # Player is never taking Duchessess. Still call resolve_gain, so we get the log
+        duchess.resolve_gain(ply, {:choice => "decline"}, parent_act)
+      else
+        parent_act.children.create!(:expected_action => "resolve_#{self}#{duchess.id}_gain",
+                                    :text => "Choose whether to gain a #{duchess}",
+                                    :player => ply,
+                                    :game => game)
+      end
+    end
+
+    # Asking about the Duchess doesn't affect the Duchy's gain in any way.
+    return false
   end
 
   def resolve_gain(ply, params, parent_act)
