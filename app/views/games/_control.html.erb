@@ -17,12 +17,14 @@
                                          :name => 'card_index',
                                          :value => ix,
                                          :form => "form_#{control.object_id}",
-                                         :disable_with => control[:text]) %>
+                                         :disable_with => control[:text],
+                                         :class => control[:css_class]) %>
       <% when :two_d_radio -%>
         <% control[:options].each_with_index do |opt, optix| -%>
           <%= radio_button_tag(:choice, "#{ix}.#{optix}", false,
                                :onclick => ("changed_#{control.object_id}()" if control[:on_update]),
-                               :form => "form_#{control.object_id}") -%><%= h opt -%><br/>
+                               :form => "form_#{control.object_id}",
+                               :class => control[:css_class]) -%><%= h opt -%><br/>
         <% end %>
       <% when :latin_radio -%>
         <% control[:options].each_with_index do |opt, optix| %>
@@ -32,7 +34,8 @@
                                "data-rowid".to_sym => "#{optix}",
                                :class => "latin-radio",
                                :onclick => ("changed_#{control.object_id}()" if control[:on_update]),
-                               :form => "form_#{control.object_id}") -%> <%= h opt %><br />
+                               :form => "form_#{control.object_id}",
+                               :class => control[:css_class]) -%> <%= h opt %><br />
         <% end %>
         <%= javascript_tag do %>
           $('.latin-radio').on('click', function()
@@ -45,7 +48,8 @@
                           :id => "#{control.object_id}_#{ix}",
                           :onclick => ("changed_#{control.object_id}()" if control[:on_update]),
                           :"data-js" => (control[:data][ix] if control[:data]),
-                          :form => "form_#{control.object_id}") -%>
+                          :form => "form_#{control.object_id}",
+                          :class => control[:css_class]) -%>
         <%= label_tag("#{control.object_id}_#{ix}", control[:choice_text]) -%>
       <% end -%>
     <% end %>
@@ -59,26 +63,30 @@
         <%= submit_tag(control[:nil_action],
                         :name => "nil_action",
                         :form => "form_#{control.object_id}",
-                        :disable_with => control[:nil_action]) %>
+                        :disable_with => control[:nil_action],
+                        :class => control[:css_class]) %>
       <% end %>
     <% when :two_d_radio, :latin_radio -%>
       <% if control[:nil_action] -%>
         <%= radio_button_tag(:choice, "nil_action", true,
-                             :form => "form_#{control.object_id}") -%><%= h control[:nil_action] -%><br/>
+                             :form => "form_#{control.object_id}",
+                             :class => control[:css_class]) -%><%= h control[:nil_action] -%><br/>
       <% end -%>
       <%= submit_tag(control[:text],
                      :form => "form_#{control.object_id}",
-                     :disable_with => control[:text])%>
+                     :disable_with => control[:text],
+                     :class => control[:css_class])%>
     <% when :checkboxes -%>
       <%= submit_tag(control[:button_text],
                      :form => "form_#{control.object_id}",
-                     :disable_with => control[:button_text])%>
+                     :disable_with => control[:button_text],
+                     :class => control[:css_class])%>
     <% end -%>
 
     <% if control[:on_update] %>
       <span id='<%= control.object_id.to_s + "_js" -%>'></span>
       <%= javascript_tag do %>
-        <%= "changed_#{control.object_id}()" %>
+        <%= "changed_#{control.object_id}()".html_safe %>
       <% end %>
     <% end %>
   </td>

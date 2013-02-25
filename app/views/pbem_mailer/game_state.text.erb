@@ -1,10 +1,10 @@
-Hi <%= @user.name %>,
+Hi <%= @user.name.html_safe %>,
 
-<%= @text %>
+<%= @text.html_safe %>
 <% if !@warn.blank? -%>
 
 You are warned about the following:
-<%= @warn %>
+<%= @warn.html_safe %>
 <% end -%>
 
 <%= render :partial => 'game' %>

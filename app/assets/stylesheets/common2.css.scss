@@ -1,3 +1,6 @@
+// Media sizes
+$break-small: 640px;
+
 @font-face {
   font-family: 'CloisterBlackLight';
   src: url('../fonts/CloisterBlack-webfont.eot');
@@ -24,7 +27,7 @@
 #siteLogo, #nav
 {
   h1, h2
-  {	
+  {
     font-family: 'CloisterBlackLight';
     font-weight: normal;
     line-height: 1em;
@@ -34,42 +37,42 @@
       text-decoration: none;
       color: inherit;
       background: transparent;
-    } 
+    }
   }
 
-  h1 
-  {  
-    font-size: 4em; 
+  h1
+  {
+    font-size: 4em;
     color: blue;
   }
-  h2 
-  {  
-    font-size: 3em; 
+  h2
+  {
+    font-size: 3em;
     a:hover {text-decoration: underline;}
   }
 }
 
 h3 {  font-size: 1.5em; }
 
-h1, h2 
+h1, h2
 {
-	font-family: inherit; 
-	font-weight: bold; 
-	color: black; 
+	font-family: inherit;
+	font-weight: bold;
+	color: black;
 	font-size: 1.5em;
 }
 
 .details-page p {padding: 0.5em 0 1em 0.5em;}
 
-.expansion-settings 
+.expansion-settings
 {
   margin-top: 5px;
   padding-left: 5px;
-  
+
   h1
   {
-    font-family: inherit; 
-    color: black; 
+    font-family: inherit;
+    color: black;
     text-decoration: underline;
     font-size: 1em;
     margin-left: -5px;
@@ -100,7 +103,7 @@ h1, h2
 		background-color: #f5f4d6;
     background-image: -moz-linear-gradient(left top, #fff 10%, #f5f4d6, #fff 90%);
 		background-image: -webkit-gradient(linear, 0 0, 100% 100%, color-stop(0.1, white), color-stop(0.5, #f5f4d6), color-stop(0.9, white));
-		border: 3px outset navy;	
+		border: 3px outset navy;
 		display: inline-block;
 		text-decoration: none;
 		text-align: center;
@@ -112,8 +115,8 @@ h1, h2
   min-height: 100%;
   overflow: visible;
 	padding: 0 2em;
-  
-  &:before 
+
+  &:before
   { /* Opera and IE8 "redraw" bug fix */
     content:"";
     float:left;
@@ -123,43 +126,43 @@ h1, h2
 }
 * html #contentWrap { height: 100% } /* IE6 workaround */
 
-#flash 
-{ 
+#flash
+{
   margin-top: 2em;
   padding-left: 2px;
   padding-right: 2px;
-  
+
   div { padding: 5px; }
-  
-  .notice 
+
+  .notice
   {
     color: green;
     border: 1px solid #008800;
     background-color: #AAFFAA;
   }
-  .warning 
+  .warning
   {
     color: black;
     border: 1px solid red;
-    background-color: #87CEFA;     
+    background-color: #87CEFA;
   }
-  .error 
+  .error
   {
     color: #880000;
     border: 1px solid red;
-    background-color: #FFCCCC;     
+    background-color: #FFCCCC;
   }
 }
 #mainContent { padding-bottom: 22px; }
 
-#footer 
+#footer
 {
   clear: both;
   height: 20px;
-  margin-top: -22px; 
-  border-top: 1px solid #ccf; 
-  font-size: 1.1em; 
-  
+  margin-top: -22px;
+  border-top: 1px solid #ccf;
+  font-size: 1.1em;
+
   a {font-weight: bold; margin: 0 0.5em;}
 }
 
@@ -168,11 +171,11 @@ h1, h2
 	margin-bottom: 1em;
 }
 
-#card_selects 
+#card_selects
 {
 	.pileLabel {width: 10em;}
 	.cardText {padding-left: 5px;}
-	//tr {border: 1px solid black;}	
+	//tr {border: 1px solid black;}
 	td {padding: 1px;}
 	.rowEven {background-color: #def;}
 }
@@ -182,17 +185,17 @@ h1, h2
 	clear: both;
 	td,th {border: 1px solid black;}
 	th#blank_th {border: none;}
-	
+
 	tr .bold {font-weight: bold;}
-	
+
 	tr.ended.rowEven {background-color: #fee;}
 	tr.ended.rowOdd {background-color: #fdd;}
-	
+
 	tr.running.rowEven {background-color: #efe;}
   tr.running.rowOdd {background-color: #dfd;}
-	
+
 	tr.waiting.rowEven {background-color: #def;}
-  tr.waiting.rowOdd {background-color: #cdf;}	
+  tr.waiting.rowOdd {background-color: #cdf;}
 }
 
 #errorExplanation h2 {font-family: verdana,arial,helvetica,sans-serif} /* Override CloisterBlack for Error boxes */
@@ -211,7 +214,7 @@ label.checkLabel {float: none;}
 
 .userform input {margin-bottom: 5px;}
 input:not([type=submit]):not([type=button]):focus {background-color: #e0f0ff;}
-.field_with_errors 
+.field_with_errors
 {
   display: inline; background-color: inherit; padding: 0;
   label {color: darkred;}
@@ -254,7 +257,7 @@ input:-moz-placeholder {font-style: italic;}
 #card_selects, #random_options
 {
   margin: 5px 0 10px 10px;
-}  
+}
 
 .lastVal
 {
@@ -265,22 +268,22 @@ input:-moz-placeholder {font-style: italic;}
   {
     display: inline-block;
     width: 15px;
-    height: 15px;    
+    height: 15px;
     background-image: image-url('arrows.png');
     vertical-align: middle;
     margin-left: -5px;
   }
-  
+
   .same {}
   .up { background-position: -15px 0; }
   .down { background-position: -30px 0; }
 }
 
-.tooltip_explain 
+.tooltip_explain
 {
-  position: relative; 
+  position: relative;
   display: inline;
-  
+
   img {vertical-align: middle;}
   .tooltip_explanation
   {
@@ -290,9 +293,17 @@ input:-moz-placeholder {font-style: italic;}
     width: 15em;
     border: 1px solid black;
     background: #f5f4d6;
-    margin-left: -9999px; 
+    margin-left: -9999px;
   }
   &:hover .tooltip_explanation {margin-left: 0;}
 }
 
 .inline_legal { font-size: 0.7em; }
+
+@media screen and (max-width: 640px) {
+  button, input[type='submit']
+  {
+    min-width: 40px;
+    min-height: 40px;
+  }
+}

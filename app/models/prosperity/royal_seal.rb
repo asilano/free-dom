@@ -8,10 +8,10 @@ class Prosperity::RoyalSeal < Card
   def determine_controls(ply, controls, substep, params)
     case substep
     when "choose"
-      card = Card.find(params[:gaining])
+      pile = Pile.find(params[:gain_pile].to_i)
       controls[:player] += [{:type => :buttons,
                              :action => :resolve,
-                             :label => "#{self}: Place #{card}...:",
+                             :label => "#{self}: Place #{pile.card_class.readable_name}...:",
                              :params => {:card => "#{self.class}#{id}",
                                          :substep => "choose"}.merge(params),
                              :options => [{:text => "#{params[:location].titleize}",
@@ -29,10 +29,10 @@ class Prosperity::RoyalSeal < Card
       return "Invalid parameters"
     end
 
-    gaining_id = params[:gaining]
-    to_del = game.pending_actions.select {|pa| pa.expected_action =~ /;gaining=#{gaining_id}/}
+    gain_pile_id = params[:gain_pile].to_i
+    to_del = game.pending_actions.where(:player_id => ply).select {|pa| pa.expected_action =~ /;gain_id=#{params[:gain_id]}/}
 
-    card = Card.find(gaining_id)
+    card = Pile.find(gain_pile_id).cards.first
     if params[:choice] == "normal"
       # If no-one else is trying to replace the gain, perform the default action here.
       if to_del.empty?

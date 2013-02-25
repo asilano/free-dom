@@ -37,16 +37,14 @@
                   (!controls[:revealed].select {|c| c[:player_id] == player.id}.empty?) -%>
       <tr>
       <th>Revealed:</th><td>
-        <%= form_tag('javascript:void(0)') do -%>
-          <table class="revealed">
-             <tr>
+        <table class="revealed">
+           <tr>
 
-              <%= render :partial => 'card', :collection => player.cards.revealed -%>
-            </tr>
-            <%= render :partial => 'control',
-                   :collection => controls[:revealed].select {|c| c[:player_id] == player.id} -%>
-          </table>
-        <% end -%>
+            <%= render :partial => 'card', :collection => player.cards.revealed -%>
+          </tr>
+          <%= render :partial => 'control',
+                 :collection => controls[:revealed].select {|c| c[:player_id] == player.id} -%>
+        </table>
         </td>
       </tr>
     <% end -%>
@@ -57,7 +55,6 @@
     <% if player.score && player.score != 0%>
       <tr class="scoreRow"><th>Score:</th><td><%= player.score %></td></tr>
     <% end %>
-
     <% if !controls[:other_players].select {|c| c[:player_id].to_i == player.id}.empty? -%>
       <tr><td colspan="2"><table>
       <% controls[:other_players].select {|c| c[:player_id].to_i == player.id}.each do |control| -%>

@@ -24,4 +24,6 @@ Feature: Minion + Secret Chamber
       Then Bob should need to Place a card on top of deck with Secret Chamber
     When Bob chooses Copper in his hand
       Then Bob should have moved Copper from hand to deck
-      And Bob should need to React to Minion
+      And Bob should not need to act
+    When the game checks actions
+      Then it should be my Play Action phase

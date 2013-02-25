@@ -1,7 +1,7 @@
-Hi, <%= @user.name %>.
+Hi, <%= @user.name.html_safe %>.
 
-<%= @text %>
-  
+<%= @text.html_safe %>
+
 Thanks, and happy gaming!
 
 ----

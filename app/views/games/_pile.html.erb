@@ -28,7 +28,8 @@
                                          :value => pile.position,
                                          :form => "form_#{control.object_id}",
                                          :disable_with => control[:text],
-                                         :confirm => (pile.card_class == BasicCards::Curse ? "Really choose Curse?" : nil)) %>
+                                         :confirm => (pile.card_class == BasicCards::Curse ? "Really choose Curse?" : nil),
+                                         :class => control[:css_class]) %>
           <% end -%>
         <% end -%>
       </td>

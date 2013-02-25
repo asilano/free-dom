@@ -1,13 +1,13 @@
 Feature: Royal Seal
   2 Cash. While this is in play, when you gain a card, you may put that card on top of your deck.
-  
+
   Background:
     Given I am a player in a standard game with Royal Seal
-    
+
   Scenario: Royal Seal should be set up at game start
     Then there should be 10 Royal Seal cards in piles
       And there should be 0 Royal Seal cards not in piles
-      
+
   Scenario: Royal Seal
     Given my hand contains Market, Market, Royal Seal, Gold
       And it is my Play Action phase
@@ -30,5 +30,5 @@ Feature: Royal Seal
       And the game checks actions
     Then I should need to Choose whether to place Estate on top of deck
     When I choose the option Discard
-    Then I should have gained Estate    
+    Then I should have gained Estate
       And it should be my Buy phase

@@ -118,7 +118,7 @@ private
 
     /Distribution:[ \t]*(true|false)/i =~ body
     game_params[:specify_distr] = ($1 == 'true') ? 1 : 0
-
+	
     %w<BaseGame Intrigue Seaside Prosperity Hinterlands>.each do |set|
       /#{set}:[ \t]*(\d+)/i =~ body
       game_params["num_#{set.underscore}_cards".to_sym] = $1
@@ -218,13 +218,14 @@ private
             process_result "Didn't understand your choice #{choice} for PA #{pa_id}", nil, nil
             raise ActiveRecord::Rollback
           end
-          if value =~ /\s/
-            value = value.split(/\s/)
-            if value.all? {|v| v =~ /.*=>.*/}
-              value = value.inject({}) do |h, v|
+          if value =~ /^\[(.*)\]/
+            value = $1.split(/,\s*/)
+          elsif value =~ /^\{(.*)\}/
+            choices = $1.split(/,\s*/)
+            if choices.all? {|v| v =~ /.*=>.*/}
+              value = choices.each_with_object({}) do |v, h|
                 v =~ /(.*)=>(.*)/
-                h[$1] = $2
-                h
+                h[$1.strip] = $2.strip
               end
             end
           end
@@ -314,10 +315,11 @@ private
     end
   end
 
-  def error_reply
+  def error_reply(error)
     if @user
       if @game
-        PbemMailer.game_error(@user, @game, @player, nil, "Sorry, something went wrong", @message.body.to_s).deliver
+        PbemMailer.game_error(@user, @game, @player, nil, "Sorry, something went wrong. The webmaster has been alerted", @message.body.to_s).deliver
+        PbemMailer.game_exception(@user, @game, error).deliver
       else
         PbemMailer.game_not_found(@user, "unknown", @message).deliver
       end

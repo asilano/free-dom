@@ -194,15 +194,21 @@ When(/(.*) chooses? the option (.*)/) do |name, choice|
 
   flunk "No controls found on player" if controls.length == 0
   # Look for an option of the chosen name anywhere in the controls
+  found = false
   controls.each do |ctrl|
     params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
 
     matching_controls = ctrl[:options].detect {|opt| opt[:text] =~ Regexp.new(Regexp.escape(choice), Regexp::IGNORECASE)}
     if matching_controls
       params[:choice] = matching_controls[:choice]
+      found = true
       player.resolve(params)
       break
     end
+  end
+
+  if !found
+    flunk "Couldn't find #{choice} in #{ctrl[:options].inspect}"
   end
 
   # Probably chosen the option for a reason

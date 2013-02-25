@@ -1,4 +1,4 @@
-if ['0.5.0', '0.6.0'].include?(I18n::VERSION)
+if ['0.5.0', '0.6.0', '0.6.1'].include?(I18n::VERSION)
   puts "Monkey patching I18n..." if ENV['I18N_DEBUG']
 
   module I18n

@@ -1,15 +1,15 @@
-html, body 
-{ 
+html, body
+{
   height: 100%;
   margin: 0;
-  padding: 0; 
+  padding: 0;
 }
 
-p 
+p
 {
   margin: 0;
 }
-  
+
 fieldset.user
 {
   max-width: 1000px;
@@ -21,8 +21,8 @@ fieldset.user
 }
 .bottom
 {
-  position: absolute; 
-  bottom: 0px; 
+  position: absolute;
+  bottom: 0px;
   width: 100%;
 }
 .inline { display: inline;}

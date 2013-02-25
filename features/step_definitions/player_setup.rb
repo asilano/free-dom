@@ -14,7 +14,8 @@ Given /I am a player in a (?:([2-6])-player )?standard game(?: with (.*))?/ do |
 
   @game.andand.destroy
   player_count ||= 3
-  @game = Factory.create(:fixed_game, :max_players => player_count.to_i)
+
+  @game = FactoryGirl.create(:fixed_game, :max_players => player_count.to_i)
 
   if card_list
     reqd_cards = card_list.split(/,\s*/)

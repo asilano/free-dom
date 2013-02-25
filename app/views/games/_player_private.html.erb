@@ -121,7 +121,8 @@
                                            :name => key,
                                            :value => opt[key],
                                            :form => "form_#{control.object_id}",
-                                           :disable_with => opt[:text] -%>
+                                           :disable_with => opt[:text],
+                                           :class => control[:css_class] -%>
             </td>
           <% end %>
         <% when :checkboxes -%>
@@ -135,14 +136,17 @@
                   <td>
                     <%= check_box_tag(control[:name] + "[]", ix, false,
                                       :id => "#{control.object_id}_#{ix}",
-                                      :form => "form_#{control.object_id}") -%>
-                    <%= label_tag("#{control.object_id}_#{ix}", choice) -%>
+                                      :form => "form_#{control.object_id}",
+                                      :class => control[:css_class]) -%>
+                    <%= label_tag("#{control.object_id}_#{ix}", choice,
+                                  :class => control[:css_class]) -%>
                   </td>
                 <% end %>
                   <td>
                     <%= submit_tag(control[:button_text],
                                    :form => "form_#{control.object_id}",
-                                   :disable_with => control[:button_text])%>
+                                   :disable_with => control[:button_text],
+                                   :class => control[:css_class])%>
                   </td>
               </tr>
             </table>
@@ -152,10 +156,12 @@
             <%= control[:label] %>
             <%= select_tag(control[:name], options_for_select(control[:choices], control[:selected]),
                            :id => "#{control.object_id}_#{control[:name]}",
-                           :form => "form_#{control.object_id}") %>
+                           :form => "form_#{control.object_id}",
+                           :class => control[:css_class]) %>
             <%= submit_tag(control[:button_text],
                                    :form => "form_#{control.object_id}",
-                                   :disable_with => control[:button_text]) %>
+                                   :disable_with => control[:button_text],
+                                   :class => control[:css_class]) %>
           </td>
         <% end -%>
       </tr>

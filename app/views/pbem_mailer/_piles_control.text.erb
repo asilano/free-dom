@@ -1,5 +1,5 @@
 <% control = piles_control -%>
-<%= PendingAction.find(control[:pa_id]).text -%> (PA <%= control[:pa_id] -%>): <% -%>
+(PA <%= control[:pa_id] -%>)<%= PendingAction.find(control[:pa_id]).text.html_safe -%>: <% -%>
 <% case control[:type]
    when :button -%>
 Choose one from the available piles. Valid choices: <%= opts_for_buttons_from_valid(control, :piles, "Pile") %>

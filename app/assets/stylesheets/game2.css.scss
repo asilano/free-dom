@@ -22,9 +22,25 @@ $p3fgcol: #0aa;
 $p4fgcol: #00f;
 $p5fgcol: #d0d;
 
+@mixin border-radius ($radius:5px) {
+  -webkit-border-radius: $radius;
+  -moz-border-radius: $radius;
+  border-radius: $radius;
+}
+
+@mixin bg-gradient($from_loc, $to_loc, $from_c, $to_c, $fstop: 0%, $tstop: 100%) {
+  background-color: $from_c;
+  background-image: -webkit-gradient(linear, $from_loc, $to_loc, stop($fstop, $from_c), stop($tstop, $to_c));
+  background-image: -webkit-linear-gradient($from_loc, $from_c $fstop, $to_c $tstop);
+  background-image:    -moz-linear-gradient($from_loc, $from_c $fstop, $to_c $tstop);
+  background-image:     -ms-linear-gradient($from_loc, $from_c $fstop, $to_c $tstop);
+  background-image:      -o-linear-gradient($from_loc, $from_c $fstop, $to_c $tstop);
+  background-image:         linear-gradient(to $to_loc, $from_c $fstop, $to_c $tstop);
+}
+
 @mixin card_grad($from, $to, $fstop: 30%, $tstop: 70%) {
   background-color: $from;
-  background-image: -webkit-gradient(linear, left top, right top, stop($fstop, $from), stop($fstop, $to));
+  background-image: -webkit-gradient(linear, left top, right top, stop($fstop, $from), stop($tstop, $to));
   background-image: -webkit-linear-gradient(left, $from $fstop, $to $tstop);
   background-image:    -moz-linear-gradient(left, $from $fstop, $to $tstop);
   background-image:     -ms-linear-gradient(left, $from $fstop, $to $tstop);
@@ -127,6 +143,22 @@ $p5fgcol: #d0d;
     td:first-child { border-left-width: 2px; }
     td:last-child  { border-right-width: 2px; }
 	}
+
+/* Control styling */
+button, input[type='submit']
+{
+  &.play
+  {
+    @include border-radius(4px);
+    @include bg-gradient(bottom, top, #6c6, #8e8, 16%, 79%);
+    border: 1px solid #888;
+
+    &:hover
+    {
+    @include bg-gradient(bottom, top, #6c6, #7d7, 16%, 79%);
+    }
+  }
+}
 
 /* Candystripe players */
 .cssgradients

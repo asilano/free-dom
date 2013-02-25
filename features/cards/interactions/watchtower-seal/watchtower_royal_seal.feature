@@ -32,6 +32,8 @@ Feature: Watchtower + Royal Seal
     And the game checks actions
       Then I should need to Choose whether to place Silver on top of deck
       And I should need to Decide on destination for Silver
+      And dump actions
+      And dump controls
     When I choose the option No - Silver to discard
       Then I should need to Choose whether to place Silver on top of deck
     When I choose the option On deck

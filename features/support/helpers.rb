@@ -8,7 +8,7 @@ AfterStep do |scenario|
   if @skip_card_checking == 0
     @players.each do |name, player|
       assert_same_elements @hand_contents[name], player.cards.hand(true).map(&:readable_name), "#{name}'s hand didn't match"
-      assert_same_elements @discard_contents[name], player.cards.in_discard(true).map(&:readable_name), "#{name}'s discard didn't match"
+      assert_same_elements @discard_contents[name], player.cards.in_discard(true).map(&:readable_name), "#{name}'s discard didn't match. #{name}'s cards in DB: #{player.cards.inspect}"
       assert_same_elements @play_contents[name], player.cards.in_play(true).map(&:readable_name), "#{name}'s cards in play didn't match"
       assert_same_elements @enduring_contents[name], player.cards.enduring(true).map(&:readable_name), "#{name}'s enduring cards didn't match"
 
