@@ -9,6 +9,7 @@ script:
   - bundle exec cucumber -f progress -r features features/cards/seaside
   - bundle exec cucumber -f progress -r features features/cards/prosperity
   - bundle exec cucumber -f progress -r features features/cards/interactions
+  - bundle exec cucumber -f progress -r features features/cards/hinterlands
 before_script:
   - cp config/database.travis.yml config/database.yml
   - psql -c 'create database dominion_test' -U postgres
