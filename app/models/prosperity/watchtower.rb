@@ -32,7 +32,9 @@ class Prosperity::Watchtower < Card
     tower = ply.cards.hand.of_type(to_s)[0]
     if tower
       # Player has a Watchtower in hand, so we need to ask where they want the card.
-      parent_act.children.create!(:expected_action => "resolve_#{self}#{tower.id}_choose;gaining=#{pile.cards[0].id};location=#{location || 'discard'};position=#{position || 0}",
+      parent_act.children.create!(:expected_action => "resolve_#{self}#{tower.id}_choose;" +
+                                             "gain_pile=#{pile.id};location=#{location || 'discard'};" +
+                                             "position=#{position || 0};gain_id=#{params[:this_act_id]}",
                                   :text => "Decide on destination for #{pile.cards[0]}.",
                                   :player => ply,
                                   :game => ply.game)

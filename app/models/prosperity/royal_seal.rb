@@ -17,7 +17,9 @@ class Prosperity::RoyalSeal < Card
       # Player has a Royal Seal in play, so we need to ask if they want the
       # card on top of their deck (unless it's going there, of course).
       if location != "deck" || position > 0
-        parent_act.children.create!(:expected_action => "resolve_#{self}#{seal.id}_choose;gaining=#{pile.cards[0].id};location=#{location || 'discard'};position=#{position || 0}",
+        parent_act.children.create!(:expected_action => "resolve_#{self}#{seal.id}_choose;" +
+                                             "gain_pile=#{pile.id};location=#{location || 'discard'};" +
+                                             "position=#{position || 0};gain_id=#{params[:this_act_id]}",
                                     :text => "Choose whether to place #{pile.cards[0]} on top of deck.",
                                     :player => ply,
                                     :game => ply.game)

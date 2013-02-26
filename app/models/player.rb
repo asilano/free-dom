@@ -420,6 +420,7 @@ class Player < ActiveRecord::Base
     gain_params = {:gainer => self,
                    :pile => pile,
                    :parent_act => parent_act,
+                   :this_act_id => params[:this_act_id],
                    :location => location,
                    :position => position}
     card_types.each do |type|
