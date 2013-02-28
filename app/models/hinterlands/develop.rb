@@ -142,22 +142,31 @@ class Hinterlands::Develop < Card
         game.histories.create!(:event => "#{ply.name} couldn't take the second replacement card.",
                                :css_class => "player#{ply.seat}")
       elsif valid_piles.one?
-        # Exactly one replacement available. Call take2 directly
-        rc = resolve_take2(ply,
-                           {:pile_index => valid_piles.index(true),
-                            :trashed_cost => trashed_cost,
-                            :valid => valid},
-                           parent_act)
+        # Exactly one replacement available. Create an action to handle the second take automatically
+        # once the first one is done.
+        parent_act.queue(:expected_action => "resolve_#{self.class}#{id}_autotake2;" +
+                                             "pile_ix=#{valid_piles.index(true)};" +
+                                             "trashed_cost=#{trashed_cost};valid=#{valid}",
+                         :game => game)
       else
         # Actually have a choice. Create an action to ask the player
-        parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_take2;trashed_cost=#{trashed_cost};valid=#{valid}",
-                                    :text => "Take second replacement card with #{self}",
-                                    :player => player,
-                                    :game => game)
+        parent_act.queue(:expected_action => "resolve_#{self.class}#{id}_take2;trashed_cost=#{trashed_cost};valid=#{valid}",
+                         :text => "Take second replacement card with #{self}",
+                         :player => player,
+                         :game => game)
       end
     end
 
     return rc
+  end
+
+  # Automatically gain the second card if there was only one choice.
+  def autotake2(params)
+    resolve_take2(player,
+                  {:pile_index => params[:pile_ix].to_i,
+                   :trashed_cost => params[:trashed_cost].to_i,
+                   :valid => params[:valid].to_i},
+                  params[:parent_act])
   end
 
   def resolve_take2(ply, params, parent_act)
