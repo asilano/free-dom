@@ -14,4 +14,5 @@ ActiveSupport::Inflector.inflections do |inflect|
     inflect.uncountable 'militia'
     inflect.plural /^talisman$/, 'talismans'
     inflect.plural /^oasis$/, 'oases'
+    inflect.plural /^jack of all trades$/, 'jacks of all trades'
 end
