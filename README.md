@@ -1,6 +1,8 @@
 FreeDom
 ======
 
+[![Build Status](https://travis-ci.org/asilano/free-dom.png?branch=master)](https://travis-ci.org/asilano/free-dom)
+
 This is the codebase for my free, online Dominion server.
 
 Notes
