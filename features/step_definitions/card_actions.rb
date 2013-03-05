@@ -87,7 +87,12 @@ When(/(.*) moves? (.*) from (.*) to (.*)/) do |name, kind, from, to|
   end
 end
 
-When(/^(\w*?) buys? #{SingleCard}/) do |name, kind|
+When(/^(\w*?) buys? #{SingleCard} expecting side-effects$/) do |name, kind|
+  @skip_card_checking = 1 if @skip_card_checking == 0
+  steps "When #{name} buys #{kind}"
+end
+
+When(/^(\w*?) buys? #{SingleCard}$/) do |name, kind|
   name = 'Alan' if name == 'I'
   
   assert_contains @game.piles.map{|p| p.card_type.readable_name}, kind
