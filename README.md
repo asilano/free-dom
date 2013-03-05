@@ -1,6 +1,8 @@
 FreeDom
 ======
 
+[![Build Status](https://travis-ci.org/asilano/free-dom.png?branch=hinterlands)](https://travis-ci.org/asilano/free-dom)
+
 This is a branch of the codebase for my free, online Dominion server.
 
 Notes
