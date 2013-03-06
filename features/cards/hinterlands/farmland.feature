@@ -42,10 +42,8 @@ When you buy this, trash a card from your hand. Gain a card costing exactly $2 m
       And it should be my Buy phase
       And I should have 8 cash available
     When I buy Farmland 
-      And the game checks actions
-    And I should need to Trash a card with Farmland 
+    Then I should need to Trash a card with Farmland 
     When I choose Estate in my hand
-      And the game checks actions
     Then I should have removed Estate from my hand
       And I should need to Take a replacement card with Farmland
       And I should be able to choose the Smithy, Militia, Feast piles
@@ -70,7 +68,7 @@ When you buy this, trash a card from your hand. Gain a card costing exactly $2 m
       And the game checks actions
     Then I should need to Trash a card with Farmland 
     When I choose Adventurer in my hand
-      Then I should have removed Adventurer from my hand
+    Then I should have removed Adventurer from my hand
     When the game checks actions
     Then the following 2 steps should happen at once
       Then I should have gained Province
@@ -87,7 +85,6 @@ When you buy this, trash a card from your hand. Gain a card costing exactly $2 m
     Then I should have played Gold x2
       And it should be my Buy phase
     When I buy Farmland expecting side-effects
-      And the game checks actions
     Then I should have removed Moat from my hand
       And I should need to Take a replacement card with Farmland
       And I should be able to choose the Smithy, Militia, Feast piles
@@ -101,8 +98,9 @@ When you buy this, trash a card from your hand. Gain a card costing exactly $2 m
       And I should have 2 cash available
 
   
-  Scenario: Buying Farmland with just one type of card in hand and precisely one upgrade choice
-    Given my hand contains Woodcutter, Gold x2, Adventurer x2
+  Scenario Outline: Buying Farmland with just one type of card in hand and precisely one upgrade choice
+      
+    Given my hand contains Woodcutter, Gold x2, <spare_hand_cards>
       And it is my Play Action phase
     When I play Woodcutter
       And the game checks actions
@@ -111,11 +109,16 @@ When you buy this, trash a card from your hand. Gain a card costing exactly $2 m
     When I buy Farmland expecting side-effects
       And the game checks actions
     Then the following 3 steps should happen at once
-      And I should have removed Adventurer from hand 
+      Then I should have removed Adventurer from hand 
       And I should have gained Province
-      Then I should have gained Farmland
+      And I should have gained Farmland
     And it should be my Buy phase
       And I should have 2 cash available
+      
+    Examples:
+      | spare_hand_cards |
+      | Adventurer       |
+      | Adventurer x2    |
     
     
   Scenario: Buying Farmland with just one card in hand and no upgrade choices
@@ -161,7 +164,7 @@ When you buy this, trash a card from your hand. Gain a card costing exactly $2 m
     Then I should have gained Farmland
       And it should be my Buy phase
     When Bob's next turn starts
-      Then it should be Bob's Play Action phase
+    Then it should be Bob's Play Action phase
     When Bob plays Smuggler
       And the game checks actions
     Then Bob should have gained Farmland

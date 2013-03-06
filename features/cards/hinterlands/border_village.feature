@@ -13,16 +13,16 @@ When you gain this, gain a card costing less than this.
   Scenario: Playing Border Village
     Given my hand contains Border Village x2
       And it is my Play Action phase
-	   Then I should have 1 action available
+	    Then I should have 1 action available
     When I play Border Village
-	     Then I should have drawn a card
-	     And I should have 2 actions available
+	    Then I should have drawn a card
+	    And I should have 2 actions available
     When I play Border Village
-	     Then I should have drawn a card
-	     And I should have 3 actions available
+	    Then I should have drawn a card
+	    And I should have 3 actions available
 
   Scenario: Buying Border Village
-	   Given my hand contains Woodcutter, Silver x2
+	  Given my hand contains Woodcutter, Silver x2
       And it is my Play Action phase
     When I play Woodcutter
       And the game checks actions
@@ -40,7 +40,7 @@ When you gain this, gain a card costing less than this.
       And I should need to Buy
 
   Scenario: Buying Border Village when Border Village's cost is changed by Quarry
-	   Given my hand contains Woodcutter, Silver, Quarry
+	  Given my hand contains Woodcutter, Silver, Quarry
       And it is my Play Action phase
     When I play Woodcutter
       And the game checks actions
@@ -60,7 +60,7 @@ When you gain this, gain a card costing less than this.
       And I should need to Buy
 
   Scenario: Buying Border Village when Border Village's cost is changed by two Quarries
-	   Given my hand contains Woodcutter, Quarry x2
+	  Given my hand contains Woodcutter, Quarry x2
       And it is my Play Action phase
     When I play Woodcutter
       And the game checks actions
@@ -113,7 +113,7 @@ When you gain this, gain a card costing less than this.
       And it should be Bob's Buy phase
 
   Scenario: Buying Border Village when only 1 choice available (!)
-	   Given my hand contains Woodcutter, Quarry x2
+	  Given my hand contains Woodcutter, Quarry x2
       And the Curse, Estate, Smithy, Peddler piles are empty
       And it is my Play Action phase
     When I play Woodcutter

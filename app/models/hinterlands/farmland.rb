@@ -9,7 +9,7 @@ class Hinterlands::Farmland < Card
   victory :points => 2
   card_text "Victory (cost: 6) - 2 points. / When you buy this, trash a card from your hand. Gain a card costing exactly 2 more than the trashed card."
   
-  # Notice a buy event. If it's Farmland itself, queue up the trash/upgrade action'
+  # Notice a buy event. If it's Farmland itself, queue up the trash/upgrade action
   def self.witness_buy(params)
     ply = params[:buyer]
     pile = params[:pile]
@@ -21,15 +21,15 @@ class Hinterlands::Farmland < Card
       farmland = pile.cards.first
       if ply.cards.hand(true).map(&:class).uniq.length == 1
         # Only holding one type of card. Call resolve_trash directly
-        farmland.resolve_trash(ply, {:card_index => 1}, parent_act)
-      elsif !(ply.cards.hand.any?)
+        farmland.resolve_trash(ply, {:card_index => 0}, parent_act)
+      elsif ply.cards.hand.empty?
         # Holding no cards. Just log
-        game.histories.create!(:event => "#{ply.name} trashed nothing buying #{farmland.readable_name}.",
+        game.histories.create!(:event => "#{ply.name} trashed nothing buying #{farmland}.",
                               :css_class => "player#{ply.seat} card_trash")
       else
         # Create a PendingAction to trash a card
         act = parent_act.children.create!(:expected_action => "resolve_#{self}#{farmland.id}_trash",
-                                         :text => "Trash a card with #{farmland.readable_name}",
+                                         :text => "Trash a card with #{farmland}",
                                          :player => ply,
                                          :game => game)
       end
@@ -52,7 +52,7 @@ class Hinterlands::Farmland < Card
                          }]
     when "take"
       valid_piles = game.piles.map do |pile|
-        (pile.cost == (params[:trashed_cost].to_i + 2)) and not pile.empty?
+        (pile.cost == (params[:trashed_cost].to_i + 2)) && !pile.empty?
       end
       controls[:piles] += [{:type => :button,
                             :action => :resolve,
@@ -134,7 +134,7 @@ class Hinterlands::Farmland < Card
     pile = game.piles[params[:pile_index].to_i]
     if (pile.cost != (params[:trashed_cost].to_i + 2))
       # Asked to take an invalid card (wrong cost)
-      return "Invalid request - card #{pile.card_type} does not cost #{ params[:trashed_cost]}"
+      return "Invalid request - card #{pile.card_type} does not cost #{params[:trashed_cost] + 2}"
     end
 
     # Process the take.

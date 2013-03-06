@@ -5,10 +5,6 @@ class Hinterlands::BorderVillage < Card
   costs 6
   card_text "Action (cost: 6) - Draw 1 card, +2 Actions. / When you gain this, gain a card costing less than this."
   
-  def self.readable_name
-    "Border Village"
-  end
-  
   def play(parent_act)
     super
     
@@ -18,7 +14,7 @@ class Hinterlands::BorderVillage < Card
     "OK"
   end
   
-  # Notice a gain event. If it's Border Village itself, queue up an action to take another card.'
+  # Notice a gain event. If it's Border Village itself, queue up an action to take another card.
   def self.witness_gain(params)
     ply = params[:gainer]
     pile = params[:pile]
@@ -29,9 +25,8 @@ class Hinterlands::BorderVillage < Card
     if pile.card_class == self
       # Check that there are any possible alternatives to take!
       valid_piles = game.piles.select do |pile2|
-                       (pile2.cost < pile.cost) and not pile2.empty?
+                       (pile2.cost < pile.cost) && !pile2.empty?
                     end
-      Rails.logger.info "######## Border Village piles: " + valid_piles.inspect
       if valid_piles.empty?
         # Most likely Border Village costs 0. 
         # Create a history that there were no options
@@ -76,25 +71,25 @@ class Hinterlands::BorderVillage < Card
   
   def resolve_take(ply, params, parent_act)
     # Copied from Expand
-    # We expect to have been passed a :pile_index or :nil_action (and the latter only if all <6 piles are empty!)
-    if not params.include? :pile_index and not params.include? :nil_action
+    # We expect to have been passed a :pile_index
+    if not params.include? :pile_index
       return "Invalid parameters"
     end
     border_village_pile = game.piles.find_by_card_type("Hinterlands::BorderVillage")
 
     # Processing is pretty much the same as a buy
-    if ((params.include? :pile_index) and
-           (params[:pile_index].to_i < 0 or
+    if ((params.include? :pile_index) &&
+           (params[:pile_index].to_i < 0 ||
             params[:pile_index].to_i > game.piles.length - 1))
       # Asked to take an invalid card (out of range)
       return "Invalid request - pile index #{params[:pile_index]} is out of range"
-    elsif (params.include? :pile_index) and
-          (not game.piles[params[:pile_index].to_i].cost < border_village_pile.cost)
+    elsif (params.include? :pile_index) &&
+          !(game.piles[params[:pile_index].to_i].cost < border_village_pile.cost)
       # Asked to take an invalid card (too expensive)
       return "Invalid request - card #{game.piles[params[:pile_index]].card_type} is too expensive"
-    elsif (not params.include? :pile_index) and
+    elsif (not params.include? :pile_index) &&
           (game.piles.map do |pile|
-              (pile.cost < border_village_pile.cost) and not pile.empty?
+              (pile.cost < border_village_pile.cost) && !pile.empty?
            end.any?)
       # Asked to take nothing when there were cards to take
       return "Invalid request - asked to take nothing, but viable options exist"
