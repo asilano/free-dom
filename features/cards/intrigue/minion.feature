@@ -33,6 +33,6 @@ Feature: Minion
     Then the following 4 steps should happen at once
       Then I should have discarded the cards named "rest of hand"
       And I should have drawn 4 cards
-      And Charlie should have discarded the cards named "Charlie's hand"
+      And Charlie should have discarded Gold, Witch, Village, Mountebank, Market
       And Charlie should have drawn 4 cards
     And it should be my Play Action phase
