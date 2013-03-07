@@ -927,6 +927,7 @@ class Player < ActiveRecord::Base
       card.save
     end
     cards.in_discard(true)
+    renum(:deck)
 
     if options[:log]
       game.histories.create!(:event => "#{name} shuffled their discard pile.",
