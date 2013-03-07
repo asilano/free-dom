@@ -4,16 +4,16 @@ class Hinterlands::BorderVillage < Card
   action
   costs 6
   card_text "Action (cost: 6) - Draw 1 card, +2 Actions. / When you gain this, gain a card costing less than this."
-  
+
   def play(parent_act)
     super
-    
+
     player.draw_cards(1)
     player.add_actions(2, parent_act)
-    
+
     "OK"
   end
-  
+
   # Notice a gain event. If it's Border Village itself, queue up an action to take another card.
   def self.witness_gain(params)
     ply = params[:gainer]
@@ -28,7 +28,7 @@ class Hinterlands::BorderVillage < Card
                        (pile2.cost < pile.cost) && !pile2.empty?
                     end
       if valid_piles.empty?
-        # Most likely Border Village costs 0. 
+        # Most likely Border Village costs 0.
         # Create a history that there were no options
         game.histories.create!(:event => "#{ply.name} couldn't take another card with Border Village.",
                               :css_class => "player#{ply.seat} card_gain")
@@ -37,7 +37,7 @@ class Hinterlands::BorderVillage < Card
         game.histories.create!(:event => "#{ply.name} took " +
              "#{valid_piles[0].card_class.readable_name} with Border Village.",
                             :css_class => "player#{ply.seat} card_gain")
-        
+
         ply.gain(parent_act, valid_piles[0].id)
       else
         # Queue up to choose another card to take
@@ -68,11 +68,11 @@ class Hinterlands::BorderVillage < Card
                           }]
     end
   end
-  
+
   def resolve_take(ply, params, parent_act)
     # Copied from Expand
     # We expect to have been passed a :pile_index
-    if not params.include? :pile_index
+    if !params.include?(:pile_index)
       return "Invalid parameters"
     end
     border_village_pile = game.piles.find_by_card_type("Hinterlands::BorderVillage")

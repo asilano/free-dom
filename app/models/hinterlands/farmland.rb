@@ -8,7 +8,7 @@ class Hinterlands::Farmland < Card
                             end}
   victory :points => 2
   card_text "Victory (cost: 6) - 2 points. / When you buy this, trash a card from your hand. Gain a card costing exactly 2 more than the trashed card."
-  
+
   # Notice a buy event. If it's Farmland itself, queue up the trash/upgrade action
   def self.witness_buy(params)
     ply = params[:buyer]
@@ -17,7 +17,7 @@ class Hinterlands::Farmland < Card
     game = ply.game
 
     # Check whether the card bought is Farmland, and if so queue to do the upgrade
-    if pile.card_class == self 
+    if pile.card_class == self
       farmland = pile.cards.first
       if ply.cards.hand(true).map(&:class).uniq.length == 1
         # Only holding one type of card. Call resolve_trash directly
@@ -34,11 +34,11 @@ class Hinterlands::Farmland < Card
                                          :game => game)
       end
     end
-    
+
     # Adding the extra gain does not affect the buy of Farmland itself in any way.
     return false
   end
-  
+
   def determine_controls(player, controls, substep, params)
     case substep
     when "trash"
@@ -83,7 +83,7 @@ class Hinterlands::Farmland < Card
 
     # All checks out. Carry on
 
-    # Trash the selected card. 
+    # Trash the selected card.
     card = ply.cards.hand[params[:card_index].to_i]
     card.trash
     trashed_cost = card.cost
@@ -134,7 +134,7 @@ class Hinterlands::Farmland < Card
     pile = game.piles[params[:pile_index].to_i]
     if (pile.cost != (params[:trashed_cost].to_i + 2))
       # Asked to take an invalid card (wrong cost)
-      return "Invalid request - card #{pile.card_type} does not cost #{params[:trashed_cost] + 2}"
+      return "Invalid request - card #{pile.card_type} does not cost #{params[:trashed_cost].to_i + 2}"
     end
 
     # Process the take.
