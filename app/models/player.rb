@@ -919,7 +919,7 @@ class Player < ActiveRecord::Base
     options = {:log => true}.merge(options)
     # Take all the cards in the discard pile and put them, in random order,
     # at the end of the deck array.
-    cards.deck(true)
+    renum(:deck)
     cards.in_discard(true).shuffle.each do |card|
       cards.deck << card
       card.location = "deck"
@@ -927,7 +927,6 @@ class Player < ActiveRecord::Base
       card.save
     end
     cards.in_discard(true)
-    renum(:deck)
 
     if options[:log]
       game.histories.create!(:event => "#{name} shuffled their discard pile.",
