@@ -1,5 +1,3 @@
-require File.expand_path(File.dirname(__FILE__)) + '/card_types'
-
 CARD_NAMES = CARD_TYPES.keys
 SingleCardNoCapture = /#{CARD_NAMES.join('|')}/
 SingleCard = /(#{SingleCardNoCapture})/
