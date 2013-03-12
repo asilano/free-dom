@@ -13,6 +13,14 @@ class Game < ActiveRecord::Base
     self.current_act_parent = act
   end
 
+  module TurnPhases
+    ACTION = 1
+    BUY = 2
+    CLEAN_UP = 3
+
+    AllPhases = [ACTION, BUY, CLEAN_UP]
+  end
+
   has_many :piles, :order => "position", :dependent => :destroy
   #accepts_nested_attributes_for :piles
   has_many :cards, :dependent => :delete_all
@@ -44,6 +52,7 @@ class Game < ActiveRecord::Base
 
   validates :name, :presence => true
   validates :max_players, :presence => true, :numericality => true, :inclusion => { :in => 2..6, :message => 'must be between 2 and 6 inclusive' }
+  validates :turn_phase, :numericality => true, :inclusion => {:in => TurnPhases::AllPhases, :message => 'must be valid'}, :allow_blank => true
 
   validate :unique_valid_piles, :on => :create
   validate :total_cards_10, :on => :create

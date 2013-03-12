@@ -3,7 +3,7 @@ Feature: Peddler's cost and gain effects
   but at reduced cost during the Buy phase (including on last buy)
 
   Background:
-    Given I am a player in a standard game with Peddler, Border Village
+    Given I am a player in a standard game with Peddler, Border Village, Smithy, Quarry
 
 	 Scenario: Buying Border Village on first buy when Peddler costs 4
 	   Given my hand contains Market x2, Silver x2

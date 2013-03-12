@@ -195,6 +195,10 @@ class Player < ActiveRecord::Base
   def play_treasures(params)
     return "Cash unexpectedly nil for Player #{id}" if cash.nil?
 
+    # Game enters the "Buy" phase as soon as it hits play_treasures
+    game.turn_phase = Game::TurnPhases::BUY
+    game.save!
+
     if cards.hand.any? {|card| card.is_treasure? && card.is_special?} ||
         !game.cards.pile.of_type("Prosperity::GrandMarket").empty? ||
         !game.cards.pile.of_type("Prosperity::Mint").empty?
@@ -449,6 +453,10 @@ class Player < ActiveRecord::Base
     game.histories.create!(:event => "#{name} ended their turn.",
                           :css_class => "player#{seat} end_turn")
 
+    # Game is now in the clean-up phase
+    game.turn_phase = Game::TurnPhases::CLEAN_UP
+    game.save!
+
     # Explode the rest of end_turn's actions. Lastly, start the next turn to ensure we have a root action
     if params[:parent_act]
       parent_act = params[:parent_act].children.create!(:expected_action => "player_next_turn;player=#{id}",
@@ -516,6 +524,7 @@ class Player < ActiveRecord::Base
 
   def start_turn
     # Start this player's turn. They should already have a hand.
+
     # Set up cash and create their pending_actions
     self.cash = 0
 
@@ -537,6 +546,8 @@ class Player < ActiveRecord::Base
                       :game => game,
                       :player => self)
 
+    # Tell the game it's in the Action phase
+    game.turn_phase = Game::TurnPhases::ACTION
 
     if seat == 0
       game.reload.turn_count += 1

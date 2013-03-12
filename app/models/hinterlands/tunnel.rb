@@ -19,8 +19,8 @@ class Hinterlands::Tunnel < Card
 
     parent_act = Game.parent_act
 
-    # If in clean-up, the parent action would be player_draw_hand
-    unless parent_act.expected_action =~ /^player_draw_hand/
+    # Skip acting if this is the clean-up phase
+    unless game.turn_phase == Game::TurnPhases::CLEAN_UP
       if player.settings.autotunnel == Settings::ASK
         # Enquire if the user wants the gold
         parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_choose",
