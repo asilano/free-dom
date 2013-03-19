@@ -59,7 +59,7 @@ class Seaside::SeaHag < Card
     if not curses_pile.empty?
       game.histories.create!(:event => "#{ply.name} gained a Curse to the top of their deck.",
                             :css_class => "player#{ply.seat} card_gain")
-      ply.gain(parent_act, curses_pile.id, :location => "deck")
+      ply.gain(parent_act, :pile => curses_pile, :location => "deck")
     else
       game.histories.create!(:event => "#{ply.name} couldn't gain a Curse - none left.",
                             :css_class => "player#{ply.seat}")

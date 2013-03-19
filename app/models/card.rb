@@ -187,9 +187,7 @@ class Card < ActiveRecord::Base
   # Default function to buy a card. Can be overridden by card-types which are
   # infinite in size.
   def gain(player, parent_act, new_location="discard", position=-1)
-    raise "Card #{id} not in pile" unless location == "pile"
-    raise "Card in pile but has no pile" unless pile
-    if pile.state[:trade_route_token]
+    if pile.andand.state.andand[:trade_route_token]
       # Card's pile currently has a Trade Route token on it. Remove that token
       # and increment the game's Trade Route value
       pile.state_will_change!

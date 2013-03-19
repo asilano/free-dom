@@ -19,7 +19,7 @@ class Seaside::Smuggler < Card
       game.histories.create!(:event => "#{player.name} took #{valid_piles[0][0].card_class.readable_name} with Smuggler.",
                             :css_class => "player#{player.seat} card_gain")
 
-      player.gain(parent_act, valid_piles[0][0].id)
+      player.gain(parent_act, :pile => valid_piles[0][0])
     else
       # An actual choice exists. Ask the player
       parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_take",
@@ -91,7 +91,7 @@ class Seaside::Smuggler < Card
       game.histories.create!(:event => "#{ply.name} took #{game.piles[pile_index].card_class.readable_name} with Smuggler.",
                             :css_class => "player#{ply.seat} card_gain")
 
-      ply.gain(parent_act, game.piles[params[:pile_index].to_i].id)
+      ply.gain(parent_act, :pile => game.piles[params[:pile_index].to_i])
     else
 
     end

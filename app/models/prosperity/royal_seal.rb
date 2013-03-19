@@ -7,7 +7,7 @@ class Prosperity::RoyalSeal < Card
 
   def self.witness_gain(params)
     ply = params[:gainer]
-    pile = params[:pile]
+    card = params[:card]
     parent_act = params[:parent_act]
     location = params[:location]
     position = params[:position]
@@ -18,9 +18,9 @@ class Prosperity::RoyalSeal < Card
       # card on top of their deck (unless it's going there, of course).
       if location != "deck" || position > 0
         parent_act.children.create!(:expected_action => "resolve_#{self}#{seal.id}_choose;" +
-                                             "gain_pile=#{pile.id};location=#{location || 'discard'};" +
+                                             "card=#{card.id};location=#{location || 'discard'};" +
                                              "position=#{position || 0};gain_id=#{params[:this_act_id]}",
-                                    :text => "Choose whether to place #{pile.cards[0]} on top of deck.",
+                                    :text => "Choose whether to place #{card} on top of deck.",
                                     :player => ply,
                                     :game => ply.game)
 
@@ -36,10 +36,10 @@ class Prosperity::RoyalSeal < Card
   def determine_controls(ply, controls, substep, params)
     case substep
     when "choose"
-      pile = Pile.find(params[:gain_pile].to_i)
+      card = Card.find(params[:card].to_i)
       controls[:player] += [{:type => :buttons,
                              :action => :resolve,
-                             :label => "#{self}: Place #{pile.card_class.readable_name}...:",
+                             :label => "#{self}: Place #{card}...:",
                              :params => {:card => "#{self.class}#{id}",
                                          :substep => "choose"}.merge(params),
                              :options => [{:text => "#{params[:location].titleize}",
@@ -57,10 +57,9 @@ class Prosperity::RoyalSeal < Card
       return "Invalid parameters"
     end
 
-    gain_pile_id = params[:gain_pile].to_i
     to_del = game.pending_actions.where(:player_id => ply).select {|pa| pa.expected_action =~ /;gain_id=#{params[:gain_id]}/}
 
-    card = Pile.find(gain_pile_id).cards.first
+    card = Card.find(params[:card])
     if params[:choice] == "normal"
       # If no-one else is trying to replace the gain, perform the default action here.
       if to_del.empty?

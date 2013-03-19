@@ -217,7 +217,7 @@ class Hinterlands::Develop < Card
       game.histories.create!(:event => "#{ply.name} took " +
              "#{take_pile.card_class.readable_name} with #{self}.",
                             :css_class => "player#{ply.seat} card_gain")
-      ply.gain(parent_act, take_pile.id, :location => "deck")
+      ply.gain(parent_act, :pile => take_pile, :location => "deck")
 
       direction = take_pile.cost > trashed_cost ? :higher : :lower
     else

@@ -17,12 +17,12 @@ class Hinterlands::BorderVillage < Card
   # Notice a gain event. If it's Border Village itself, queue up an action to take another card.
   def self.witness_gain(params)
     ply = params[:gainer]
-    pile = params[:pile]
+    card = params[:card]
     parent_act = params[:parent_act]
     game = ply.game
 
     # Check whether the card gained is Border Village, and if so queue to choose another card to take
-    if pile.card_class == self
+    if card.class == self
       # Check that there are any possible alternatives to take!
       valid_piles = game.piles.select do |pile2|
                        (pile2.cost < pile.cost) && !pile2.empty?
@@ -38,7 +38,7 @@ class Hinterlands::BorderVillage < Card
              "#{valid_piles[0].card_class.readable_name} with Border Village.",
                             :css_class => "player#{ply.seat} card_gain")
 
-        ply.gain(parent_act, valid_piles[0].id)
+        ply.gain(parent_act, :pile => valid_piles[0])
       else
         # Queue up to choose another card to take
         parent_act.children.create!(:expected_action => "resolve_#{self}#{pile.cards[0].id}_take",
@@ -102,7 +102,7 @@ class Hinterlands::BorderVillage < Card
              "#{game.piles[params[:pile_index].to_i].card_class.readable_name} with Border Village.",
                             :css_class => "player#{ply.seat} card_gain")
 
-      ply.gain(parent_act, game.piles[params[:pile_index].to_i].id)
+      ply.gain(parent_act, :pile => game.piles[params[:pile_index].to_i])
     end
 
     return "OK"

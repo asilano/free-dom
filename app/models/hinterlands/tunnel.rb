@@ -66,7 +66,7 @@ class Hinterlands::Tunnel < Card
       game.histories.create!(:event => "#{ply.name} discarded Tunnel, and gained a Gold.",
                              :css_class => "player#{ply.seat} card_gain")
 
-      ply.gain(parent_act, gold_pile.id)
+      ply.gain(parent_act, :pile => gold_pile)
     else
       # Player chose not to gain a gold. Don't log - discards are private.
     end

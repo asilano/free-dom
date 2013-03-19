@@ -117,7 +117,7 @@ class Intrigue::Saboteur < Card
              "#{game.piles[params[:pile_index].to_i].card_class.readable_name} as replacement with Saboteur.",
                             :css_class => "player#{ply.seat} card_gain")
 
-      ply.gain(parent_act, game.piles[params[:pile_index].to_i].id)
+      ply.gain(parent_act, :pile => game.piles[params[:pile_index].to_i])
     end
 
     return "OK"

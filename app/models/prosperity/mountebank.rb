@@ -90,14 +90,14 @@ class Prosperity::Mountebank < Card
                             :css_class => "player#{ply.seat} card_gain")
       curses_pile = game.piles.find_by_card_type("BasicCards::Curse")
       if not curses_pile.empty?
-        ply.gain(parent_act, curses_pile.id)
+        ply.gain(parent_act, :pile => curses_pile)
       else
         game.histories.create!(:event => "#{ply.name} couldn't gain a Curse - none left.",
                               :css_class => "player#{ply.seat}")
       end
 
       copper_pile = game.piles.find_by_card_type("BasicCards::Copper")
-      ply.gain(parent_act, copper_pile.id)
+      ply.gain(parent_act, :pile => copper_pile)
     else
       # :card_index specified. Discard the specified card
       card = ply.cards.hand[params[:card_index].to_i]

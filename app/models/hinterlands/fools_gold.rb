@@ -38,7 +38,7 @@ class Hinterlands::FoolsGold < Card
   end
 
   def self.witness_gain(params)
-    return false unless params[:pile].card_type == 'BasicCards::Province'
+    return false unless params[:card].class == BasicCards::Province
 
     # Queue up appropriate actions for each Fool's Gold held by other players
     gainer = Player.find(params[:gainer])
@@ -81,7 +81,7 @@ class Hinterlands::FoolsGold < Card
                             :css_class => "player#{ply.seat} card_gain card_trash")
 
       trash
-      ply.gain(parent_act, game.piles.find_by_card_type("BasicCards::Gold").id)
+      ply.gain(parent_act, :pile => game.piles.find_by_card_type("BasicCards::Gold"))
     else
       # Don't log. Technically, this is secret.
     end

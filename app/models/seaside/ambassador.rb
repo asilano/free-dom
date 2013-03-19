@@ -153,7 +153,7 @@ class Seaside::Ambassador < Card
     else
       game.histories.create!(:event => "#{target.name} gained a copy due to Ambassador.",
                             :css_class => "player#{target.seat} card_gain")
-      target.gain(parent_act, pile.id)
+      target.gain(parent_act, :pile => pile)
     end
 
     return "OK"

@@ -15,7 +15,7 @@ class Hinterlands::JackOfAllTrades < Card
     # Technically, the "draw to 5" part doesn't need a triggering action, but
     # this way it's clearer what we're doing.
     silver_pile = game.piles.find_by_card_type("BasicCards::Silver")
-    player.gain(parent_act, silver_pile.id)
+    player.gain(parent_act, :pile => silver_pile)
     parent_act.queue(:expected_action => "resolve_#{self.class}#{id}_triggerpeek",
                      :game => game)
     parent_act.queue(:expected_action => "resolve_#{self.class}#{id}_triggerdraw",

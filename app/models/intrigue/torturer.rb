@@ -103,7 +103,7 @@ class Intrigue::Torturer < Card
         game.histories.create!(:event => "#{ply.name} gained a Curse.",
                               :css_class => "player#{ply.seat} card_gain")
 
-        ply.gain(parent_act, curses_pile.id, :location => "hand")
+        ply.gain(parent_act, :pile => curses_pile, :location => "hand")
       else
         game.histories.create!(:event => "#{ply.name} couldn't gain a Curse - none left.",
                               :css_class => "player#{ply.seat}")

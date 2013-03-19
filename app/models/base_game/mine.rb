@@ -117,7 +117,7 @@ class BaseGame::Mine < Card
     game.histories.create!(:event => "#{ply.name} took " +
            "#{game.piles[params[:pile_index].to_i].card_class.readable_name} with Mine.",
                           :css_class => "player#{ply.seat} card_gain")
-    ply.gain(parent_act, game.piles[params[:pile_index].to_i].id, :location => "hand")
+    ply.gain(parent_act, :pile => game.piles[params[:pile_index].to_i], :location => "hand")
 
     return "OK"
   end

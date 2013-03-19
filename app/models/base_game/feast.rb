@@ -63,7 +63,7 @@ class BaseGame::Feast < Card
            "#{game.piles[params[:pile_index].to_i].card_class.readable_name} with Feast.",
                           :css_class => "player#{ply.seat} card_gain")
 
-    ply.gain(parent_act, game.piles[params[:pile_index].to_i].id)
+    ply.gain(parent_act, :pile => game.piles[params[:pile_index].to_i])
 
     return "OK"
   end

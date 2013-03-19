@@ -79,12 +79,12 @@ class Hinterlands::Duchess < Card
 
   def self.witness_gain(params)
     ply = params[:gainer]
-    pile = params[:pile]
+    card = params[:card]
     parent_act = params[:parent_act]
     game = ply.game
 
     duchess = game.cards.pile.of_type(self.to_s).first
-    if duchess && pile.card_type == "BasicCards::Duchy"
+    if duchess && card.class == BasicCards::Duchy
       # Game has Duchesses still in the pile, so once the primary gain is complete,
       # we need to work out if the player wants one
       if ply.settings.autoduchess == Settings::ALWAYS
@@ -122,7 +122,7 @@ class Hinterlands::Duchess < Card
       game.histories.create!(:event => "#{ply.name} chose to gain a #{readable_name}.",
                              :css_class => "player#{ply.seat} card_gain")
       duchess_pile = game.piles.find_by_card_type("Hinterlands::Duchess")
-      ply.gain(parent_act, duchess_pile.id)
+      ply.gain(parent_act, :pile => duchess_pile)
     end
   end
 end

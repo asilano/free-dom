@@ -23,7 +23,7 @@ class Prosperity::Hoard < Card
                             :css_class => "player#{ply.seat} card_gain")
 
       num_hoards.times do |ix|
-        ply.gain(parent_act, gold_pile.id)
+        ply.gain(parent_act, :pile => gold_pile)
       end
     end
   end

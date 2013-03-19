@@ -101,7 +101,7 @@ class Hinterlands::Farmland < Card
            "#{valid_piles[0].card_class.readable_name} with Farmland.",
                           :css_class => "player#{ply.seat} card_gain")
 
-      ply.gain(parent_act, valid_piles[0].id)
+      ply.gain(parent_act, :pile => valid_piles[0])
     elsif valid_piles.length == 0
       # No possible replacements
       game.histories.create!(:event => "#{ply.name} couldn't take a replacement.",
@@ -142,7 +142,7 @@ class Hinterlands::Farmland < Card
            "#{pile.card_class.readable_name} with #{self.class.readable_name}.",
                           :css_class => "player#{ply.seat} card_gain")
 
-    ply.gain(parent_act, pile.id)
+    ply.gain(parent_act, :pile => pile)
 
     return "OK"
   end

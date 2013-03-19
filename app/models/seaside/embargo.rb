@@ -86,7 +86,7 @@ class Seaside::Embargo < Card
                             :css_class => "player#{ply.seat} card_gain") unless num_to_gain == 0
 
       num_to_gain.times do |ix|
-        ply.gain(parent_act, curses_pile.id)
+        ply.gain(parent_act, :pile => curses_pile)
       end
 
       if num_to_gain < pile.state[:embargo]

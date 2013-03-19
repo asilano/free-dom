@@ -57,7 +57,7 @@ class Intrigue::Ironworks < Card
     game.histories.create!(:event => "#{ply.name} took #{card.readable_name} from the Ironworks.",
                           :css_class => "player#{ply.seat} card_gain")
 
-    ply.gain(parent_act, card.pile.id)
+    ply.gain(parent_act, :pile => card.pile)
 
     return "OK"
   end

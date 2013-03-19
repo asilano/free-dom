@@ -379,7 +379,7 @@ class Player < ActiveRecord::Base
 
       # Queue up a request for the player to gain the chosen card (assuming it's still there)
       if !pile.cards(true).empty?
-        parent_act = gain(parent_act, pile.id)
+        parent_act = gain(parent_act, :pile => pile)
       end
 
       # Trip any cards that need to trigger on buy, to occur before the gain
@@ -402,18 +402,23 @@ class Player < ActiveRecord::Base
   end
 
   def do_gain(params)
-    # Called to move a card from a pile to this player
+    # Called to move a card, possibly from a pile, to this player
     parent_act = params[:parent_act]
-    pile = Pile.find(params[:pile])
-    raise "Pile not in this game" if pile.game != game
+    pile_id = params[:pile_id]
+    card_id = params[:card_id]
+    pile = pile_id && Pile.find(pile_id)
+    raise "Pile not in this game" if pile && (pile.game != game)
 
-    if pile.empty?
+    if pile.andand.empty?
       # Can't gain this card
       game.histories.create!(:event => "#{name} couldn't gain a #{pile.card_class.readable_name}, as the pile was empty.",
                             :css_class => "player#{seat}")
       return
     end
 
+    card = (card_id && Card.find(card_id)) || (pile && pile.cards[0])
+    raise "Couldn't determine card to gain" if card.nil?
+    raise "Card not in this game" if card.game != game
     location = params[:location]
     position = params[:position]
 
@@ -422,7 +427,7 @@ class Player < ActiveRecord::Base
     # Trip any cards that need to trigger on gain
     card_types = game.cards.select('distinct type').map(&:type).map(&:constantize)
     gain_params = {:gainer => self,
-                   :pile => pile,
+                   :card => card,
                    :parent_act => parent_act,
                    :this_act_id => params[:this_act_id],
                    :location => location,
@@ -440,7 +445,7 @@ class Player < ActiveRecord::Base
     # Card#gain defaults to discard, -1
     #
     # Get the card to do it, so that we mint a fresh instance of infinite cards
-    pile.cards[0].gain(self, parent_act, location, position)
+    card.gain(self, parent_act, location, position)
 
   end
 
@@ -1025,15 +1030,28 @@ class Player < ActiveRecord::Base
 #                     :game => game)
 #  end
 
-  def gain(parent_act, pile_id, opts = {})
-    action = "player_do_gain;player=#{id};pile=#{pile_id}"
-    action += ";" + opts.map {|k,v| "#{k}=#{v}"}.join(';') unless opts.empty?
+  # Queue up an action in order to gain a card. This needs to handle gaining both
+  # from a pile, and of a specific card (as in Thief). opts must contain either
+  # :pile => <Pile object> or :card => <Card object>
+  def gain(parent_act, opts = {})
+    raise "No :card or :pile to gain" unless (opts.include?(:card) || opts.include?(:pile))
+    raise "Both :card and :pile given to gain" if (opts.include?(:card) && opts.include?(:pile))
+    raise ":card supplied but not a Card" if (opts[:card] && !opts[:card].is_a?(Card))
+    raise ":pile supplied but not a Pile" if (opts[:pile] && !opts[:pile].is_a?(Pile))
+
+    action = "player_do_gain;player=#{id};"
+    if opts[:pile]
+      action << "pile_id=#{opts.delete(:pile).id}"
+    else
+      action << "card_id=#{opts.delete(:card).id}"
+    end
+    action << ";" + opts.map {|k,v| "#{k}=#{v}"}.join(';') unless opts.empty?
     parent_act = parent_act.children.create!(:expected_action => action,
                                              :game => game)
 
     # Trip any cards that need to trigger before the gain (as, say, Trader)
     card_types = game.cards.select('distinct type').map(&:type).map(&:constantize)
-    gain_params = {:gainer => self, :pile_id => pile_id, :parent_act => parent_act}
+    gain_params = {:gainer => self, :pile => opts[:pile], :card => opts[:card], :parent_act => parent_act}
     card_types.each do |type|
       if type.respond_to?(:witness_pre_gain)
         type.witness_pre_gain(gain_params)
