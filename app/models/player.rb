@@ -428,6 +428,7 @@ class Player < ActiveRecord::Base
     card_types = game.cards.select('distinct type').map(&:type).map(&:constantize)
     gain_params = {:gainer => self,
                    :card => card,
+                   :pile => pile, # Can be nil
                    :parent_act => parent_act,
                    :this_act_id => params[:this_act_id],
                    :location => location,

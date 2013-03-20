@@ -41,7 +41,7 @@ class Hinterlands::BorderVillage < Card
         ply.gain(parent_act, :pile => valid_piles[0])
       else
         # Queue up to choose another card to take
-        parent_act.children.create!(:expected_action => "resolve_#{self}#{pile.cards[0].id}_take",
+        parent_act.children.create!(:expected_action => "resolve_#{self}#{card.id}_take",
                                     :text => "Choose a card to gain with Border Village",
                                     :player => ply,
                                     :game => game)

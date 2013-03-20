@@ -18,7 +18,7 @@ class Prosperity::RoyalSeal < Card
       # card on top of their deck (unless it's going there, of course).
       if location != "deck" || position > 0
         parent_act.children.create!(:expected_action => "resolve_#{self}#{seal.id}_choose;" +
-                                             "card=#{card.id};location=#{location || 'discard'};" +
+                                             "card_id=#{card.id};location=#{location || 'discard'};" +
                                              "position=#{position || 0};gain_id=#{params[:this_act_id]}",
                                     :text => "Choose whether to place #{card} on top of deck.",
                                     :player => ply,
@@ -36,7 +36,7 @@ class Prosperity::RoyalSeal < Card
   def determine_controls(ply, controls, substep, params)
     case substep
     when "choose"
-      card = Card.find(params[:card].to_i)
+      card = Card.find(params[:card_id].to_i)
       controls[:player] += [{:type => :buttons,
                              :action => :resolve,
                              :label => "#{self}: Place #{card}...:",
@@ -59,7 +59,7 @@ class Prosperity::RoyalSeal < Card
 
     to_del = game.pending_actions.where(:player_id => ply).select {|pa| pa.expected_action =~ /;gain_id=#{params[:gain_id]}/}
 
-    card = Card.find(params[:card])
+    card = Card.find(params[:card_id])
     if params[:choice] == "normal"
       # If no-one else is trying to replace the gain, perform the default action here.
       if to_del.empty?

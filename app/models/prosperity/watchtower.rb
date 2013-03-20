@@ -33,7 +33,8 @@ class Prosperity::Watchtower < Card
     if tower
       # Player has a Watchtower in hand, so we need to ask where they want the card.
       parent_act.children.create!(:expected_action => "resolve_#{self}#{tower.id}_choose;" +
-                                             "card_id=#{card.id};location=#{location || 'discard'};" +
+                                             "card_id=#{card.id};pile_id=#{params[:pile].id || 'nil'};" +
+                                             "location=#{location || 'discard'};" +
                                              "position=#{position || 0};gain_id=#{params[:this_act_id]}",
                                   :text => "Decide on destination for #{card}.",
                                   :player => ply,
@@ -76,7 +77,12 @@ class Prosperity::Watchtower < Card
 
     to_del = game.pending_actions.where(:player_id => ply).select {|pa| pa.expected_action =~ /;gain_id=#{params[:gain_id]}/}
 
-    card = Card.find(params[:card_id])
+    if params[:pile_id] != "nil"
+      card = Pile.find(params[:pile_id]).cards.first
+    else
+      card = Card.find(params[:card_id])
+    end
+
 
     if params[:choice] == "normal"
       # If no-one else is trying to replace the gain, perform the default action here.
