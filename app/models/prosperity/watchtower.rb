@@ -33,7 +33,7 @@ class Prosperity::Watchtower < Card
     if tower
       # Player has a Watchtower in hand, so we need to ask where they want the card.
       parent_act.children.create!(:expected_action => "resolve_#{self}#{tower.id}_choose;" +
-                                             "card_id=#{card.id};pile_id=#{params[:pile].id || 'nil'};" +
+                                             "card_id=#{card.id};" + "pile_id=#{params[:pile].andand.id || 'nil'};" +
                                              "location=#{location || 'discard'};" +
                                              "position=#{position || 0};gain_id=#{params[:this_act_id]}",
                                   :text => "Decide on destination for #{card}.",
