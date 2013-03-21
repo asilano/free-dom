@@ -25,7 +25,7 @@ class Hinterlands::BorderVillage < Card
     if card.class == self
       # Check that there are any possible alternatives to take!
       valid_piles = game.piles.select do |pile2|
-                       (pile2.cost < pile.cost) && !pile2.empty?
+                       (pile2.cost < card.cost) && !pile2.empty?
                     end
       if valid_piles.empty?
         # Most likely Border Village costs 0.
