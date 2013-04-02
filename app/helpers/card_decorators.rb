@@ -167,7 +167,11 @@ module CardDecorators
 
     # Set up the "Play" stuff relating to the attack, including PendingActions
     def startattack(params)
+      # Find the parent action, and the attacker
       parent_act = params.delete :parent_act
+      attacker = Player.where(:id => params.delete(:attacker_id)).first || player
+      prevent_react = !!params.delete(:prevent_react)
+
       # Considering each player in turn,
       # create a Game-scope pending action to suffer the attack. If the player
       # owns a reaction, hang an action off that one for the player to react.
@@ -178,48 +182,50 @@ module CardDecorators
         param_string = ";" + params.map{|k,v| "#{k}=#{v}"}.join(";")
       end
 
-      player.other_players.reverse.each do |ply|
+      attacker.other_players.reverse.each do |ply|
         attack_act = parent_act.children.create(:expected_action => "resolve_#{self.class}#{id}" +
                                                                     "_doattack;" +
                                                                     "target=#{ply.id};" +
-                                                                    "source=#{player.id}" +
+                                                                    "source=#{attacker.id}" +
                                                                     param_string,
                                                 :game => game)
 
-        # Handle automoating here. If the attacked player has a Moat in hand
-        # and Automoat enabled, call Moat.react. If they have no other reaction,
-        # also suppress the "react" action.
-        moat = ply.cards.hand.of_type("BaseGame::Moat")
-        non_moat_reaction = ply.cards.hand.any? {|card| (card.is_reaction? && card.react_trigger == :attack && (card.class != BaseGame::Moat))}
+        unless prevent_react
+          # Handle automoating here. If the attacked player has a Moat in hand
+          # and Automoat enabled, call Moat.react. If they have no other reaction,
+          # also suppress the "react" action.
+          moat = ply.cards.hand.of_type("BaseGame::Moat")
+          non_moat_reaction = ply.cards.hand.any? {|card| (card.is_reaction? && card.react_trigger == :attack && (card.class != BaseGame::Moat))}
 
-        # Also lighthouses (which are always automatic, but the player can still play other reactions)
-        lighthouse = ply.cards.enduring.of_type("Seaside::Lighthouse")
+          # Also lighthouses (which are always automatic, but the player can still play other reactions)
+          lighthouse = ply.cards.enduring.of_type("Seaside::Lighthouse")
 
-        if !lighthouse.empty?
-          # Code copied from moat
-          # Note - we can still auto from here, though we won't use a moat if
-          # the lighthouse has already defended.
-          game.histories.create(:event => "#{ply.name} has a lighthouse in play, negating the attack",
-                                :css_class => "player#{ply.seat} play_reaction")
-          if attack_act.expected_action !~ /moated=true/
-            attack_act.expected_action += ";moated=true"
-            attack_act.save!
+          if !lighthouse.empty?
+            # Code copied from moat
+            # Note - we can still auto from here, though we won't use a moat if
+            # the lighthouse has already defended.
+            game.histories.create(:event => "#{ply.name} has a lighthouse in play, negating the attack",
+                                  :css_class => "player#{ply.seat} play_reaction")
+            if attack_act.expected_action !~ /moated=true/
+              attack_act.expected_action += ";moated=true"
+              attack_act.save!
+            end
+          else
+            # Automoat if we can
+            if ply.settings.automoat && !moat.empty?
+              moat[0].react(attack_act, attack_act)
+            end
           end
-        else
-          # Automoat if we can
-          if ply.settings.automoat && !moat.empty?
-            moat[0].react(attack_act, attack_act)
-          end
-        end
 
-        if ( !ply.settings.automoat ) || non_moat_reaction
-          # If we're NOT automoating, or there are non-moats to select
-          # then go ahead and offer them to the player
-          react_act = attack_act.children.create(:expected_action => "resolve_#{self.class}#{id}_react",
-                                                 :text => "React to #{self.class.readable_name}")
-          react_act.player = ply
-          react_act.game = game
-          react_act.save
+          if ( !ply.settings.automoat ) || non_moat_reaction
+            # If we're NOT automoating, or there are non-moats to select
+            # then go ahead and offer them to the player
+            react_act = attack_act.children.create(:expected_action => "resolve_#{self.class}#{id}_react",
+                                                   :text => "React to #{self.class.readable_name}")
+            react_act.player = ply
+            react_act.game = game
+            react_act.save
+          end
         end
 
         if self.class.order_relevant && instance_exec(params, &self.class.order_relevant)
@@ -232,8 +238,8 @@ module CardDecorators
         # Attack also affects the attacker. Create the attack action for the attacker themself (e.g, Spy)
         parent_act.children.create(:expected_action => "resolve_#{self.class}#{id}" +
                                                        "_doattack;" +
-                                                       "target=#{player.id};" +
-                                                       "source=#{player.id}",
+                                                       "target=#{attacker.id};" +
+                                                       "source=#{attacker.id}",
                                    :game => game)
 
         # All existing Reactions (Moat, Secret Chamber) only work on /other/ player's attacks.
