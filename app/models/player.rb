@@ -383,7 +383,7 @@ class Player < ActiveRecord::Base
       end
 
       # Trip any cards that need to trigger on buy, to occur before the gain
-      card_types = game.cards.select('distinct type').map(&:type).map(&:constantize)
+      card_types = game.cards.unscoped.select('distinct type').map(&:type).map(&:constantize)
       buy_params = {:buyer => self, :pile => pile, :parent_act => parent_act}
       card_types.each do |type|
         if type.respond_to?(:witness_buy)
@@ -425,7 +425,7 @@ class Player < ActiveRecord::Base
     asking = false
 
     # Trip any cards that need to trigger on gain
-    card_types = game.cards.select('distinct type').map(&:type).map(&:constantize)
+    card_types = game.cards.unscoped.select('distinct type').map(&:type).map(&:constantize)
     gain_params = {:gainer => self,
                    :card => card,
                    :pile => pile, # Can be nil
@@ -1051,7 +1051,7 @@ class Player < ActiveRecord::Base
                                              :game => game)
 
     # Trip any cards that need to trigger before the gain (as, say, Trader)
-    card_types = game.cards.select('distinct type').map(&:type).map(&:constantize)
+    card_types = game.cards.unscoped.select('distinct type').map(&:type).map(&:constantize)
     gain_params = {:gainer => self, :pile => opts[:pile], :card => opts[:card], :parent_act => parent_act}
     card_types.each do |type|
       if type.respond_to?(:witness_pre_gain)
