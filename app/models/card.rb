@@ -9,16 +9,17 @@ class Card < ActiveRecord::Base
 
   validates :revealed, :peeked, :inclusion => [true, false]
 
+  default_scope :order => "position"
   %w<deck hand enduring pile>.each do |loc|
-    scope loc.to_sym, :conditions => {:location => loc}, :order => "position"
+    scope loc.to_sym, :conditions => {:location => loc}
   end
   %w<play discard trash>.each do |loc|
-    scope "in_#{loc}".to_sym, :conditions => {:location => loc}, :order => "position"
+    scope "in_#{loc}".to_sym, :conditions => {:location => loc}
   end
   scope :revealed, :conditions => {:revealed => true}
   scope :peeked, :conditions => {:peeked => true}
   scope :of_type, lambda {|*types| {:conditions => {:type => types}}}
-  scope :in_location, lambda {|*locs| {:conditions => {:location => locs}, :order => "position"}}
+  scope :in_location, lambda {|*locs| {:conditions => {:location => locs}}}
 
   before_save :clear_visibility, :check_end
 
