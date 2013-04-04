@@ -9,7 +9,7 @@ class Card < ActiveRecord::Base
 
   validates :revealed, :peeked, :inclusion => [true, false]
 
-  default_scope :order => "position"
+  default_scope :order => "location, position"
   %w<deck hand enduring pile>.each do |loc|
     scope loc.to_sym, :conditions => {:location => loc}
   end
