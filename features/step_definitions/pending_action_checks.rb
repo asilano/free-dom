@@ -24,9 +24,9 @@ Then(/(.*) should (not )?need to (?!act)(.*)/) do |name, negate, action|
   actions = @players[name].active_actions(true).map(&:text)
 
   if negate
-    assert_not_contains(actions, Regexp.new(action, Regexp::IGNORECASE))
+    assert_not_contains(actions, /^#{action}$/i)
   else
-    assert_contains(actions, Regexp.new(action, Regexp::IGNORECASE))
+    assert_contains(actions, /^#{action}$/i)
   end
 end
 
@@ -175,7 +175,7 @@ Then(/(.*) should (not )?be able to choose the (.*) piles? labelled (.*)$/) do |
   all_controls = player.determine_controls
   controls = all_controls[:piles]
 
-  controls.select! {|c| c[:text] =~ Regexp.new(Regexp.escape(label), Regexp::IGNORECASE)}
+  controls.select! {|c| c[:text] =~ /^#{Regexp.escape(label)}$/i}
   flunk "Multiple pile controls with same button text" unless controls.length == 1
   ctrl = controls[0]
   acceptable = ctrl[:piles].map.with_index {|valid, ix| @game.piles[ix].card_type.readable_name if valid}.compact

@@ -114,7 +114,7 @@ When(/^(\w*?)(?:'s)? chooses? (?:his|my) (revealed|peeked) (.*)$/) do |name, loc
   @skip_card_checking = 1 if @skip_card_checking == 0
 end
 
-# Step for any control that requires you to make a choice of a card in play; 
+# Step for any control that requires you to make a choice of a card in play;
 # that is, process any controls[:play] control
 #
 # Matches
@@ -198,7 +198,7 @@ When(/(.*) chooses? the option (.*)/) do |name, choice|
   controls.each do |ctrl|
     params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
 
-    matching_controls = ctrl[:options].detect {|opt| opt[:text] =~ Regexp.new(Regexp.escape(choice), Regexp::IGNORECASE)}
+    matching_controls = ctrl[:options].detect {|opt| opt[:text] =~ /^#{Regexp.escape(choice)}$/i}
     if matching_controls
       params[:choice] = matching_controls[:choice]
       found = true
@@ -238,7 +238,7 @@ When(/(.*) chooses? for (.*) the option (.*)/) do |name, target, choice|
     next unless params[:target] == @players[target].id.to_s
 
     matching_controls = ctrl[:options].detect do |opt|
-      opt[:text] =~ Regexp.new(Regexp.escape(choice), Regexp::IGNORECASE)
+      opt[:text] =~ /^#{Regexp.escape(choice)}$/i
     end
     if matching_controls
       params[:choice] = matching_controls[:choice]
@@ -356,7 +356,7 @@ When(/^(\w*?) chooses? (?:the )?(.*?) (?:for )?piles? labelled (.*)$/) do |name,
   # So, really, we need to duplicate the logic of what to do with a control
   all_controls = player.determine_controls
   controls = all_controls[:piles]
-  controls.select! {|c| c[:text] =~ Regexp.new(Regexp.escape(label), Regexp::IGNORECASE)}
+  controls.select! {|c| c[:text] =~ /^#{Regexp.escape(label)}$/i}
   flunk "Unimplemented multi-piles controls in testbed" unless controls.length == 1
 
   ctrl = controls[0]
