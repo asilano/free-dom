@@ -41,7 +41,7 @@ Feature: Tunnel
     And I choose Tunnel, Estate, Estate in my hand
       Then I should have discarded Tunnel, Estate, Estate
     When the game checks actions
-      Then I should need to Choose whether to gain a Gold
+      Then I should need to Choose whether to gain a Gold from Tunnel
     When I choose the option Gain a Gold
     And the game checks actions
       Then the following 2 steps should happen at once
@@ -51,11 +51,11 @@ Feature: Tunnel
     And I choose Tunnel, Tunnel in my hand
       Then I should have discarded Tunnel, Tunnel
     When the game checks actions
-      Then I should need to Choose whether to gain a Gold
+      Then I should need to Choose whether to gain a Gold from Tunnel
     When I choose the option Gain a Gold
     And the game checks actions
       Then I should have gained Gold
-      And I should need to Choose whether to gain a Gold
+      And I should need to Choose whether to gain a Gold from Tunnel
     When I choose the option Gain a Gold
     And the game checks actions
       Then the following 2 steps should happen at once
@@ -71,7 +71,7 @@ Feature: Tunnel
     And I choose Tunnel, Estate, Estate in my hand
       Then I should have discarded Tunnel, Estate, Estate
     When the game checks actions
-      Then I should need to Choose whether to gain a Gold
+      Then I should need to Choose whether to gain a Gold from Tunnel
     When I choose the option Don't gain a Gold
     And the game checks actions
       Then I should have drawn 3 cards

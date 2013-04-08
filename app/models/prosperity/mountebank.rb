@@ -54,7 +54,7 @@ class Prosperity::Mountebank < Card
         return resolve_discard(target, {:card_index => ix}, parent_act)
       else
         parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_discard",
-                                   :text => "Discard a Curse.",
+                                   :text => "Discard a Curse",
                                    :player => target,
                                    :game => game)
       end

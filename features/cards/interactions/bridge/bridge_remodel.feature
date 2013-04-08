@@ -1,9 +1,9 @@
 Feature: Bridge + Remodel
   Bridge's cost reduction applies to both halves of Remodel, but does allow 0->3 remodelling
-  
+
   Background:
     Given I am a player in a standard game with Wharf
-  
+
   Scenario: Remodel, not 0->3
     Given my hand contains Village, Bridge, Remodel, Silver
       And my deck contains Estate
@@ -16,7 +16,7 @@ Feature: Bridge + Remodel
     And I choose Silver in my hand
       Then I should have removed Silver from my hand
       And later history should include "[I] trashed a Silver from hand (cost: 2)."
-      And I should need to Take a replacement card
+      And I should need to Take a replacement card with Remodel
       And I should be able to choose the Wharf pile
     When I choose the Wharf pile
     And the game checks actions
@@ -34,7 +34,7 @@ Feature: Bridge + Remodel
     And I choose Copper in my hand
       Then I should have removed Copper from my hand
       And later history should include "[I] trashed a Copper from hand (cost: 0)."
-      And I should need to Take a replacement card
+      And I should need to Take a replacement card with Remodel
       And I should be able to choose the Silver pile
     When I choose the Silver pile
     And the game checks actions

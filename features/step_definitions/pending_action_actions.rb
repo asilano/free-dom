@@ -208,7 +208,7 @@ When(/(.*) chooses? the option (.*)/) do |name, choice|
   end
 
   if !found
-    flunk "Couldn't find #{choice} in #{ctrl[:options].inspect}"
+    flunk "Couldn't find #{choice} in #{controls.map {|c| c[:options].map {|o| o[:text]}}.inspect}"
   end
 
   # Probably chosen the option for a reason

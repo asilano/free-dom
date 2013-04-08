@@ -14,7 +14,7 @@ class Prosperity::Forge < Card
     else
       # Add an action to ask for forge material
       parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_trash",
-                                 :text => "Trash cards from hand with #{readable_name}.",
+                                 :text => "Trash cards from hand with #{readable_name}",
                                  :game => game,
                                  :player => player)
     end
@@ -100,7 +100,7 @@ class Prosperity::Forge < Card
                             :css_class => "player#{ply.seat}")
     else
       parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_take;trashed_cost=#{cost}",
-                                 :text => "Take a replacement card costing #{cost} with #{readable_name}.",
+                                 :text => "Take a replacement card costing #{cost} with #{readable_name}",
                                  :game => game,
                                  :player => player)
     end

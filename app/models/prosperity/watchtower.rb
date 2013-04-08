@@ -36,7 +36,7 @@ class Prosperity::Watchtower < Card
                                              "card_id=#{card.id};" + "pile_id=#{params[:pile].andand.id || 'nil'};" +
                                              "location=#{location || 'discard'};" +
                                              "position=#{position || 0};gain_id=#{params[:this_act_id]}",
-                                  :text => "Decide on destination for #{card}.",
+                                  :text => "Decide on destination for #{card}",
                                   :player => ply,
                                   :game => ply.game)
 

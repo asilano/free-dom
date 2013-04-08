@@ -20,7 +20,7 @@ class Prosperity::RoyalSeal < Card
         parent_act.children.create!(:expected_action => "resolve_#{self}#{seal.id}_choose;" +
                                              "card_id=#{card.id};location=#{location || 'discard'};" +
                                              "position=#{position || 0};gain_id=#{params[:this_act_id]}",
-                                    :text => "Choose whether to place #{card} on top of deck.",
+                                    :text => "Choose whether to place #{card} on top of deck",
                                     :player => ply,
                                     :game => ply.game)
 

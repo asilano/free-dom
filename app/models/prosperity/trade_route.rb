@@ -23,7 +23,7 @@ class Prosperity::TradeRoute < Card
                             :css_class => "player#{player.seat} card_trash")
     else
       parent_act.queue(:expected_action => "resolve_#{self.class}#{id}_trash",
-                       :text => "Trash a card with #{self}.",
+                       :text => "Trash a card with #{self}",
                        :player => player,
                        :game => game)
     end
