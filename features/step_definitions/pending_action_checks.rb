@@ -211,3 +211,29 @@ Then /(.*) should be able to choose (exactly )?(.*) from the dropdown/ do |name,
     assert_contains ctrl[:choices].map(&:first), choices.split(/,\s*/)
   end
 end
+
+# Verify that an option-only control has the stated option
+#
+# Matches:
+#   I should be able to choose the option Don't discard
+#   I should not be able to choose the option Reticulate the splines
+Then /(.*) should (not )?be able to choose the option (.*)$/ do |name, negate, choice|
+  name = "Alan" if name == "I"
+  player = @players[name]
+
+  # We want to check the valid options for a pile-based action.
+  # These are encoded in the control that that action produces.
+  all_controls = player.determine_controls
+  controls = all_controls[:player]
+  flunk "No options controls found for #{name}" if controls.length == 0
+  flunk "Too many options controls for #{name}" unless controls.length == 1
+
+  ctrl = controls[0]
+  acceptable = ctrl[:options].map {|opt| opt[:text]}
+
+  unless negate
+    assert_contains acceptable, choice
+  else
+    assert_not_contains acceptable, choice
+  end
+end

@@ -183,7 +183,7 @@ end
 # Matches
 #   I choose the option Don't discard
 #   I choose the option Top of deck
-When(/(.*) chooses? the option (.*)/) do |name, choice|
+When(/^(\w*?) chooses? the option (.*)/) do |name, choice|
   name = "Alan" if name == "I"
   player = @players[name]
 
