@@ -38,7 +38,7 @@ Feature: Mint
     Then it should be my Play Treasure phase
 
   Scenario: Playing Mint - decline to copy
-    Given my hand contains Mint, Copper, Silver, Harem, Smithy
+    Given my hand contains Mint, Smithy, Copper, Silver, Harem, Smithy
       And it is my Play Action phase
     When I play Mint
     Then I should need to Reveal a Treasure card from hand

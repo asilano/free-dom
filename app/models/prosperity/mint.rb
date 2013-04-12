@@ -51,18 +51,17 @@ class Prosperity::Mint < Card
       return "Invalid request - card index #{params[:card_index]} is out of range"
     end
 
-    card = ply.cards.hand[params[:card_index].to_i]
-    if !card.is_treasure?
-      # Asked to copy a non-treasure
-      return "Invalid request - #{card.readable_name} is not a Treasure"
-    end
-
     # All checks out. Carry on
     if params.include? :nil_action
       game.histories.create!(:event => "#{ply.name} chose to copy nothing.",
                             :css_class => "player#{ply.seat}")
     else
       # Locate the pile for that treasure card.
+      card = ply.cards.hand[params[:card_index].to_i]
+      if !card.is_treasure?
+        # Asked to copy a non-treasure
+        return "Invalid request - #{card.readable_name} is not a Treasure"
+      end
       pile = game.piles.find_by_card_type(card.class.to_s)
 
       if !pile
