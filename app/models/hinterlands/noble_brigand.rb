@@ -1,8 +1,8 @@
 class Hinterlands::NobleBrigand < Card
   action :attack => true
   costs 4
-  card_text "+1 Cash / When you buy this or play it, each other player reveals the top 2 cards of his deck, " +
-            "trashes a revealed Silver or Gold you choose, and discards the rest. " +
+  card_text "Action (Attack; cost: 4) - +1 Cash / When you buy this or play it, each other player reveals the " +
+            " top 2 cards of his deck, trashes a revealed Silver or Gold you choose, and discards the rest. " +
             "If he didn't reveal a Treasure, he gains a Copper. You gain the trashed cards."
 
   def play(parent_act)

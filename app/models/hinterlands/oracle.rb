@@ -1,8 +1,8 @@
 class Hinterlands::Oracle < Card
   action :attack => true, :affects_attacker => true
   costs 3
-  card_text "Each player (including you) reveals the top 2 cards of his deck, and you choose one: either he discards them, " +
-            "or he puts them back on top in an order he chooses. Draw 2 cards."
+  card_text "Action (Attack; cost: 3) - Each player (including you) reveals the top 2 cards of his deck, " +
+            "and you choose one: either he discards them, or he puts them back on top in an order he chooses. Draw 2 cards."
 
   def play(parent_act)
     super
