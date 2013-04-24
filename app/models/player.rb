@@ -1041,8 +1041,8 @@ class Player < ActiveRecord::Base
     raise ":card supplied but not a Card" if (opts[:card] && !opts[:card].is_a?(Card))
     raise ":pile supplied but not a Pile" if (opts[:pile] && !opts[:pile].is_a?(Pile))
 
-    # Trip any cards that need to trigger before the gain (as, say, Trader). Such triggers
-    # can change the details of the gain (as for, say, Nomad Camp)
+    # Trip any cards that need to trigger before the gain to change the details of the gain
+    # (as for, say, Nomad Camp)
     card_types = game.cards.unscoped.select('distinct type').map(&:type).map(&:constantize)
     gain_params = {:gainer => self,
                    :card => opts[:card], # Can be nil
@@ -1051,8 +1051,8 @@ class Player < ActiveRecord::Base
                    :location => opts[:location] || 'discard',
                    :position => opts[:position] || 0}
     card_types.each do |type|
-      if type.respond_to?(:witness_pre_gain)
-        type.witness_pre_gain(gain_params)
+      if type.respond_to?(:witness_pre_gain_modify)
+        type.witness_pre_gain_modify(gain_params)
       end
     end
     opts[:location] = gain_params[:location]
@@ -1067,6 +1067,15 @@ class Player < ActiveRecord::Base
     action << ";" + opts.map {|k,v| "#{k}=#{v}"}.join(';') unless opts.empty?
     parent_act = parent_act.children.create!(:expected_action => action,
                                              :game => game)
+
+    # Trip any cards that need to trigger before the gain in order to queue up
+    # another action before the gain happens (as for, say, Trader)
+    gain_params[:parent_act] = parent_act
+    card_types.each do |type|
+      if type.respond_to?(:witness_pre_gain_queue)
+        parent_act = type.witness_pre_gain_queue(gain_params)
+      end
+    end
 
     return parent_act
   end
