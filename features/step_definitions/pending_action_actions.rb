@@ -78,7 +78,8 @@ When(/^(\w*?)(?:'s)? chooses? (?:his|my) (revealed|peeked) (.*)$/) do |name, loc
   # So, really, we need to duplicate the logic of what to do with a control
   all_controls = player.determine_controls
   controls = all_controls[location]
-  flunk "Unimplemented multi-hand controls in testbed" unless controls.length == 1
+  flunk "No controls found for #{name}'s peeked cards" if controls.length == 0
+  flunk "Unimplemented multi-peek controls in testbed" unless controls.length == 1
 
   ctrl = controls[0]
   params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
@@ -101,7 +102,7 @@ When(/^(\w*?)(?:'s)? chooses? (?:his|my) (revealed|peeked) (.*)$/) do |name, loc
     end
     assert_not_empty possibilities
     kinds = choice.split(/,\s*/)
-    if kinds.length == 1
+    if kinds.length == 1 && ctrl[:type] != :checkboxes
       params[key] = possibilities.index(kinds[0])
     else
       params[key] = kinds.map {|kind| possibilities.index(kind)}
@@ -112,6 +113,11 @@ When(/^(\w*?)(?:'s)? chooses? (?:his|my) (revealed|peeked) (.*)$/) do |name, loc
 
   # Probably chosen the card for a reason
   @skip_card_checking = 1 if @skip_card_checking == 0
+end
+
+# Provides the ability to choose none of my peeked or revealed cards
+When(/^(\w*?)(?:'s)? chooses? none of (?:his|my) (revealed|peeked) cards$/) do |name, location|
+  steps "When #{name} chooses his #{location} ,"
 end
 
 # Step for any control that requires you to make a choice of a card in play;
