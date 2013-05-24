@@ -97,7 +97,7 @@ Feature: Duchess - Action: 2
         And I should have gained Duchess
       And it should be my Buy phase
 
-  Scenario: Gaining Duchy - autoduchess set to
+  Scenario: Gaining Duchy - autoduchess set to Never
     Given my hand contains Silver, Remodel, Estate
       And it is my Play Action phase
       And I have setting autoduchess set to NEVER
