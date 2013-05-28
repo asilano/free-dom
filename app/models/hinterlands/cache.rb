@@ -3,7 +3,7 @@ class Hinterlands::Cache < Card
   treasure :cash => 3
   card_text "Treasure (cost: 5) - 3 Cash. When you gain this, gain two Coppers."
 
-  # Notice a gain event. If it's Cache itself, queue up an action to take another card.
+  # Notice a gain event. If it's Cache itself, gain two Coppers.
   def self.witness_gain(params)
     ply = params[:gainer]
     card = params[:card]
