@@ -15,7 +15,7 @@ class Hinterlands::NobleBrigand < Card
     attack(parent_act)
   end
 
-  # Notice a buy event. If it's Farmland itself, queue up the trash/upgrade action
+  # Notice a buy event. If it's Noble Brigand itself, queue up the attack
   def self.witness_buy(params)
     ply = params[:buyer]
     pile = params[:pile]
