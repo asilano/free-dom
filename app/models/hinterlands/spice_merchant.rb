@@ -1,7 +1,7 @@
 class Hinterlands::SpiceMerchant < Card
   action
   costs 4
-  card_text "Action (cost: 4) - You may trash a Treasure from your hand. If you do, choose one:" +
+  card_text "Action (cost: 4) - You may trash a Treasure from your hand. If you do, choose one: " +
             "Draw 2 cards, +1 Action; or +2 cash, +1 Buy"
 
   def play(parent_act)
