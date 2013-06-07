@@ -17,10 +17,10 @@ class Hinterlands::JackOfAllTrades < Card
     silver_pile = game.piles.find_by_card_type("BasicCards::Silver")
     player.gain(parent_act, :pile => silver_pile)
     parent_act.queue(:expected_action => "resolve_#{self.class}#{id}_triggerpeek",
-                     :game => game)
-    parent_act.queue(:expected_action => "resolve_#{self.class}#{id}_triggerdraw",
-                     :game => game)
-    parent_act.queue(:expected_action => "resolve_#{self.class}#{id}_triggertrash",
+                     :game => game).queue(
+                    :expected_action => "resolve_#{self.class}#{id}_triggerdraw",
+                     :game => game).queue(
+                    :expected_action => "resolve_#{self.class}#{id}_triggertrash",
                      :game => game)
 
     "OK"

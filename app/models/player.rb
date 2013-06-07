@@ -474,8 +474,8 @@ class Player < ActiveRecord::Base
     end
 
     parent_act.queue(:expected_action => "player_clean_up;player=#{id}",
-                     :game => game)
-    parent_act.queue(:expected_action => "player_draw_hand;player=#{id}",
+                     :game => game).queue(
+                    :expected_action => "player_draw_hand;player=#{id}",
                      :game => game)
 
     return "OK"
@@ -543,15 +543,17 @@ class Player < ActiveRecord::Base
                                               :player => nil)
 
     # Now queue up playing an action, playing treasures and buying a card
-    parent_action = root_action.queue(:expected_action => "play_action",
-                                      :game => game,
-                                      :player => self)
-    root_action.queue(:expected_action => "player_play_treasures;player=#{id}",
+    root_action.queue(:expected_action => "play_action",
                       :game => game,
-                      :player => nil)
-    root_action.queue(:expected_action => "buy",
+                      :player => self).queue(
+                     :expected_action => "player_play_treasures;player=#{id}",
+                      :game => game,
+                      :player => nil).queue(
+                     :expected_action => "buy",
                       :game => game,
                       :player => self)
+    parent_action = active_actions[0]
+    raise "Unexpected action at start of turn" unless parent_action.expected_action == "play_action"
 
     # Tell the game it's in the Action phase
     game.turn_phase = Game::TurnPhases::ACTION
