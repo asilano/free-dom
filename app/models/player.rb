@@ -202,9 +202,12 @@ class Player < ActiveRecord::Base
     if cards.hand.any? {|card| card.is_treasure? && card.is_special?} ||
         !game.cards.pile.of_type("Prosperity::GrandMarket").empty? ||
         !game.cards.pile.of_type("Prosperity::Mint").empty?
-      params[:parent_act].queue(:expected_action => "play_treasure",
-                                          :game => game,
-                                          :player => self)
+      # Need to ask the player about playing treasures. If they choose to play
+      # a treasure (or all simple treasures), we'll re-enter here.
+      parent_act = params[:parent_act]
+      parent_act.queue(:expected_action => "play_treasure",
+                       :game => game,
+                       :player => self)
     else
       auto_play_treasures(true)
 
@@ -260,10 +263,14 @@ class Player < ActiveRecord::Base
       return "Invalid request - card index #{params[:card_index]} is not an treasure"
     end
 
-    # Checks are good. Find the play_treasure action, and note it. We'll remove it later, if needed
-    # (Most of the time, we'll leave it in place, so the player can keep playing treasures)
+    # Checks are good.
     rc = "OK"
+
+    # Find the Play Treasure action, and remove it noting the parent
     this_act = active_actions.detect {|act| act.expected_action == "play_treasure"}
+    parent_act = this_act.parent
+    Game.current_act_parent = parent_act
+    this_act.destroy
 
     if params[:card_index]
       # Player has chosen to play a specific treasure. Find it.
@@ -274,20 +281,23 @@ class Player < ActiveRecord::Base
       return "Special treasure not defining how to play itself - please report to site owner" if (card.is_special? && !card.class.implements_instance_method?(:play_treasure))
       game.histories.create!(:event => "#{name} played #{card.class.readable_name}.",
                             :css_class => "player#{seat} play_treasure")
-      Game.current_act_parent = this_act
-      rc = card.play_treasure(this_act)
+      rc = card.play_treasure(parent_act)
 
       if !card.is_special?
         # For normal treasures, we have to add the cash ourselves.
         self.cash += card.cash
         save!
+      else
+        # Ensure any cash added by the card is taken into account
+        reload
       end
+
+      # Played a treasure. Get #play_treasures to check whether any more need to be played
+      play_treasures(:parent_act => parent_act)
     else
       # One of the nil-actions chosen.
       if params[:nil_action] =~ /^Stop/
-        # Player chose to stop playing treasures. Destroy this act, to trip the Buy
-        this_act.destroy
-        this_act = nil
+        # Player chose to stop playing treasures. Log, and drop through to the Buy
         split_string = self.buys <= 1 ? "" : ", split #{self.buys} ways"
         if state.played_treasure
           game.histories.create!(:event => "#{name} has #{self.cash} total cash#{split_string}.",
@@ -300,18 +310,10 @@ class Player < ActiveRecord::Base
         # Player chose to play all their simple treasures.
         return "Don't appear to be Playing Simple, or Stopping" unless params[:nil_action] =~ /^Play/
         auto_play_treasures(false)
+
+        # Played a treasure. Get #play_treasures to check whether any more need to be played
+        play_treasures(:parent_act => parent_act)
       end
-    end
-
-    if this_act && !cards.hand(true).any? {|c| c.is_treasure?}
-      # No more treasures in hand. Destroy this action, to trip the buy.
-      this_act.remove!
-
-      # Also log the total cash available.
-      reload
-      split_string = self.buys <= 1 ? "" : ", split #{self.buys} ways"
-      game.histories.create!(:event => "#{name} has #{self.cash} total cash#{split_string}.",
-                             :css_class => "player#{seat} play_treasure")
     end
 
     return rc
