@@ -199,16 +199,21 @@ class Player < ActiveRecord::Base
     game.turn_phase = Game::TurnPhases::BUY
     game.save!
 
-    if cards.hand.any? {|card| card.is_treasure? && card.is_special?} ||
-        !game.cards.pile.of_type("Prosperity::GrandMarket").empty? ||
-        !game.cards.pile.of_type("Prosperity::Mint").empty?
-      # Need to ask the player about playing treasures. If they choose to play
-      # a treasure (or all simple treasures), we'll re-enter here.
+    if cards.hand.any? {|card| card.is_treasure?} &&
+        (cards.hand.any? {|card| card.is_treasure? && card.is_special?} ||
+         !game.cards.pile.of_type("Prosperity::GrandMarket").empty? ||
+         !game.cards.pile.of_type("Prosperity::Mint").empty?)
+      # Need to ask the player about playing treasures. But queue up another copy of this
+      # first, so that we re-check afterwards
       parent_act = params[:parent_act]
       parent_act.queue(:expected_action => "play_treasure",
                        :game => game,
-                       :player => self)
+                       :player => self).queue(
+                      :expected_action => "player_play_treasures;player=#{id}",
+                       :game => game)
     else
+      # This branch handles a hand with no special treasures, and with no special buy piles,
+      # including holding no treasures.
       auto_play_treasures(true)
 
       return "Played all treasures, then had some left!" if cards.hand.any? {|card| card.is_treasure?}
@@ -287,17 +292,12 @@ class Player < ActiveRecord::Base
         # For normal treasures, we have to add the cash ourselves.
         self.cash += card.cash
         save!
-      else
-        # Ensure any cash added by the card is taken into account
-        reload
       end
-
-      # Played a treasure. Get #play_treasures to check whether any more need to be played
-      play_treasures(:parent_act => parent_act)
     else
       # One of the nil-actions chosen.
       if params[:nil_action] =~ /^Stop/
-        # Player chose to stop playing treasures. Log, and drop through to the Buy
+        # Player chose to stop playing treasures. Log, and destroy the parent action to
+        # drop through to the Buy
         split_string = self.buys <= 1 ? "" : ", split #{self.buys} ways"
         if state.played_treasure
           game.histories.create!(:event => "#{name} has #{self.cash} total cash#{split_string}.",
@@ -306,13 +306,12 @@ class Player < ActiveRecord::Base
           game.histories.create!(:event => "#{name} played no Treasures. (#{self.cash} total#{split_string}).",
                                 :css_class => "player#{seat} play_treasure")
         end
+
+        parent_act.destroy
       else
         # Player chose to play all their simple treasures.
         return "Don't appear to be Playing Simple, or Stopping" unless params[:nil_action] =~ /^Play/
         auto_play_treasures(false)
-
-        # Played a treasure. Get #play_treasures to check whether any more need to be played
-        play_treasures(:parent_act => parent_act)
       end
     end
 

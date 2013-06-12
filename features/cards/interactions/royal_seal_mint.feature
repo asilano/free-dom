@@ -14,8 +14,10 @@ Feature: Royal Seal + Mint
     When the game checks actions
       Then I should need to Play treasure
     When I play Royal Seal as treasure
-      And I play Gold as treasure
-    Then it should be my Buy phase
+    And the game checks actions
+    And I play Gold as treasure
+    And the game checks actions
+      Then it should be my Buy phase
     When I buy Mint
     And the game checks actions
       Then the following 2 steps should happen at once

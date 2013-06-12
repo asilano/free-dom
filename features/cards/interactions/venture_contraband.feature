@@ -20,8 +20,7 @@ Feature: Venture finds Contraband
       And Bob should need to Ban Alan from buying a card
       And I should not need to act
     When Bob chooses the Duchy pile
-      Then I should need to Play Treasure
-    When I play simple treasures
+    And the game checks actions
       Then I should have played Gold x3
       Then I should have 13 cash
       And it should be my Buy phase

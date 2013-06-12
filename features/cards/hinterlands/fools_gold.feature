@@ -19,10 +19,10 @@ Feature: Fool's Gold - Treasure/Reaction: 2
       Then I should need to Play Treasure
     When I play Fool's Gold as treasure
       Then I should have 1 cash
-      And I should need to Play Treasure
+    When the game checks actions
+      Then I should need to Play Treasure
     When I play Fool's Gold as treasure
       Then I should have 5 cash
-      And I should need to play treasure
 
   Scenario: Playing Fool's Gold as second, fourth and fifth treasures
     Given my hand contains Fool's Gold x3, Copper x2
@@ -31,16 +31,21 @@ Feature: Fool's Gold - Treasure/Reaction: 2
     And the game checks actions
       Then I should need to Play Treasure
     When I play Copper as treasure
+    And the game checks actions
     And I play Fool's Gold as treasure
       Then I should have 2 cash
-      And I should need to Play Treasure
+    When the game checks actions
+      Then I should need to Play Treasure
     When I play Copper as treasure
+    And the game checks actions
     And I play Fool's Gold as treasure
       Then I should have 7 cash
-      And I should need to play treasure
+    When the game checks actions
+      Then I should need to play treasure
     When I play Fool's Gold as treasure
       Then I should have 11 cash
-      And it should be my Buy phase
+    When the game checks actions
+      Then it should be my Buy phase
 
   Scenario: Fool's Gold doesn't persist across turns
     Given my hand contains Fool's Gold x2, Copper
@@ -51,10 +56,12 @@ Feature: Fool's Gold - Treasure/Reaction: 2
       Then I should need to Play Treasure
     When I play Fool's Gold as treasure
       Then I should have 1 cash
-      And I should need to Play Treasure
+    When the game checks actions
+      Then I should need to Play Treasure
     When I play Fool's Gold as treasure
       Then I should have 5 cash
-      And I should need to play treasure
+    When the game checks actions
+      Then I should have played Copper
     When my next turn starts
     And I stop playing actions
     And the game checks actions
@@ -62,10 +69,10 @@ Feature: Fool's Gold - Treasure/Reaction: 2
       And I should need to Play Treasure
     When I play Fool's Gold as treasure
       Then I should have 1 cash
-      And I should need to Play Treasure
+    When the game checks actions
+      Then I should need to Play Treasure
     When I play Fool's Gold as treasure
       Then I should have 5 cash
-      And I should need to play treasure
 
   Scenario: Using ability on Province gain (autofools-gold ask)
     Given my hand contains Fool's Gold x2

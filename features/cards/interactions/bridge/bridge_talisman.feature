@@ -29,7 +29,8 @@ Feature: Bridge + Talisman
     And I play simple treasures
       Then I should have played Silver, Talisman
       And the Mint pile should cost 4
-    When I buy Mint
+    When the game checks actions
+    And I buy Mint
     And the game checks actions
       Then the following 2 steps should happen at once
         Then I should have gained Mint x2
