@@ -50,12 +50,14 @@ Feature: Mint
     Given my hand contains Woodcutter, Harem, Copper, Silver, Bank
       And it is my Play Action phase
     When I play Woodcutter
-      And the game checks actions
-    Then I should need to Play Treasure
+    And the game checks actions
+      Then I should need to Play Treasure
     When I play simple treasures
-    Then I should have played Harem, Copper, Silver
+      Then I should have played Harem, Copper, Silver
+    When the game checks actions
       And I should need to Play Treasure
     When I play Bank as treasure
+    And the game checks actions
     Then it should be my Buy phase
       And I should have 11 cash
       And I should have 2 buys available

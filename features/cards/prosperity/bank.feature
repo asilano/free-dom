@@ -15,11 +15,16 @@ Feature: Bank
     And the game checks actions
       Then I should need to Play Treasure
     When I play Copper as treasure
+    And the game checks actions
     And I play Harem as treasure
       Then I should have 3 cash
-    When I play Bank as treasure
+    When the game checks actions
+    And I play Bank as treasure
       Then I should have 6 cash
-    When I play Bank as treasure
+    When the game checks actions
+    And I play Bank as treasure
+      Then I should have 10 cash
+    When the game checks actions
       Then I should have played Silver
       And I should have 12 cash
       And it should be my Buy phase
