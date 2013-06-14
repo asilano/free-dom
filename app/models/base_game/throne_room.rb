@@ -136,7 +136,7 @@ class BaseGame::ThroneRoom < Card
                                                      :game => game)
     end
 
-    state = []
+    self.state = []
     save!
 
     return "OK"
