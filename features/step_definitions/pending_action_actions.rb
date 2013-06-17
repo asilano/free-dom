@@ -332,7 +332,7 @@ When(/^(\w*?) chooses? (?:the )?(.*?) (?:for )?piles?$/) do |name, choice|
   if ctrl[:nil_action].andand == choice
     params[:nil_action] = choice
   else
-    possibilities = @game.piles.map{|p| p.card_type.readable_name}
+    possibilities = @game.piles.map{|p| p.card_class.readable_name}
     kinds = choice.split(/,\s*/)
     if kinds.length == 1
       params[:pile_index] = possibilities.index(kinds[0])
@@ -371,7 +371,7 @@ When(/^(\w*?) chooses? (?:the )?(.*?) (?:for )?piles? labelled (.*)$/) do |name,
   if ctrl[:nil_action].andand == choice
     params[:nil_action] = true
   else
-    possibilities = @game.piles.map{|p| p.card_type.readable_name}
+    possibilities = @game.piles.map{|p| p.card_class.readable_name}
     kinds = choice.split(/,\s*/)
     if kinds.length == 1
       params[:pile_index] = possibilities.index(kinds[0])

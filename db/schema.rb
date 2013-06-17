@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130313132238) do
+ActiveRecord::Schema.define(:version => 20130605125856) do
 
   create_table "cards", :force => true do |t|
     t.integer "game_id"
@@ -153,6 +153,7 @@ ActiveRecord::Schema.define(:version => 20130313132238) do
     t.boolean "autoscheme",        :default => true
     t.integer "autotunnel",        :default => 1
     t.boolean "autobrigand",       :default => true
+    t.integer "autoigg",           :default => 0
   end
 
   create_table "users", :force => true do |t|

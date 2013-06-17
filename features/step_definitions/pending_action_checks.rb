@@ -152,7 +152,7 @@ Then(/(.*) should (not )?be able to choose the (.*) piles?$/) do |name, negate, 
   flunk "Unimplemented multi-pile controls in testbed" unless controls.length == 1
 
   ctrl = controls[0]
-  acceptable = ctrl[:piles].map.with_index {|valid, ix| @game.piles[ix].card_type.readable_name if valid}.compact
+  acceptable = ctrl[:piles].map.with_index {|valid, ix| @game.piles[ix].card_class.readable_name if valid}.compact
 
   unless negate
     assert_subset kinds.split(/,\s*/), acceptable
@@ -178,7 +178,7 @@ Then(/(.*) should (not )?be able to choose the (.*) piles? labelled (.*)$/) do |
   controls.select! {|c| c[:text] =~ /^#{Regexp.escape(label)}$/i}
   flunk "Multiple pile controls with same button text" unless controls.length == 1
   ctrl = controls[0]
-  acceptable = ctrl[:piles].map.with_index {|valid, ix| @game.piles[ix].card_type.readable_name if valid}.compact
+  acceptable = ctrl[:piles].map.with_index {|valid, ix| @game.piles[ix].card_class.readable_name if valid}.compact
 
   unless negate
     assert_subset kinds.split(/,\s*/), acceptable

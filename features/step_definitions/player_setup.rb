@@ -87,7 +87,8 @@ Given(/^(\w*) ha(?:ve|s) setting (.*) set to (.*)/) do |name, setting, value|
   name = "Alan" if name == "I"
   set_sym = {"autoduchess" => :autoduchess=,
              "autofoolsgold" => :autofoolsgold=,
-             "autotunnel" => :autotunnel=}[setting]
+             "autotunnel" => :autotunnel=,
+             "autoigg" => :autoigg=}[setting]
   if Settings.constants.include?(value.to_sym)
     value = Settings.const_get(value)
   end
