@@ -76,7 +76,7 @@
   <% if (!player_private.cards.peeked.empty?) ||
         (!controls[:peeked].empty?) -%>
       <tr>
-      <th>Looked at:</th><td>
+      <th><%= controls[:peeked].andand[0].andand[:label] || "Looked at:" -%></th><td>
           <table class="hand peeked">
             <tr>
               <%= render :partial => 'card', :collection => player_private.cards.peeked -%>

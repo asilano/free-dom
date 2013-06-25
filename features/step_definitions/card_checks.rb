@@ -53,7 +53,7 @@ end
 # Matches
 #  I should have drawn 1 card
 #  Bob should have drawn 3 cards
-Then /(.*) should have drawn (\d+|a) cards?/ do |name, num|
+Then(/(.*) should have drawn (\d+|a) cards?/) do |name, num|
   name = 'Alan' if name == 'I'
   num = 1 if num == 'a'
   deck = @deck_contents[name]
@@ -78,6 +78,13 @@ Then /(.*) should have shuffled (?:his|my) discards/ do |name|
   name = 'Alan' if name == 'I'
   @deck_contents[name].concat(@discard_contents[name].shuffle)
   @discard_contents[name] = []
+end
+
+# Matches
+#  I should have shuffled my deck
+Then(/(.*) should have shuffled (?:his|my) deck/) do |name|
+  name = 'Alan' if name == 'I'
+  @deck_contents[name].shuffle!
 end
 
 # Matches
@@ -385,7 +392,7 @@ end
 # Check that a player's deck contents are precisely as expected.
 # This duplicates the normal checks performed by the AfterStep, so
 # is not normally necessary; use it only as a sanity check in unusual cases.
-Then /^(\w*?)(?:'s)? deck should contain #{CardList}$/ do |name, deck|
+Then(/^(\w*?)(?:'s)? deck should contain #{CardList}$/) do |name, deck|
   name = "Alan" if name == "my"
   player = @players[name]
 

@@ -219,6 +219,19 @@ class Card < ActiveRecord::Base
       player.state.save!
     end
 
+    # Trip any cards that need to trigger after a card is gained
+    card_types = game.cards.unscoped.select('distinct type').map(&:type).map(&:constantize)
+    gain_params = {:gainer => player,
+                   :card => self,
+                   :parent_act => parent_act,
+                   :location => new_location,
+                   :position => position}
+    card_types.each do |type|
+      if type.respond_to?(:witness_post_gain)
+        type.witness_post_gain(gain_params)
+      end
+    end
+
     return parent_act
   end
 
@@ -311,6 +324,20 @@ class Card < ActiveRecord::Base
     player.cards.in_discard << self
     self.location = 'discard'
     self.position = -1
+    save!
+  end
+
+  # Peek at a card - mark it as peeked, so its owner can see it.
+  # Raise if the card doesn't have a player
+  def peek
+    raise "Card not owned" unless player
+    self.peeked = true
+    save!
+  end
+
+  # Reveal a card - mark it as revealed, so everyone can see it.
+  def reveal
+    self.revealed = true
     save!
   end
 

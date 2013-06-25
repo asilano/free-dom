@@ -29,18 +29,15 @@ class Hinterlands::Cartographer < Card
     case substep
     when "discard"
       controls[:peeked] += [{:type => :checkboxes,
-                           :action => :resolve,
                            :name => "discard",
                            :choice_text => "Discard",
                            :button_text => "Discard selected",
                            :params => {:card => "#{self.class}#{id}",
                                        :substep => "discard"},
-                           :cards => [true] * player.cards.hand.size
+                           :cards => [true] * player.cards.peeked.length
                           }]
     when "place"
-      controls[:peeked] += [{:player_id => player.id,
-                            :type => :button,
-                            :action => :resolve,
+      controls[:peeked] += [{:type => :button,
                             :text => "Place #{ActiveSupport::Inflector.ordinalize(params[:posn])}",
                             :params => {:card => "#{self.class}#{id}",
                                         :substep => "place",
