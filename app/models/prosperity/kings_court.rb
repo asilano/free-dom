@@ -152,7 +152,7 @@ class Prosperity::KingsCourt < Card
                                                      :game => game)
     end
 
-    state = []
+    self.state = []
     save!
 
     return "OK"
