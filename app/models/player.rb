@@ -190,7 +190,7 @@ class Player < ActiveRecord::Base
   end
 
   # If the player has any special treasures in hand, queue an action to play a treasure.
-  # Likewise if the game has Grand Markets or Mints left to buy. Otherwise, just play all
+  # Likewise if the game has Grand Markets, Mints or Mandarins left to buy. Otherwise, just play all
   # the non-special treasures in hand.
   def play_treasures(params)
     return "Cash unexpectedly nil for Player #{id}" if cash.nil?
@@ -202,7 +202,8 @@ class Player < ActiveRecord::Base
     if cards.hand.any? {|card| card.is_treasure?} &&
         (cards.hand.any? {|card| card.is_treasure? && card.is_special?} ||
          !game.cards.pile.of_type("Prosperity::GrandMarket").empty? ||
-         !game.cards.pile.of_type("Prosperity::Mint").empty?)
+         !game.cards.pile.of_type("Prosperity::Mint").empty? ||
+         !game.cards.pile.of_type("Hinterlands::Mandarin").empty?)
       # Need to ask the player about playing treasures. But queue up another copy of this
       # first, so that we re-check afterwards
       parent_act = params[:parent_act]
