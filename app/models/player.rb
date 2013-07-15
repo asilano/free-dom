@@ -91,7 +91,8 @@ class Player < ActiveRecord::Base
                              :text => "Play",
                              :nil_action => "Stop Playing Treasures",
                              :cards => [false] * cards.hand.length,
-                             :pa_id => action.id
+                             :pa_id => action.id,
+                             :confirm => [:nil_action]
                             }]
       when 'buy'
         piles = game.piles.map do |pile|
