@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130605125856) do
+ActiveRecord::Schema.define(:version => 20130716120036) do
 
   create_table "cards", :force => true do |t|
     t.integer "game_id"
@@ -108,6 +108,7 @@ ActiveRecord::Schema.define(:version => 20130605125856) do
     t.integer  "user_id"
     t.boolean  "lock"
     t.datetime "last_emailed", :default => '2011-01-01 00:00:00'
+    t.integer  "vp_chips",     :default => 0
   end
 
   create_table "rankings", :force => true do |t|

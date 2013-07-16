@@ -87,9 +87,7 @@ class Prosperity::Goons < Card
 
     goons = ply.cards.in_play.of_type(self.to_s).length
     if goons > 0
-      ply.score ||= 0
-      ply.score += goons
-      ply.save!
+      ply.add_vps(goons)
       ply.game.histories.create!(:event => "#{ply.name} gained #{goons} point#{goons == 1 ? '' : 's'} from Goons.",
                                  :css_class => "player#{ply.seat} score")
     end

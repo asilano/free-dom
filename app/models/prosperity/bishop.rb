@@ -9,10 +9,8 @@ class Prosperity::Bishop < Card
     super
 
     # Grant the cash and fixed VP boost first
-    player.cash += 1
-    player.score ||= 0
-    player.score += 1
-    player.save!
+    player.add_cash(1)
+    player.add_vps(1)
 
     game.histories.create!(:event => "#{player.name} gained 1 cash and 1 point from #{readable_name}.",
                           :css_class => "player#{player.seat} score")
@@ -78,8 +76,7 @@ class Prosperity::Bishop < Card
 
     # And grant points. The player is guaranteed to have a non-nil score by now, since they gained 1
     # when they played Bishop. We round down - taking advantage of the quirks of integer arithmetic
-    player.score += card.cost / 2
-    player.save!
+    player.add_vps(card.cost / 2)
     game.histories.create!(:event => "#{ply.name} trashed a #{card.class.readable_name} from hand, gaining #{card.cost / 2} point#{card.cost / 2 == 1 ? '' : 's'}.",
                           :css_class => "player#{ply.seat} card_trash score")
 

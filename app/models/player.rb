@@ -35,6 +35,7 @@ class Player < ActiveRecord::Base
     self.create_state
 
     self.score = 0
+    self.vp_chips = 0
   end
 
   def name
@@ -658,6 +659,12 @@ class Player < ActiveRecord::Base
     save!
   end
 
+  def add_vps(num)
+    self.vp_chips += num
+    self.score += num
+    save!
+  end
+
   # Draw, or attempt to, the specified number of cards, shuffling the discard
   # pile under the deck if needed.
   #
@@ -958,7 +965,7 @@ class Player < ActiveRecord::Base
   end
 
   def calc_score
-    self.score ||= 0
+    self.score ||= vp_chips || 0
     self.score += self.cards(true).inject(0) {|sum, card| sum + card.points}
     save!
   end
@@ -1005,6 +1012,14 @@ class Player < ActiveRecord::Base
       deck_list[ix] = {:type => type, :num => num, :css_class => css_class, :points => points}
     end
 
+    vps = if self.vp_chips != 0 && html
+      "<span class='victory-text'>#{vp_chips} VP chip#{vp_chips == 1 ? "" : "s"}</span>, "
+    elsif self.vp_chips != 0
+      "#{vp_chips} VP chips, "
+    else
+      ""
+    end
+
     list = if html
       deck_list.map do |det|
         "<span class='#{det[:css_class]}'>" +
@@ -1021,7 +1036,7 @@ class Player < ActiveRecord::Base
       end.join(', ')
     end
 
-    return list
+    return vps + list
   end
 
   def waiting_for?(action)
