@@ -26,14 +26,10 @@ Feature: Oracle
       And I should need to Choose Oracle effect for Bob's revealed cards
       And I should need to Choose Oracle effect for Charlie's revealed cards
     When I choose the option Put back
-      Then I should need to Put a card 2nd from top with Oracle
-    When I choose Place 2nd for my revealed Gold
-      Then I should have Silver, Gold in my deck
+      Then I should have Gold, Silver in my deck
     When I choose for Bob the option Discard
       Then Bob should have moved Platinum, Market from his deck to discard
     When I choose for Charlie the option Put back
-      Then Charlie should need to Put a card 2nd from top with Oracle
-    When Charlie chooses Put on deck for his revealed Estate
       Then Charlie should have Curse, Estate in his deck
     When the game checks actions
       Then I should have drawn 2 cards
