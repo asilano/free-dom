@@ -138,3 +138,10 @@ Feature: Mandarin
     And the game checks actions
       Then I should have gained Mandarin
     And I should need to Buy
+
+  Scenario: Mandarin doesn't hold up play if money's too tight
+    Given my hand contains Copper
+      And it is my Play Treasure phase
+    When the game checks actions
+      Then I should have played Copper
+      And I should need to Buy

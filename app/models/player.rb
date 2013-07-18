@@ -201,11 +201,24 @@ class Player < ActiveRecord::Base
     game.turn_phase = Game::TurnPhases::BUY
     game.save!
 
+    immediate_cash = cash + cards.hand.select(&:is_treasure?).map{|c| c.cash || 0}.inject(0,&:+)
+    quarries = cards.hand.of_type("Prosperity::Quarry").count
+
+    gm_pile_card = game.cards.pile.of_type("Prosperity::GrandMarket").first
+    mint_pile_card = game.cards.pile.of_type("Prosperity::Mint").first
+    mandarin_pile_card = game.cards.pile.of_type("Hinterlands::Mandarin").first
+
+    gm_blocking = gm_pile_card &&
+                  immediate_cash >= gm_pile_card.cost - 2*quarries &&
+                  !cards.hand.of_type("BasicCards::Copper").empty?
+    mint_blocking = mint_pile_card &&
+                    immediate_cash >= mint_pile_card.cost - 2*quarries
+    mandarin_blocking = mandarin_pile_card &&
+                        immediate_cash >= mandarin_pile_card.cost - 2*quarries
+
     if cards.hand.any? {|card| card.is_treasure?} &&
         (cards.hand.any? {|card| card.is_treasure? && card.is_special?} ||
-         !game.cards.pile.of_type("Prosperity::GrandMarket").empty? ||
-         !game.cards.pile.of_type("Prosperity::Mint").empty? ||
-         !game.cards.pile.of_type("Hinterlands::Mandarin").empty?)
+          gm_blocking || mint_blocking || mandarin_blocking)
       # Need to ask the player about playing treasures. But queue up another copy of this
       # first, so that we re-check afterwards
       parent_act = params[:parent_act]

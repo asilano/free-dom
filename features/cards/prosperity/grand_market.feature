@@ -46,19 +46,37 @@ Feature: Grand Market
       And I should not be able to choose the Grand Market pile
 
   Scenario: Can buy Grand Market without Copper
-    Given my hand contains Gold, Gold
+    Given my hand contains Gold, Gold, Copper
       And it is my Play Treasure phase
     When the game checks actions
       Then I should need to Play Treasure
-    When I play simple treasures
-      Then I should have played Gold, Gold
-    When the game checks actions
+    When I play Gold as treasure
+    And the game checks actions
+    And I play Gold as treasure
+    And the game checks actions
+    And I stop playing treasures
       Then I should need to Buy
       And I should be able to choose the Grand Market pile
     When I buy Grand Market
     And the game checks actions
-      Then the following 3 steps should happen at once
+      Then the following 4 steps should happen at once
       Then I should have gained Grand Market
       And I should have moved Gold, Gold from play to discard
+      And I should have discarded Copper
       And I should have drawn 5 cards
     And it should be Bob's Play Action phase
+
+  Scenario: Grand Market doesn't hold up play if money's too tight
+    Given my hand contains Copper
+      And it is my Play Treasure phase
+    When the game checks actions
+      Then I should have played Copper
+      And I should need to Buy
+
+  Scenario: Grand Market doesn't hold up play if no Copper is held
+    Given my hand contains Gold, Gold
+      And it is my Play Treasure phase
+    When the game checks actions
+      Then I should have played Gold x2
+      And I should need to Buy
+      And I should be able to choose the Grand Market pile

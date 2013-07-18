@@ -21,7 +21,7 @@ Feature: Mint
       And I should need to Play treasure
 
   Scenario: Playing Mint - one treasure in hand
-    Given my hand contains Mint, Talisman, Smithy, Gardens
+    Given my hand contains Mint, Talisman x5, Smithy, Gardens
       And it is my Play Action phase
     When I play Mint
     Then I should need to Reveal a Treasure card from hand
@@ -68,3 +68,24 @@ Feature: Mint
         Then I should have gained Mint
     And it should be my Buy phase
       And I should have 6 cash
+
+  Scenario: Mint doesn't hold up play if money's too tight
+    Given my hand contains Copper
+      And it is my Play Treasure phase
+    When the game checks actions
+      Then I should have played Copper
+      And I should need to Buy
+
+  Scenario: Mint doesn't hold up play if I have no treasures
+    Given my hand contains Market x5
+      And it is my Play Action phase
+      And my deck is empty
+    When I play Market
+    And I play Market
+    And I play Market
+    And I play Market
+    And I play Market
+    And I stop playing actions
+    And the game checks actions
+      Then I should need to Buy
+      And I should be able to choose the Mint pile
