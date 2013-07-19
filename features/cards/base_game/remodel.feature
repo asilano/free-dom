@@ -11,6 +11,7 @@ Feature: Remodel
   Scenario: Playing Remodel - choices in hand
     Given my hand contains Remodel, Copper, Estate and 2 other cards
       And it is my Play Action phase
+      And I have 6 cash
     When I play Remodel
     Then I should need to Trash a card with Remodel
     When I choose Estate in my hand

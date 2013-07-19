@@ -111,3 +111,10 @@ Given(/^(.*?)(?:'s)? state (\w*) is (.*)$/) do |name, prop, value|
   @players[name].state.send(set_sym, value)
   @players[name].state.save!
 end
+
+Given(/^(\w*) ha(?:ve|s) (\d+) cash/) do |name, amount|
+  name = "Alan" if name = "I"
+
+  @players[name].cash = amount
+  @players[name].save!
+end

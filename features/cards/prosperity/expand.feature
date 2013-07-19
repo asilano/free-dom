@@ -9,7 +9,7 @@ Feature: Expand
       And there should be 0 Expand cards not in piles
 
   Scenario: Playing Expand - choices in hand
-    Given my hand contains Expand, Copper, Estate, Duchy, Witch
+    Given my hand contains Expand, Gold x2, Estate, Duchy, Witch
       And it is my Play Action phase
     When I play Expand
     Then I should need to Trash a card with Expand

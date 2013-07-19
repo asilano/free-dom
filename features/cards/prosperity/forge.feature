@@ -9,7 +9,7 @@ Feature: Forge
       And there should be 0 Forge cards not in piles
 
   Scenario: Playing Forge - total trashed is pickable
-    Given my hand contains Forge, Copper, Estate, Woodcutter, Throne Room, Mint, Adventurer
+    Given my hand contains Forge, Gold x2, Estate, Woodcutter, Throne Room, Mint, Adventurer
       And it is my Play Action phase
     When I play Forge
     Then I should need to Trash cards from hand with Forge

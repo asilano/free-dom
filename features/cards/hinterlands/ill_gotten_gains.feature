@@ -10,7 +10,7 @@ Feature: Ill-Gotten Gains
       And there should be 0 Ill-Gotten Gains cards not in piles
 
   Scenario: Playing IGG - choose to gain / not to gain a Copper
-    Given my hand contains Ill-Gotten Gains x2
+    Given my hand contains Ill-Gotten Gains x2, Silver
       And it is my Play Action phase
     When I stop playing actions
     And the game checks actions
@@ -30,7 +30,7 @@ Feature: Ill-Gotten Gains
       Then I should need to Play Treasure
 
   Scenario: Playing IGG - auto gain a Copper
-    Given my hand contains Ill-Gotten Gains
+    Given my hand contains Ill-Gotten Gains, Gold
       And it is my Play Action phase
       And I have setting autoigg set to ALWAYS
     When I stop playing actions
