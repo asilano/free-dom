@@ -11,6 +11,7 @@ group :production do
   gem 'pg'
   gem 'thin'
   gem 'newrelic_rpm'
+  gem 'unicorn'
 end
 group :development, :test do
   gem 'sqlite3'
