@@ -27,6 +27,7 @@ end
 gem 'jquery-rails', :path => "vendor/gems/jquery-rails-1.0.19"
 #gem 'therubyracer'
 gem 'actionmailer-with-request'
+gem 'haml'
 
 gem 'andand'
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130716120036) do
+ActiveRecord::Schema.define(:version => 20130723125302) do
 
   create_table "cards", :force => true do |t|
     t.integer "game_id"
@@ -167,6 +167,7 @@ ActiveRecord::Schema.define(:version => 20130716120036) do
     t.boolean  "contact_me",      :default => false
     t.datetime "last_completed"
     t.boolean  "pbem",            :default => false
+    t.boolean  "admin",           :default => false
   end
 
 end

@@ -5,7 +5,7 @@ subj = nil
 
 opts = OptionParser.new
 opts.on("-s", "--subject SUBJECT", String)  {|val| subj = val}
-opts.on("-f", "--file FILENAME", String) do |val| 
+opts.on("-f", "--file FILENAME", String) do |val|
   begin
     text = File.read(val)
   rescue
@@ -29,5 +29,5 @@ if text.nil?
 end
 
 User.find(:all, :conditions => ['contact_me = ?', true]).each do |u|
-  UserMailer.deliver_announce(u, text, {:subject => subj})
+  UserMailer.announce(u, text, {:subject => subj}).deliver
 end

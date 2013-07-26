@@ -87,6 +87,8 @@ GEM
       json (>= 1.4.6)
     gherkin (2.7.3-x86-mingw32)
       json (>= 1.4.6)
+    haml (4.0.3)
+      tilt
     hike (1.2.1)
     i18n (0.6.1)
     json (1.7.6)
@@ -183,6 +185,7 @@ DEPENDENCIES
   cucumber-rails
   database_cleaner
   factory_girl_rails
+  haml
   i18n
   jquery-rails!
   launchy
