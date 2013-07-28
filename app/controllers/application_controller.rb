@@ -9,13 +9,13 @@ class ApplicationController < ActionController::Base
   # filter_parameter_logging :password
   before_filter :check_cookied_user
   before_filter :record_player_pa_ids
-  
+
   after_filter {check_player_pa_ids; email_pbem_players}
-  
+
   def nop
     render :text => ""
   end
-  
+
 protected
   def check_cookied_user
     if cookies[:userId] && cookies[:userCode]
@@ -32,12 +32,12 @@ protected
       end
     end
   end
-  
+
   def cookie_login
     cookies[:userId] = {:value => @user.id.to_s, :expires => User.cookie_timeout.days.from_now}
     cookies[:userCode] = {:value => @user.hashed_email, :expires => User.cookie_timeout.days.from_now}
   end
-  
+
   def uncookie_login
     cookies.delete :userId
     cookies.delete :userCode
@@ -49,23 +49,23 @@ protected
       @pa_ids[ply.id] = ply.active_actions(true).map(&:id)
     end
   end
-  
+
   def check_player_pa_ids
     Game.current and Game.current.players.each do |ply|
       new_ids = ply.active_actions(true).map(&:id)
       diff = new_ids - (@pa_ids[ply.id] || [])
 
-      if !diff.empty? && ply.user.pbem? && 
+      if !diff.empty? && ply.user.pbem? &&
           (!Player.to_email[ply.id] || !Player.to_email[ply.id].include?(:game_state))
         Player.to_email[ply.id] ||= {}
-        Player.to_email[ply.id][:game_state] = [:controls, 
+        Player.to_email[ply.id][:game_state] = [:controls,
                                                 "free-dom: Your action is required: Game '#{ply.game.name}'",
                                                 "You are needed to take one or more actions in '#{ply.game.name}'.",
                                                 nil]
       end
     end
   end
-  
+
   def email_pbem_players
     Player.to_email.sort.each do |pid, mails|
       player = Player.find(pid)
@@ -79,8 +79,37 @@ protected
         PbemMailer.send("#{kind}".to_sym, *args).deliver
       end
       player.emailed
-      player.save      
+      player.save
     end
     Player.to_email = {}
   end
+
+  def authorise
+    unless @user
+      flash[:warning] = "Please log in"
+      session[:original_uri] = request.url
+      redirect_to login_path
+      return false
+    end
+    true
+  end
+
+  def ensure_admin
+    if authorise
+      if !@user.admin?
+        flash[:warning] = "You are not authorised to view that page"
+        redirect_to games_path
+        return false
+      end
+    else
+      return false
+    end
+    true
+  end
+
+  def find_user
+    @user = User.find_by_id(session[:user_id])
+    @player = @user.players.find_by_game_id(@game.id) if (@game and @user)
+  end
+
 end

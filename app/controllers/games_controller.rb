@@ -217,19 +217,6 @@ protected
     redirect_to :action => 'index'
   end
 
-  def find_user
-    @user = User.find_by_id(session[:user_id])
-    @player = @user.players.find_by_game_id(@game.id) if (@game and @user)
-  end
-
-  def authorise
-    unless @user
-      flash[:warning] = "Please log in"
-      session[:original_uri] = request.url
-      redirect_to login_path
-    end
-  end
-
   def setup_title
     @title = action_name.humanize
   end

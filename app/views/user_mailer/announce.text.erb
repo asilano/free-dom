@@ -5,5 +5,5 @@ Hi, <%= @user.name.html_safe %>.
 Thanks, and happy gaming!
 
 ----
-You received this email because an account on free-dom.heroku.com has registered with this email address, and checked the "Contact Me" option.
+You received this email because an account on free-dom.heroku.com has registered with this email address<%= raw ', and checked the "Contact Me" option' unless @override %>.
 If you have received this email in error, please contact the webmaster by replying to this email.

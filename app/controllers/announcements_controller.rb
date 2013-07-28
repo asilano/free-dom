@@ -1,4 +1,7 @@
 class AnnouncementsController < ApplicationController
+  before_filter :find_user
+  before_filter :ensure_admin
+
   # GET /announcements/new
   # GET /announcements/new.json
   def new
@@ -19,12 +22,12 @@ class AnnouncementsController < ApplicationController
     end
 
     recipients.each do |u|
-      UserMailer.announce(u, params[:annText], {:subject => params[:annSubject]}).deliver
+      UserMailer.announce(u, params[:annText], {:subject => params[:annSubject], :override => params[:annOverride]}).deliver
     end
 
     flash[:notice] = 'Announcement sent!'
     respond_to do |format|
-      format.html { render action: "new", notice: 'Announcement was sent.' }
+      format.html { redirect_to action: "new" }
     end
   end
 end
