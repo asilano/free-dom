@@ -187,6 +187,30 @@ Then(/(.*) should (not )?be able to choose the (.*) piles? labelled (.*)$/) do |
   end
 end
 
+# Verify that there is (not) a nil action on piles
+#
+# Matches:
+#   I should be able to choose a nil action on piles
+#   Bob should not be able to choose a nil action on piles
+Then /(.*) should (not )?be able to choose a nil action on piles/ do |name, negate|
+  name = "Alan" if name == "I"
+  player = @players[name]
+
+  # We want to check the valid options for a play-based action.
+  # These are encoded in the control that that action produces.
+  all_controls = player.determine_controls
+  controls = all_controls[:piles]
+  flunk "Unimplemented multi-play controls in testbed" unless controls.length == 1
+
+  ctrl = controls[0]
+
+  unless negate
+    assert_not_nil ctrl[:nil_action]
+  else
+    assert_nil ctrl[:nil_action]
+  end
+end
+
 # Verify that a dropdown control has the stated options
 #
 # Matches:

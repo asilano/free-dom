@@ -16,6 +16,7 @@ Feature: Ironworks
     Then I should need to Take a card with Ironworks
       And I should be able to choose the Estate, Copper, Silver, Great Hall, Ironworks, Bridge piles
       And I should not be able to choose the Duchy, Province, Gold, Cellar, Harem, Bank, Mine, Peddler piles
+      And I should not be able to choose a nil action on piles
     When I choose the Bridge pile
       And the game checks actions
     Then I should have gained Bridge
@@ -30,6 +31,7 @@ Feature: Ironworks
     Then I should need to Take a card with Ironworks
       And I should be able to choose the Estate, Copper, Silver, Great Hall, Ironworks, Bridge piles
       And I should not be able to choose the Duchy, Province, Gold, Cellar, Harem, Bank, Mine, Peddler piles
+      And I should not be able to choose a nil action on piles
     When I choose the Silver pile
       And the game checks actions
     Then I should have gained Silver
@@ -45,6 +47,7 @@ Feature: Ironworks
     Then I should need to Take a card with Ironworks
       And I should be able to choose the Estate, Copper, Silver, Great Hall, Ironworks, Bridge piles
       And I should not be able to choose the Duchy, Province, Gold, Cellar, Harem, Bank, Mine, Peddler piles
+      And I should not be able to choose a nil action on piles
     When I choose the Estate pile
       And the game checks actions
     Then the following 2 steps should happen at once
@@ -60,6 +63,7 @@ Feature: Ironworks
     Then I should need to Take a card with Ironworks
       And I should be able to choose the Estate, Copper, Silver, Great Hall, Ironworks, Bridge piles
       And I should not be able to choose the Duchy, Province, Gold, Cellar, Harem, Bank, Mine, Peddler piles
+      And I should not be able to choose a nil action on piles
     When I choose the Great Hall pile
       And the game checks actions
     Then the following 2 steps should happen at once
@@ -78,6 +82,7 @@ Feature: Ironworks
     Then I should need to Take a card with Ironworks
       And I should be able to choose the Estate, Duchy, Copper, Silver, Gold, Great Hall, Ironworks, Bridge, Mine, Harem piles
       And I should not be able to choose the Province, Cellar, Bank, Peddler piles
+      And I should not be able to choose a nil action on piles
     When I choose the Harem pile
       And the game checks actions
     Then the following 2 steps should happen at once

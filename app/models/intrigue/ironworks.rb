@@ -20,7 +20,7 @@ class Intrigue::Ironworks < Card
       controls[:piles] += [{:type => :button,
                             :action => :resolve,
                             :text => "Take",
-                            :nil_action => "Take nothing",
+                            :nil_action => nil,
                             :params => {:card => "#{self.class}#{id}",
                                         :substep => "take"},
                             :piles => game.piles.map do |pile|
