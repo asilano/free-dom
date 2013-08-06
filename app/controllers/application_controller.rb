@@ -76,7 +76,13 @@ protected
           args[args.index(:controls)] = player.determine_controls
         end
         args = [user, game, player] + args
-        PbemMailer.send("#{kind}".to_sym, *args).deliver
+
+        # Ignore any errors thrown by the PBEM mail system - they don't impact
+        # the game.
+        begin
+          PbemMailer.send("#{kind}".to_sym, *args).deliver
+        rescue
+        end
       end
       player.emailed
       player.save
