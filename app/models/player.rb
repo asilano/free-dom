@@ -144,27 +144,26 @@ class Player < ActiveRecord::Base
   end
 
   def play_action(params)
-    # Checks. In order to be playing an action, the player must be waiting to
-    # play an action
-    active_actions.reload
-    if not waiting_for?("play_action")
-      return "Not expecting an Action at this time"
+    # Checks, including retrieving the action.
+    this_act, response = find_action(params[:pa_id])
+
+    if this_act.nil?
+      return response
     elsif (!params.include?(:nil_action) &&
            !params.include?(:card_index))
-       return "Invalid parameters - must specify a card or nil_action"
-    elsif ((params.include? :card_index) and
-           (params[:card_index].to_i < 0 or
+      return "Invalid parameters - must specify a card or nil_action"
+    elsif ((params.include? :card_index) &&
+           (params[:card_index].to_i < 0 ||
             params[:card_index].to_i > cards.hand.length - 1))
       # Asked to play an invalid card (out of range)
       return "Invalid request - card index #{params[:card_index]} is out of range"
-    elsif params.include? :card_index and not cards.hand[params[:card_index].to_i].is_action?
+    elsif params.include?(:card_index) && !cards.hand[params[:card_index].to_i].is_action?
       # Asked to play an invalid card (not an action)
       return "Invalid request - card index #{params[:card_index]} is not an action"
     end
 
-    # Checks are good. Find the play_action action, and remove it noting the parent
+    # Checks are good. Remove the play_action action, noting the parent
     rc = "OK"
-    this_act = active_actions.detect {|act| act.expected_action == "play_action"}
     parent_act = this_act.parent
     Game.current_act_parent = parent_act
     params[:this_act_id] = this_act.id
@@ -269,26 +268,28 @@ class Player < ActiveRecord::Base
   def play_treasure(params)
     return "Cash unexpectedly nil for Player #{id}" if cash.nil?
     # Unsurprisingly, this is much like play_action.
-    if not waiting_for?("play_treasure")
-      return "Not expecting a Treasure at this time"
+    # Checks, including retrieving the action.
+    this_act, response = find_action(params[:pa_id])
+
+    if this_act.nil?
+      return response
     elsif (!params.include?(:nil_action) &&
            !params.include?(:card_index))
        return "Invalid parameters - must specify a card or nil_action"
-    elsif ((params.include? :card_index) and
-           (params[:card_index].to_i < 0 or
+    elsif ((params.include? :card_index) &&
+           (params[:card_index].to_i < 0 ||
             params[:card_index].to_i > cards.hand.length - 1))
       # Asked to play an invalid card (out of range)
       return "Invalid request - card index #{params[:card_index]} is out of range"
-    elsif params.include? :card_index and not cards.hand[params[:card_index].to_i].is_treasure?
+    elsif params.include?(:card_index) && !cards.hand[params[:card_index].to_i].is_treasure?
       # Asked to play an invalid card (not an treasure)
-      return "Invalid request - card index #{params[:card_index]} is not an treasure"
+      return "Invalid request - card index #{params[:card_index]} is not a treasure"
     end
 
     # Checks are good.
     rc = "OK"
 
-    # Find the Play Treasure action, and remove it noting the parent
-    this_act = active_actions.detect {|act| act.expected_action == "play_treasure"}
+    # Remove the Play Treasure action, noting the parent
     parent_act = this_act.parent
     Game.current_act_parent = parent_act
     this_act.destroy
@@ -335,15 +336,16 @@ class Player < ActiveRecord::Base
   end
 
   def buy(params)
-    # Checks. In order to be buying a card, the player must be waiting to
-    # buy a card
-    if not waiting_for?("buy")
-      return "Not expecting to Buy at this time"
+    # Checks, including retrieving the action.
+    this_act, response = find_action(params[:pa_id])
+
+    if this_act.nil?
+      return response
     elsif (!params.include?(:nil_action) &&
            !params.include?(:pile_index))
        return "Invalid parameters - must specify a card or nil_action"
-    elsif ((params.include? :pile_index) and
-           (params[:pile_index].to_i < 0 or
+    elsif ((params.include? :pile_index) &&
+           (params[:pile_index].to_i < 0 ||
             params[:pile_index].to_i > game.piles.length - 1))
       # Asked to buy an invalid card (out of range)
       return "Invalid request - pile index #{params[:pile_index]} is out of range"
@@ -373,8 +375,7 @@ class Player < ActiveRecord::Base
                             :css_class => "player#{seat} buy")
     end
 
-    # Find the Buy action, and remove it noting the parent
-    this_act = active_actions.detect {|act| act.expected_action == "buy"}
+    # Remove the Buy action, noting the parent
     parent_act = this_act.parent
     Game.current_act_parent = parent_act
     this_act.destroy
@@ -470,7 +471,7 @@ class Player < ActiveRecord::Base
 
   def end_turn(params)
     # Check the player doesn't have any pending actions left
-    if not pending_actions.empty?
+    if !pending_actions.empty?
       return "You unexpectedly have actions pending when ending turn"
     end
 
@@ -849,17 +850,11 @@ class Player < ActiveRecord::Base
   end
 
   def resolve(params)
-    # Checks.
-    # First, we'll need to build the action we were expecting from the params
-    act = "resolve_"
-    act += params[:card]
-    if params.include? :substep
-      act += "_#{params[:substep]}"
-    end
+    # Checks, including retrieving the action.
+    this_act, response = find_action(params[:pa_id])
 
-    # Check the player is waiting for that action
-    if not waiting_for?(act)
-      return "Not expecting to #{act} at this time"
+    if this_act.nil?
+      return response
     end
 
     # Now split the card, and make sure it makes sense.
@@ -882,39 +877,31 @@ class Player < ActiveRecord::Base
       return "Card of type #{card_type} can't respond to #{meth}"
     end
 
-    # Make sure we can find exactly the action this is resolving
-    r = Regexp.new("^" + act + "(;.*)?")
-    candidate_acts = active_actions.select do |action|
-      if action.expected_action =~ r
-        result = true
-        param_string = $1
-        act_params = {}
-        if param_string
-          param_string.scan(/;([^;=]*)=([^;=]*)/) {|m| act_params[m[0].to_sym] = m[1]}
-        end
+    # Make sure the action we're resolving has the correct parameters
+    act_text = "resolve_"
+    act_text << params[:card]
+    if params.include? :substep
+      act_text << "_#{params[:substep]}"
+    end
+    r = Regexp.new("^" + act_text + "(;.*)?")
 
-        act_params.each do |key, value|
-          if (not params.include? key) or (params[key] != value)
-            result = false
-            break
-          end
-        end
-      else
-        result = false
-      end
-
-      result
+    match = r.match(this_act.expected_action)
+    param_string = match[1]
+    act_params = {}
+    if param_string
+      param_string.scan(/;([^;=]*)=([^;=]*)/) {|m| act_params[m[0].to_sym] = m[1]}
     end
 
-    if candidate_acts.empty?
+    act_params.each do |key, value|
+      if (!params.include? key) || (params[key] != value)
+        this_act = nil
+        break
+      end
+    end
+
+    if this_act.nil?
       return "Couldn't find action to exactly match all required arguments"
     end
-
-    if candidate_acts.length > 1
-      Rails.logger.warn("Ambiguous request")
-    end
-
-    this_act = candidate_acts[0]
 
     # All good - remove the action and call through
     parent_act = this_act.parent
@@ -1134,6 +1121,25 @@ class Player < ActiveRecord::Base
   end
 
 private
+
+  def find_action(action_id)
+    pa = nil
+    error = ""
+    begin
+      pa = PendingAction.find(action_id.to_i)
+
+      active_actions.reload
+      if !active_actions.include? pa
+        error = "Not expecting you to #{pa.text} at this time"
+        pa = nil
+      end
+    rescue ActiveRecord::RecordNotFound
+      pa = nil
+      error = "Sorry, no matching action could be found"
+    end
+
+    [pa, error]
+  end
 
   def email_creator
     if game_id_changed? && self != game.players[0] && game.players[0].user.pbem?

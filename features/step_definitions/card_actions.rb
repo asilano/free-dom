@@ -14,7 +14,7 @@ When(/^(\w*?) plays? #{SingleCard}$/) do |name, kind|
   assert_match /play_action/, parent_act.expected_action
 
   card_ix = @players[name].cards.hand.index {|c| c.type == card.type}
-  @players[name].play_action(:card_index => card_ix)
+  @players[name].play_action(:card_index => card_ix, :pa_id => parent_act.id)
 
   # Playing the card is likely to do something. Skip checking this step
   @skip_card_checking = 1 if @skip_card_checking == 0
@@ -25,7 +25,7 @@ When(/^(\w*?) stops? playing actions$/) do |name|
   parent_act = @players[name].active_actions[0]
   assert_match /play_action/, parent_act.expected_action
 
-  @players[name].play_action(:nil_action => "Leave Action Phase")
+  @players[name].play_action(:nil_action => "Leave Action Phase", :pa_id => parent_act.id)
 end
 
 When(/^(\w*?) plays? #{SingleCard} as treasure$/) do |name, kind|
@@ -40,7 +40,7 @@ When(/^(\w*?) plays? #{SingleCard} as treasure$/) do |name, kind|
   assert_match /play_treasure/, parent_act.expected_action
 
   card_ix = @players[name].cards.hand.index {|c| c.type == card.type}
-  @players[name].play_treasure(:card_index => card_ix)
+  @players[name].play_treasure(:card_index => card_ix, :pa_id => parent_act.id)
 
   # Playing the card is likely to do something. Skip checking this step
   @skip_card_checking = 1 if @skip_card_checking == 0
@@ -52,7 +52,7 @@ When(/^(\w*?) stops? playing treasures$/) do |name|
   parent_act = @players[name].active_actions[0]
   assert_match /play_treasure/, parent_act.expected_action
 
-  @players[name].play_treasure(:nil_action => "Stop Playing Treasures")
+  @players[name].play_treasure(:nil_action => "Stop Playing Treasures", :pa_id => parent_act.id)
 end
 
 When(/^(\w*?) plays? simple treasures$/) do |name|
@@ -61,7 +61,7 @@ When(/^(\w*?) plays? simple treasures$/) do |name|
   parent_act = @players[name].active_actions[0]
   assert_match /play_treasure/, parent_act.expected_action
 
-  @players[name].play_treasure(:nil_action => "Play Simple Treasures")
+  @players[name].play_treasure(:nil_action => "Play Simple Treasures", :pa_id => parent_act.id)
 
   # Skip checking this step, so the feature can move the cards
   @skip_card_checking = 1 if @skip_card_checking == 0
@@ -104,7 +104,7 @@ When(/^(\w*?) buys? #{SingleCard}$/) do |name, kind|
 
   pile_ix = @game.piles.index {|p| p.card_type == pile.card_type}
   # Need to ensure player has correct record of cash from database, or buy fails
-  @players[name].reload.buy(:pile_index => pile_ix)
+  @players[name].reload.buy(:pile_index => pile_ix, :pa_id => parent_act.id)
 end
 
 When(/^(\w*?) stops? buying cards$/) do |name|
@@ -112,5 +112,5 @@ When(/^(\w*?) stops? buying cards$/) do |name|
   parent_act = @players[name].active_actions(true)[0]
   assert_match /buy/, parent_act.expected_action
 
-  @players[name].buy(:nil_action => "Buy no more")
+  @players[name].buy(:nil_action => "Buy no more", :pa_id => parent_act.id)
 end

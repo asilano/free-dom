@@ -17,6 +17,7 @@ When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in (?:his|my) hand/) do |name, 
 
   ctrl = controls[0]
   params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
+  params[:pa_id] = ctrl[:pa_id]
 
   key = if ctrl[:type] == :button
     :card_index
@@ -83,6 +84,7 @@ When(/^(\w*?)(?:'s)? chooses? (?:his|my) (revealed|peeked) (.*)$/) do |name, loc
 
   ctrl = controls[0]
   params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
+  params[:pa_id] = ctrl[:pa_id]
 
   key = if ctrl[:type] == :button
     :card_index
@@ -140,6 +142,7 @@ When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in play/) do |name, choices|
 
   ctrl = controls[0]
   params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
+  params[:pa_id] = ctrl[:pa_id]
 
   key = if ctrl[:type] == :button
     :card_index
@@ -203,6 +206,7 @@ When(/^(\w*?) chooses? the option (.*)/) do |name, choice|
   found = false
   controls.each do |ctrl|
     params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
+    params[:pa_id] = ctrl[:pa_id]
 
     matching_controls = ctrl[:options].detect {|opt| opt[:text] =~ /^#{Regexp.escape(choice)}$/i}
     if matching_controls
@@ -241,6 +245,7 @@ When(/(.*) chooses? for (.*) the option (.*)/) do |name, target, choice|
   # Look for an option of the chosen name anywhere in the controls
   controls.each do |ctrl|
     params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
+    params[:pa_id] = ctrl[:pa_id]
     next unless params[:target] == @players[target].id.to_s
 
     matching_controls = ctrl[:options].detect do |opt|
@@ -274,6 +279,7 @@ When(/^(.*) chooses? the options (.*)$/) do |name, choices|
 
   ctrl = controls[0]
   params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
+  params[:pa_id] = ctrl[:pa_id]
 
   params[:choice] = choices.split(/,\s*/).map {|choice| ctrl[:choices].index(choice) }
 
@@ -301,6 +307,7 @@ When /^(\w*?) chooses? (.*) from the dropdown/ do |name, choice|
 
   ctrl = controls[0]
   params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
+  params[:pa_id] = ctrl[:pa_id]
 
   params[:choice] = choice
 
@@ -328,6 +335,7 @@ When(/^(\w*?) chooses? (?:the )?(.*?) (?:for )?piles?$/) do |name, choice|
 
   ctrl = controls[0]
   params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
+  params[:pa_id] = ctrl[:pa_id]
 
   if ctrl[:nil_action].andand == choice
     params[:nil_action] = choice
@@ -367,6 +375,7 @@ When(/^(\w*?) chooses? (?:the )?(.*?) (?:for )?piles? labelled (.*)$/) do |name,
 
   ctrl = controls[0]
   params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
+  params[:pa_id] = ctrl[:pa_id]
 
   if ctrl[:nil_action].andand == choice
     params[:nil_action] = true
@@ -404,6 +413,7 @@ When(/^(\w*?) chooses? (.*?) for (\w*?)(?:'s)? revealed (#{SingleCardNoCapture}|
 
   ctrl = controls.detect {|c| c[:player_id] == target.id}
   params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
+  params[:pa_id] = ctrl[:pa_id]
 
   if ctrl[:nil_action].andand == choice
     params[:choice] = "nil_action"
@@ -442,6 +452,7 @@ When(/^(\w*?) chooses? the matrix ((?:\w+ the #{SingleCardNoCapture}(?:, )?)+)$/
 
   # Default values for the other params
   params = controls[:params]
+  params[:pa_id] = ctrl[:pa_id]
 
   # Look at each peeked card (there may not necessarily be 3) and
   # assemble the corresponding action in params[:choice][n]

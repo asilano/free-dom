@@ -157,6 +157,9 @@ EOS
       end
     end
 
+    # Add the PendingAction ID as a hidden field, so we can correlate accurately on return
+    str << raw(hidden_field_tag("pa_id", control[:pa_id], :id => "pa_id_#{control[:name]}_#{control.object_id}"))
+
     form = form_tag({:action => control[:action]},
                         :remote => true,
                         :id => "form_#{control.object_id}",
