@@ -452,7 +452,7 @@ When(/^(\w*?) chooses? the matrix ((?:\w+ the #{SingleCardNoCapture}(?:, )?)+)$/
 
   # Default values for the other params
   params = controls[:params]
-  params[:pa_id] = ctrl[:pa_id]
+  params[:pa_id] = controls[:pa_id]
 
   # Look at each peeked card (there may not necessarily be 3) and
   # assemble the corresponding action in params[:choice][n]
