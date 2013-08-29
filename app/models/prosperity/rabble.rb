@@ -78,7 +78,8 @@ class Prosperity::Rabble < Card
       end
 
       # If there were 2 or more cards revealed but not discarded, reveal them properly and ask for them to be put back.
-      if revealed_cards.length >= discarded_cards.length + 2
+      remaining_types = revealed_cards.reject { |c| c.is_treasure? || c.is_action? }.map(&:class)
+      if (revealed_cards.length >= discarded_cards.length + 2) && remaining_types.uniq.length > 1
         target.renum(:deck)
         target.reveal_from_deck(revealed_cards.length - discarded_cards.length, :silent => true)
         (2..target.cards.revealed.length).each do |ix|
@@ -87,6 +88,10 @@ class Prosperity::Rabble < Card
                                                   :player => target,
                                                   :game => game)
         end
+      elsif revealed_cards.length >= discarded_cards.length + 2
+        # All cards must be the same type. Log that they're being put back
+        game.histories.create!(:event => "#{target.name} replaced their revealed cards on their deck.",
+                               :css_class => "player#{target.seat}")
       end
     end
 
@@ -101,8 +106,8 @@ class Prosperity::Rabble < Card
 
     # Processing is surprisingly similar to a Play; code shamelessly yoinked from
     # Player.play_action.
-    if ((params.include? :card_index) and
-        (params[:card_index].to_i < 0 or
+    if ((params.include? :card_index) &&
+        (params[:card_index].to_i < 0 ||
          params[:card_index].to_i > ply.cards.revealed.count - 1))
       # Asked to place an invalid card (out of range)
       return "Invalid request - card index #{params[:card_index]} is out of range"
@@ -131,6 +136,12 @@ class Prosperity::Rabble < Card
     end
 
     ply.renum(:deck)
+
+    # Now, if the revealed cards are all of the same type, we can put them back as well
+    if ply.cards.revealed(true).map(&:class).uniq.length == 1
+      resolve_place(ply, {card_index: 0, posn: params[:posn].to_i - 1}, parent_act)
+      ply.pending_actions.where('expected_action LIKE ?', "resolve_#{self.class}#{id}_place;posn=%").destroy_all
+    end
 
     return "OK"
   end
