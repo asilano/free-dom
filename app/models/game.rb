@@ -47,8 +47,12 @@ class Game < ActiveRecord::Base
                             :finder_sql => proc {"select p.* from pending_actions p where game_id = #{id} and player_id is null and (select count(*) from pending_actions where parent_id = p.id) = 0"},
                             :counter_sql => proc {"select count(*) from pending_actions p where game_id = #{id} and player_id is null and (select count(*) from pending_actions where parent_id = p.id) = 0"}
   has_many :active_ply_actions, :class_name => "PendingAction",
-                            :finder_sql => proc {"select p.* from pending_actions p where game_id = #{id} and player_id is not null and (select count(*) from pending_actions where parent_id = p.id) = 0"},
-                            :counter_sql => proc {"select count(*) from pending_actions p where game_id = #{id} and player_id is not null and (select count(*) from pending_actions where parent_id = p.id) = 0"}
+                            :finder_sql => proc {"select p.* from pending_actions p
+                                                    where game_id = #{id} and
+                                                          player_id is not null and
+                                                          text is not null and
+                                                          text != '' and
+                                                          (select count(*) from pending_actions where parent_id = p.id) = 0"}
 
   validates :name, :presence => true
   validates :max_players, :presence => true, :numericality => true, :inclusion => { :in => 2..6, :message => 'must be between 2 and 6 inclusive' }

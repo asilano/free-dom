@@ -282,9 +282,12 @@ private
 
     if @game.state == 'running'
       waiting_players = @game.active_ply_actions.map {|a| a.player}
+
+      # Ensure the current player is on the front of the list.
       if waiting_players.delete(@player)
         waiting_players.unshift(@player)
       end
+
       @full_title = waiting_players.map{|p| p.name }.join(', ')
       @full_title += " to act - "
       @full_title += @game.current_turn_player.name
