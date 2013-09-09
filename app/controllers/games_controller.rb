@@ -254,6 +254,7 @@ private
       flash[:warning] = $1 if $1 != ""
 
       @game.process_actions if do_actions
+      raise StandardError.new
       if not @player.nil?
         @controls = @player.determine_controls
       else

@@ -26,7 +26,7 @@ Feature: Mine
 
 
   Scenario: Playing Mine - one treasure in hand
-    Given my hand contains Mine, Talisman, Smithy, Gardens#
+    Given my hand contains Mine, Talisman, Smithy, Gardens
       And it is my Play Action phase
       And I have 6 cash
     When I play Mine
@@ -44,3 +44,19 @@ Feature: Mine
       And it is my Play Action phase
     When I play Mine
     Then it should be my Play Treasure phase
+
+  Scenario: Playing Mine - a treasure pile is empty
+    Given my hand contains Mine, Talisman, Smithy, Gardens
+      And the Talisman pile is empty
+      And it is my Play Action phase
+      And I have 6 cash
+    When I play Mine
+    Then I should have removed Talisman from hand
+      And I should need to Take a replacement card with Mine
+      And I should be able to choose the Copper, Silver, Gold, Harem piles
+      And I should not be able to choose the Talisman pile
+      And I should not be able to choose the Platinum, Mine piles
+    When I choose the Harem pile
+      And the game checks actions
+    Then I should have placed Harem in my hand
+      And I should need to Play treasure
