@@ -1,0 +1,49 @@
+#nav
+  %h2.inline Games
+  %h2.right
+    = link_to 'View User Rankings', users_path
+
+#game_list
+  %table
+    %tr
+      %th Name
+      %th Num Players
+      %th Players
+      %th State
+      %th.blank_th
+
+    - @games.each_with_index do |game, ix|
+      - css_class = game.state
+      - css_class += (ix % 2 == 0 ? ' rowEven' : ' rowOdd')
+      %tr{:class => css_class}
+        %td
+          = h game.name
+        %td
+          - if game.state == "waiting"
+            = "up to #{h game.max_players}"
+          - else
+            = h game.players.length
+
+        %td
+          - if game.state == 'running'
+            = raw running_player_list(game)
+          - elsif game.state == 'ended'
+            - ply_ordered = game.players.sort_by {|p| p.score}.reverse
+            %span.bold #{h ply_ordered[0].name} (1st)
+            - ply_ordered[1..-1].each_with_index do |p, ix|
+              = h ", " + p.name + " (#{(ix+2).ordinalize})"
+          - else
+            = h game.players.map{|p| p.name}.join(', ')
+
+        %td= h game.state.capitalize
+        %td= link_to 'Watch', watch_game_path(game)
+        - if session[:user_id]
+          %td= button_to 'Join', join_game_path(game)
+          - if (@user && (@user.name == 'Chowlett' || @user.games.include?(game))) # || request.host == '127.0.0.1'
+            %td= button_to 'Destroy', game, :confirm => 'Are you sure?', :method => :delete
+%br
+
+- if session[:user_id]
+  = link_to('New game', new_game_path)
+- else
+  You must #{link_to "login", login_path} or #{link_to "register", new_user_path} to start or join a game

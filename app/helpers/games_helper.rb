@@ -3,6 +3,16 @@ module GamesHelper
     ctype.camelize.constantize
   end
 
+  def running_player_list(game)
+    game.players.map do |p|
+      str = ""
+      str += "<span class='bold'>" unless p.active_actions.empty?
+      str += p.name
+      str += "</span>" unless p.active_actions.empty?
+      str
+    end.join(', ')
+  end
+
   def format_history(history, player)
     result = history.event
     result.gsub!(/\[([0-9]+)\?([^|]*)\|([^\]]*)\]/) do |match|
