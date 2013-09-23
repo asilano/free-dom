@@ -341,6 +341,26 @@ class Card < ActiveRecord::Base
     save!
   end
 
+  # Apply a moat effect to an attack for the given player
+  def moat_attack(attack_action, ply)
+    if attack_action.expected_action =~ /_doattack;/
+      if attack_action.expected_action !~ /moated=true/
+        attack_action.expected_action += ";moated=true"
+        attack_action.save!
+      end
+    else
+      if !attack_action.state.andand[ply.id].andand[:moated]
+        attack_action.state_will_change!
+        attack_action.state ||= {}
+        attack_action.state[ply.id] ||= {}
+        attack_action.state[ply.id][:moated] = true
+        attack_action.save!
+      end
+    end
+
+    Rails.logger.info("Moated: #{attack_action.reload.inspect}")
+  end
+
 private
 
   def clear_visibility

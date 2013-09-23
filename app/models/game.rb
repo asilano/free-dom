@@ -166,6 +166,7 @@ class Game < ActiveRecord::Base
           param_string.scan(/;([^;=]*)=([^;=]*)/) {|m| params[m[0].to_sym] = m[1]}
           params[:parent_act] = action.parent
           params[:this_act_id] = action.id
+          params[:state] = action.state
           Game.current_act_parent = action.parent
           action.destroy
 

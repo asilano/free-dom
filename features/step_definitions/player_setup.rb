@@ -113,7 +113,7 @@ Given(/^(.*?)(?:'s)? state (\w*) is (.*)$/) do |name, prop, value|
 end
 
 Given(/^(\w*) ha(?:ve|s) (\d+) cash/) do |name, amount|
-  name = "Alan" if name = "I"
+  name = "Alan" if name == "I"
 
   @players[name].cash = amount
   @players[name].save!

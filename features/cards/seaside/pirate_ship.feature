@@ -7,7 +7,7 @@ Feature: Pirate Ship
   Scenario: Pirate Ship should be set up at game start
     Then there should be 10 Pirate Ship cards in piles
       And there should be 0 Pirate Ship cards not in piles
-      
+
   Scenario Outline: Playing Pirate Ship for cash
     Given my hand contains Lighthouse, Pirate Ship, Estate x3
       And my state pirate_coins is <coins>
@@ -15,24 +15,26 @@ Feature: Pirate Ship
       Then I should have 1 cash available
       And I should have 1 action available
     When I play Pirate Ship
+    And the game checks actions
       Then I should need to Choose Pirate Ship mode
     When I choose the option Gain cash
       Then I should have <coins_plus_one> cash available
     When the game checks actions
       Then it should be my Buy phase
-      
+
     Examples:
       | coins | coins_plus_one |
       |   0   |       1        |
       |   1   |       2        |
       |   4   |       5        |
-      |   10  |       11       | 
+      |   10  |       11       |
 
   Scenario: Playing Pirate Ship - steal autotrashes treasures if just one kind
     Given my hand contains Pirate Ship, Estate x4
       And Bob's deck contains Silver x2
       And Charlie's deck contains Harem, Great Hall
     When I play Pirate Ship
+    And the game checks actions
       Then I should need to Choose Pirate Ship mode
     When I choose the option Trash treasures
       And the game checks actions
@@ -42,12 +44,13 @@ Feature: Pirate Ship
         And Charlie should have removed Harem from his deck
         And Charlie should have moved Great Hall from deck to discard
       And my state pirate_coins should be 1
-      
+
   Scenario: Playing Pirate Ship - steal offers choice of treasure if multiple
     Given my hand contains Pirate Ship, Estate x4
       And Bob's deck contains Silver, Gold
       And Charlie's deck contains Harem, Hoard
     When I play Pirate Ship
+    And the game checks actions
       Then I should need to Choose Pirate Ship mode
     When I choose the option Trash treasures
       And the game checks actions
@@ -66,8 +69,8 @@ Feature: Pirate Ship
     When the game checks actions
       Then my state pirate_coins should be 1
       And it should be my Buy phase
-      
-  Scenario: Playing multiple Pirate Ships 
+
+  Scenario: Playing multiple Pirate Ships
     Given my hand contains Village x2, Pirate Ship x3
       And my deck contains Duchy x5
       And Bob's deck contains Silver x2, Curse x2
@@ -77,6 +80,7 @@ Feature: Pirate Ship
     When I play Village
       Then I should have drawn a card
     When I play Pirate Ship
+    And the game checks actions
       Then I should need to Choose Pirate Ship mode
     When I choose the option Trash treasures
       And the game checks actions
@@ -89,6 +93,7 @@ Feature: Pirate Ship
       Then my state pirate_coins should be 1
       And it should be my Play Action phase
     When I play Pirate Ship
+    And the game checks actions
       Then I should need to Choose Pirate Ship mode
     When I choose the option Trash treasures
       And the game checks actions
@@ -100,6 +105,7 @@ Feature: Pirate Ship
       Then my state pirate_coins should be 2
       And it should be my Play Action phase
     When I play Pirate Ship
+    And the game checks actions
       Then I should need to Choose Pirate Ship mode
     When I choose the option Gain cash
       Then I should have 2 cash available
@@ -111,30 +117,54 @@ Feature: Pirate Ship
       And Bob's deck contains Smithy, Moat and 3 other cards
       And Charlie's deck is empty
     When I play Pirate Ship
+    And the game checks actions
       Then I should need to Choose Pirate Ship mode
     When I choose the option Trash treasures
       And the game checks actions
     Then Bob should have moved Smithy, Moat from deck to discard
     And I should need to Play Treasure
-    
+
   Scenario: Playing Pirate Ship - defendable; still grants coins if hits some players
     Given my hand contains Throne Room, Pirate Ship
       And Bob's deck contains Gold, Silver, Copper
       And Bob has Lighthouse as a duration
       And Charlie's deck contains Province, Estate, Gold, Gold
     When I play Throne Room
-      And the game checks actions
-      Then I should have moved Pirate Ship from my hand to play 
+    And the game checks actions
+      Then I should have moved Pirate Ship from my hand to play
       And I should need to Choose Pirate Ship mode
+      And dump actions
     When I choose the option Trash treasures
-      And the game checks actions
+    And the game checks actions
       Then Charlie should have moved Province, Estate from deck to discard
       And my state pirate_coins should be 0
       And I should need to Choose Pirate Ship mode
     When I choose the option Trash treasures
-      And the game checks actions
+    And the game checks actions
       Then the following 2 steps should happen at once
         Then Charlie should have removed Gold from his deck
         And Charlie should have moved Gold from deck to discard
       And my state pirate_coins should be 1
       And it should be my Buy phase
+
+  Scenario: Reactions should be requested before mode choice
+    Given my hand contains Pirate Ship, Estate x4
+      And Bob's deck contains Silver, Gold
+      And Charlie's deck contains Harem, Estate
+      And Bob's hand contains Moat, Witch, Village, Mountebank, Market
+      And Charlie's hand contains Secret Chamber, Witch, Village, Mountebank, Market
+      And Bob has setting automoat off
+    When I play Pirate Ship
+    And the game checks actions
+      Then Charlie should need to React to Pirate Ship
+      And Bob should need to React to Pirate Ship
+    When Charlie chooses Don't react in his hand
+    And Bob chooses Moat in his hand
+    And Bob chooses Don't react in his hand
+      Then I should need to Choose Pirate Ship mode
+    When I choose the option Trash treasures
+    And the game checks actions
+      Then the following 2 steps should happen at once
+        Then Charlie should have removed Harem from his deck
+        And Charlie should have moved Estate from deck to discard
+      And my state pirate_coins should be 1

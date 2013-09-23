@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130723125302) do
+ActiveRecord::Schema.define(:version => 20130910120951) do
 
   create_table "cards", :force => true do |t|
     t.integer "game_id"
@@ -72,6 +72,7 @@ ActiveRecord::Schema.define(:version => 20130723125302) do
     t.string  "expected_action"
     t.string  "text"
     t.boolean "emailed",         :default => false
+    t.text    "state"
   end
 
   add_index "pending_actions", ["game_id"], :name => "index_pending_actions_on_game_id"

@@ -2,6 +2,7 @@ class PendingAction < ActiveRecord::Base
   belongs_to :game
   belongs_to :player
   acts_as_tree
+  serialize :state
 
   after_create :email_owner
 
