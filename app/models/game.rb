@@ -52,6 +52,12 @@ class Game < ActiveRecord::Base
                                                           player_id is not null and
                                                           text is not null and
                                                           text != '' and
+                                                          (select count(*) from pending_actions where parent_id = p.id) = 0"},
+                            :counter_sql => proc {"select count(*) from pending_actions p
+                                                    where game_id = #{id} and
+                                                          player_id is not null and
+                                                          text is not null and
+                                                          text != '' and
                                                           (select count(*) from pending_actions where parent_id = p.id) = 0"}
 
   validates :name, :presence => true
