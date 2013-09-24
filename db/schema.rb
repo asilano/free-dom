@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120301170223) do
+ActiveRecord::Schema.define(:version => 20130910120951) do
 
   create_table "cards", :force => true do |t|
     t.integer "game_id"
@@ -47,6 +47,7 @@ ActiveRecord::Schema.define(:version => 20120301170223) do
     t.text     "facts"
     t.datetime "end_time"
     t.integer  "turn_count"
+    t.integer  "turn_phase"
   end
 
   create_table "histories", :force => true do |t|
@@ -71,6 +72,7 @@ ActiveRecord::Schema.define(:version => 20120301170223) do
     t.string  "expected_action"
     t.string  "text"
     t.boolean "emailed",         :default => false
+    t.text    "state"
   end
 
   add_index "pending_actions", ["game_id"], :name => "index_pending_actions_on_game_id"
@@ -87,14 +89,16 @@ ActiveRecord::Schema.define(:version => 20120301170223) do
 
   create_table "player_states", :force => true do |t|
     t.integer  "player_id"
-    t.boolean  "outpost_queued",   :default => false
-    t.boolean  "outpost_prevent",  :default => false
-    t.integer  "pirate_coins",     :default => 0
+    t.boolean  "outpost_queued",    :default => false
+    t.boolean  "outpost_prevent",   :default => false
+    t.integer  "pirate_coins",      :default => 0
     t.text     "gained_last_turn"
-    t.boolean  "bought_victory",   :default => false
+    t.boolean  "bought_victory",    :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "played_treasure"
+    t.boolean  "played_crossroads", :default => false
+    t.boolean  "played_fools_gold"
   end
 
   create_table "players", :force => true do |t|
@@ -105,6 +109,7 @@ ActiveRecord::Schema.define(:version => 20120301170223) do
     t.integer  "user_id"
     t.boolean  "lock"
     t.datetime "last_emailed", :default => '2011-01-01 00:00:00'
+    t.integer  "vp_chips",     :default => 0
   end
 
   create_table "rankings", :force => true do |t|
@@ -144,6 +149,13 @@ ActiveRecord::Schema.define(:version => 20120301170223) do
     t.boolean "autotorture_curse", :default => false
     t.boolean "automountebank",    :default => true
     t.boolean "autotreasury",      :default => true
+    t.integer "autoduchess",       :default => 0
+    t.integer "autofoolsgold",     :default => 1
+    t.boolean "autooracle",        :default => true
+    t.boolean "autoscheme",        :default => true
+    t.integer "autotunnel",        :default => 1
+    t.boolean "autobrigand",       :default => true
+    t.integer "autoigg",           :default => 0
   end
 
   create_table "users", :force => true do |t|
@@ -156,6 +168,7 @@ ActiveRecord::Schema.define(:version => 20120301170223) do
     t.boolean  "contact_me",      :default => false
     t.datetime "last_completed"
     t.boolean  "pbem",            :default => false
+    t.boolean  "admin",           :default => false
   end
 
 end

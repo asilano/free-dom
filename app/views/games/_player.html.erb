@@ -55,5 +55,28 @@
     <% if player.score && player.score != 0%>
       <tr class="scoreRow"><th>Score:</th><td><%= player.score %></td></tr>
     <% end %>
+    <% if !controls[:other_players].select {|c| c[:player_id].to_i == player.id}.empty? -%>
+      <tr><td colspan="2"><table>
+      <% controls[:other_players].select {|c| c[:player_id].to_i == player.id}.each do |control| -%>
+        <% control_form(control) %>
+        <tr>
+        <% case control[:type]
+           when :buttons -%>
+            <td><%= control[:label] %></td>
+            <% control[:options].each do |opt| %>
+              <td>
+                  <% key = opt.keys.detect{|k| k != :text} %>
+                  <%= button_tag opt[:text], :type => 'submit',
+                                             :name => key,
+                                             :value => opt[key],
+                                             :form => "form_#{control.object_id}",
+                                             :disable_with => opt[:text] -%>
+              </td>
+            <% end %>
+        <% end %>
+        </tr>
+      <% end %>
+      </table></td></tr>
+    <% end %>
   </table>
 </td>

@@ -32,7 +32,41 @@
     <br/>
     <% flag = true %>
   <% end %>
-
+  <% if card_types.include?("Hinterlands::Brigand") %>
+    <%= setting_checkbox 'autobrigand', 'AutoBrigand?' %>
+    <br/>
+    <% flag = true %>
+  <% end %>
+  <% if card_types.include?("Hinterlands::Duchess") %>
+    <%= setting_dropdown 'autoduchess', 'AutoDuchess?', Settings::AskAlwaysNever %>
+    <br/>
+    <% flag = true %>
+  <% end %>
+  <% if card_types.include?("Hinterlands::FoolsGold") %>
+    <%= setting_dropdown 'autofoolsgold', 'AutoFool\'sGold?', Settings::AskAlwaysNever %>
+    <br/>
+    <% flag = true %>
+  <% end %>
+  <% if card_types.include?("Hinterlands::IllGottenGains") %>
+    <%= setting_dropdown 'autoigg', 'AutoIGG?', Settings::AskAlwaysNever %>
+    <br/>
+    <% flag = true %>
+  <% end %>
+  <% if card_types.include?("Hinterlands::Oracle") %>
+    <%= setting_checkbox 'autooracle', 'AutoOracle?' %>
+    <br/>
+    <% flag = true %>
+  <% end %>
+  <% if card_types.include?("Hinterlands::Scheme") %>
+    <%= setting_checkbox 'autoscheme', 'AutoScheme?' %>
+    <br/>
+    <% flag = true %>
+  <% end %>
+  <% if card_types.include?("Hinterlands::Tunnel") %>
+    <%= setting_dropdown 'autotunnel', 'AutoTunnel?', Settings::AskAlwaysNever %>
+    <br/>
+    <% flag = true %>
+  <% end %>
   <% if flag %>
     <%= submit_tag "Update" %>
   <% else %>

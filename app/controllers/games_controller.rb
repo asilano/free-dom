@@ -217,19 +217,6 @@ protected
     redirect_to :action => 'index'
   end
 
-  def find_user
-    @user = User.find_by_id(session[:user_id])
-    @player = @user.players.find_by_game_id(@game.id) if (@game and @user)
-  end
-
-  def authorise
-    unless @user
-      flash[:warning] = "Please log in"
-      session[:original_uri] = request.url
-      redirect_to login_path
-    end
-  end
-
   def setup_title
     @title = action_name.humanize
   end
@@ -267,6 +254,7 @@ private
       flash[:warning] = $1 if $1 != ""
 
       @game.process_actions if do_actions
+      raise StandardError.new
       if not @player.nil?
         @controls = @player.determine_controls
       else
@@ -295,9 +283,12 @@ private
 
     if @game.state == 'running'
       waiting_players = @game.active_ply_actions.map {|a| a.player}
+
+      # Ensure the current player is on the front of the list.
       if waiting_players.delete(@player)
         waiting_players.unshift(@player)
       end
+
       @full_title = waiting_players.map{|p| p.name }.join(', ')
       @full_title += " to act - "
       @full_title += @game.current_turn_player.name

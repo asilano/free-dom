@@ -62,7 +62,7 @@
         </td>
         <td>
           <ul>
-            <% game.active_ply_actions.select{|act| act.text && !act.text.empty?}.each do |act| %>
+            <% game.active_ply_actions.each do |act| %>
             <li>
               <%= act.player.name + " to " + act.text %>
             </li>

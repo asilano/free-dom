@@ -8,8 +8,8 @@ Feature: Upgrade
     Then there should be 10 Upgrade cards in piles
       And there should be 0 Upgrade cards not in piles
 
-  Scenario: Playing Upgrade - choices in hand 
-    Given my hand contains Upgrade, Copper, Estate and 2 other cards
+  Scenario: Playing Upgrade - choices in hand
+    Given my hand contains Upgrade, Copper, Estate
       And it is my Play Action phase
     When I play Upgrade
     Then I should have drawn 1 card
@@ -43,7 +43,7 @@ Feature: Upgrade
       And I should have 1 action available
 
   Scenario: Playing Upgrade - no available upgrade
-    Given my hand contains Upgrade, Copper, Estate and 2 other cards
+    Given my hand contains Upgrade, Copper, Estate
       And it is my Play Action phase
     When I play Upgrade
     Then I should have drawn 1 card
@@ -54,19 +54,19 @@ Feature: Upgrade
       And I should have 1 action available
 
   Scenario: Playing Upgrade - one available upgrade
-    Given my hand contains Upgrade, Copper, Estate and 2 other cards
+    Given my hand contains Upgrade, Copper, Estate
       And the Woodcutter pile is empty
       And it is my Play Action phase
     When I play Upgrade
     Then I should have drawn 1 card
       And I should need to Upgrade a card
     When I choose Estate in my hand
-    Then I should have removed Estate from my hand      
+    Then I should have removed Estate from my hand
     When the game checks actions
     Then I should have gained Silver
       And it should be my Play Action phase
       And I should have 1 action available
-      
+
   Scenario: Playing Upgrade - nothing in hand
     Given my hand contains Upgrade
       And my deck is empty

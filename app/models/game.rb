@@ -1,5 +1,25 @@
 class Game < ActiveRecord::Base
   class_attribute :current
+  class_attribute :current_act_parent
+
+  def self.parent_act
+    return nil unless self.current_act_parent
+    raise "ID mismatch on parent_act" if self.current_act_parent.game.id != self.current.id
+    self.current_act_parent
+  end
+
+  def self.parent_act=(act)
+    raise "ID mismatch on setting parent_act" if self.current.id != act.game.id
+    self.current_act_parent = act
+  end
+
+  module TurnPhases
+    ACTION = 1
+    BUY = 2
+    CLEAN_UP = 3
+
+    AllPhases = [ACTION, BUY, CLEAN_UP]
+  end
 
   has_many :piles, :order => "position", :dependent => :destroy
   #accepts_nested_attributes_for :piles
@@ -14,8 +34,8 @@ class Game < ActiveRecord::Base
   serialize :facts
 
   attr_accessor :random_select, :specify_distr, :plat_colony
-  attr_accessor *([:base_game, :intrigue, :seaside, :prosperity].map {|set| "num_#{set}_cards".to_sym})
-  attr_accessor *([:base_game, :intrigue, :seaside, :prosperity].map {|set| "#{set}_present".to_sym})
+  attr_accessor *([:base_game, :intrigue, :seaside, :prosperity, :hinterlands].map {|set| "num_#{set}_cards".to_sym})
+  attr_accessor *([:base_game, :intrigue, :seaside, :prosperity, :hinterlands].map {|set| "#{set}_present".to_sym})
   attr_accessor(*(1..10).map{|n| "pile_#{n}".to_sym})
 
   # A game should only ever have one root pending action outstanding
@@ -27,11 +47,16 @@ class Game < ActiveRecord::Base
                             :finder_sql => proc {"select p.* from pending_actions p where game_id = #{id} and player_id is null and (select count(*) from pending_actions where parent_id = p.id) = 0"},
                             :counter_sql => proc {"select count(*) from pending_actions p where game_id = #{id} and player_id is null and (select count(*) from pending_actions where parent_id = p.id) = 0"}
   has_many :active_ply_actions, :class_name => "PendingAction",
-                            :finder_sql => proc {"select p.* from pending_actions p where game_id = #{id} and player_id is not null and (select count(*) from pending_actions where parent_id = p.id) = 0"},
-                            :counter_sql => proc {"select count(*) from pending_actions p where game_id = #{id} and player_id is not null and (select count(*) from pending_actions where parent_id = p.id) = 0"}
+                            :finder_sql => proc {"select p.* from pending_actions p
+                                                    where game_id = #{id} and
+                                                          player_id is not null and
+                                                          text is not null and
+                                                          text != '' and
+                                                          (select count(*) from pending_actions where parent_id = p.id) = 0"}
 
   validates :name, :presence => true
   validates :max_players, :presence => true, :numericality => true, :inclusion => { :in => 2..6, :message => 'must be between 2 and 6 inclusive' }
+  validates :turn_phase, :numericality => true, :inclusion => {:in => TurnPhases::AllPhases, :message => 'must be valid'}, :allow_blank => true
 
   validate :unique_valid_piles, :on => :create
   validate :total_cards_10, :on => :create
@@ -130,7 +155,7 @@ class Game < ActiveRecord::Base
       active_actions(true).each do |action|
         check_game_end
         case action.expected_action
-        when /^resolve_([[:alpha:]]+::[[:alpha:]]+)([0-9]+)(?:_([[:alnum:]]*))?(;.*)?/
+        when /^resolve_([[:alpha:]]+::[[:alpha:]]+)([0-9]+)(?:_([[:alnum:]_]*))?(;.*)?/
           card_type = $1
           card_id = $2
           substep = $3
@@ -141,19 +166,24 @@ class Game < ActiveRecord::Base
           param_string.scan(/;([^;=]*)=([^;=]*)/) {|m| params[m[0].to_sym] = m[1]}
           params[:parent_act] = action.parent
           params[:this_act_id] = action.id
+          params[:state] = action.state
+          Game.current_act_parent = action.parent
           action.destroy
 
           if not card.respond_to? substep.to_sym
             return "Unexpected substep #{substep} for #{card_type}"
           end
+
           card.method(substep.to_sym).call(params)
         when /^player_([[:alpha:]_]+);player=([0-9]+)(;.*)?$/
           player = Player.find($2)
           task = $1
           param_string = $3 || ""
+          Game.current_act_parent = action.parent
           params = {:parent_act => action.parent, :this_act_id => action.id}
           param_string.scan(/;([^;=]*)=([^;=]*)/) {|m| params[m[0].to_sym] = m[1]}
           action.destroy
+
           player.method(task.to_sym).call(params)
         when /^end_game$/
           action.destroy
@@ -291,9 +321,10 @@ class Game < ActiveRecord::Base
         rand_intrigue_cards = Intrigue.kingdom_cards.shuffle
         rand_seaside_cards = Seaside.kingdom_cards.shuffle
         rand_prosperity_cards = Prosperity.kingdom_cards.shuffle
+        rand_hinterlands_cards = Hinterlands.kingdom_cards.shuffle
 
         pile_id = 0
-        [:base_game, :intrigue, :seaside, :prosperity].each do |set|
+        [:base_game, :intrigue, :seaside, :prosperity, :hinterlands].each do |set|
           (0...send("num_#{set}_cards").to_i).each do |ix|
             pile_id += 1
             send("pile_#{pile_id}=", eval("rand_#{set}_cards")[ix].name)
@@ -303,7 +334,7 @@ class Game < ActiveRecord::Base
         # User chose a totally random distibution over specified sets.
         valid_cards = []
 
-        [BaseGame, Intrigue, Seaside, Prosperity].each do |set|
+        [BaseGame, Intrigue, Seaside, Prosperity, Hinterlands].each do |set|
           valid_cards += set.kingdom_cards if send("#{set.name.underscore}_present").to_i == 1
         end
 
@@ -333,7 +364,7 @@ protected
 
   def total_cards_10
     if random_select.to_i == 1 && specify_distr.to_i == 1
-      sum = [BaseGame, Intrigue, Seaside, Prosperity].inject(0) {|total, exp| total + self.send("num_#{exp.name.underscore}_cards").to_i}
+      sum = [BaseGame, Intrigue, Seaside, Prosperity, Hinterlands].inject(0) {|total, exp| total + self.send("num_#{exp.name.underscore}_cards").to_i}
       if sum != 10
         errors[:base] << "Number of cards from each set must sum to 10."
       end
@@ -342,7 +373,7 @@ protected
 
   def some_sets_present
     if random_select.to_i == 1 && specify_distr.to_i == 0
-      if [BaseGame, Intrigue, Seaside, Prosperity].all? {|set| self.send("#{set.name.underscore}_present") == 0}
+      if [BaseGame, Intrigue, Seaside, Prosperity, Hinterlands].all? {|set| self.send("#{set.name.underscore}_present") == 0}
         errors[:base] << "Must select at least one set."
       end
     end
@@ -355,14 +386,12 @@ protected
     self.num_intrigue_cards = self.num_intrigue_cards.to_i
     self.num_seaside_cards = self.num_seaside_cards.to_i
     self.num_prosperity_cards = self.num_prosperity_cards.to_i
+    self.num_hinterlands_cards = self.num_hinterlands_cards.to_i
     self.base_game_present = self.base_game_present.to_i
     self.intrigue_present = self.intrigue_present.to_i
     self.seaside_present = self.seaside_present.to_i
     self.prosperity_present = self.prosperity_present.to_i
-
-    # Force Latin1 as long as we're on toothycat
-    #c = Iconv.new("UTF-8", "LATIN1")
-    #self.name = c.iconv(self.name)
+    self.hinterlands_present = self.hinterlands_present.to_i
   end
 
   def init_facts

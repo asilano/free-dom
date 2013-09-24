@@ -50,7 +50,8 @@ class BaseGame::Mine < Card
                                         :trashed_cost => params[:trashed_cost]},
                             :piles => game.piles.map do |pile|
                               (pile.cost <= (params[:trashed_cost].to_i + 3) &&
-                               pile.card_class.is_treasure?)
+                               pile.card_class.is_treasure? &&
+                               !pile.cards.empty?)
                             end
                           }]
     end
@@ -117,7 +118,7 @@ class BaseGame::Mine < Card
     game.histories.create!(:event => "#{ply.name} took " +
            "#{game.piles[params[:pile_index].to_i].card_class.readable_name} with Mine.",
                           :css_class => "player#{ply.seat} card_gain")
-    ply.gain(parent_act, game.piles[params[:pile_index].to_i].id, :location => "hand")
+    ply.gain(parent_act, :pile => game.piles[params[:pile_index].to_i], :location => "hand")
 
     return "OK"
   end

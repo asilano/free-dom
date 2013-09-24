@@ -8,13 +8,11 @@ class Seaside::PirateShip < Card
   def play(parent_act)
     super
 
-    # Like Minion, Pirate Ship is an attack regardless of which mode it's in. However, since
-    # Reacting is just Something You Can Do, rather than a "triggered ability",
-    # we should find which mode we're in before we ask for reactions.
-    parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_mode",
-                               :text => "Choose Pirate Ship mode",
-                               :player => player,
-                               :game => game)
+    # Like Minion, Pirate Ship is an Attack Card in either mode, and reactions to the attack should be resolved
+    # before the mode choice. So launch the attack now, with a pre-attack action to choose the mode
+    attack(parent_act, :pre_attack => "mode",
+                        :pre_attack_ply => player.id,
+                        :pre_attack_text => "Choose Pirate Ship mode")
     return "OK"
   end
 
@@ -60,39 +58,31 @@ class Seaside::PirateShip < Card
 
     # All looks fine, process the choice
     if params[:choice] == "cash"
-      # Nice Pirate Ship. Grant the cash, write the history, set up the param
+      # Nice Pirate Ship. Grant the cash, write the history, remove the parent (doattacks) action
       ply.cash += ply.state.pirate_coins
       ply.save!
       game.histories.create!(:event => "#{ply.name} chose to take cash from the #{readable_name}, gaining #{ply.state.pirate_coins} cash.",
                             :css_class => "player#{ply.seat}")
-      attack_type = "nice"
+
+      raise "Parent action is not the doattacks action" unless parent_act.expected_action =~ /_doattacks/
+      parent_act.destroy
     else
-      # Nasty Pirate Ship. Write the history and set up the param
+      # Nasty Pirate Ship. Write the history and initialise the record of whether we trashed anything
       game.histories.create!(:event => "#{ply.name} chose to trash treasures with the #{readable_name}.",
                             :css_class => "player#{ply.seat}")
-      attack_type = "nasty"
 
-      # We also need to set a Game-level action to grant the token if the act succeeded
-      parent_act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_gaintoken",
-                                              :game => game)
+      # We also need to set a Game-level action /after/ the doattacks to grant the token if the act succeeded
+      parent_act.insert_parent!(:expected_action => "resolve_#{self.class}#{id}_gaintoken",
+                                :game => game)
+
       self.state = "no"
       save!
     end
-
-    # Create the attack framework
-    attack(parent_act, :attack_type => attack_type)
 
     return "OK"
   end
 
   def attackeffect(params)
-    # Golden path - the attack is a no-op in "nice" mode
-    if params[:attack_type] == "nice"
-      return "OK"
-    end
-
-    raise "Invalid attack type" unless params[:attack_type] == "nasty"
-
     # Effect of the attack succeeding - that is, reveal the top two cards of
     # the target's deck, and ask the attacker to pick a treasure.
     target = Player.find(params[:target])

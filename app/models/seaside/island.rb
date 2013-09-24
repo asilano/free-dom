@@ -24,7 +24,7 @@ class Seaside::Island < Card
     else
       # Queue up an action for setting a card aside
       parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_setaside",
-                                 :text => "Set a card aside with #{readable_name}.",
+                                 :text => "Set a card aside with #{readable_name}",
                                  :player => player,
                                  :game => game)
     end

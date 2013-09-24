@@ -74,10 +74,10 @@ class Seaside::Navigator < Card
       elsif player.cards.peeked.length > 1
         # Create pending actions to put the remaining cards back in any
         # order. We don't need an action for the last one.
-        (2..player.cards.peeked.length).each do |ix|
+        (2..ply.cards.peeked.length).each do |ix|
           parent_act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_place;posn=#{ix}",
                                                   :text => "Put a card #{ActiveSupport::Inflector.ordinalize(ix)} from top with #{readable_name}",
-                                                  :player => player,
+                                                  :player => ply,
                                                   :game => game)
         end
       end

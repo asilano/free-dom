@@ -22,4 +22,5 @@ Feature: Venture finds Loan
       And I should have 2 cash
     When I choose Trash for my revealed Silver
       Then I should have removed Silver from my deck
-      And I should need to Play treasure
+    When the game checks actions
+      Then I should have played Gold x3

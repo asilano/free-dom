@@ -8,8 +8,8 @@ Feature: Forge
     Then there should be 10 Forge cards in piles
       And there should be 0 Forge cards not in piles
 
-  Scenario: Playing Forge - total trashed is pickable 
-    Given my hand contains Forge, Copper, Estate, Woodcutter, Throne Room, Mint, Adventurer
+  Scenario: Playing Forge - total trashed is pickable
+    Given my hand contains Forge, Gold x2, Estate, Woodcutter, Throne Room, Mint, Adventurer
       And it is my Play Action phase
     When I play Forge
     Then I should need to Trash cards from hand with Forge
@@ -33,16 +33,16 @@ Feature: Forge
       And it should be my Play Treasure phase
 
   Scenario: Playing Forge - one available replacement
-    Given my hand contains Forge, Estate x2, Woodcutter and 2 other cards
+    Given my hand contains Forge, Estate x2, Woodcutter, Curse x2
       And it is my Play Action phase
     When I play Forge
     Then I should need to Trash cards from hand with Forge
     When I choose Estate, Estate, Woodcutter in my hand
-    Then I should have removed Estate, Estate, Woodcutter from my hand     
+    Then I should have removed Estate, Estate, Woodcutter from my hand
     When the game checks actions
     Then I should have gained Forge
-      And I should need to Play Treasure
-      
+      And I should need to Buy
+
   Scenario: Playing Forge - nothing in hand
     Given my hand contains Forge
       And my deck is empty
@@ -53,4 +53,4 @@ Feature: Forge
     When I choose the Copper pile
       And the game checks actions
     Then I should have gained Copper
-      And I should need to Play Treasure
+      And I should need to Buy

@@ -22,21 +22,47 @@ class Prosperity::Watchtower < Card
     return "OK"
   end
 
+  def self.witness_gain(params)
+    ply = params[:gainer]
+    card = params[:card]
+    parent_act = params[:parent_act]
+    location = params[:location]
+    position = params[:position]
+
+    tower = ply.cards.hand.of_type(to_s)[0]
+    if tower
+      # Player has a Watchtower in hand, so we need to ask where they want the card.
+      parent_act.children.create!(:expected_action => "resolve_#{self}#{tower.id}_choose;" +
+                                             "card_id=#{card.id};" + "pile_id=#{params[:pile].andand.id || 'nil'};" +
+                                             "location=#{location || 'discard'};" +
+                                             "position=#{position || 0};gain_id=#{params[:this_act_id]}",
+                                  :text => "Decide on destination for #{card}",
+                                  :player => ply,
+                                  :game => ply.game)
+
+      # Watchtower prevents the gain from just occurring
+      return true
+    end
+
+    # No action from tower
+    return false
+  end
+
   def determine_controls(ply, controls, substep, params)
     case substep
     when "choose"
       # Reaction controls
-      pile = Pile.find(params[:gain_pile].to_i)
+      card = Card.find(params[:card_id])
       controls[:player] += [{:type => :buttons,
                              :action => :resolve,
-                             :label => "Apply #{self} to #{pile.card_type.readable_name}?",
+                             :label => "Apply #{self} to #{card}?",
                              :params => {:card => "#{self.class}#{id}",
                                          :substep => "choose"}.merge(params),
-                             :options => [{:text => "No - #{pile.card_type.readable_name} to #{params[:location]}",
+                             :options => [{:text => "No - #{card} to #{params[:location]}",
                                            :choice => "normal"},
-                                          ({:text => "Yes - #{pile.card_type.readable_name} on deck",
+                                          ({:text => "Yes - #{card} on deck",
                                            :choice => "deck"} unless params[:location] == "deck"),
-                                          {:text => "Yes - trash #{pile.card_type.readable_name}",
+                                          {:text => "Yes - trash #{card}",
                                            :choice => "trash"}].compact
                             }]
     end
@@ -49,10 +75,15 @@ class Prosperity::Watchtower < Card
       return "Invalid parameters"
     end
 
-    gain_pile_id = params[:gain_pile].to_i
     to_del = game.pending_actions.where(:player_id => ply).select {|pa| pa.expected_action =~ /;gain_id=#{params[:gain_id]}/}
 
-    card = Pile.find(gain_pile_id).cards.first
+    if params[:pile_id] != "nil"
+      card = Pile.find(params[:pile_id]).cards.first
+    else
+      card = Card.find(params[:card_id])
+    end
+
+
     if params[:choice] == "normal"
       # If no-one else is trying to replace the gain, perform the default action here.
       if to_del.empty?

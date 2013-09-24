@@ -27,7 +27,15 @@ end
 
 Then(/^(.*?)(?:'s)? state (\w*) should be (.*)$/) do |name, prop, expected|
   name = "Alan" if name == "my"
-             
+
   actual = @players[name].state.send(prop.to_sym)
   assert_equal expected, actual.to_s, "Expected player #{name}'s state #{prop} to be #{expected} but it was #{actual.to_s}"
+end
+
+Then(/^(.*) should have ended (?:my|his) turn$/) do |name|
+  name = "Alan" if name == "I"
+
+  steps "Then #{name} should have discarded his hand
+         And #{name} should have discarded his in-play cards
+         And #{name} should have drawn 5 cards"
 end

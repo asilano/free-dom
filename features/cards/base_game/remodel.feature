@@ -8,9 +8,10 @@ Feature: Remodel
     Then there should be 10 Remodel cards in piles
       And there should be 0 Remodel cards not in piles
 
-  Scenario: Playing Remodel - choices in hand 
+  Scenario: Playing Remodel - choices in hand
     Given my hand contains Remodel, Copper, Estate and 2 other cards
       And it is my Play Action phase
+      And I have 6 cash
     When I play Remodel
     Then I should need to Trash a card with Remodel
     When I choose Estate in my hand
@@ -34,7 +35,7 @@ Feature: Remodel
     When I choose the Throne Room pile
       And the game checks actions
     Then I should have gained Throne Room
-      And I should need to Play treasure
+      And it should be my Buy phase
 
   Scenario: Playing Remodel - nothing in hand
     Given my hand contains Remodel

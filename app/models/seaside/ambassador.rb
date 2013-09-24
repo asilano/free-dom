@@ -125,8 +125,8 @@ class Seaside::Ambassador < Card
 
       game.histories.create!(:event => "#{ply.name} returned a #{card.readable_name} to the supply.",
                             :css_class => "player#{ply.seat}")
-      # Do we have more discards allowed?  Queue up an action for them
-      if ( params[:remain].to_i > 1 )
+      # Do we have more discards allowed, and cards to discard to them?  Queue up an action for them
+      if ( params[:remain].to_i > 1 && !ply.cards.hand.of_type(card.class.to_s).empty?)
         parent_act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_returncard;chosen=#{card.class.name};remain=#{params[:remain].to_i-1}",
                                                 :text => "Return another card with Ambassador")
         parent_act.player = player
@@ -153,7 +153,7 @@ class Seaside::Ambassador < Card
     else
       game.histories.create!(:event => "#{target.name} gained a copy due to Ambassador.",
                             :css_class => "player#{target.seat} card_gain")
-      target.gain(parent_act, pile.id)
+      target.gain(parent_act, :pile => pile)
     end
 
     return "OK"

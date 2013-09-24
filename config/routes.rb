@@ -35,6 +35,8 @@ Dominion::Application.routes.draw do
   match 'pbem', :controller => 'pbem', :action => 'handle' #,:method => :post, :as => 'pbem'
   match 'nop', :controller => 'pbem', :action => 'nop' #,:method => :post, :as => 'nop'
 
+  # Announcements interface
+  resources :announcements, :only => [:new, :create]
 
   root :to => "games#index"
 

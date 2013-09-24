@@ -1,0 +1,18 @@
+= form_tag(announcements_path) do |f|
+
+  %p.field
+    = label_tag 'annSubject', 'Email subject:'
+    %br
+    = text_field_tag 'annSubject'
+
+  %p.field
+    = label_tag 'annText', 'Announcement Text:'
+    %br
+    = text_area_tag 'annText'
+
+  %p.field
+    = check_box_tag 'annOverride'
+    = label_tag 'annOverride', 'Email all users, even if they have opted out?'
+
+  .actions
+    = submit_tag 'Send emails'

@@ -18,7 +18,8 @@
                                          :value => ix,
                                          :form => "form_#{control.object_id}",
                                          :disable_with => control[:text],
-                                         :class => control[:css_class]) %>
+                                         :class => control[:css_class],
+                                         :confirm => control[:confirm].andand.include?(ix) ? "Are you sure?" : nil) %>
       <% when :two_d_radio -%>
         <% control[:options].each_with_index do |opt, optix| -%>
           <%= radio_button_tag(:choice, "#{ix}.#{optix}", false,
@@ -64,7 +65,8 @@
                         :name => "nil_action",
                         :form => "form_#{control.object_id}",
                         :disable_with => control[:nil_action],
-                        :class => control[:css_class]) %>
+                        :class => control[:css_class],
+                        :confirm => control[:confirm].andand.include?(:nil_action) ? "Are you sure?" : nil) %>
       <% end %>
     <% when :two_d_radio, :latin_radio -%>
       <% if control[:nil_action] -%>

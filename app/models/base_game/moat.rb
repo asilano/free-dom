@@ -6,31 +6,25 @@ class BaseGame::Moat < Card
                                  "Attack card, you may reveal this from your " +
                                  "hand. If you do, you are unaffected by " +
                                  "that Attack."
-  
+
   def play(parent_act)
     super
-    
+
     # Just draw two cards
     player.draw_cards(2)
-    
+
     return "OK"
   end
-  
+
   def react(attack_action, parent_act)
     # The Moat just negates the attack action.
-    # Check the parameter is indeed an attackeffect, and then append a note to
-    # cancel it.
-    if attack_action.expected_action !~ /^resolve_[[:alnum:]:]*_doattack/
-      return "Unexpected parent playing reaction"
-    end
-    
-    game.histories.create!(:event => "#{player.name} reacted with a Moat, negating the attack.", 
+    game.histories.create!(:event => "#{player.name} reacted with a Moat, negating the attack.",
                           :css_class => "player#{player.seat} play_reaction")
-    if attack_action.expected_action !~ /moated=true/
-      attack_action.expected_action += ";moated=true"
-      attack_action.save!
-    end
-    
+
+Rails.logger.info("Moating: #{attack_action.inspect}")
+
+    moat_attack(attack_action, player)
+
     return "OK"
   end
 end

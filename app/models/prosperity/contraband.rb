@@ -14,7 +14,7 @@ class Prosperity::Contraband < Card
 
     # Queue up an action for the next player to ban a card.
     parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_ban",
-                               :text => "Ban #{player.name} from buying a card.",
+                               :text => "Ban #{player.name} from buying a card",
                                :player => player.next_player,
                                :game => game)
 

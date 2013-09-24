@@ -3,6 +3,16 @@ module GamesHelper
     ctype.camelize.constantize
   end
 
+  def running_player_list(game)
+    game.players.map do |p|
+      str = ""
+      str += "<span class='bold'>" unless p.active_actions.empty?
+      str += p.name
+      str += "</span>" unless p.active_actions.empty?
+      str
+    end.join(', ')
+  end
+
   def format_history(history, player)
     result = history.event
     result.gsub!(/\[([0-9]+)\?([^|]*)\|([^\]]*)\]/) do |match|
@@ -144,6 +154,11 @@ EOS
     str << label_tag(name, label)
   end
 
+  def setting_dropdown(name, label, options)
+    str = label_tag(name, label)
+    str << select_tag(name, options_for_select(options, @player.settings.__send__(name)), :name => "settings[#{name}]")
+  end
+
   def control_form(control)
     str = ''
     if control[:params]
@@ -151,6 +166,9 @@ EOS
         str << raw(hidden_field_tag(key, value, :id => "#{key}_#{control[:name]}_#{control.object_id}"))
       end
     end
+
+    # Add the PendingAction ID as a hidden field, so we can correlate accurately on return
+    str << raw(hidden_field_tag("pa_id", control[:pa_id], :id => "pa_id_#{control[:name]}_#{control.object_id}"))
 
     form = form_tag({:action => control[:action]},
                         :remote => true,

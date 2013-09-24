@@ -13,8 +13,7 @@ Feature: Watchtower when multiple people are gaining
     And I choose Estate in my hand
       Then I should have removed Estate from my hand
       And there should be 13 Estate cards in piles
-    When I choose Return no more in my hand
-    And the game checks actions
+    When the game checks actions
       Then Bob should have gained Estate
       And there should be 12 Estate cards in piles
       And Charlie should need to Decide on destination for Estate

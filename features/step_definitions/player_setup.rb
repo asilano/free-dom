@@ -14,6 +14,7 @@ Given /I am a player in a (?:([2-6])-player )?standard game(?: with (.*))?/ do |
 
   @game.andand.destroy
   player_count ||= 3
+
   @game = FactoryGirl.create(:fixed_game, :max_players => player_count.to_i)
 
   if card_list
@@ -22,13 +23,16 @@ Given /I am a player in a (?:([2-6])-player )?standard game(?: with (.*))?/ do |
 
     # Kingdom cards start right after Curse
     pos = @game.piles.find_index {|p| p.card_type == 'BasicCards::Curse'} + 1
-    pos += 1 while reqd_cards.include?(@game.piles[pos])
-    reqd_cards.each do |card|
-      unless @game.piles.map(&:card_type).map(&:readable_name).include?(card)
-        @game.piles[pos].card_type = CARD_TYPES[card].name
-        @game.piles[pos].save!
-        pos += 1 while @game.piles[pos] && reqd_cards.include?(@game.piles[pos].card_type.readable_name)
-      end
+    cards_needed = reqd_cards + @game.piles[pos..-1].map(&:card_type).map(&:readable_name)
+    cards_needed.uniq!
+
+    @game.piles[pos..-1].each_with_index do |pile, ix|
+      pile.update_attribute("card_type", ix)
+    end
+
+    cards_needed.take(10).each do |card|
+      @game.piles[pos].update_attribute("card_type", CARD_TYPES[card].name)
+      pos += 1
     end
   end
 
@@ -52,6 +56,8 @@ Given /I am a player in a (?:([2-6])-player )?standard game(?: with (.*))?/ do |
 
   @game.start_game
 
+  Game.current = @game
+
   # Setup records of the current state of everybody's zones
   @hand_contents = Hash[names.map {|n| [n, @players[n].cards.hand.map(&:readable_name)]}]
   @deck_contents = Hash[names.map {|n| [n, @players[n].cards.deck.map(&:readable_name)]}]
@@ -68,9 +74,26 @@ Given(/^(\w*) ha(?:ve|s) setting (.*) (on|off)/) do |name, setting, value|
              "autobaron" => :autobaron=,
              "autotorture" => :autotorture_curse=,
              "automountebank" => :automountebank=,
-             "autotreasury" => :autotreasury=}[setting]
+             "autotreasury" => :autotreasury=,
+             "autooracle" => :autooracle=,
+             "autoscheme" => :autoscheme=,
+             "autobrigand" => :autobrigand=}[setting]
 
   @players[name].settings.send(set_sym, value == "on")
+  @players[name].settings.save!
+end
+
+Given(/^(\w*) ha(?:ve|s) setting (.*) set to (.*)/) do |name, setting, value|
+  name = "Alan" if name == "I"
+  set_sym = {"autoduchess" => :autoduchess=,
+             "autofoolsgold" => :autofoolsgold=,
+             "autotunnel" => :autotunnel=,
+             "autoigg" => :autoigg=}[setting]
+  if Settings.constants.include?(value.to_sym)
+    value = Settings.const_get(value)
+  end
+
+  @players[name].settings.send(set_sym, value)
   @players[name].settings.save!
 end
 
@@ -87,4 +110,11 @@ Given(/^(.*?)(?:'s)? state (\w*) is (.*)$/) do |name, prop, value|
 
   @players[name].state.send(set_sym, value)
   @players[name].state.save!
+end
+
+Given(/^(\w*) ha(?:ve|s) (\d+) cash/) do |name, amount|
+  name = "Alan" if name == "I"
+
+  @players[name].cash = amount
+  @players[name].save!
 end

@@ -40,13 +40,20 @@ Then /(.*) should have #{CardList} [io]n (?:my |his )?(.*)/ do |name, kinds, loc
   name = 'Alan' if name == 'I'
   exp = instance_variable_get("@#{location}_contents")[name]
 
-  exp.replace(kinds.split(/,\s*/))
+  exp.replace([])
+  kinds.split(/,\s*/).each do |kind|
+    /(.*) ?x ?(\d+)/ =~ kind
+    kind = $1.rstrip if $1
+    num = $2.andand.to_i || 1
+
+    num.times {exp << kind}
+  end
 end
 
 # Matches
 #  I should have drawn 1 card
 #  Bob should have drawn 3 cards
-Then /(.*) should have drawn (\d+|a) cards?/ do |name, num|
+Then(/(.*) should have drawn (\d+|a) cards?/) do |name, num|
   name = 'Alan' if name == 'I'
   num = 1 if num == 'a'
   deck = @deck_contents[name]
@@ -71,6 +78,13 @@ Then /(.*) should have shuffled (?:his|my) discards/ do |name|
   name = 'Alan' if name == 'I'
   @deck_contents[name].concat(@discard_contents[name].shuffle)
   @discard_contents[name] = []
+end
+
+# Matches
+#  I should have shuffled my deck
+Then(/(.*) should have shuffled (?:his|my) deck/) do |name|
+  name = 'Alan' if name == 'I'
+  @deck_contents[name].shuffle!
 end
 
 # Matches
@@ -120,6 +134,26 @@ Then(/(.*) should have discarded #{CardList}$/) do |name, kinds|
 end
 
 # Matches
+#   I should have discarded Copper, Curse from in play
+#   Bob should have discarded Copper from in play
+Then(/(.*) should have discarded #{CardList} from in play$/) do |name, kinds|
+  name = "Alan" if name == "I"
+  player = @players[name]
+
+  kinds.split(/,\s*/).each do |kind|
+    /(.*) ?x ?(\d+)/ =~ kind
+    kind = $1.rstrip if $1
+    num = $2.andand.to_i || 1
+
+    num.times do
+      @discard_contents[name].unshift(kind)
+      assert_contains @play_contents[name], kind
+      @play_contents[name].delete_first(kind)
+    end
+  end
+end
+
+# Matches
 #   I should have discarded the cards named "rest of hand"
 Then(/(.*) should have discarded the cards named "([^"]*)"/) do |name, grp_name|
   name = "Alan" if name == "I"
@@ -135,7 +169,29 @@ Then(/(.*) should have discarded the cards named "([^"]*)"/) do |name, grp_name|
   end
 end
 
-# This step is occasionally used in templated lists of steps, such as
+# Checks for the discard of all cards in hand
+# Matches:
+#   I should have discarded my hand
+Then /^(.*) should have discarded (?:my|his) hand$/ do |name|
+  name = "Alan" if name == "I"
+  player_hand = @hand_contents[name].join(", ")
+  player_hand = "nothing" if player_hand == ""
+
+  steps "Then #{name} should have discarded #{player_hand}"
+end
+
+# Checks for the discard of all in-play cards
+# Matches
+#   I should have discarded my in-play cards
+Then /^(.*) should have discarded (?:my|his) in-play cards$/ do |name|
+  name = "Alan" if name == "I"
+  player_hand = @play_contents[name].join(", ")
+  player_hand = "nothing" if player_hand == ""
+
+  steps "Then #{name} should have discarded #{player_hand} from in play"
+end
+
+# These steps are occasionally used in templated lists of steps, such as
 # in Adventurer, where there's a Scenario Outline, and in the "next turn starts"
 # meta-step, which makes players discard whatever's in their hand.
 # Matches
@@ -143,6 +199,10 @@ end
 Then /^(.*) should have discarded nothing$/ do |_|
 end
 
+# Matches
+#   I should have discarded nothing from in play
+Then /^(.*) should have discarded nothing from in play$/ do |_|
+end
 # Matches
 #   I should have gained Copper
 #   Bob should have gained Curse, Curse
@@ -332,7 +392,7 @@ end
 # Check that a player's deck contents are precisely as expected.
 # This duplicates the normal checks performed by the AfterStep, so
 # is not normally necessary; use it only as a sanity check in unusual cases.
-Then /^(\w*?)(?:'s)? deck should contain #{CardList}$/ do |name, deck|
+Then(/^(\w*?)(?:'s)? deck should contain #{CardList}$/) do |name, deck|
   name = "Alan" if name == "my"
   player = @players[name]
 

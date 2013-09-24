@@ -106,6 +106,28 @@ module CardDecorators
     end
   end
 
+  def trigger(meth, opts)
+    raise "No condition provided" unless opts.include?(:on)
+    unless opts[:on].is_a?(Hash)
+      raise "Options not a hash"
+    end
+    opts[:on].each {|key, val| raise "#{key.inspect} not a field" unless self.new.respond_to?("#{key}_was")}
+
+    condition = lambda do |object|
+      opts[:on].all? do |field, change|
+        changed = method("#{field}_changed?").call
+        if (change[0] != :any)
+          changed &&= method("#{field}_was").call == change[0]
+        end
+        if (change[1] != :any)
+          changed &&= method(field).call == change[1]
+        end
+        changed
+      end
+    end
+
+    before_update meth, :if => condition
+  end
 
   module AttackMethods
     ######
@@ -145,7 +167,14 @@ module CardDecorators
 
     # Set up the "Play" stuff relating to the attack, including PendingActions
     def startattack(params)
+      # Find the parent action, and the attacker
       parent_act = params.delete :parent_act
+      pre_attack = params.delete :pre_attack
+      pre_attack_ply = params.delete :pre_attack_ply
+      pre_attack_text = params.delete :pre_attack_text
+      prevent_react = !!params[:prevent_react]
+      params.delete :this_act_id
+
       # Considering each player in turn,
       # create a Game-scope pending action to suffer the attack. If the player
       # owns a reaction, hang an action off that one for the player to react.
@@ -153,65 +182,132 @@ module CardDecorators
       # Whether the order of the attacks is relevant depends on :order_relevant
       param_string = ""
       if not params.empty?
-        param_string = ";" + params.map{|k,v| "#{k}=#{v}"}.join(";")
+        param_string = ";" + params.except(:attacker_id, :prevent_react).map{|k,v| "#{k}=#{v}"}.join(";")
       end
 
-      player.other_players.reverse.each do |ply|
-        attack_act = parent_act.children.create(:expected_action => "resolve_#{self.class}#{id}" +
-                                                                    "_doattack;" +
-                                                                    "target=#{ply.id};" +
-                                                                    "source=#{player.id}" +
-                                                                    param_string,
-                                                :game => game)
+      if pre_attack
+        # This attack has a step between reactions and the attack taking effect (such as
+        # Minion and Pirate Ship's mode choice).
+        # Create a single action which will later explode into actions for each player.
+        action = "resolve_#{self.class}#{id}" + "_doattacks"
+        action += ";" + params.map {|k,v| "#{k}=#{v}"}.join(';') unless params.empty?
+        group_attack_act = parent_act.children.create(expected_action: action,
+                                                      game: game)
 
-        # Handle automoating here. If the attacked player has a Moat in hand
-        # and Automoat enabled, call Moat.react. If they have no other reaction,
-        # also suppress the "react" action.
-        moat = ply.cards.hand.of_type("BaseGame::Moat")
-        non_moat_reaction = ply.cards.hand.any? {|card| (card.is_reaction? && card.react_trigger == :attack && (card.class != BaseGame::Moat))}
+        # And add the pre-attack action to happen before it.
+        pre_attack_act = group_attack_act.children.create(expected_action: "resolve_#{self.class}#{id}_" +
+                                                                            pre_attack,
+                                                          text: pre_attack_text,
+                                                          player: (pre_attack_ply ? Player.find(pre_attack_ply) : nil),
+                                                          game: game)
 
-        # Also lighthouses (which are always automatic, but the player can still play other reactions)
-        lighthouse = ply.cards.enduring.of_type("Seaside::Lighthouse")
-
-        if !lighthouse.empty?
-          # Code copied from moat
-          # Note - we can still auto from here, though we won't use a moat if
-          # the lighthouse has already defended.
-          game.histories.create(:event => "#{ply.name} has a lighthouse in play, negating the attack",
-                                :css_class => "player#{ply.seat} play_reaction")
-          if attack_act.expected_action !~ /moated=true/
-            attack_act.expected_action += ";moated=true"
-            attack_act.save!
-          end
+        # Then add reaction actions for each other player
+        add_attack_acts(params, param_string, pre_attack_act, group_attack_act, {}, :reactions)
+      else
+        # No pre-attack step, so add actions for the attack effect and reactions here
+        # (unless the attack prevents reactions)
+        if prevent_react
+          add_attack_acts(params, param_string, parent_act, nil, {}, :attacks)
         else
-          # Automoat if we can
-          if ply.settings.automoat && !moat.empty?
-            moat[0].react(attack_act, attack_act)
+          add_attack_acts(params, param_string, parent_act, nil, {}, :attacks, :reactions)
+        end
+      end
+
+      return "OK"
+    end
+
+    # This is the action resolution of the placeholder created for an attack with a pre-attack action
+    # We need to explode it here into actions for each individual attackee, taking account of any state
+    # stored on it.
+    def doattacks(params)
+      parent_act = params.delete :parent_act
+      state = params.delete :state
+      params.delete :this_act_id
+      param_string = ""
+      if not params.empty?
+        param_string = ";" + params.except(:attacker_id, :prevent_react).map{|k,v| "#{k}=#{v}"}.join(";")
+      end
+
+      add_attack_acts(params, param_string, parent_act, nil, state, :attacks)
+    end
+
+    def add_attack_acts(params, param_string, parent_act, attack_act, attack_state, *steps_to_add)
+      Rails.logger.info("State: #{attack_state}")
+      add_attack = steps_to_add.include? :attacks
+      add_react = steps_to_add.include? :reactions
+
+      attacker = Player.where(:id => params.delete(:attacker_id)).first || player
+      prevent_react = !!params.delete(:prevent_react)
+
+      attacker.other_players.reverse.each do |ply|
+        local_parent = parent_act
+
+        if add_attack
+          local_param_string = param_string.dup
+
+          if (attack_state.andand.include? ply.id)
+            local_param_string = [local_param_string, *attack_state[ply.id].map {|k,v| "#{k}=#{v}"}].join(';')
           end
+
+          local_parent = parent_act.children.create(:expected_action => "resolve_#{self.class}#{id}" +
+                                                                        "_doattack;" +
+                                                                        "target=#{ply.id};" +
+                                                                        "source=#{attacker.id}" +
+                                                                        local_param_string,
+                                                    :game => game)
         end
 
-        if ( !ply.settings.automoat ) || non_moat_reaction
-          # If we're NOT automoating, or there are non-moats to select
-          # then go ahead and offer them to the player
-          react_act = attack_act.children.create(:expected_action => "resolve_#{self.class}#{id}_react",
-                                                 :text => "React to #{self.class.readable_name}")
-          react_act.player = ply
-          react_act.game = game
-          react_act.save
+        react_to = attack_act || local_parent
+        Rails.logger.info("Applying Lighthouse and Automoat to: #{react_to.inspect}")
+
+        if add_react && !prevent_react
+          # Handle automoating here. If the attacked player has a Moat in hand
+          # and Automoat enabled, call Moat.react. If they have no other reaction,
+          # also suppress the "react" action.
+          moat = ply.cards.hand.of_type("BaseGame::Moat")
+          non_moat_reaction = ply.cards.hand.any? {|card| (card.is_reaction? &&
+                                                            card.react_trigger == :attack &&
+                                                            (card.class != BaseGame::Moat))}
+
+          # Also lighthouses (which are always automatic, but the player can still play other reactions)
+          lighthouse = ply.cards.enduring.of_type("Seaside::Lighthouse")
+
+          if !lighthouse.empty?
+            # Code copied from moat
+            # Note - we can still auto from here, though we won't use a moat if
+            # the lighthouse has already defended.
+            game.histories.create(:event => "#{ply.name} has a lighthouse in play, negating the attack",
+                                  :css_class => "player#{ply.seat} play_reaction")
+            moat_attack(react_to, ply)
+          else
+            # Automoat if we can
+            if ply.settings.automoat && !moat.empty?
+              moat[0].react(react_to, local_parent)
+            end
+          end
+
+          if ( !ply.settings.automoat ) || non_moat_reaction
+            # If we're NOT automoating, or there are non-moats to select
+            # then go ahead and offer them to the player
+            react_act = local_parent.children.create(:expected_action => "resolve_#{self.class}#{id}_react",
+                                                     :text => "React to #{self.class.readable_name}",
+                                                     :player => ply,
+                                                     :game => game)
+          end
         end
 
         if self.class.order_relevant && instance_exec(params, &self.class.order_relevant)
           # Players need to be attacked in order, so update parent_act
-          parent_act = attack_act
+          parent_act = local_parent
         end
       end
 
-      if self.class.affects_attacker
+      if add_attack && self.class.affects_attacker
         # Attack also affects the attacker. Create the attack action for the attacker themself (e.g, Spy)
         parent_act.children.create(:expected_action => "resolve_#{self.class}#{id}" +
                                                        "_doattack;" +
-                                                       "target=#{player.id};" +
-                                                       "source=#{player.id}",
+                                                       "target=#{attacker.id};" +
+                                                       "source=#{attacker.id}",
                                    :game => game)
 
         # All existing Reactions (Moat, Secret Chamber) only work on /other/ player's attacks.
@@ -227,7 +323,6 @@ module CardDecorators
 
       return "OK"
     end
-
 
     # Set up controls for reactions, and handling for the reaction actions
     def determine_react_controls(player, controls, substep, params)
@@ -277,16 +372,18 @@ module CardDecorators
         # Player played a reaction. Check that the parent action is a Game-level
         # action to make the attack effect happen, and add a child to ask for
         # further reactions.
-        if parent_act.expected_action !~ /^resolve_#{self.class}#{id}_doattack/
-          return "Unexpected parent playing reaction"
+        attack_act = parent_act
+        if (attack_act.expected_action !~ /_doattack/)
+          attack_act = attack_act.parent until attack_act.expected_action =~ /_doattacks/
         end
+
         react_act = parent_act.children.create(:expected_action => "resolve_#{self.class}#{id}_react;nolog=true",
                                                  :text => "React to #{readable_name}",
                                                  :player => ply,
                                                  :game => game)
 
         # Pass the reaction action in to the reaction handler as parent action.
-        rc = ply.cards.hand[params[:card_index].to_i].react(parent_act, react_act)
+        rc = ply.cards.hand[params[:card_index].to_i].react(attack_act, react_act)
 
       end
 

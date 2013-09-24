@@ -118,8 +118,8 @@ private
 
     /Distribution:[ \t]*(true|false)/i =~ body
     game_params[:specify_distr] = ($1 == 'true') ? 1 : 0
-
-    %w<BaseGame Intrigue Seaside Prosperity>.each do |set|
+	
+    %w<BaseGame Intrigue Seaside Prosperity Hinterlands>.each do |set|
       /#{set}:[ \t]*(\d+)/i =~ body
       game_params["num_#{set.underscore}_cards".to_sym] = $1
 

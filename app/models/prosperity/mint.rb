@@ -51,18 +51,17 @@ class Prosperity::Mint < Card
       return "Invalid request - card index #{params[:card_index]} is out of range"
     end
 
-    card = ply.cards.hand[params[:card_index].to_i]
-    if !card.is_treasure?
-      # Asked to copy a non-treasure
-      return "Invalid request - #{card.readable_name} is not a Treasure"
-    end
-
     # All checks out. Carry on
     if params.include? :nil_action
       game.histories.create!(:event => "#{ply.name} chose to copy nothing.",
                             :css_class => "player#{ply.seat}")
     else
       # Locate the pile for that treasure card.
+      card = ply.cards.hand[params[:card_index].to_i]
+      if !card.is_treasure?
+        # Asked to copy a non-treasure
+        return "Invalid request - #{card.readable_name} is not a Treasure"
+      end
       pile = game.piles.find_by_card_type(card.class.to_s)
 
       if !pile
@@ -78,11 +77,33 @@ class Prosperity::Mint < Card
         game.histories.create!(:event => "#{ply.name} took a copy of #{card} with Mint.",
                               :css_class => "player#{ply.seat} card_gain")
 
-        ply.gain(parent_act, pile.id)
+        ply.gain(parent_act, :pile => pile)
       end
 
       return "OK"
     end
   end
 
+  # Notice a buy action. If it's Mint itself, queue up an action to trash treasures
+  # (it needs to be queued so that other buy-triggered treasures can still trigger)
+  def self.witness_buy(params)
+    ply = params[:buyer]
+    pile = params[:pile]
+    parent_act = params[:parent_act]
+
+    # Check whether the card bought was a Mint, and if so queue to trash all the player's in-play treasures
+    if pile.card_class == self
+      parent_act.children.create!(:expected_action => "resolve_#{self}#{pile.cards[0].id}_trashothers;ply=#{ply.id}",
+                                  :game => ply.game)
+    end
+  end
+
+  def trashothers(params)
+    ply = Player.find(params[:ply])
+
+    trashed = []
+    ply.cards.in_play.select {|c| c.is_treasure?}.each {|c| trashed << c.class; c.trash}
+    game.histories.create!(:event => "#{ply.name} trashed #{trashed.map {|c| c.readable_name}.join(', ')} buying Mint.",
+                           :css_class => "player#{ply.seat} card_trash")
+  end
 end

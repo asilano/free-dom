@@ -20,3 +20,7 @@ end
 Then /dump hands/ do
     @hand_contents.each {|plr, cards| Rails.logger.info("#{plr}'s hand was: #{cards.inspect}")}
 end
+
+Then /dump histories/ do
+  History.all.each {|hist| Rails.logger.info(hist.event)}
+end

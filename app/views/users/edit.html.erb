@@ -15,7 +15,7 @@
     <legend>
       Account details for user <%= h @user.name -%>
     </legend>
-    <div class="field">    
+    <div class="field">
       <%= f.label :email, 'Email address:' %>
       <%= f.email_field :email%>
     </div>
@@ -23,13 +23,13 @@
       Change password
     </p>
     <div class="field">
-      <%= f.label :password, 'New password:' %>      
+      <%= f.label :password, 'New password:' %>
       <%= f.password_field :password %>
     </div>
     <div class="field">
       <%= f.label :password_confirmation, 'Retype password:' %>
       <%= f.password_field :password_confirmation %>
-    </div>     
+    </div>
     <div class="field">
       <%= f.check_box :contact_me %>
       <%= f.label :contact_me, 'Email me with important announcements', :class => "checkLabel"%>
@@ -39,7 +39,7 @@
           Stay informed about major updates to the free-dom server. We will only use this to contact you about new versions and items of similar importance.
         </div>
       </span>
-    </div>       
+    </div>
   </fieldset>
   <fieldset class="user prefsform">
     <legend>
@@ -61,16 +61,16 @@
         </div>
         <p class="explain">If AutoMoat is enabled, you will always react with a
                            Moat if you are attacked while one is in your hand.</p>
-        <p class="explain">If AutoMoat is enabled, attacks against you will 
-                           succeed immediately if you have no reaction in your hand</p>  
+        <p class="explain">If AutoMoat is enabled, attacks against you will
+                           succeed immediately if you have no reaction in your hand</p>
         <div class="field">
           <%= sf.check_box :autocrat_victory %>
           <%= sf.label :autocrat_victory, "Enable AutoCrat" %>
         </div>
-        <p class="explain">If AutoCrat is enabled, you will  
+        <p class="explain">If AutoCrat is enabled, you will
                            automatically place a Victory card on top of your deck
                            if you are holding exactly one type of Victory card
-                           when successfully attacked by the Bureaucrat.</p>              
+                           when successfully attacked by the Bureaucrat.</p>
       </div>
       <div class="expansion-settings">
         <h1>Intrigue Cards</h1>
@@ -79,14 +79,14 @@
           <%= sf.label :autobaron, "Enable AutoBaron" %>
         </div>
         <p class="explain">If AutoBaron is enabled, you will automatically discard an Estate
-                           card if you are holding one when you play Baron.</p>                   
-        <div class="field">  
+                           card if you are holding one when you play Baron.</p>
+        <div class="field">
           <%= sf.check_box :autotorture_curse %>
           <%= sf.label :autotorture_curse, "Enable AutoTorturer for Curses" %>
         </div>
-        <p class="explain">If AutoTorturer for Curses is enabled, you will  
+        <p class="explain">If AutoTorturer for Curses is enabled, you will
                            automatically choose to gain a Curse card
-                           when successfully attacked by the Torturer.</p>              
+                           when successfully attacked by the Torturer.</p>
       </div>
       <div class="expansion-settings">
         <h1>Seaside Cards</h1>
@@ -95,7 +95,7 @@
           <%= sf.label :autotreasury, "Enable AutoTreasury" %>
         </div>
         <p class="explain">If AutoTreasury is enabled, you will automatically place a Treasury
-                           on top of your deck (if eligible) when it would be put into your 
+                           on top of your deck (if eligible) when it would be put into your
                            discard pile from play.</p>
       </div>
       <div class="expansion-settings">
@@ -104,9 +104,80 @@
           <%= sf.check_box :automountebank %>
           <%= sf.label :automountebank, "Enable AutoMountebank" %>
         </div>
-        <p class="explain">If AutoMountebank is enabled, you will  
+        <p class="explain">If AutoMountebank is enabled, you will
                            automatically discard a Curse card if you are holding one
-                           when successfully attacked by the Mountebank.</p>              
+                           when successfully attacked by the Mountebank.</p>
+      </div>
+      <div class="expansion-settings">
+        <h1>Hinterlands Cards</h1>
+        <div class="field">
+          <%= sf.check_box :autobrigand %>
+          <%= sf.label :autobrigand, "Enable AutoBrigand" %>
+        </div>
+        <p class="explain">If AutoBrigand is enabled, when your Noble Brigand reveals both
+                            a Silver and a Gold for an attacked player, you will automatically
+                            choose to trash and gain the Gold.</p>
+
+        <div class="field">
+          <%= sf.label :autoduchess, "AutoDuchess choice: "%>
+          <%= sf.select :autoduchess, Settings::AskAlwaysNever%>
+        </div>
+        <p class="explain">If AutoDuchess is set to "Always", you will always gain a Duchess
+                           whenever you gain a Duchy. If AutoDuchess is set to "Never", you
+                           will never gain a Duchess when you gain a Duchy. If AutoDuchess
+                           is set to "Ask", the game will ask whether you want to gain a
+                           Duchess each time you gain a Duchy.</p>
+
+        <div class="field">
+          <%= sf.label :autofoolsgold, "AutoFool'sGold choice: "%>
+          <%= sf.select :autofoolsgold, Settings::AskAlwaysNever%>
+        </div>
+        <p class="explain">If AutoFool'sGold is set to "Always", you will always trash all
+                           Fool's Gold cards in hand whenever another player gains a Province.
+                           If AutoFool'sGold is set to "Never", you will never trash any
+                           Fool's Gold cards in hand when another player gains a Province.
+                           If AutoFool'sGold is set to "Ask", the game will ask whether you
+                           want to trash each Fool's Gold card in hand whenever another player
+                           gains a Province.</p>
+
+        <div class="field">
+          <%= sf.label :autoigg, "AutoIGG choice: "%>
+          <%= sf.select :autoigg, Settings::AskAlwaysNever%>
+        </div>
+        <p class="explain">If AutoIGG is set to "Always", you will always gain a Copper
+                            card when you play Ill-Gotten Gains. If AutoIGG is set to
+                            "Never", you will never gain a Copper card when you play
+                            Ill-Gotten Gains. If AutoIGG is set to "Ask", the game will
+                            ask you whether you want to gain a Copper each time you play
+                            Ill-Gotten Gains.
+
+        <div class="field">
+          <%= sf.check_box :autooracle %>
+          <%= sf.label :autooracle, "Enable AutoOracle" %>
+        </div>
+        <p class="explain">If AutoOracle is enabled, when you are attacked by the Oracle
+                           and the attacker chooses to leave your cards on your deck,
+                           they will automatically be replaced in the same order.</p>
+
+        <div class="field">
+          <%= sf.check_box :autoscheme %>
+          <%= sf.label :autoscheme, "Enable AutoScheme" %>
+        </div>
+        <p class="explain">If AutoScheme is enabled, if you play Scheme during your Play Action
+                            phase and the only non-enduring action cards you have in play at Clean-Up
+                            Schemes, then you will return one of those Schemes to your deck.</p>
+
+        <div class="field">
+          <%= sf.label :autotunnel, "AutoTunnel choice: "%>
+          <%= sf.select :autotunnel, Settings::AskAlwaysNever%>
+        </div>
+        <p class="explain">If AutoTunnel is set to "Always", you will always gain a Gold if
+                          you discard a Tunnel outside of the Clean-Up phase. If AutoTunnel
+                          is set to "Never", you will never gain a Gold when you discard a
+                          Tunnel. If AutoTunnel is set to "Ask", the game will ask whether
+                          you want to reveal your Tunnel and gain a Gold whenever you discard
+                          a Tunnel outside of the Clean-Up phase.</p>
+
       </div>
     <% end %>
   </fieldset>

@@ -1,10 +1,10 @@
 Feature: Rabble
-  Attack - Draw 3 cards. Each other player reveals the top 3 cards of his deck, 
+  Attack - Draw 3 cards. Each other player reveals the top 3 cards of his deck,
     discards the revealed Actions and Treasures, and puts the rest back on top in any order.
-    
+
   Background:
     Given I am a player in a standard game with Rabble
-  
+
   Scenario: Rabble should be set up at game start
     Then there should be 10 Rabble cards in piles
       And there should be 0 Rabble cards not in piles
@@ -22,7 +22,7 @@ Feature: Rabble
       And Bob should have moved cards 0, 1, 2 from deck to discard
       And Charlie should have moved cards 0, 2 from deck to discard
     And it should be my Buy phase
-      
+
   Scenario: Playing Rabble - hit 1 or 0 cards
     Given my hand contains Rabble
       And my deck contains Market x3
@@ -43,14 +43,33 @@ Feature: Rabble
       And Bob should not need to act
       And Bob should be revealing nothing
     When Charlie chooses his revealed Province
-    Then the following 5 steps should happen at once 
+    Then the following 5 steps should happen at once
       And Charlie should be revealing Curse, Colony
       And Charlie should need to Put a card 2nd from top
       When Charlie chooses his revealed Colony
       Then Charlie should have Curse, Colony, Province on his deck
       And Charlie should be revealing nothing
-    And it should be my Play Treasure phase      
-      
+    And it should be my Play Treasure phase
+
+  Scenario: Playing Rabble - left with identical cards
+    Given my hand contains Rabble
+      And my deck contains Market x3
+      And Bob's deck contains Duchy, Estate, Estate
+      And Charlie's deck contains Duchy x3
+      And it is my Play Action phase
+    When I play Rabble
+    And the game checks actions
+      Then I should have drawn 3 cards
+      And Bob should be revealing Duchy, Estate x2
+      And Charlie should be revealing nothing
+      And Bob should need to Put a card 3rd from top
+      And Charlie should not need to act
+    When Bob chooses his revealed Duchy
+      Then Bob should have Estate x2, Duchy on his deck
+      And Bob should not need to act
+      And Bob should be revealing nothing
+    And it should be my Play Treasure phase
+
   Scenario: Playing Rabble - small decks
     Given my hand contains Rabble
       And my deck contains Market x3
@@ -63,7 +82,7 @@ Feature: Rabble
       Then I should have drawn 3 cards
       And Bob should have moved Smithy from deck to discard
     And it should be my Buy phase
-      
+
   Scenario: Playing Rabble - Prevented by (Moat/Lighthouse)
     Given my hand contains Rabble
       And Bob's hand contains Moat
@@ -75,6 +94,6 @@ Feature: Rabble
       And it is my Play Action phase
     When I play Rabble
       And the game checks actions
-    Then I should have drawn 3 cards      
+    Then I should have drawn 3 cards
       And it should be my Buy phase
 

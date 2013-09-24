@@ -7,12 +7,13 @@ AfterStep do |scenario|
 
   if @skip_card_checking == 0
     @players.each do |name, player|
+      player.renum(:deck)
       assert_same_elements @hand_contents[name], player.cards.hand(true).map(&:readable_name), "#{name}'s hand didn't match"
-      assert_same_elements @discard_contents[name], player.cards.in_discard(true).map(&:readable_name), "#{name}'s discard didn't match. #{name}'s cards in DB: #{player.cards.inspect}"
+      assert_same_elements @discard_contents[name], player.cards.in_discard(true).map(&:readable_name), "#{name}'s discard didn't match"
       assert_same_elements @play_contents[name], player.cards.in_play(true).map(&:readable_name), "#{name}'s cards in play didn't match"
       assert_same_elements @enduring_contents[name], player.cards.enduring(true).map(&:readable_name), "#{name}'s enduring cards didn't match"
 
-      assert_equal @deck_contents[name], player.cards.deck(true).map(&:readable_name), "#{name}'s deck didn't match."
+      assert_equal @deck_contents[name], player.cards.deck(true).map(&:readable_name), "#{name}'s deck didn't match"
     end
   else
     @skip_card_checking -= 1
@@ -33,6 +34,23 @@ def assert_contains(collection, x, extra_msg = "")
     assert(collection.detect { |e| e =~ x }, msg)
   else
     assert(collection.include?(x), msg)
+  end
+end
+
+# Asserts that the given collection does not contain item x.  If x is a regular expression, ensure that
+# no element from the collection matches x.  +extra_msg+ is appended to the error message if the assertion fails.
+#
+#   assert_not_contains(['a', '1'], /\d/) => fails
+#   assert_not_contains(['a', '1'], 'a') => fails
+#   assert_not_contains(['a', '1'], /not there/) => passes
+def assert_not_contains(collection, x, extra_msg = "")
+  collection = [collection] unless collection.is_a?(Array)
+  msg = "#{x.inspect} found in #{collection.to_a.inspect} #{extra_msg}"
+  case x
+  when Regexp
+    assert(collection.detect { |e| e !~ x }, msg)
+  else
+    assert(!collection.include?(x), msg)
   end
 end
 
