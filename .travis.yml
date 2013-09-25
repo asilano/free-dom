@@ -10,7 +10,7 @@ env:
   - CARD_SET=hinterlands
   - CARD_SET=interactions
 script:
-  - RAILS_ENV=test bundle exec rake db:test:prepare --trace
+  - RAILS_ENV=test bundle exec rake db:migrate --trace
   - bundle exec cucumber -f progress -r features features/cards/$CARD_SET
 before_script:
   - cp config/database.travis.yml config/database.yml
