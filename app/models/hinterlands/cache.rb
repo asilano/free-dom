@@ -14,7 +14,6 @@ class Hinterlands::Cache < Card
     if card.class == self
       coppers = game.piles.find_by_card_type("BasicCards::Copper")
       2.times { ply.gain(parent_act, :pile => coppers) }
-      end
 
       game.histories.create!(:event => "#{ply.name} gained two #{coppers.card_class.readable_name}s.",
                              :css_class => "player#{ply.seat} card_gain")
