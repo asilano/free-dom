@@ -73,6 +73,8 @@ class Hinterlands::SpiceMerchant < Card
 
       # Trash the treasure
       card.trash
+      game.histories.create!(:event => "#{ply.name} trashed a #{card} from hand.",
+                             :css_class => "player#{ply.seat} card_trash")
 
       # And queue up a request to ask which type of benefit they want
       parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_choose",
@@ -95,13 +97,13 @@ class Hinterlands::SpiceMerchant < Card
     if (params[:choice] == "cardsact")
       # Chose cards and action. Log and grant them
       game.histories.create(:event => "#{ply.name} chose to draw 2 and gain an Action.",
-                            :css_class => "#{ply.seat}")
+                            :css_class => "player#{ply.seat}")
       ply.draw_cards(2)
       ply.add_actions(1, parent_act)
     else
       # Chose cash and buy. Log and grant them
       game.histories.create(:event => "#{ply.name} chose to gain 2 Cash and a Buy.",
-                            :css_class => "#{ply.seat}")
+                            :css_class => "player#{ply.seat}")
       ply.add_cash(2)
       ply.add_buys(1, parent_act)
     end
