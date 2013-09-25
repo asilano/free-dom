@@ -24,5 +24,7 @@ class Hinterlands::Crossroads < Card
 
     player.state.played_crossroads = true
     player.state.save!
+
+    "OK"
   end
 end
