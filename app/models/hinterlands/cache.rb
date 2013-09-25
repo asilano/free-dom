@@ -13,7 +13,11 @@ class Hinterlands::Cache < Card
     # Check whether the card gained is Cache, and if so request gain of two Coppers
     if card.class == self
       coppers = game.piles.find_by_card_type("BasicCards::Copper")
-      2.times {ply.gain(parent_act, :pile => coppers)}
+      2.times { ply.gain(parent_act, :pile => coppers) }
+      end
+
+      game.histories.create!(:event => "#{ply.name} gained two #{coppers.card_class.readable_name}s.",
+                             :css_class => "player#{ply.seat} card_gain")
     end
 
     # Cache's Copper gains don't affect the gain of Cache at all

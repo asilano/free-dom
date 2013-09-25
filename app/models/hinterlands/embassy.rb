@@ -93,7 +93,12 @@ class Hinterlands::Embassy < Card
     # Check whether the card gained is Embassy, and if so give out Silvers
     if card.class == self
       silvers = game.piles.find_by_card_type("BasicCards::Silver")
-      ply.other_players.each {|opp| opp.gain(parent_act, :pile => silvers)}
+      ply.other_players.each do |opp|
+        opp.gain(parent_act, :pile => silvers)}
+        game.histories.create!(:event => "#{opp.name} gained a #{silvers.card_class.readable_name}" +
+                                          " from #{ply.name}'s #{readable_name}.",
+                               :css_class => "player#{opp.seat} player#{ply.seat} card_gain")
+      end
     end
 
     # Embassy's Silver gains don't affect the gain of Embassy at all
