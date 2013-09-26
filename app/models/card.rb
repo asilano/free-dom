@@ -177,8 +177,10 @@ class Card < ActiveRecord::Base
     res = [0, res - bridges].max
 
     # Handle Highways
-    highways = game.current_turn_player.cards.in_play.of_type("Hinterlands::Highway").length
-    res = [0, res - highways].max
+    if game.current_turn_player
+      highways = game.current_turn_player.cards.in_play.of_type("Hinterlands::Highway").length
+      res = [0, res - highways].max
+    end
 
     # Handle Quarries
     if is_action? && game.current_turn_player
