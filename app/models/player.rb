@@ -971,7 +971,7 @@ class Player < ActiveRecord::Base
   end
 
   def cards_for_decklist(html = true)
-    deck = cards.count(:group => "type").sort do |gp_a,gp_b|
+    deck = cards.unscoped.where(:player_id => self).count(:group => "type").sort do |gp_a,gp_b|
       type_a = gp_a[0]
       type_b = gp_b[0]
       a = cards.find_by_type(type_a)
