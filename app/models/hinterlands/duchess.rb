@@ -19,6 +19,8 @@ class Hinterlands::Duchess < Card
                                     :game => game)
       end
     end
+
+    "OK"
   end
 
   def determine_controls(player, controls, substep, params)
@@ -124,5 +126,7 @@ class Hinterlands::Duchess < Card
       duchess_pile = game.piles.find_by_card_type("Hinterlands::Duchess")
       ply.gain(parent_act, :pile => duchess_pile)
     end
+
+    "OK"
   end
 end
