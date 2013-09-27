@@ -1,7 +1,0 @@
-<% [:notice, :warning, :error].each do |type| %>
-  <% if flash[type] %>
-    <p class="flash <%= h(type)-%>" id="flash<%= h(type) -%>">
-      <%= raw flash[type] %>
-    </p>
-  <% end %>
-<% end %>
