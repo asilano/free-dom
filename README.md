@@ -1,15 +1,17 @@
 FreeDom
 ======
 
-[![Build Status](https://travis-ci.org/asilano/free-dom.png?branch=hinterlands)](https://travis-ci.org/asilano/free-dom)
+[![Build Status](https://travis-ci.org/asilano/free-dom.png?branch=master)](https://travis-ci.org/asilano/free-dom)
 
-This is a branch of the codebase for my free, online Dominion server.
+This is the main branch of the codebase for my free, online Dominion server.
 
 Notes
 -----
 
-Currently, "master" is the codebase as it exists on heroku.
+`master` is the main branch. Development work will be performed here (if small), or merged here when complete. It is intended that `master` is always building and passing; however, mistakes happen.
 
-This branch is for the development of Cucumber tests and implementation (in that order) of Hinterlands.
+The `release` branch is the codebase as it exists on heroku.
+
+Other branches may be created for significant items of development (such as new sets, or UI rewrites).
 
 _**Please fork and contribute where possible!**_
