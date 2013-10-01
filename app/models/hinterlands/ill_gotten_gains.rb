@@ -27,6 +27,8 @@ class Hinterlands::IllGottenGains < Card
                                   :player => player,
                                   :game => game)
     end
+
+    "OK"
   end
 
   def determine_controls(player, controls, substep, params)
@@ -63,6 +65,8 @@ class Hinterlands::IllGottenGains < Card
       copper_pile = game.piles.find_by_card_type("BasicCards::Copper")
       ply.gain(parent_act, :pile => copper_pile, :location => "hand")
     end
+
+    "OK"
   end
 
   # Notice a gain event. If it's Ill-Gotten Gains itself, grant each other player a Curse.

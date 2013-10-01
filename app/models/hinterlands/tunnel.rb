@@ -70,5 +70,7 @@ class Hinterlands::Tunnel < Card
     else
       # Player chose not to gain a gold. Don't log - discards are private.
     end
+
+    "OK"
   end
 end
