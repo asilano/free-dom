@@ -86,12 +86,12 @@ class Hinterlands::Trader < Card
 
   def self.witness_pre_gain_queue(params)
     card = params[:card] || params[:pile].cards.first
+    parent_act = params[:parent_act]
 
     if card.class != BasicCards::Silver
       # Someone is about to gain something that isn't a Silver.
       # If they're holding Trader, ask them if they want a Silver instead.
       ply = params[:gainer]
-      parent_act = params[:parent_act]
       trader = ply.cards.hand.of_type(to_s).first
       if trader
         parent_act = parent_act.children.create!(:expected_action => "resolve_#{self}#{trader.id}_react;card_type=#{card.class}",
