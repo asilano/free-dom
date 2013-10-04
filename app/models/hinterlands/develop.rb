@@ -93,8 +93,13 @@ class Hinterlands::Develop < Card
 
     # Check whether the player has a real choice to make
     valid_piles = game.piles.map do |pile|
-      (pile.cost == trashed_cost + 1 || pile.cost == trashed_cost- 1) && !pile.empty?
+      (pile.cost == trashed_cost + 1 || pile.cost == trashed_cost - 1) && !pile.empty?
     end
+
+    valid_costs = [trashed_cost + 1, trashed_cost - 1].select do |cost|
+      game.piles.any? { |pile| pile.cost == cost && !pile.empty? }
+    end
+    both_directions = valid_costs.length == 2
 
     if valid_piles.none?
       # No replacements available. Just log
@@ -114,9 +119,21 @@ class Hinterlands::Develop < Card
 
       return rc
     else
-      # Actual choice. Create action to ask
-      act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_take1;trashed_cost=#{trashed_cost}",
-                                       :text => "Take first replacement card with #{self}",
+      # Actual choice. Create action to ask. Whether it's the "first" or "second" action depends
+      # on whether both directions are possible
+      action = 'take1'
+      first = 'first '
+      valid = ''
+
+      unless both_directions
+        action = 'take2'
+        first = ''
+        valid = ";valid=#{valid_costs[0]}"
+      end
+
+      act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_#{action};" +
+                                                            "trashed_cost=#{trashed_cost}#{valid}",
+                                       :text => "Take #{first}replacement card with #{self}",
                                        :player => player,
                                        :game => game)
     end

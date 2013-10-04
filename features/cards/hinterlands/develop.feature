@@ -53,7 +53,7 @@ Feature: Develop - Action: 3
       And it is my Play Action phase
     When I play Develop
       Then I should have removed Woodcutter from my hand
-      And I should need to Take first replacement card with Develop
+      And I should need to Take replacement card with Develop
       And I should be able to choose the Thief, Salvager piles
       And I should not be able to choose the Silver, Gold, Moat, Estate piles
     When I choose the Thief pile
