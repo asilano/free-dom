@@ -119,7 +119,7 @@ class Hinterlands::Oracle < Card
       # Chose to discard the target's cards. Create a history
       revealed_cards = target.cards.revealed
       game.histories.create!(:event => "#{ply.name} chose to discard #{target.name}'s revealed #{revealed_cards.join(', ')}.",
-                             :css_class => "player#{ply.seat}, player#{target.seat}")
+                             :css_class => "player#{ply.seat} player#{target.seat}")
 
       # And discard them
       revealed_cards.each do |cd|
