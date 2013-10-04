@@ -92,7 +92,7 @@ class Hinterlands::Scheme < Card
     card.position = -1
     card.save!
 
-    game.histories.create(:event => "#{ply.name} put #{card} on top of his deck with #{self}",
+    game.histories.create(:event => "#{ply.name} put #{card} on top of their deck with #{self}",
                           :css_class => "player#{ply.seat}")
 
     return "OK"

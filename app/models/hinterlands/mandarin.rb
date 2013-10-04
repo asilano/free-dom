@@ -149,7 +149,7 @@ class Hinterlands::Mandarin < Card
     card.position = -1
     card.save!
 
-    game.histories.create(:event => "#{ply.name} put #{card} on top of his deck with #{self}.",
+    game.histories.create(:event => "#{ply.name} put #{card} on top of their deck with #{self}.",
                           :css_class => "player#{ply.seat}")
 
     if params[:posn].to_i == 2
