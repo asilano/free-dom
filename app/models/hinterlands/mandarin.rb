@@ -160,7 +160,7 @@ class Hinterlands::Mandarin < Card
       card.location = "deck"
       card.position = -2
       card.save!
-      game.histories.create!(:event => "#{ply.name} placed #{card} on top of their deck with #{self}.",
+      game.histories.create!(:event => "#{ply.name} put #{card} on top of their deck with #{self}.",
                             :css_class => "player#{ply.seat}")
     end
 
