@@ -191,8 +191,8 @@ class Player < ActiveRecord::Base
   end
 
   # If the player has any special treasures in hand, queue an action to play a treasure.
-  # Likewise if the game has Grand Markets, Mints or Mandarins left to buy. Otherwise, just play all
-  # the non-special treasures in hand.
+  # Likewise if the game has Grand Markets, Mints, Mandarins or Farmlands left to buy.
+  # Otherwise, just play all the non-special treasures in hand.
   def play_treasures(params)
     return "Cash unexpectedly nil for Player #{id}" if cash.nil?
 
@@ -206,6 +206,7 @@ class Player < ActiveRecord::Base
     gm_pile_card = game.cards.pile.of_type("Prosperity::GrandMarket").first
     mint_pile_card = game.cards.pile.of_type("Prosperity::Mint").first
     mandarin_pile_card = game.cards.pile.of_type("Hinterlands::Mandarin").first
+    farmland_pile_card = game.cards.pile.of_type("Hinterlands::Farmland").first
 
     gm_blocking = gm_pile_card &&
                   immediate_cash >= gm_pile_card.cost - 2*quarries &&
@@ -214,10 +215,11 @@ class Player < ActiveRecord::Base
                     immediate_cash >= mint_pile_card.cost - 2*quarries
     mandarin_blocking = mandarin_pile_card &&
                         immediate_cash >= mandarin_pile_card.cost - 2*quarries
+    farmland_blocking = farmland_pile_card && immediate_cash >= farmland_pile_card.cost
 
     if cards.hand.any? {|card| card.is_treasure?} &&
         (cards.hand.any? {|card| card.is_treasure? && card.is_special?} ||
-          gm_blocking || mint_blocking || mandarin_blocking)
+          gm_blocking || mint_blocking || mandarin_blocking || farmland_blocking)
       # Need to ask the player about playing treasures. But queue up another copy of this
       # first, so that we re-check afterwards
       parent_act = params[:parent_act]
