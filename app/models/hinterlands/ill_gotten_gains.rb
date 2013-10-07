@@ -79,7 +79,11 @@ class Hinterlands::IllGottenGains < Card
     # Check whether the card gained is IGG, and if so give out Curses
     if card.class == self
       curses = game.piles.find_by_card_type("BasicCards::Curse")
-      ply.other_players.each {|opp| opp.gain(parent_act, :pile => curses)}
+      ply.other_players.each do |opp|
+        game.histories.create!(:event => "#{opp.name} gained #{curses.card_class.readable_name} due to #{readable_name}",
+                               :css_class => "player#{opp.seat} card_gain")
+        opp.gain(parent_act, :pile => curses)
+      end
     end
 
     # IGG's Curse gains don't affect the gain of IGG at all
