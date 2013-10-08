@@ -1,7 +1,7 @@
 class Hinterlands::Develop < Card
   action
   costs 3
-  card_text "Action (cost: 2) - Trash a card from your hand. Gain a card costing exactly 1 more than it and a card costing exactly " +
+  card_text "Action (cost: 3) - Trash a card from your hand. Gain a card costing exactly 1 more than it and a card costing exactly " +
             "1 less than it, in either order, putting them on top of your deck."
 
   def play(parent_act)
