@@ -13,13 +13,15 @@ Feature: Watchtower + Farmland
       And it is my Play Action phase
     When I play Woodcutter
       And the game checks actions
+      And I play simple treasures
+      And the game checks actions
     Then I should have played Platinum x2
       And it should be my Buy phase
       And I should have 12 cash available
       And I should have 2 buys available
-      
+
     When I buy Farmland
-    Then I should need to Trash a card with Farmland 
+    Then I should need to Trash a card with Farmland
     When I choose Estate in my hand
     Then I should have removed Estate from my hand
       And I should need to Take a replacement card with Farmland
@@ -35,7 +37,7 @@ Feature: Watchtower + Farmland
     When I choose the option Yes - Farmland on deck
     Then I should have put Farmland on top of my deck
       And I should need to Buy
-      
+
     When I buy Farmland expecting side-effects
     Then I should have removed Watchtower from my hand
     When the game checks actions
