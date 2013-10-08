@@ -79,6 +79,9 @@ class Hinterlands::Trader < Card
 
     # Now gain as many Silvers as the trashed card's cost
     silver_pile = game.piles.find_by_card_type('BasicCards::Silver')
+    silvers_text = silver_pile.card_class.readable_name + (trashed_cost == 1 ? '' : 's')
+    game.histories.create!(:event => "#{ply.name} gained #{trashed_cost} #{silvers_text} from #{self}",
+                           :css_class => "player#{ply.seat} card_gain")
     trashed_cost.times {ply.gain(parent_act, :pile => silver_pile)}
 
     return "OK"
