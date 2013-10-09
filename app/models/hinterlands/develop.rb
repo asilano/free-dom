@@ -51,7 +51,7 @@ class Hinterlands::Develop < Card
                           }]
     when "take2"
       valid_piles = game.piles.map do |pile|
-        pile.cost == params[:valid].to_i
+        pile.cost == params[:valid].to_i && !pile.empty?
       end
 
       controls[:piles] += [{:type => :button,
