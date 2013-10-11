@@ -6,6 +6,8 @@ class Hinterlands::Trader < Card
             "Gain a number of Silvers equal to its cost in coins / " +
             "When you would gain a card, you may reveal this from your hand. If you do, instead gain a Silver."
 
+  before_save :check_replacement_action
+
   def play(parent_act)
     super
 
@@ -101,6 +103,12 @@ class Hinterlands::Trader < Card
                                                  :text => "Choose whether to react with #{readable_name}",
                                                  :player => ply,
                                                  :game => trader.game)
+
+        # Because of when this trigger occurs, other triggers can remove the Trader from hand before
+        # the gain is to be modified. Therefore, store the action's ID on the Trader, so we can
+        # remove the action if the Trader goes away.
+        trader.state = parent_act.id
+        trader.save!
       end
     end
 
@@ -139,6 +147,44 @@ class Hinterlands::Trader < Card
       ply.gain(new_parent, :pile => silver_pile)
     end
 
+    # Stop this card referencing its replacement action
+    self.state = nil
+    save!
+
     "OK"
+  end
+
+  # No-op action for when a Trader disappears after triggering.
+  def nothing(_)
+  end
+
+private
+
+  # If Trader is being moved out of the hand, either move its replacement action onto
+  # another Trader which is still in hand, or negate it.
+  def check_replacement_action
+    if location_changed? && location_was == 'hand'
+      if state
+        repl_action = PendingAction.find(state)
+
+        other_trader = Player.find(player_id_was).cards.hand.of_type(self.class.to_s).where(['id != ?', self]).first
+
+        if other_trader
+          repl_action.expected_action.sub!(self.id.to_s, other_trader.id.to_s)
+          other_trader.state = repl_action.id
+          other_trader.save!
+        else
+          # We can't just destroy the action, since other code may be holding references
+          # to it. Instead, mutate it into a no-op.
+          repl_action.expected_action = "resolve_#{self.class}#{id}_nothing"
+          repl_action.player = nil
+          repl_action.save!
+        end
+
+        self.state = nil
+      end
+    end
+
+    true
   end
 end
