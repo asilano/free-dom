@@ -111,6 +111,22 @@ Feature: Tunnel
       Then Bob should have gained Gold
       And it should be my Buy phase
 
+  Scenario: Tunnel trips on enemy Minion
+    Given I am a player in a standard game
+      And my hand contains Minion
+      And Bob's hand contains Tunnel, Estate x4
+      And Charlie's hand is empty
+    When I play Minion
+    And the game checks actions
+    And I choose the option Cycle hands
+    And the game checks actions
+      Then the following 4 steps should happen at once
+        Then Bob should have discarded Tunnel, Estate x4
+        And I should have drawn 4 cards
+        And Bob should have drawn 4 cards
+        And Bob should have gained Gold
+      And it should be my Play Action phase
+
   Scenario: Tunnel doesn't trip on gain or buy
     Given I am a player in a standard game with Tunnel
       And my hand contains Copper x3, Moat, Remodel
