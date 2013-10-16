@@ -85,5 +85,7 @@ class Hinterlands::FoolsGold < Card
     else
       # Don't log. Technically, this is secret.
     end
+
+    "OK"
   end
 end
