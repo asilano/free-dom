@@ -1,3 +1,4 @@
+
 class Hinterlands::FoolsGold < Card
   treasure :special => true
   reaction :to => :opponent_gain
@@ -81,7 +82,7 @@ class Hinterlands::FoolsGold < Card
                             :css_class => "player#{ply.seat} card_gain card_trash")
 
       trash
-      ply.gain(parent_act, :pile => game.piles.find_by_card_type("BasicCards::Gold"))
+      ply.gain(parent_act, :pile => game.piles.find_by_card_type("BasicCards::Gold"), :location => 'deck')
     else
       # Don't log. Technically, this is secret.
     end

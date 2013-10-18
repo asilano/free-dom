@@ -89,7 +89,7 @@ Feature: Fool's Gold - Treasure/Reaction: 2
     When I choose the option Trash
       Then I should have removed Fool's Gold from my hand
     When the game checks actions
-      Then I should have gained Gold
+      Then I should have put Gold on top of my deck
       And I should need to Decide whether to exchange Fool's Gold for Gold
     When I choose the option Don't trash
       Then nothing should have happened
@@ -107,7 +107,7 @@ Feature: Fool's Gold - Treasure/Reaction: 2
       Then the following 3 steps should happen at once
         Then Bob should have gained Province
         And I should have removed Fool's Gold x2 from my hand
-        And I should have gained Gold x2
+        And I should have put Gold x2 on top of my deck
       And it should be Bob's Buy phase
 
   Scenario: Acting on Province gain (autofools-gold never)
