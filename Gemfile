@@ -13,6 +13,7 @@ group :production do
   gem 'thin'
   gem 'newrelic_rpm'
   gem 'unicorn'
+  gem 'rails_12factor'
 end
 group :development, :test do
   gem 'sqlite3'
