@@ -155,3 +155,47 @@ Feature: Tunnel
       Then the following 2 steps should happen at once
         Then I should have discarded Tunnel
         And I should have drawn 5 cards
+
+  Scenario: Tunnel works in first player's turn (bug-fix)
+    Given I am a player in a standard game
+      And my hand contains Tunnel, Cellar, Estate
+      And my deck is empty
+      And I have setting autotunnel set to ALWAYS
+      And Bob's hand contains Tunnel, Cellar, Estate
+      And Bob's deck is empty
+      And Bob has setting autotunnel set to ALWAYS
+      And Charlie's hand contains Tunnel, Cellar, Estate
+      And Charlie's deck is empty
+      And Charlie has setting autotunnel set to ALWAYS
+    When I play Cellar
+    And I choose Tunnel, Estate in my hand
+      Then I should have discarded Tunnel, Estate
+    When the game checks actions
+      Then the following 2 steps should happen at once
+        Then I should have gained Gold
+        And I should have drawn 2 cards
+    When Bob's next turn starts
+    And Bob plays Cellar
+    And Bob chooses Tunnel, Estate in his hand
+      Then Bob should have discarded Tunnel, Estate
+    When the game checks actions
+      Then the following 2 steps should happen at once
+        Then Bob should have gained Gold
+        And Bob should have drawn 2 cards
+    When Charlie's next turn starts
+    And Charlie plays Cellar
+    And Charlie chooses Tunnel, Estate in his hand
+      Then Charlie should have discarded Tunnel, Estate
+    When the game checks actions
+      Then the following 2 steps should happen at once
+        Then Charlie should have gained Gold
+        And Charlie should have drawn 2 cards
+    When my next turn starts
+      Then I should have Tunnel, Cellar, Estate, Gold in my hand
+    When I play Cellar
+    And I choose Tunnel, Estate in my hand
+      Then I should have discarded Tunnel, Estate
+    When the game checks actions
+      Then the following 2 steps should happen at once
+        Then I should have gained Gold
+        And I should have drawn 2 cards

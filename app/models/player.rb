@@ -576,13 +576,15 @@ class Player < ActiveRecord::Base
     parent_action = active_actions[0]
     raise "Unexpected action at start of turn" unless parent_action.expected_action == "play_action"
 
-    # Tell the game it's in the Action phase
-    game.turn_phase = Game::TurnPhases::ACTION
-
+    # Advance the turn counter when the first player starts their turn.
     if seat == 0
       game.reload.turn_count += 1
-      game.save!
     end
+
+    # Tell the game it's in the Action phase
+    game.turn_phase = Game::TurnPhases::ACTION
+    game.save!
+
     game.reset_facts
     state(true).reset_fields
 
