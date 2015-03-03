@@ -31,11 +31,11 @@ class BaseGame::Workshop < Card
                  with do
     # Process the take. Move the chosen card to the top of the discard pile
     # Get the card to do it, so that we mint a fresh instance of infinite cards
-    game.histories.create!(:event => "#{ply.name} took " +
+    game.histories.create!(:event => "#{actor.name} took " +
            "#{game.piles[params[:pile_index].to_i].card_class.readable_name} from the Workshop.",
-                          :css_class => "player#{ply.seat} card_gain")
+                          :css_class => "player#{actor.seat} card_gain")
 
-    ply.gain(parent_act, :pile => game.piles[params[:pile_index].to_i])
+    actor.gain(parent_act, :pile => game.piles[params[:pile_index].to_i])
 
     "OK"
   end
