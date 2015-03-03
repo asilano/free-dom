@@ -35,19 +35,12 @@ class BaseGame::Cellar < Card
     end
   end
 
-  def resolve_discard(ply, params, parent_act)
-    # The player can choose to discard nothing; if a :discard paramter is
-    # present, we expect each entry to be a valid card index.
-    if (params.include? :discard and
-        params[:discard].any? {|d| d.to_i < 0 or d.to_i >= ply.cards.hand.size})
-      return "Invalid parameters - at least one card index out of range"
-    end
-
+  resolves(:discard).validating_param_is_card_array(:discard, scope: :hand).with do
     # Looks good.
-    if not params.include? :discard
+    if !params.include? :discard
       # Nothing to do but create a log
-      game.histories.create!(:event => "#{ply.name} discarded no cards to Cellar.",
-                            :css_class => "player#{ply.seat} card_discard")
+      game.histories.create!(:event => "#{actor.name} discarded no cards to Cellar.",
+                            :css_class => "player#{actor.seat} card_discard")
     else
       # Queue up the draw action in case discarding causes anything to trigger
       # (I'm looking at you, Hinterlands::Tunnel)
@@ -57,15 +50,15 @@ class BaseGame::Cellar < Card
 
       # Discard each selected card, taking note of its class for logging purposes
       cards_discarded = []
-      cards_chosen = params[:discard].map {|ix| ply.cards.hand[ix.to_i]}
+      cards_chosen = params[:discard].map { |ix| actor.cards.hand[ix.to_i] }
       cards_chosen.each do |card|
         card.discard
         cards_discarded << card.class.readable_name
       end
 
       # Log the discards
-      game.histories.create!(:event => "#{ply.name} discarded #{cards_discarded.join(', ')} with Cellar.",
-                            :css_class => "player#{ply.seat} card_discard")
+      game.histories.create!(:event => "#{actor.name} discarded #{cards_discarded.join(', ')} with Cellar.",
+                            :css_class => "player#{actor.seat} card_discard")
     end
 
     return "OK"

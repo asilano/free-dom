@@ -70,50 +70,33 @@ class BaseGame::Bureaucrat < Card
     return "OK"
   end
 
-  def resolve_victory(ply, params, parent_act)
-    # This is at the attack target either putting a card back on their deck,
-    # or revealing a hand devoid of victory cards. We should expect a
-    # :card_index or a :nil_action parameter
-    if (not params.include? :nil_action) and (not params.include? :card_index)
-      return "Invalid parameters"
-    end
-
-    # Processing is pretty much the same as a Play; code shamelessly yoinked from
-    # Player.play_action.
-    if ((params.include? :card_index) and
-        (params[:card_index].to_i < 0 or
-         params[:card_index].to_i > ply.cards.hand.length - 1))
-      # Asked to replace an invalid card (out of range)
-      return "Invalid request - card index #{params[:card_index]} is out of range"
-    elsif params.include? :card_index and
-          not ply.cards.hand[params[:card_index].to_i].is_victory?
-      # Asked to replace an invalid card (not a Victory card)
-      return "Invalid request - card index #{params[:card_index]} is not a Victory card"
-    elsif params.include? :nil_action and ply.cards.hand.any? {|c| c.is_victory?}
-      # Asked to reveal hand when hand contains a Victory
-      return "Invalid request - must place a Victory card on deck"
-    end
-
+  # This is at the attack target either putting a card back on their deck,
+  # or revealing a hand devoid of victory cards.
+  resolves(:victory).validating_params_has_any_of(:nil_action, :card_index).
+                     validating_param_is_card(:card_index, scope: :hand, &:is_victory?).
+                     validating_param_present_only_if(:nil_action, description: 'you have no victory cards in hand') do
+                       !actor.cards.hand.any?(&:is_victory?)
+                     end.with do
     # All looks good - process the request
     if params.include? :nil_action
       # :nil_action specified. "Reveal" the player's hand. Since no-one needs to
       # act on the revealed cards, just add a history entry detailing them.
-      game.histories.create!(:event => "#{ply.name} revealed their hand to the Bureaucrat:",
-                            :css_class => "player#{ply.seat} card_reveal")
-      game.histories.create!(:event => "#{ply.name} revealed #{ply.cards.hand.map {|c| c.class.readable_name}.join(', ')}.",
-                            :css_class => "player#{ply.seat} card_reveal")
+      game.histories.create!(:event => "#{actor.name} revealed their hand to the Bureaucrat:",
+                            :css_class => "player#{actor.seat} card_reveal")
+      game.histories.create!(:event => "#{actor.name} revealed #{actor.cards.hand.map {|c| c.class.readable_name}.join(', ')}.",
+                            :css_class => "player#{actor.seat} card_reveal")
     else
       # :card_index specified. Place the specified card on top of the player's
       # deck, and "reveal" it by creating a history.
-      card = ply.cards.hand[params[:card_index].to_i]
+      card = actor.cards.hand[params[:card_index].to_i]
       card.location = "deck"
       card.position = -1
       card.save!
-      ply.renum(:deck)
-      game.histories.create!(:event => "#{ply.name} put a #{card.class.readable_name} on top of their deck.",
-                            :css_class => "player#{ply.seat}")
+      actor.renum(:deck)
+      game.histories.create!(:event => "#{actor.name} put a #{card.class.readable_name} on top of their deck.",
+                            :css_class => "player#{actor.seat}")
     end
 
-    return "OK"
+    "OK"
   end
 end

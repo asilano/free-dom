@@ -5,13 +5,12 @@ class BaseGame::Workshop < Card
 
   def play(parent_act)
     super
-    act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}",
-                                     :text => "Take a card with Workshop")
-    act.player = player
-    act.game = game
-    act.save!
+    act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_take",
+                                     :text => "Take a card with Workshop",
+                                     :player => player,
+                                     :game => game)
 
-    return "OK"
+    "OK"
   end
 
   def determine_controls(player, controls, substep, params)
@@ -19,32 +18,17 @@ class BaseGame::Workshop < Card
                           :action => :resolve,
                           :text => "Take",
                           :nil_action => nil,
-                          :params => {:card => "#{self.class}#{id}"},
+                          :params => {:card => "#{self.class}#{id}",
+                                      :substep => 'take'},
                           :piles => game.piles.map do |pile|
                             pile.cost <= 4 and not pile.empty?
                           end
                         }]
   end
 
-  def resolve(ply, params, parent_act)
-    # We expect to have been passed a :pile_index
-    if not params.include? :pile_index
-      return "Invalid parameters"
-    end
-
-    # Processing is pretty much the same as a buy; code shamelessly yoinked from
-    # Player.buy.
-    if ((params.include? :pile_index) and
-           (params[:pile_index].to_i < 0 or
-            params[:pile_index].to_i > game.piles.length - 1))
-      # Asked to take an invalid card (out of range)
-      return "Invalid request - pile index #{params[:pile_index]} is out of range"
-    elsif params.include? :pile_index and not game.piles[params[:pile_index].to_i].cost <= 4
-      # Asked to take an invalid card (too expensive)
-      return "Invalid request - card #{game.piles[params[:pile_index]].card_type} is too expensive"
-    end
-
-
+  resolves(:take).validating_params_has_any_of(:pile_index).
+                 validating_param_is_pile(:pile_index) { |pile| pile.cost <= 4 }.
+                 with do
     # Process the take. Move the chosen card to the top of the discard pile
     # Get the card to do it, so that we mint a fresh instance of infinite cards
     game.histories.create!(:event => "#{ply.name} took " +
@@ -53,7 +37,7 @@ class BaseGame::Workshop < Card
 
     ply.gain(parent_act, :pile => game.piles[params[:pile_index].to_i])
 
-    return "OK"
+    "OK"
   end
 
 end

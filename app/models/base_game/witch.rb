@@ -15,7 +15,7 @@ class BaseGame::Witch < Card
     # Then conduct the attack
     attack(parent_act)
 
-    return "OK"
+    "OK"
   end
 
   def determine_controls(player, controls, substep, params)
@@ -37,6 +37,6 @@ class BaseGame::Witch < Card
                             :css_class => "player#{ply.seat}")
     end
 
-    return "OK"
+    "OK"
   end
 end

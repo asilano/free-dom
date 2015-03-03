@@ -13,7 +13,7 @@ class BaseGame::Militia < Card
     # Then conduct the attack
     attack(parent_act)
 
-    return "OK"
+    "OK"
   end
 
   def determine_controls(player, controls, substep, params)
@@ -52,31 +52,18 @@ class BaseGame::Militia < Card
       parent_act.save!
     end
 
-    return "OK"
+    "OK"
   end
 
-  def resolve_discard(ply, params, parent_act)
-    # This is processing the target's request to discard a card
-    # We expect to have been passed a :card_index
-    if not params.include? :card_index
-      return "Invalid parameters"
-    end
-
-    # Processing is surprisingly similar to a Play; code shamelessly yoinked from
-    # Player.play_action.
-    if ((params.include? :card_index) and
-        (params[:card_index].to_i < 0 or
-         params[:card_index].to_i > ply.cards.hand.length - 1))
-      # Asked to discard an invalid card (out of range)
-      return "Invalid request - card index #{params[:card_index]} is out of range"
-    end
-
+  resolves(:discard).validating_params_has_any_of(:card_index).
+                     validating_param_is_card(:card_index, scope: :hand).
+                     with do
     # All checks out. Discard the selected card.
-    card = ply.cards.hand[params[:card_index].to_i]
+    card = actor.cards.hand[params[:card_index].to_i]
     card.discard
-    game.histories.create!(:event => "#{ply.name} discarded #{card.class.readable_name}.",
-                            :css_class => "player#{ply.seat} card_discard")
+    game.histories.create!(:event => "#{actor.name} discarded #{card.class.readable_name}.",
+                            :css_class => "player#{actor.seat} card_discard")
 
-    return "OK"
+    "OK"
   end
 end

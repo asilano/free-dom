@@ -13,7 +13,7 @@ class BaseGame::Moat < Card
     # Just draw two cards
     player.draw_cards(2)
 
-    return "OK"
+    "OK"
   end
 
   def react(attack_action, parent_act)
@@ -21,10 +21,8 @@ class BaseGame::Moat < Card
     game.histories.create!(:event => "#{player.name} reacted with a Moat, negating the attack.",
                           :css_class => "player#{player.seat} play_reaction")
 
-Rails.logger.info("Moating: #{attack_action.inspect}")
-
     moat_attack(attack_action, player)
 
-    return "OK"
+    "OK"
   end
 end

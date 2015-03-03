@@ -33,6 +33,7 @@ gem 'actionmailer-with-request'
 gem 'haml'
 
 gem 'andand'
+gem 'squeel'
 
 # Use unicorn as the web server
 # gem 'unicorn'

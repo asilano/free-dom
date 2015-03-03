@@ -12,7 +12,7 @@ class BaseGame::Chancellor < Card
 
     # Now, the "discard your deck" step is actually optional, so create a
     # PendingAction to ask.
-    act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}",
+    act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_choose",
                                      :text => "Choose whether to discard your deck, with Chancellor")
     act.player = player
     act.game = game
@@ -25,7 +25,8 @@ class BaseGame::Chancellor < Card
     controls[:player] += [{:type => :buttons,
                            :action => :resolve,
                            :label => "#{readable_name}:",
-                           :params => {:card => "#{self.class}#{id}"},
+                           :params => {:card => "#{self.class}#{id}",
+                                        :substep => 'choose'},
                            :options => [{:text => "Discard deck",
                                          :choice => "discard"},
                                         {:text => "Don't discard",
@@ -33,29 +34,25 @@ class BaseGame::Chancellor < Card
                            }]
   end
 
-  def resolve(ply, params, parent_act)
-    # We expect to have a :choice parameter, either "discard" or "keep"
-    if (not params.include? :choice) or
-       (not params[:choice].in? ["discard", "keep"])
-      return "Invalid parameters"
-    end
-
+  resolves(:choose).validating_params_has_any_of(:choice).
+                    validating_param_value_in(:choice, 'discard', 'keep').
+                    with do
     # Everything looks fine. Carry out the requested choice
     if params[:choice] == "keep"
       # Chose not to discard the deck, so a no-op. Just create a history
-      game.histories.create!(:event => "#{ply.name} chose not to discard their deck.",
-                            :css_class => "player#{ply.seat}")
+      game.histories.create!(:event => "#{actor.name} chose not to discard their deck.",
+                            :css_class => "player#{actor.seat}")
     else
-      ply.cards.deck(true).each do |card|
-        # Move card to discard _without tripping callbacks_
+      actor.cards.deck(true).each do |card|
+        # Move card to discard _without tripping callbacks
         card.update_column(:location, 'discard')
       end
 
       # And create a history
-      game.histories.create!(:event => "#{ply.name} put their deck onto their discard pile.",
-                            :css_class => "player#{ply.seat}")
+      game.histories.create!(:event => "#{actor.name} put their deck onto their discard pile.",
+                            :css_class => "player#{actor.seat}")
     end
 
-    return "OK"
+    "OK"
   end
 end

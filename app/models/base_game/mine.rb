@@ -24,7 +24,7 @@ class BaseGame::Mine < Card
                                        :game => game)
     end
 
-    return "OK"
+    "OK"
   end
 
   def determine_controls(player, controls, substep, params)
@@ -57,69 +57,35 @@ class BaseGame::Mine < Card
     end
   end
 
-  def resolve_trash(ply, params, parent_act)
-    # We expect to have been passed a :card_index
-    if !params.include?(:card_index)
-      return "Invalid parameters"
-    end
-
-    # Processing is pretty much the same as a Play; code shamelessly yoinked from
-    # Player.play_action.
-    if ((params[:card_index].to_i < 0 ||
-         params[:card_index].to_i > ply.cards.hand.length - 1))
-      # Asked to trash an invalid card (out of range)
-      return "Invalid request - card index #{params[:card_index]} is out of range"
-    elsif !ply.cards.hand[params[:card_index].to_i].is_treasure?
-      # Asked to trash an invalid card (not a treasure)
-      return "Invalid request - card index #{params[:card_index]} is not a treasure"
-    end
-
-    # All checks out. Carry on
-
+  resolves(:trash).validating_params_has_any_of(:card_index).
+                   validating_param_is_card(:card_index, scope: :hand, &:is_treasure?).
+                   with do
     # Trash the selected card, and create a new PendingAction for picking up
     # the Mined card.
-    card = ply.cards.hand[params[:card_index].to_i]
+    card = actor.cards.hand[params[:card_index].to_i]
     card.trash
     trashed_cost = card.cost
-    game.histories.create!(:event => "#{ply.name} trashed a #{card.class.readable_name} from hand (cost: #{trashed_cost}).",
-                          :css_class => "player#{ply.seat} card_trash")
+    game.histories.create!(:event => "#{actor.name} trashed a #{card.class.readable_name} from hand (cost: #{trashed_cost}).",
+                          :css_class => "player#{actor.seat} card_trash")
 
     act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_take;trashed_cost=#{trashed_cost}",
                                      :text => "Take a replacement card with #{self}",
                                      :player => player,
                                      :game => game)
 
-    return "OK"
+    "OK"
   end
 
-  def resolve_take(ply, params, parent_act)
-    # We expect to have been passed a :pile_index
-    if not params.include? :pile_index
-      return "Invalid parameters"
-    end
-
-    # Processing is pretty much the same as a buy; code shamelessly yoinked from
-    # Player.buy.
-    if ((params.include? :pile_index) and
-           (params[:pile_index].to_i < 0 or
-            params[:pile_index].to_i > game.piles.length - 1))
-      # Asked to take an invalid card (out of range)
-      return "Invalid request - pile index #{params[:pile_index]} is out of range"
-    elsif not game.piles[params[:pile_index].to_i].card_class.is_treasure?
-      # Asked to take an invalid card (not a treasure)
-      return "Invalid request - card #{game.piles[params[:pile_index].to_i].card_type} is not a treasure"
-    elsif (params.include? :pile_index) and
-          (not game.piles[params[:pile_index].to_i].cost <= (params[:trashed_cost].to_i + 3))
-      # Asked to take an invalid card (too expensive)
-      return "Invalid request - card #{game.piles[params[:pile_index].to_i].card_type} is too expensive"
-    end
-
+  resolves(:take).validating_params_has_any_of(:pile_index).
+                  validating_param_is_pile(:pile_index) { |pile| pile.card_class.is_treasure? &&
+                                                                  pile.cost <= my{params}[:trashed_cost].to_i + 3 }.
+                  with do
     # Process the take.
-    game.histories.create!(:event => "#{ply.name} took " +
+    game.histories.create!(:event => "#{actor.name} took " +
            "#{game.piles[params[:pile_index].to_i].card_class.readable_name} with Mine.",
-                          :css_class => "player#{ply.seat} card_gain")
-    ply.gain(parent_act, :pile => game.piles[params[:pile_index].to_i], :location => "hand")
+                          :css_class => "player#{actor.seat} card_gain")
+    actor.gain(parent_act, :pile => game.piles[params[:pile_index].to_i], :location => "hand")
 
-    return "OK"
+    "OK"
   end
 end

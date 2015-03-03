@@ -2,6 +2,7 @@ class Card < ActiveRecord::Base
   extend Passthrough
   extend CardDecorators
   include GamesHelper
+  include Resolvable
 
   belongs_to :player
   belongs_to :game
@@ -126,6 +127,7 @@ class Card < ActiveRecord::Base
               :is_reaction?, :is_duration?, :is_curse?, :varieties, :cash, :text,
               :readable_name, :is_special?
   def self.is_victory?
+    Rails.logger.info("Testing victory for #{readable_name}")
     false
   end
   def self.is_treasure?

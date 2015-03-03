@@ -33,42 +33,31 @@ class BaseGame::Chapel < Card
     end
   end
 
-  def resolve_trash(ply, params, parent_act)
-    # We expect to have been passed either :nil_action or a :card_index
-    if (not params.include? :nil_action) and (not params.include? :card_index)
-      return "Invalid parameters"
-    end
-
-    # Processing is pretty much the same as a Play; code shamelessly yoinked from
-    # Player.play_action.
-    if ((params.include? :card_index) and
-        (params[:card_index].to_i < 0 or
-         params[:card_index].to_i > ply.cards.hand.length - 1))
-      # Asked to trash an invalid card (out of range)
-      return "Invalid request - card index #{params[:card_index]} is out of range"
-    end
-
+  resolves(:trash).validating_params_has_any_of(:nil_action, :card_index).
+                   validating_param_is_card(:card_index, scope: :hand).
+                   with do
     # All checks out. Carry on
     if params.include? :nil_action
       # Player has chosen to "Trash no more". Destroy any remaining Trash
       # actions above here.
-      game.histories.create!(:event => "#{ply.name} stopped trashing.",
-                            :css_class => "player#{ply.seat} card_trash")
-      until parent_act.expected_action != "resolve_#{self.class}#{id}_trash"
-        act = parent_act
-        parent_act = parent_act.parent
+      game.histories.create!(:event => "#{actor.name} stopped trashing.",
+                            :css_class => "player#{actor.seat} card_trash")
+      local_act = parent_act
+      until local_act.expected_action != "resolve_#{self.class}#{id}_trash"
+        act = local_act
+        local_act = local_act.parent
         act.destroy
       end
 
-      Game.current_act_parent = parent_act
+      Game.current_act_parent = local_act
     else
       # Trash the selected card
-      card = ply.cards.hand[params[:card_index].to_i]
+      card = actor.cards.hand[params[:card_index].to_i]
       card.trash
-      game.histories.create!(:event => "#{ply.name} trashed a #{card.class.readable_name} from hand.",
-                            :css_class => "player#{ply.seat} card_trash")
+      game.histories.create!(:event => "#{actor.name} trashed a #{card.class.readable_name} from hand.",
+                            :css_class => "player#{actor.seat} card_trash")
     end
 
-    return "OK"
+    "OK"
   end
 end

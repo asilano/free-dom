@@ -38,32 +38,15 @@ class BaseGame::Feast < Card
     end
   end
 
-  def resolve_take(ply, params, parent_act)
-    # We expect to have been passed a :pile_index
-    if not params.include? :pile_index
-      return "Invalid parameters"
-    end
-
-    # Processing is pretty much the same as a buy; code shamelessly yoinked from
-    # Player.buy.
-    if ((params.include? :pile_index) and
-           (params[:pile_index].to_i < 0 or
-            params[:pile_index].to_i > game.piles.length - 1))
-      # Asked to take an invalid card (out of range)
-      return "Invalid request - pile index #{params[:pile_index]} is out of range"
-    elsif (params.include? :pile_index) and
-          (not game.piles[params[:pile_index].to_i].cost <= 5)
-      # Asked to take an invalid card (too expensive)
-      return "Invalid request - card #{game.piles[params[:pile_index]].card_type} is too expensive"
-    end
-
-
+  resolves(:take).validating_params_has_any_of(:pile_index).
+                 validating_param_is_pile(:pile_index) { |pile| pile.cost <= 5 }.
+                 with do
     # Process the take.
-    game.histories.create!(:event => "#{ply.name} took " +
+    game.histories.create!(:event => "#{actor.name} took " +
            "#{game.piles[params[:pile_index].to_i].card_class.readable_name} with Feast.",
-                          :css_class => "player#{ply.seat} card_gain")
+                          :css_class => "player#{actor.seat} card_gain")
 
-    ply.gain(parent_act, :pile => game.piles[params[:pile_index].to_i])
+    actor.gain(parent_act, :pile => game.piles[params[:pile_index].to_i])
 
     return "OK"
   end

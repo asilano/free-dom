@@ -17,20 +17,20 @@ class BaseGame::ThroneRoom < Card
     if player.cards.hand(true).select {|c| c.is_action?}.map(&:class).uniq.length == 1
       # Only holding one type of card. Call resolve directly
       ix = player.cards.hand.index {|c| c.is_action?}
-      return resolve(player, {:card_index => ix}, parent_act)
+      return resolve_choose(player, {:card_index => ix}, parent_act)
     elsif !(player.cards.hand.any? {|c| c.is_action?})
       # Holding no Actions. Just log
       game.histories.create!(:event => "#{player.name} chose no action to double.",
                             :css_class => "player#{player.seat}")
     else
       # Create a PendingAction to choose a card
-      act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}",
+      act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_choose",
                                        :text => "Choose a card to play with Throne Room",
                                        :player => player,
                                        :game => game)
     end
 
-    return "OK"
+    "OK"
   end
 
   def determine_controls(player, controls, substep, params)
@@ -39,38 +39,22 @@ class BaseGame::ThroneRoom < Card
                          :action => :resolve,
                          :text => "Choose",
                          :nil_action => nil,
-                         :params => {:card => "#{self.class}#{id}"},
+                         :params => {:card => "#{self.class}#{id}",
+                                      :substep => 'choose'},
                          :cards => player.cards.hand.map do |card|
                            card.is_action?
                          end
                         }]
   end
 
-  def resolve(ply, params, parent_act)
-    # Player has made a choice of what card to play, twice.
-    # We expect to have been passed a :card_index
-    if !params.include? :card_index
-      return "Invalid parameters"
-    end
-
-    # Processing is pretty much the same as a Play; code shamelessly yoinked from
-    # Player.play_action.
-    if (params[:card_index].to_i < 0 ||
-        params[:card_index].to_i > ply.cards.hand.length - 1)
-      # Asked to play an invalid card (out of range)
-      return "Invalid request - card index #{params[:card_index]} is out of range"
-    elsif !ply.cards.hand[params[:card_index].to_i].is_action?
-      # Asked to play an invalid card (not an reaction)
-      return "Invalid request - card index #{params[:card_index]} is not an action"
-    end
-
-    # Now process the action chosen
-
+  resolves(:choose).validating_params_has_any_of(:card_index).
+                    validating_param_is_card(:card_index, scope: :hand, &:is_action?).
+                    with do
     # Player chose a card. Create two Game-level actions under the parent
     # to play that card.
-    chosen = ply.cards.hand[params[:card_index].to_i]
-    game.histories.create!(:event => "#{ply.name} chose #{chosen.class.readable_name} to double.",
-                          :css_class => "player#{ply.seat}")
+    chosen = actor.cards.hand[params[:card_index].to_i]
+    game.histories.create!(:event => "#{actor.name} chose #{chosen.class.readable_name} to double.",
+                          :css_class => "player#{actor.seat}")
     act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}" +
                                                          "_playaction;" +
                                                          "type=#{chosen[:type]};id=#{chosen.id}",
@@ -92,7 +76,7 @@ class BaseGame::ThroneRoom < Card
 
     save!
 
-    return "OK"
+    "OK"
   end
 
   def playaction(params)
@@ -139,7 +123,7 @@ class BaseGame::ThroneRoom < Card
     self.state = []
     save!
 
-    return "OK"
+    "OK"
   end
 
   def attachedduration(params)

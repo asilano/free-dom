@@ -11,7 +11,7 @@ class BaseGame::Thief < Card
     # Just conduct the attack
     attack(parent_act)
 
-    return "OK"
+    "OK"
   end
 
   def determine_controls(player, controls, substep, params)
@@ -64,53 +64,42 @@ class BaseGame::Thief < Card
                             parent_act)
     end
 
-    return "OK"
+    "OK"
   end
 
-  def resolve_choose(ply, params, parent_act)
-    # This is at the scope of the attacker, and represents their choice of what
-    # to do with the revealed cards from each attackee.
-    # The control is a radio-button array, and hence we expect to have received
-    # a :choice_#{self.class}#{id}, which may be "nil_action" or may be of the form
-    # "card_index.option_index".
-    if not params.include?(:choice)
-      return "Invalid parameters"
-    end
-
+  # This is at the scope of the attacker, and represents their choice of what
+  # to do with the revealed cards from each attackee.
+  resolves(:choose).prepare_param(:choice) do |value|
+                        if value == 'nil_action'
+                          params[:nil_action] = true
+                        else
+                          match = /^([0-9]+)\.([0-9]+)$/.match(value)
+                          if match
+                            params[:card_index] = match[1]
+                            params[:option_index] = match[2]
+                          end
+                        end
+                      end.
+                    # Check we have either both card_index and option_index, _or_ :nil_action
+                    validating_params_has_any_of([:card_index, :option_index], :nil_action).
+                    validating_params_has_any_of(:target).
+                    validating_param_is_player(:target).
+                    validating_param_present_only_if(:nil_action, description: 'target has no revealed treasures') do
+                      Player.find_by_id(params[:target]).cards.revealed.none?(&:is_treasure?)
+                    end.
+                    validating_param_is_card(:card_index, scope: :revealed, player: :target, &:is_treasure?).
+                    validating_param_value_in(:option_index, '0', '1').
+                    with do
     target = Player.find(params[:target])
-
-    if params[:choice] != "nil_action" and
-       params[:choice] !~ /^[0-9]+\.[0-9]+$/
-       return "Invalid request - choice '#{params[:choice]}' is not of the correct form"
-    end
-
     if params[:choice] == "nil_action"
       # Attacker chose not to trash either card. We'll discard them both below,
       # so just create a history entry here.
-      #
-      # This is an invalid option if at least one of the revealed cards is
-      # actually a Treasure
-      if target.cards.revealed.any? {|c| c.is_treasure?}
-        return "Invalid request - must choose to trash or take a Treasure card"
-      end
-
-      game.histories.create!(:event => "#{ply.name} chose to trash neither of #{target.name}'s cards.",
-                            :css_class => "player#{ply.seat} player#{target.seat} card_trash")
+      game.histories.create!(:event => "#{actor.name} chose to trash neither of #{target.name}'s cards.",
+                            :css_class => "player#{actor.seat} player#{target.seat} card_trash")
 
       discardrest(params)
     else
-      card_index, option_index = params[:choice].scan(/([0-9]+)\.([0-9]+)/)[0].map {|i| i.to_i}
-
-      if card_index >= target.cards.revealed.length
-        # Asked to trash/take an invalid card
-        return "Invalid request - card index #{card_index} is greater than number of revealed cards"
-      elsif option_index > 1
-        # Asked to do something invalid with a card
-        return "Invalid request - option index #{option_index} is greater than number of options"
-      elsif !target.cards.revealed[card_index].is_treasure?
-        # Asked to do something to a non-treasure
-        return "Invalid request - card index #{card_index} is not a treasure"
-      end
+      card_index, option_index = [params[:card_index], params[:option_index]].map {|i| i.to_i}
 
       # Everything checks out. Do the requested action with the specified card.
       card = target.cards.revealed[card_index]
@@ -118,18 +107,18 @@ class BaseGame::Thief < Card
         # Chose to just trash the card.
         game.cards.in_trash(true)
         card.trash
-        game.histories.create!(:event => "#{ply.name} chose to trash #{target.name}'s #{card.class.readable_name}.",
-                              :css_class => "player#{ply.seat} player#{target.seat} card_trash")
+        game.histories.create!(:event => "#{actor.name} chose to trash #{target.name}'s #{card.class.readable_name}.",
+                              :css_class => "player#{actor.seat} player#{target.seat} card_trash")
 
         # And discard the rest
         discardrest(params)
       else
         # Chose to steal the card. Queue an action to discard the other one, then gain the chosen one
-        game.histories.create!(:event => "#{ply.name} chose to steal #{target.name}'s #{card.class.readable_name}.",
-                              :css_class => "player#{ply.seat} player#{target.seat}")
-        parent_act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_discardrest;target=#{target.id}",
+        game.histories.create!(:event => "#{actor.name} chose to steal #{target.name}'s #{card.class.readable_name}.",
+                              :css_class => "player#{actor.seat} player#{target.seat}")
+        new_act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_discardrest;target=#{target.id}",
                                                  :game => game)
-        ply.gain(parent_act, :card => card)
+        actor.gain(new_act, :card => card)
       end
     end
 
@@ -145,6 +134,6 @@ class BaseGame::Thief < Card
     game.histories.create!(:event => "#{target.name} discarded the remaining revealed cards.",
                           :css_class => "player#{target.seat} card_discard")
 
-    return "OK"
+    "OK"
   end
 end

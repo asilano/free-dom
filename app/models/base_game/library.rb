@@ -68,32 +68,22 @@ class BaseGame::Library < Card
     end
   end
 
-  def resolve_choose(ply, params, parent_act)
-    # We expect to have been passed either :nil_action or a :card_index
-    if (not params.include? :nil_action) and (not params.include? :card_index)
-      return "Invalid parameters"
-    end
-
-    # If we've got :card_index, it must be for the last card
-    if ((params.include? :card_index) and
-        (params[:card_index].to_i != ply.cards.hand.length - 1))
-      # Asked to set aside an invalid card (out of range)
-      return "Invalid request - card index #{params[:card_index]} is not the last-drawn"
-    end
-
+  resolves(:choose).validating_params_has_any_of(:card_index, :nil_action).
+                    validating_param_is_card(:card_index, scope: :hand).
+                    with do
     if params.include? :nil_action
       # Player chose not to set aside. That's hidden information, but anyone manically
       # refreshing would have seen the pending action - so write a history.
-      game.histories.create!(:event => "#{ply.name} chose not to set a card aside.",
-                            :css_class => "player#{ply.seat}")
+      game.histories.create!(:event => "#{actor.name} chose not to set a card aside.",
+                            :css_class => "player#{actor.seat}")
     else
-      card = ply.cards.hand[-1]
-      ply.cards.revealed(true) << card
+      card = actor.cards.hand[-1]
+      actor.cards.revealed(true) << card
       card.location = "library"
       card.revealed = true
       card.save!
-      game.histories.create!(:event => "#{ply.name} set aside #{card.class.readable_name}.",
-                            :css_class => "player#{ply.seat}")
+      game.histories.create!(:event => "#{actor.name} set aside #{card.class.readable_name}.",
+                            :css_class => "player#{actor.seat}")
     end
 
     # Carry on processing
@@ -103,7 +93,6 @@ class BaseGame::Library < Card
   def discard_set_aside
     # Move all revealed cards to Discard, and unreveal them
     # Force a reload of all affected areas
-
     player.cards.revealed(true).each do |card|
       card.discard
     end
