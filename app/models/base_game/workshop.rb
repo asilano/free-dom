@@ -26,7 +26,7 @@ class BaseGame::Workshop < Card
                         }]
   end
 
-  resolves(:take).validating_params_has_any_of(:pile_index).
+  resolves(:take).validating_params_has(:pile_index).
                  validating_param_is_pile(:pile_index) { |pile| pile.cost <= 4 }.
                  with do
     # Process the take. Move the chosen card to the top of the discard pile

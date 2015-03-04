@@ -62,6 +62,11 @@ class Resolution
     self
   end
 
+  def validating_params_has(arg)
+    @validations << ParamPresenceValidator.new(arg)
+    self
+  end
+
   def validating_param_is_card(*args, &block)
     @validations << ParamCardValidator.new(*args, &block)
     self
@@ -89,6 +94,11 @@ class Resolution
 
   def validating_param_value_in(*args, &block)
     @validations << ParamValueInArrayValidator.new(*args, &block)
+    self
+  end
+
+  def validating_param_satisfies(*args, &block)
+    @validations << ParamValueSatisfiesValidator.new(*args, &block)
     self
   end
 
@@ -122,6 +132,7 @@ Rails.logger.info("Errors: #{failure_messages}")
   class ParamPreparator
     def initialize(key, &block)
       @key = key
+      raise ArgumentError.new("Expected a block argument to prepare_param") unless block_given?
       @block = block
     end
 
@@ -275,13 +286,15 @@ Rails.logger.info("Errors: #{failure_messages}")
   class ParamOnlyPresentIfValidator < Validator
     def initialize(key, options = {}, &condition)
       @key = key
+      raise ArgumentError.new("Expected a block argument to validating_param_present_only_if") unless block_given?
       @condition = condition
       condition_descr = options[:description]
       @failure_msg = options[:failure_msg] || "Invalid parameters - can't supply #{key} unless #{condition_descr || 'it meets the supplied condition'}"
     end
 
     def validate(card)
-      !card.params.has_key?(@key) || card.instance_eval(&@condition)
+      return true unless card.params.has_key? @key
+      card.instance_eval(&@condition)
     end
   end
 
@@ -310,6 +323,27 @@ Rails.logger.info("Errors: #{failure_messages}")
     def validate(card)
       return true if !card.params.has_key? @key
       valid = card.game.players.where { id == my{card.params[@key]}.to_i }.count != 0
+    end
+  end
+
+  class ParamValueSatisfiesValidator < Validator
+    def initialize(key, options = {}, &condition)
+      @key = key
+      raise ArgumentError.new("Expected a block argument to validating_param_satisfies") unless block_given?
+      @condition = condition
+      riase ArgumentError.new("Expected a block with arity 1 or 2 to validating_param_satisfies") unless [1,2].include?(@condition.arity)
+      condition_descr = options[:description]
+      @failure_msg = options[:failure_msg] || "Invalid parameters - #{key} must #{condition_descr || 'meet the supplied condition'}"
+    end
+
+    def validate(card)
+      return true unless card.params.has_key?(@key)
+
+      if @condition.arity == 1
+        card.params[@key].instance_eval(&@condition)
+      else
+        @condition.call(card.params[@key], card)
+      end
     end
   end
 end

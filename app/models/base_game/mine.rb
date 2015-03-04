@@ -57,7 +57,7 @@ class BaseGame::Mine < Card
     end
   end
 
-  resolves(:trash).validating_params_has_any_of(:card_index).
+  resolves(:trash).validating_params_has(:card_index).
                    validating_param_is_card(:card_index, scope: :hand, &:is_treasure?).
                    with do
     # Trash the selected card, and create a new PendingAction for picking up
@@ -76,7 +76,7 @@ class BaseGame::Mine < Card
     "OK"
   end
 
-  resolves(:take).validating_params_has_any_of(:pile_index).
+  resolves(:take).validating_params_has(:pile_index).
                   validating_param_is_pile(:pile_index) { |pile| pile.card_class.is_treasure? &&
                                                                   pile.cost <= my{params}[:trashed_cost].to_i + 3 }.
                   with do

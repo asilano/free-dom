@@ -1,3 +1,4 @@
+
 class BaseGame::Thief < Card
   costs 4
   action :attack => true
@@ -69,6 +70,10 @@ class BaseGame::Thief < Card
 
   # This is at the scope of the attacker, and represents their choice of what
   # to do with the revealed cards from each attackee.
+  #
+  # The control is a radio-button array, and hence we expect to have received
+  # a :choice_#{self.class}#{id}, which may be "nil_action" or may be of the form
+  # "card_index.option_index".
   resolves(:choose).prepare_param(:choice) do |value|
                         if value == 'nil_action'
                           params[:nil_action] = true
@@ -82,7 +87,7 @@ class BaseGame::Thief < Card
                       end.
                     # Check we have either both card_index and option_index, _or_ :nil_action
                     validating_params_has_any_of([:card_index, :option_index], :nil_action).
-                    validating_params_has_any_of(:target).
+                    validating_params_has(:target).
                     validating_param_is_player(:target).
                     validating_param_present_only_if(:nil_action, description: 'target has no revealed treasures') do
                       Player.find_by_id(params[:target]).cards.revealed.none?(&:is_treasure?)

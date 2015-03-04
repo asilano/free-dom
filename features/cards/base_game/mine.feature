@@ -24,7 +24,6 @@ Feature: Mine
     Then I should have placed Gold in my hand
       And I should need to Play treasure
 
-
   Scenario: Playing Mine - one treasure in hand
     Given my hand contains Mine, Talisman, Smithy, Gardens
       And it is my Play Action phase

@@ -70,6 +70,7 @@ class BaseGame::Library < Card
 
   resolves(:choose).validating_params_has_any_of(:card_index, :nil_action).
                     validating_param_is_card(:card_index, scope: :hand).
+                    validating_param_satisfies(:card_index) { |value, context| value.to_i == context.actor.cards.hand.count - 1 }.
                     with do
     if params.include? :nil_action
       # Player chose not to set aside. That's hidden information, but anyone manically

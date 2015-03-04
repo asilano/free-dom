@@ -34,7 +34,7 @@ class BaseGame::Chancellor < Card
                            }]
   end
 
-  resolves(:choose).validating_params_has_any_of(:choice).
+  resolves(:choose).validating_params_has(:choice).
                     validating_param_value_in(:choice, 'discard', 'keep').
                     with do
     # Everything looks fine. Carry out the requested choice
@@ -44,7 +44,7 @@ class BaseGame::Chancellor < Card
                             :css_class => "player#{actor.seat}")
     else
       actor.cards.deck(true).each do |card|
-        # Move card to discard _without tripping callbacks
+        # Move card to discard _without tripping callbacks_
         card.update_column(:location, 'discard')
       end
 

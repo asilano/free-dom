@@ -52,7 +52,7 @@ class BaseGame::Remodel < Card
     end
   end
 
-  resolves(:trash).validating_params_has_any_of(:card_index).
+  resolves(:trash).validating_params_has(:card_index).
                    validating_param_is_card(:card_index, scope: :hand).
                    with do
     # Trash the selected card, and create a new PendingAction for picking up
@@ -71,7 +71,7 @@ class BaseGame::Remodel < Card
     "OK"
   end
 
-  resolves(:take).validating_params_has_any_of(:pile_index).
+  resolves(:take).validating_params_has(:pile_index).
                     validating_param_is_pile(:pile_index) { |pile| pile.cost <= my{params}[:trashed_cost].to_i + 2 }.
                     with do
     # Process the take.

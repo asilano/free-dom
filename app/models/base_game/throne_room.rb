@@ -47,7 +47,7 @@ class BaseGame::ThroneRoom < Card
                         }]
   end
 
-  resolves(:choose).validating_params_has_any_of(:card_index).
+  resolves(:choose).validating_params_has(:card_index).
                     validating_param_is_card(:card_index, scope: :hand, &:is_action?).
                     with do
     # Player chose a card. Create two Game-level actions under the parent

@@ -55,7 +55,7 @@ class BaseGame::Militia < Card
     "OK"
   end
 
-  resolves(:discard).validating_params_has_any_of(:card_index).
+  resolves(:discard).validating_params_has(:card_index).
                      validating_param_is_card(:card_index, scope: :hand).
                      with do
     # All checks out. Discard the selected card.
