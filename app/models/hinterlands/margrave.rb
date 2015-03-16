@@ -65,10 +65,10 @@ class Hinterlands::Margrave < Card
                       validating_param_is_card(:card_index, scope: :hand).
                       with do
     # All checks out. Discard the selected card.
-    card = ply.cards.hand[params[:card_index].to_i]
+    card = actor.cards.hand[params[:card_index].to_i]
     card.discard
-    game.histories.create!(:event => "#{ply.name} discarded #{card} to #{self}.",
-                            :css_class => "player#{ply.seat} card_discard")
+    game.histories.create!(:event => "#{actor.name} discarded #{card} to #{self}.",
+                            :css_class => "player#{actor.seat} card_discard")
 
     "OK"
   end
