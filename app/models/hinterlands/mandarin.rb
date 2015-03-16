@@ -51,30 +51,18 @@ class Hinterlands::Mandarin < Card
     end
   end
 
-  def resolve_place(ply, params, parent_act)
-    # We expect to have been passed a :card_index
-    if not params.include? :card_index
-      return "Invalid parameters"
-    end
-
-    # Processing is surprisingly similar to a Play; code shamelessly yoinked from
-    # Player.play_action.
-    if ((params.include? :card_index) &&
-        (params[:card_index].to_i < 0 ||
-         params[:card_index].to_i > ply.cards.hand.length - 1))
-      # Asked to place an invalid card (out of range)
-      return "Invalid request - card index #{params[:card_index]} is out of range"
-    end
-
+  resolves(:place).validating_params_has(:card_index).
+                    validating_param_is_card(:card_index, scope: :hand).
+                    with do
     # All checks out. Place the selected card on the deck.
-    card = ply.cards.hand[params[:card_index].to_i]
-    player.renum(:deck)
+    card = actor.cards.hand[params[:card_index].to_i]
+    actor.renum(:deck)
     card.location = 'deck'
     card.position = -1
     card.save!
-    game.histories.create!(:event => "#{ply.name} put [#{ply.id}?#{card.class.readable_name}|a card] " +
+    game.histories.create!(:event => "#{actor.name} put [#{actor.id}?#{card.class.readable_name}|a card] " +
                                      "from their hand onto their deck.",
-                            :css_class => "player#{ply.seat}")
+                            :css_class => "player#{actor.seat}")
 
     return "OK"
   end
@@ -111,59 +99,42 @@ class Hinterlands::Mandarin < Card
     return false
   end
 
-  def resolve_return(ply, params, parent_act)
-    # We expect to have been passed either :nil_action or a :card_index
-    if !params.include?(:nil_action) && !params.include?(:card_index)
-      return "Invalid parameters"
-    end
-
-    # Processing is pretty much the same as a Play; code shamelessly yoinked from
-    # Player.play_action.
-    if ((params.include? :card_index) &&
-        (params[:card_index].to_i < 0 ||
-         params[:card_index].to_i > ply.cards.in_play.length - 1))
-      # Asked to return an invalid card (out of range)
-      return "Invalid request - card index #{params[:card_index]} is out of range"
-    end
-
+  resolves(:return).validating_params_has_any_of(:card_index, :nil_action).
+                    validating_param_is_card(:card_index, scope: :in_play, &:is_treasure?).
+                    with do
     if params.include? :nil_action
       # Returning the remaining cards in any order. Y'know what? Let's just call ourselves to do it.
-      ply.cards.in_play.select(&:is_treasure?).length.downto(2) do |posn|
-        ix = ply.cards.in_play(true).index(&:is_treasure?)
-        resolve_return(ply, {:card_index => ix, :posn => posn}, parent_act)
+      actor.cards.in_play.select(&:is_treasure?).length.downto(2) do |posn|
+        ix = actor.cards.in_play(true).index(&:is_treasure?)
+        resolve_return(actor, {:card_index => ix, :posn => posn}, parent_act)
       end
 
       # Remove all pending actions above this that are for replacing with Mandarin
-      ply.pending_actions.where('expected_action LIKE ?', "resolve_#{self.class}#{id}_return;posn=%").destroy_all
+      actor.pending_actions.where('expected_action LIKE ?', "resolve_#{self.class}#{id}_return;posn=%").destroy_all
       return "OK"
     end
 
-    card = ply.cards.in_play[params[:card_index].to_i]
-    if !card.is_treasure?
-      # Asked to return a non-action
-      return "Invalid request - #{card.readable_name} is not a Treasure"
-    end
-
     # All good. put the chosen card on top of the deck
+    card = actor.cards.in_play[params[:card_index].to_i]
     card.location = "deck"
     card.position = -1
     card.save!
 
-    game.histories.create(:event => "#{ply.name} put #{card} on top of their deck with #{self}.",
-                          :css_class => "player#{ply.seat}")
+    game.histories.create(:event => "#{actor.name} put #{card} on top of their deck with #{self}.",
+                          :css_class => "player#{actor.seat}")
 
     if params[:posn].to_i == 2
       # That was the card second from top, so only one card remains to be placed. Do so.
-      treasures = ply.cards.in_play.select(&:is_treasure?)
+      treasures = actor.cards.in_play.select(&:is_treasure?)
       raise "Wrong number of in-play treasures" unless treasures.count == 1
       card = treasures[0]
       card.location = "deck"
       card.position = -2
       card.save!
-      game.histories.create!(:event => "#{ply.name} put #{card} on top of their deck with #{self}.",
-                            :css_class => "player#{ply.seat}")
+      game.histories.create!(:event => "#{actor.name} put #{card} on top of their deck with #{self}.",
+                            :css_class => "player#{actor.seat}")
     end
 
-    return "OK"
+    "OK"
   end
 end

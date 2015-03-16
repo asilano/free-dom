@@ -48,35 +48,30 @@ class Hinterlands::Duchess < Card
     end
   end
 
-  def resolve_choose(ply, params, parent_act)
-    # We expect to have a :choice parameter, either "discard" or "leave"
-    if (not params.include? :choice) or
-       (not params[:choice].in? ["discard", "leave"])
-      return "Invalid parameters"
-    end
-
+  resolves(:choose).validating_params_has(:choice).
+                    validating_param_value_in(:choice, 'discard', 'leave').
+                    with do
     # Everything looks fine. Carry out the requested choice
-    card = ply.cards.deck(true)[0]
+    card = actor.cards.deck(true)[0]
     if params[:choice] == "leave"
       # Chose not to discard the card, so a no-op other than unpeeking.
       card.peeked = false
       card.save!
 
       # Create a history
-      game.histories.create!(:event => "#{ply.name} chose not to discard the card on the top of their deck.",
-                            :css_class => "player#{ply.seat}")
+      game.histories.create!(:event => "#{actor.name} chose not to discard the card on the top of their deck.",
+                            :css_class => "player#{actor.seat}")
 
     else
       # Discard the card. It will become unpeeked due to zone change
       card.discard
 
       # And create a history
-      game.histories.create!(:event => "#{ply.name} discarded #{card} from their deck.",
-                              :css_class => "player#{ply.seat} card_discard")
+      game.histories.create!(:event => "#{actor.name} discarded #{card} from their deck.",
+                              :css_class => "player#{actor.seat} card_discard")
     end
 
-    return "OK"
-
+    "OK"
   end
 
   def self.witness_gain(params)
@@ -107,24 +102,20 @@ class Hinterlands::Duchess < Card
     return false
   end
 
-  def resolve_gain(ply, params, parent_act)
-    # We expect to have a :choice parameter, either "accept" or "decline"
-    if (not params.include? :choice) or
-       (not params[:choice].in? ["accept", "decline"])
-      return "Invalid parameters"
-    end
-
+  resolves(:gain).validating_params_has(:choice).
+                  validating_param_value_in('accept', 'decline').
+                  with do
     # Everything looks fine. Carry out the requested choice
     if params[:choice] == "decline"
        # Chose not to gain a Duchess. Just log
-       game.histories.create!(:event => "#{ply.name} chose not to gain a #{readable_name}.",
-                              :css_class => "player#{ply.seat}")
+       game.histories.create!(:event => "#{actor.name} chose not to gain a #{readable_name}.",
+                              :css_class => "player#{actor.seat}")
     else
       # Gain a Duchess
-      game.histories.create!(:event => "#{ply.name} chose to gain a #{readable_name}.",
-                             :css_class => "player#{ply.seat} card_gain")
+      game.histories.create!(:event => "#{actor.name} chose to gain a #{readable_name}.",
+                             :css_class => "player#{actor.seat} card_gain")
       duchess_pile = game.piles.find_by_card_type("Hinterlands::Duchess")
-      ply.gain(parent_act, :pile => duchess_pile)
+      actor.gain(parent_act, :pile => duchess_pile)
     end
 
     "OK"

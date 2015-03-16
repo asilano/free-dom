@@ -45,36 +45,19 @@ class Hinterlands::SpiceMerchant < Card
     end
   end
 
-  def resolve_trash(ply, params, parent_act)
-    # We expect to have been passed either :nil_action or a :card_index
-    if (not params.include? :nil_action) and (not params.include? :card_index)
-      return "Invalid parameters"
-    end
-
-    # Processing is pretty much the same as a Play; code shamelessly yoinked from
-    # Player.play_action.
-    if ((params.include? :card_index) &&
-        (params[:card_index].to_i < 0 ||
-         params[:card_index].to_i > ply.cards.hand.length - 1))
-      # Asked to trash an invalid card (out of range)
-      return "Invalid request - card index #{params[:card_index]} is out of range"
-    end
-
-    # All checks out. Carry on
+  resolves(:trash).validating_params_has_any_of(:nil_action, :card_index).
+                    validating_param_is_card(:card_index, scope: :hand, &:is_treasure?).
+                    with do
     if params.include? :nil_action
-      game.histories.create!(:event => "#{ply.name} trashed nothing.",
-                            :css_class => "player#{ply.seat}")
+      game.histories.create!(:event => "#{actor.name} trashed nothing.",
+                            :css_class => "player#{actor.seat}")
     else
-      card = ply.cards.hand[params[:card_index].to_i]
-      if !(card.andand.is_treasure?)
-        # Asked to trash a non-treasure
-        return "Invalid request - #{card.readable_name} is not a Treasure"
-      end
+      card = actor.cards.hand[params[:card_index].to_i]
 
       # Trash the treasure
       card.trash
-      game.histories.create!(:event => "#{ply.name} trashed a #{card} from hand.",
-                             :css_class => "player#{ply.seat} card_trash")
+      game.histories.create!(:event => "#{actor.name} trashed a #{card} from hand.",
+                             :css_class => "player#{actor.seat} card_trash")
 
       # And queue up a request to ask which type of benefit they want
       parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_choose",
@@ -83,32 +66,29 @@ class Hinterlands::SpiceMerchant < Card
                                   :player => player)
     end
 
-    return "OK"
+    "OK"
   end
 
-  def resolve_choose(ply, params, parent_act)
-    # We expect to have a :choice parameter, "cards_act" or "cashbuy"
-    if (!params.include? :choice) ||
-       (!params[:choice].in? ["cardsact","cashbuy"])
-      return "Invalid parameters"
-    end
-
+  # We expect to have a :choice parameter, "cards_act" or "cashbuy"
+  resolves(:choose).validating_params_has(:choice).
+                    validating_param_value_in(:choice, 'cardsact', 'cashbuy').
+                    with do
     # Everything looks fine. Carry out the requested choice
     if (params[:choice] == "cardsact")
       # Chose cards and action. Log and grant them
-      game.histories.create(:event => "#{ply.name} chose to draw 2 and gain an Action.",
-                            :css_class => "player#{ply.seat}")
-      ply.draw_cards(2)
-      ply.add_actions(1, parent_act)
+      game.histories.create(:event => "#{actor.name} chose to draw 2 and gain an Action.",
+                            :css_class => "player#{actor.seat}")
+      actor.draw_cards(2)
+      actor.add_actions(1, parent_act)
     else
       # Chose cash and buy. Log and grant them
-      game.histories.create(:event => "#{ply.name} chose to gain 2 Cash and a Buy.",
-                            :css_class => "player#{ply.seat}")
-      ply.add_cash(2)
-      ply.add_buys(1, parent_act)
+      game.histories.create(:event => "#{actor.name} chose to gain 2 Cash and a Buy.",
+                            :css_class => "player#{actor.seat}")
+      actor.add_cash(2)
+      actor.add_buys(1, parent_act)
     end
 
-    return "OK"
+    "OK"
   end
 
 end

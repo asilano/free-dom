@@ -58,43 +58,26 @@ class Hinterlands::Scheme < Card
     return "OK"
   end
 
-  def resolve_return(ply, params, parent_act)
-    # We expect to have been passed either :nil_action or a :card_index
-    if !params.include?(:nil_action) && !params.include?(:card_index)
-      return "Invalid parameters"
-    end
-
-    # Processing is pretty much the same as a Play; code shamelessly yoinked from
-    # Player.play_action.
-    if ((params.include? :card_index) &&
-        (params[:card_index].to_i < 0 ||
-         params[:card_index].to_i > ply.cards.in_play.length - 1))
-      # Asked to return an invalid card (out of range)
-      return "Invalid request - card index #{params[:card_index]} is out of range"
-    end
-
+  resolves(:return).validating_params_has_any_of(:nil_action, :card_index).
+                    validating_param_is_card(:card_index, scope: :in_play, &:is_action?).
+                    with do
     if params.include? :nil_action
       # Not returning anything; just log
-      game.histories.create(:event => "#{ply.name} chose not to return anything with #{self}",
-                            :css_class => "player#{ply.seat}")
+      game.histories.create(:event => "#{actor.name} chose not to return anything with #{self}",
+                            :css_class => "player#{actor.seat}")
 
       return "OK"
     end
 
-    card = ply.cards.in_play[params[:card_index].to_i]
-    if !card.is_action?
-      # Asked to return a non-action
-      return "Invalid request - #{card.readable_name} is not an Action"
-    end
-
-    # All good. put the chosen card on top of the deck
+    # Put the chosen card on top of the deck
+    card = actor.cards.in_play[params[:card_index].to_i]
     card.location = "deck"
     card.position = -1
     card.save!
 
-    game.histories.create(:event => "#{ply.name} put #{card} on top of their deck with #{self}",
-                          :css_class => "player#{ply.seat}")
+    game.histories.create(:event => "#{actor.name} put #{card} on top of their deck with #{self}",
+                          :css_class => "player#{actor.seat}")
 
-    return "OK"
+    "OK"
   end
 end

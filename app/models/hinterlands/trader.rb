@@ -55,38 +55,24 @@ class Hinterlands::Trader < Card
     end
   end
 
-  def resolve_trash(ply, params, parent_act)
-    # We expect to have been passed a :card_index
-    if !params.include?(:card_index)
-      return "Invalid parameters"
-    end
-
-    # Processing is pretty much the same as a Play; code shamelessly yoinked from
-    # Player.play_action.
-    if ((params[:card_index].to_i < 0 ||
-         params[:card_index].to_i > ply.cards.hand.length - 1))
-      # Asked to trash an invalid card (out of range)
-      return "Invalid request - card index #{params[:card_index]} is out of range"
-
-    end
-
-    # All checks out. Carry on
-
+  resolves(:trash).validating_params_has(:card_index).
+                    validating_param_is_card(:card_index, scope: :hand).
+                    with do
     # Trash the selected card, and log
-    card = ply.cards.hand[params[:card_index].to_i]
+    card = actor.cards.hand[params[:card_index].to_i]
     card.trash
     trashed_cost = card.cost
-    game.histories.create!(:event => "#{ply.name} trashed a #{card} from hand (cost: #{trashed_cost}).",
-                          :css_class => "player#{ply.seat} card_trash")
+    game.histories.create!(:event => "#{actor.name} trashed a #{card} from hand (cost: #{trashed_cost}).",
+                          :css_class => "player#{actor.seat} card_trash")
 
     # Now gain as many Silvers as the trashed card's cost
     silver_pile = game.piles.find_by_card_type('BasicCards::Silver')
     silvers_text = silver_pile.card_class.readable_name + (trashed_cost == 1 ? '' : 's')
-    game.histories.create!(:event => "#{ply.name} gained #{trashed_cost} #{silvers_text} from #{self}",
-                           :css_class => "player#{ply.seat} card_gain")
-    trashed_cost.times {ply.gain(parent_act, :pile => silver_pile)}
+    game.histories.create!(:event => "#{actor.name} gained #{trashed_cost} #{silvers_text} from #{self}",
+                           :css_class => "player#{actor.seat} card_gain")
+    trashed_cost.times { actor.gain(parent_act, :pile => silver_pile) }
 
-    return "OK"
+    "OK"
   end
 
   def self.witness_pre_gain_queue(params)
@@ -96,12 +82,12 @@ class Hinterlands::Trader < Card
     if card.class != BasicCards::Silver
       # Someone is about to gain something that isn't a Silver.
       # If they're holding Trader, ask them if they want a Silver instead.
-      ply = params[:gainer]
-      trader = ply.cards.hand.of_type(to_s).first
+      actor = params[:gainer]
+      trader = actor.cards.hand.of_type(to_s).first
       if trader
         parent_act = parent_act.children.create!(:expected_action => "resolve_#{self}#{trader.id}_react;card_type=#{card.class}",
                                                  :text => "Choose whether to react with #{readable_name}",
-                                                 :player => ply,
+                                                 :player => actor,
                                                  :game => trader.game)
 
         # Because of when this trigger occurs, other triggers can remove the Trader from hand before
@@ -115,13 +101,9 @@ class Hinterlands::Trader < Card
     return parent_act
   end
 
-  def resolve_react(ply, params, parent_act)
-    # We expect to have a :choice parameter, either "normal" or "silver"
-    if !params.include?(:choice) ||
-        !params[:choice].in?(["normal", "silver"])
-      return "Invalid parameters"
-    end
-
+  resolves(:react).validating_params_has(:choice).
+                    validating_param_value_in(:choice, 'normal', 'silver').
+                    with do
     # Check that the gain action which is this one's parent is for the expected card-type
     card_id = parent_act.expected_action.match(/card_id=(\d+)/).to_a[1]
     pile_id = parent_act.expected_action.match(/pile_id=(\d+)/).to_a[1]
@@ -137,14 +119,14 @@ class Hinterlands::Trader < Card
       # No-op. Don't even log
     else
       # Log
-      game.histories.create!(:event => "#{ply.name} reacted with #{self} to gain a Silver instead.",
-                             :css_class => "player#{ply.seat}")
+      game.histories.create!(:event => "#{actor.name} reacted with #{self} to gain a Silver instead.",
+                             :css_class => "player#{actor.seat}")
 
       # Remove the parent action, and create a new one to gain a Silver instead
       new_parent = parent_act.parent
       parent_act.remove!
       silver_pile = game.piles.find_by_card_type("BasicCards::Silver")
-      ply.gain(new_parent, :pile => silver_pile)
+      actor.gain(new_parent, :pile => silver_pile)
     end
 
     # Stop this card referencing its replacement action
@@ -154,14 +136,15 @@ class Hinterlands::Trader < Card
     "OK"
   end
 
-  # No-op action for when a Trader disappears after triggering.
+  # No-op action for when a Trader disappears after triggering, such as with Farmland
   def nothing(_)
   end
 
 private
 
   # If Trader is being moved out of the hand, either move its replacement action onto
-  # another Trader which is still in hand, or negate it.
+  # another Trader which is still in hand, or negate it. This covers cases like Farmland
+  # trashing the Trader before it's bought
   def check_replacement_action
     if location_changed? && location_was == 'hand'
       if state
@@ -182,6 +165,7 @@ private
         end
 
         self.state = nil
+        save
       end
     end
 

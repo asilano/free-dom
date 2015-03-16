@@ -41,7 +41,7 @@ class Hinterlands::Embassy < Card
       end
     end
 
-    return "OK"
+    "OK"
   end
 
   def determine_controls(player, controls, substep, params)
@@ -59,28 +59,16 @@ class Hinterlands::Embassy < Card
     end
   end
 
-  def resolve_discard(ply, params, parent_act)
-    # We expect to have been passed a :card_index
-    if !params.include? :card_index
-      return "Invalid parameters"
-    end
-
-    # Processing is surprisingly similar to a Play; code shamelessly yoinked from
-    # Player.play_action.
-    if ((params.include? :card_index) &&
-        (params[:card_index].to_i < 0 ||
-         params[:card_index].to_i > ply.cards.hand.length - 1))
-      # Asked to discard an invalid card (out of range)
-      return "Invalid request - card index #{params[:card_index]} is out of range"
-    end
-
+  resolves(:discard).validating_params_has(:card_index).
+                      validating_param_is_card(:card_index, scope: :hand).
+                      with do
     # All checks out. Discard the selected card.
-    card = ply.cards.hand[params[:card_index].to_i]
+    card = actor.cards.hand[params[:card_index].to_i]
     card.discard
-    game.histories.create!(:event => "#{ply.name} discarded #{card.class.readable_name}.",
-                            :css_class => "player#{ply.seat} card_discard")
+    game.histories.create!(:event => "#{actor.name} discarded #{card.class.readable_name}.",
+                            :css_class => "player#{actor.seat} card_discard")
 
-    return "OK"
+    "OK"
   end
 
   # Notice a gain event. If it's Embassy itself, grant each other player a Silver.
@@ -102,6 +90,6 @@ class Hinterlands::Embassy < Card
     end
 
     # Embassy's Silver gains don't affect the gain of Embassy at all
-    return false
+    false
   end
 end

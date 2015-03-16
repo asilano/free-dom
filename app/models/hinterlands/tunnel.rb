@@ -51,22 +51,17 @@ class Hinterlands::Tunnel < Card
     end
   end
 
-  def resolve_choose(ply, params, parent_act)
-    # We expect to have a :choice parameter, either "yes" or "no"
-    if !params.include?(:choice) ||
-       !params[:choice].in?(["yes", "no"])
-      return "Invalid parameters"
-    end
-
-    # All looks fine, process the choice
+  resolves(:choose).validating_params_has(:choice).
+                    validating_param_value_in(:choice, 'yes', 'no').
+                    with do
     if params[:choice] == "yes"
       # Player chose to gain a Gold
       gold_pile = game.piles.find_by_card_type("BasicCards::Gold")
 
-      game.histories.create!(:event => "#{ply.name} discarded Tunnel, and gained a Gold.",
-                             :css_class => "player#{ply.seat} card_gain")
+      game.histories.create!(:event => "#{actor.name} discarded Tunnel, and gained a Gold.",
+                             :css_class => "player#{actor.seat} card_gain")
 
-      ply.gain(parent_act, :pile => gold_pile)
+      actor.gain(parent_act, :pile => gold_pile)
     else
       # Player chose not to gain a gold. Don't log - discards are private.
     end

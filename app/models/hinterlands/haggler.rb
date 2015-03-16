@@ -70,43 +70,18 @@ class Hinterlands::Haggler < Card
     end
   end
 
-  def resolve_take(ply, params, parent_act)
-    # Copied from Expand
-    # We expect to have been passed a :pile_index
-    if !params.include?(:pile_index)
-      return "Invalid parameters"
-    end
-    original_cost = params[:cost].to_i
+  resolves(:take).validating_params_has(:pile_index).
+                  validating_params_has(:cost).
+                  validating_param_is_pile(:pile_index) { cost < my{params}[:cost].to_i && !card_class.is_victory?}.
+                  with do
+    # Process the take.
+    game.histories.create!(:event => "#{actor.name} took " +
+           "#{game.piles[params[:pile_index].to_i].card_class.readable_name} with #{self}.",
+                          :css_class => "player#{actor.seat} card_gain")
 
-    # Processing is pretty much the same as a buy
-    if ((params.include? :pile_index) &&
-           (params[:pile_index].to_i < 0 ||
-            params[:pile_index].to_i > game.piles.length - 1))
-      # Asked to take an invalid card (out of range)
-      return "Invalid request - pile index #{params[:pile_index]} is out of range"
-    elsif (params.include? :pile_index) &&
-          !(game.piles[params[:pile_index].to_i].cost < original_cost)
-      # Asked to take an invalid card (too expensive)
-      return "Invalid request - card #{game.piles[params[:pile_index]].card_type} is too expensive"
-    elsif (!params.include? :pile_index) &&
-          (game.piles.map do |pile|
-              (pile.cost < original_cost) && !pile.empty? && !pile.card_class.is_victory?
-           end.any?)
-      # Asked to take nothing when there were cards to take
-      return "Invalid request - asked to take nothing, but viable options exist"
-    end
+    actor.gain(parent_act, :pile => game.piles[params[:pile_index].to_i])
 
-
-    if params.include? :pile_index
-      # Process the take.
-      game.histories.create!(:event => "#{ply.name} took " +
-             "#{game.piles[params[:pile_index].to_i].card_class.readable_name} with #{self}.",
-                            :css_class => "player#{ply.seat} card_gain")
-
-      ply.gain(parent_act, :pile => game.piles[params[:pile_index].to_i])
-    end
-
-    return "OK"
+    "OK"
   end
 
 end

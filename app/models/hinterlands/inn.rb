@@ -75,28 +75,16 @@ class Hinterlands::Inn < Card
     end
   end
 
-  def resolve_discard(ply, params, parent_act)
-    # We expect to have been passed a :card_index
-    if not params.include? :card_index
-      return "Invalid parameters"
-    end
-
-    # Processing is surprisingly similar to a Play; code shamelessly yoinked from
-    # Player.play_action.
-    if ((params.include? :card_index) &&
-        (params[:card_index].to_i < 0 ||
-         params[:card_index].to_i > ply.cards.hand.length - 1))
-      # Asked to discard an invalid card (out of range)
-      return "Invalid request - card index #{params[:card_index]} is out of range"
-    end
-
+  resolves(:discard).validating_params_has(:card_index).
+                      validating_param_is_card(:card_index, scope: :hand).
+                      with do
     # All checks out. Discard the selected card.
-    card = ply.cards.hand[params[:card_index].to_i]
+    card = actor.cards.hand[params[:card_index].to_i]
     card.discard
-    game.histories.create!(:event => "#{ply.name} discarded #{card.class.readable_name}.",
-                            :css_class => "player#{ply.seat} card_discard")
+    game.histories.create!(:event => "#{actor.name} discarded #{card.class.readable_name}.",
+                            :css_class => "player#{actor.seat} card_discard")
 
-    return "OK"
+    "OK"
   end
 
   # Notice a Gain after it's happened. If the card being gained is Inn itself, queue up to ask which actions to return.
@@ -138,23 +126,18 @@ class Hinterlands::Inn < Card
     end
   end
 
-  def resolve_return(ply, params, parent_act)
-    # The player can choose to return nothing; if a :return paramter is
-    # present, we expect each entry to be a valid card index.
-    if (params.include?(:return) &&
-        params[:return].any? {|d| d.to_i < 0 or d.to_i >= ply.cards.peeked.size})
-      return "Invalid parameters - at least one card index out of range"
-    end
-
+  # The player can choose to return nothing; if a :return paramter is
+  # present, we expect each entry to be a valid card index.
+  resolves(:return).validating_param_is_card_array(:return, scope: :peeked).with do
     # Looks good.
     if !params.include?(:return)
       # No returning to do; create a log
-      game.histories.create!(:event => "#{ply.name} returned no cards with #{self}.",
-                             :css_class => "player#{ply.seat}")
+      game.histories.create!(:event => "#{actor.name} returned no cards with #{self}.",
+                             :css_class => "player#{actor.seat}")
     else
       # Place each selected card on the deck, taking note of its class for logging purposes
       cards_returned = []
-      cards_chosen = params[:return].map {|ix| ply.cards.peeked[ix.to_i]}
+      cards_chosen = params[:return].map {|ix| actor.cards.peeked[ix.to_i]}
       cards_chosen.each do |card|
         card.location = "deck"
         card.save!
@@ -162,16 +145,16 @@ class Hinterlands::Inn < Card
       end
 
       # Log the returns
-      game.histories.create!(:event => "#{ply.name} returned #{cards_returned.join(', ')} to their deck with #{self}.",
-                             :css_class => "player#{ply.seat}")
+      game.histories.create!(:event => "#{actor.name} returned #{cards_returned.join(', ')} to their deck with #{self}.",
+                             :css_class => "player#{actor.seat}")
     end
 
     # Even if no cards were returned, shuffle the deck
-    ply.cards.deck.shuffle.each.with_index do |card, index|
+    actor.cards.deck.shuffle.each.with_index do |card, index|
       card.position = index
       card.save!
     end
 
-    return "OK"
+    "OK"
   end
 end

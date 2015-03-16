@@ -11,7 +11,7 @@ class Hinterlands::NomadCamp < Card
     player.add_buys(1, parent_act)
     player.add_cash(2)
 
-    return "OK"
+    "OK"
   end
 
   # Notice a gain event before it happens. If it's Nomad Camp itself, change the gain

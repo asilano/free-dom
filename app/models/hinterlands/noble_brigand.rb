@@ -103,32 +103,24 @@ class Hinterlands::NobleBrigand < Card
     end
   end
 
-  def resolve_steal(ply, params, parent_act)
-    # This is at the scope of the attacker, and represents their choice of which
-    # of the attackee's cards (which must contain a Silver and/or a Gold) to steal.
-    # We expect to have been passed a :card_index
-    if !params.include? :card_index
-      return "Invalid parameters"
-    end
-
+  # This is at the scope of the attacker, and represents their choice of which
+  # of the attackee's cards (which must contain a Silver and/or a Gold) to steal.
+  resolves(:steal).validating_params_has(:card_index).
+                    validating_params_has(:target).
+                    validating_param_is_player(:target).
+                    validating_param_is_card(:card_index, scope: :revealed, player: :target) { self.class.in? [BasicCards::Silver, BasicCards::Gold] }.
+                    with do
     target = Player.find(params[:target])
 
-    card_index = params[:card_index].to_i
-
-    if card_index > target.cards.revealed.length
-      # Asked to steal an invalid card
-      return "Invalid request - card index #{card_index} is greater than number of revealed cards"
-    end
-
     # Everything checks out. Queue up to discard the other card, and steal the specified card.
-    card = target.cards.revealed[card_index]
-    game.histories.create!(:event => "#{ply.name} stole #{target.name}'s #{card}.",
-                           :css_class => "player#{ply.seat} player#{target.seat} card_trash")
-    parent_act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_discardrest;target=#{target.id}",
+    card = target.cards.revealed[params[:card_index].to_i]
+    game.histories.create!(:event => "#{actor.name} stole #{target.name}'s #{card}.",
+                           :css_class => "player#{actor.seat} player#{target.seat} card_trash")
+    discard_act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_discardrest;target=#{target.id}",
                                              :game => game)
-    ply.gain(parent_act, :card => card)
+    actor.gain(discard_act, :card => card)
 
-    return "OK"
+    "OK"
   end
 
   def discardrest(params)
@@ -140,6 +132,6 @@ class Hinterlands::NobleBrigand < Card
     game.histories.create!(:event => "#{target.name} discarded the remaining revealed cards.",
                           :css_class => "player#{target.seat} card_discard")
 
-    return "OK"
+    "OK"
   end
 end

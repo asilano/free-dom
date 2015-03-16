@@ -22,7 +22,7 @@ class Hinterlands::Develop < Card
                                        :game => game)
     end
 
-    return "OK"
+    "OK"
   end
 
   def determine_controls(player, controls, substep, params)
@@ -67,29 +67,15 @@ class Hinterlands::Develop < Card
     end
   end
 
-  def resolve_trash(ply, params, parent_act)
-    # We expect to have been passed a :card_index
-    if !params.include?(:card_index)
-      return "Invalid parameters"
-    end
-
-    # Processing is pretty much the same as a Play; code shamelessly yoinked from
-    # Player.play_action.
-    if ((params[:card_index].to_i < 0 ||
-         params[:card_index].to_i > ply.cards.hand.length - 1))
-      # Asked to trash an invalid card (out of range)
-      return "Invalid request - card index #{params[:card_index]} is out of range"
-
-    end
-
-    # All checks out. Carry on
-
+  resolves(:trash).validating_params_has(:card_index).
+                    validating_param_is_card(:card_index, scope: :hand).
+                    with do
     # Trash the selected card.
-    card = ply.cards.hand[params[:card_index].to_i]
+    card = actor.cards.hand[params[:card_index].to_i]
     card.trash
     trashed_cost = card.cost
-    game.histories.create!(:event => "#{ply.name} trashed a #{card.class.readable_name} from hand (cost: #{trashed_cost}).",
-                          :css_class => "player#{ply.seat} card_trash")
+    game.histories.create!(:event => "#{actor.name} trashed a #{card.class.readable_name} from hand (cost: #{trashed_cost}).",
+                          :css_class => "player#{actor.seat} card_trash")
 
     # Check whether the player has a real choice to make
     valid_piles = game.piles.map do |pile|
@@ -103,18 +89,18 @@ class Hinterlands::Develop < Card
 
     if valid_piles.none?
       # No replacements available. Just log
-      game.histories.create!(:event => "#{ply.name} couldn't take either replacement card.",
-                             :css_class => "player#{ply.seat}")
+      game.histories.create!(:event => "#{actor.name} couldn't take either replacement card.",
+                             :css_class => "player#{actor.seat}")
     elsif valid_piles.one?
       # Exactly one replacement available. Log that the other one wasn't, and call take2 directly
-      rc = resolve_take2(ply,
+      rc = resolve_take2(actor,
                          {:pile_index => valid_piles.index(true),
                           :trashed_cost => trashed_cost},
                          parent_act)
 
       if rc =~ /^OK/
-        game.histories.create!(:event => "#{ply.name} could only take one replacement card.",
-                               :css_class => "player#{ply.seat}")
+        game.histories.create!(:event => "#{actor.name} could only take one replacement card.",
+                               :css_class => "player#{actor.seat}")
       end
 
       return rc
@@ -138,12 +124,13 @@ class Hinterlands::Develop < Card
                                        :game => game)
     end
 
-    return "OK"
+    "OK"
   end
 
-  def resolve_take1(ply, params, parent_act)
+  # No validation - done by common resolution "take"
+  resolves(:take1).with do
     # Call common function to perform the take
-    rc, direction = take(ply, params, parent_act)
+    rc, direction = resolve_take(actor, params, parent_act)
 
     if rc =~ /^OK/
       # Check if an action is needed to take the second card
@@ -156,8 +143,8 @@ class Hinterlands::Develop < Card
 
       if valid_piles.none?
         # No replacements available. Just log
-        game.histories.create!(:event => "#{ply.name} couldn't take the second replacement card.",
-                               :css_class => "player#{ply.seat}")
+        game.histories.create!(:event => "#{actor.name} couldn't take the second replacement card.",
+                               :css_class => "player#{actor.seat}")
       elsif valid_piles.one?
         # Exactly one replacement available. Create an action to handle the second take automatically
         # once the first one is done.
@@ -186,62 +173,35 @@ class Hinterlands::Develop < Card
                   params[:parent_act])
   end
 
-  def resolve_take2(ply, params, parent_act)
+  # No validation - done by common resolution "take"
+  resolves(:take2).with do
     # Call common function to perform the take
-    rc, direction = take(ply, params, parent_act)
+    rc, direction = resolve_take(actor, params, parent_act)
 
     return rc
   end
 
-  def take(ply, params, parent_act)
-    # We expect to have been passed a :pile_index or :nil_action
-    if !params.include?(:pile_index) && !params.include?(:nil_action)
-      return "Invalid parameters"
-    end
-
-    # Define the set of valid costs (it's either both sides of the trashed cost,
-    # or just one side if one take has already happened)
-    trashed_cost = params[:trashed_cost].to_i
-    if params.include?(:valid)
-      valid_costs = [params[:valid].to_i]
-    else
-      valid_costs = [trashed_cost - 1, trashed_cost + 1]
-    end
-
-    # Processing is pretty much the same as a buy; code shamelessly yoinked from
-    # Player.buy.
-    if ((params.include? :pile_index) &&
-           (params[:pile_index].to_i < 0 ||
-            params[:pile_index].to_i > game.piles.length - 1))
-      # Asked to take an invalid card (out of range)
-      return "Invalid request - pile index #{params[:pile_index]} is out of range"
-    elsif (params.include? :pile_index) &&
-          !(valid_costs.include?(game.piles[params[:pile_index].to_i].cost))
-      # Asked to take an invalid card (too expensive)
-      return "Invalid request - card #{game.piles[params[:pile_index].to_i].card_type} is the wrong cost"
-    elsif (!params.include? :pile_index) &&
-          (game.piles.any? do |pile|
-              (valid_costs.include?(pile.cost)) && !pile.empty?
-           end)
-      # Asked to take nothing when there were cards to take
-      return "Invalid request - asked to take nothing, but viable replacements exist"
-    end
-
+  resolves(:take).validating_params_has(:trashed_cost).
+                  validating_params_has(:pile_index).
+                  validating_param_is_pile(:pile_index) do
+                    if my{params}.has_key? :valid
+                      cost == my{params}[:valid].to_i
+                    else
+                      cost == my{params}[:trashed_cost].to_i + 1 ||
+                      cost == my{params}[:trashed_cost].to_i - 1
+                    end
+                  end.
+                  with do
+    # Process the take.
     direction = nil
-    if params.include? :pile_index
-      # Process the take.
-      take_pile = game.piles[params[:pile_index].to_i]
-      game.histories.create!(:event => "#{ply.name} took " +
-             "#{take_pile.card_class.readable_name} with #{self}.",
-                            :css_class => "player#{ply.seat} card_gain")
-      ply.gain(parent_act, :pile => take_pile, :location => "deck")
+    trashed_cost = params[:trashed_cost].to_i
+    take_pile = game.piles[params[:pile_index].to_i]
+    game.histories.create!(:event => "#{actor.name} took " +
+           "#{take_pile.card_class.readable_name} with #{self}.",
+                          :css_class => "player#{actor.seat} card_gain")
+    actor.gain(parent_act, :pile => take_pile, :location => "deck")
 
-      direction = take_pile.cost > trashed_cost ? :higher : :lower
-    else
-      # Create a history
-      game.histories.create!(:event => "#{ply.name} couldn't take a replacement.",
-                            :css_class => "player#{ply.seat} card_gain")
-    end
+    direction = take_pile.cost > trashed_cost ? :higher : :lower
 
     return "OK", direction
   end

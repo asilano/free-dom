@@ -77,8 +77,8 @@ class BaseGame::Mine < Card
   end
 
   resolves(:take).validating_params_has(:pile_index).
-                  validating_param_is_pile(:pile_index) { |pile| pile.card_class.is_treasure? &&
-                                                                  pile.cost <= my{params}[:trashed_cost].to_i + 3 }.
+                  validating_param_is_pile(:pile_index) { card_class.is_treasure? &&
+                                                            cost <= my{params}[:trashed_cost].to_i + 3 }.
                   with do
     # Process the take.
     game.histories.create!(:event => "#{actor.name} took " +

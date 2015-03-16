@@ -30,7 +30,7 @@ module Resolvable
     attr_reader :resolutions
 
     def resolves(symbol)
-      res = Resolution.new(symbol)
+      res = Resolution.new(symbol, self)
       @resolutions ||= []
       @resolutions << res
       res
@@ -41,15 +41,15 @@ end
 class Resolution
   attr_reader :name
 
-  def initialize(name)
+  def initialize(name, klass)
     @name = name
-    @block = nil
+    @klass = klass
     @validations = []
     @preps = []
   end
 
   def with(&block)
-    @block = block
+    @klass.send(:define_method, "resolution_#{@name}_occurs", block)
   end
 
   def prepare_param(*args, &block)
@@ -119,13 +119,9 @@ class Resolution
     failure_messages = @validations.map do |validation|
       validation.failure_msg unless validation.validate(card)
     end.compact
-Rails.logger.info("Errors: #{failure_messages}")
     return failure_messages.join("\n") if failure_messages.present?
 
-    card.define_singleton_method(:resolution_occurs, @block)
-    rc = card.resolution_occurs
-    card.singleton_class.send(:remove_method, :resolution_occurs)
-    rc
+    card.send("resolution_#{@name}_occurs")
   end
 
   # Preparation class. Pretty simple - it's just a way of delay-running a block
@@ -244,6 +240,7 @@ Rails.logger.info("Errors: #{failure_messages}")
       @key = key
       @condition = condition
       @failure_msg = options[:failure_msg]
+      @allow_empty = options[:allow_empty]
       @custom_message = @failure_msg.present?
     end
 
@@ -266,12 +263,15 @@ Rails.logger.info("Errors: #{failure_messages}")
       valid &&= index >= 0
       valid &&= index < actor.game.piles.count
 
+      @failure_msg = "Invalid parameters - pile #{index} is empty" if valid && !@custom_message
+      test_pile = actor.game.piles[index]
+      valid &&= @allow_empty || test_pile.cards.present?
+
       if @condition && valid
         @failure_msg = "Invalid parameters - pile #{index} doesn't satisfy the required conditions" unless @custom_message
 
         # We need a way for the card under test to examine the state of the resolving card.
         # The following trick is borrowed from squeel.
-        test_pile = actor.game.piles[index]
         test_pile.instance_variable_set(:@res_card, card)
         def test_pile.my(&block)
           @res_card.instance_eval &block

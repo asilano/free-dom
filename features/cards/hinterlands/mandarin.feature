@@ -106,7 +106,7 @@ Feature: Mandarin
       And I should be able to choose a nil action in play
       And I should not be able to choose Woodcutter in play
     When I choose Any order in play
-      Then I should have moved Copper, Silver, Harem from play to deck
+      Then I should have moved Silver, Copper, Harem from play to deck
       And I should need to Buy
 
   Scenario: Buying Mandarin with one type of Treasure

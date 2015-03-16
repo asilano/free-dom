@@ -27,7 +27,7 @@ class BaseGame::Workshop < Card
   end
 
   resolves(:take).validating_params_has(:pile_index).
-                 validating_param_is_pile(:pile_index) { |pile| pile.cost <= 4 }.
+                 validating_param_is_pile(:pile_index) { cost <= 4 }.
                  with do
     # Process the take. Move the chosen card to the top of the discard pile
     # Get the card to do it, so that we mint a fresh instance of infinite cards

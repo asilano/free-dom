@@ -61,29 +61,16 @@ class Hinterlands::Margrave < Card
     end
   end
 
-  def resolve_discard(ply, params, parent_act)
-    # This is processing the target's request to discard a card
-    # We expect to have been passed a :card_index
-    if !params.include? :card_index
-      return "Invalid parameters"
-    end
-
-    # Processing is surprisingly similar to a Play; code shamelessly yoinked from
-    # Player.play_action.
-    if ((params.include? :card_index) &&
-        (params[:card_index].to_i < 0 ||
-         params[:card_index].to_i > ply.cards.hand.length - 1))
-      # Asked to discard an invalid card (out of range)
-      return "Invalid request - card index #{params[:card_index]} is out of range"
-    end
-
+  resolves(:discard).validating_params_has(:card_index).
+                      validating_param_is_card(:card_index, scope: :hand).
+                      with do
     # All checks out. Discard the selected card.
     card = ply.cards.hand[params[:card_index].to_i]
     card.discard
     game.histories.create!(:event => "#{ply.name} discarded #{card} to #{self}.",
                             :css_class => "player#{ply.seat} card_discard")
 
-    return "OK"
+    "OK"
   end
 
 end

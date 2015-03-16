@@ -46,24 +46,20 @@ class Hinterlands::IllGottenGains < Card
     end
   end
 
-  def resolve_copper(ply, params, parent_act)
-    # We expect to have a :choice parameter, either "accept" or "decline"
-    if (not params.include? :choice) or
-       (not params[:choice].in? ["accept", "decline"])
-      return "Invalid parameters"
-    end
-
+  resolves(:copper).validating_params_has(:choice).
+                    validating_param_value_in(:choice, 'accept', 'decline').
+                    with do
     # Everything looks fine. Carry out the requested choice
     if params[:choice] == "decline"
        # Chose not to gain a Copper. Just log
-       game.histories.create!(:event => "#{ply.name} chose not to gain a #{BasicCards::Copper.readable_name}.",
-                              :css_class => "player#{ply.seat}")
+       game.histories.create!(:event => "#{actor.name} chose not to gain a #{BasicCards::Copper.readable_name}.",
+                              :css_class => "player#{actor.seat}")
     else
       # Gain a Copper
-      game.histories.create!(:event => "#{ply.name} chose to gain a #{BasicCards::Copper.readable_name}.",
-                             :css_class => "player#{ply.seat} card_gain")
+      game.histories.create!(:event => "#{actor.name} chose to gain a #{BasicCards::Copper.readable_name}.",
+                             :css_class => "player#{actor.seat} card_gain")
       copper_pile = game.piles.find_by_card_type("BasicCards::Copper")
-      ply.gain(parent_act, :pile => copper_pile, :location => "hand")
+      actor.gain(parent_act, :pile => copper_pile, :location => "hand")
     end
 
     "OK"

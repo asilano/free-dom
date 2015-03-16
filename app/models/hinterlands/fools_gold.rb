@@ -68,21 +68,16 @@ class Hinterlands::FoolsGold < Card
     return false
   end
 
-  def resolve_exchange(ply, params, parent_act)
-    # This is the player choosing whether to exchange their Fool's Gold for a Gold
-    # We expect to have a :choice parameter, either "trash" or "keep"
-    if (!params.include? :choice) ||
-       (!params[:choice].in? ["trash", "keep"])
-      return "Invalid parameters"
-    end
-
+  resolves(:exchange).validating_params_has(:choice).
+                      validating_param_value_in(:choice, 'trash', 'keep').
+                      with do
     if params[:choice] == "trash"
       # Player chose to trash, and therefore gain a Gold
-      game.histories.create(:event => "#{ply.name} chose to trash #{self} from hand, and gained a Gold.",
-                            :css_class => "player#{ply.seat} card_gain card_trash")
+      game.histories.create(:event => "#{actor.name} chose to trash #{self} from hand, and gained a Gold.",
+                            :css_class => "player#{actor.seat} card_gain card_trash")
 
       trash
-      ply.gain(parent_act, :pile => game.piles.find_by_card_type("BasicCards::Gold"), :location => 'deck')
+      actor.gain(parent_act, :pile => game.piles.find_by_card_type("BasicCards::Gold"), :location => 'deck')
     else
       # Don't log. Technically, this is secret.
     end

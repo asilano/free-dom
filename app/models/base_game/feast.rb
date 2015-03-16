@@ -39,7 +39,7 @@ class BaseGame::Feast < Card
   end
 
   resolves(:take).validating_params_has(:pile_index).
-                 validating_param_is_pile(:pile_index) { |pile| pile.cost <= 5 }.
+                 validating_param_is_pile(:pile_index) { cost <= 5 }.
                  with do
     # Process the take.
     game.histories.create!(:event => "#{actor.name} took " +

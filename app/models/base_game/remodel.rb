@@ -72,7 +72,7 @@ class BaseGame::Remodel < Card
   end
 
   resolves(:take).validating_params_has(:pile_index).
-                    validating_param_is_pile(:pile_index) { |pile| pile.cost <= my{params}[:trashed_cost].to_i + 2 }.
+                    validating_param_is_pile(:pile_index) { cost <= my{params}[:trashed_cost].to_i + 2 }.
                     with do
     # Process the take.
     game.histories.create!(:event => "#{actor.name} took " +

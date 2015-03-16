@@ -72,22 +72,19 @@ class Hinterlands::Oracle < Card
     return "OK"
   end
 
-  def resolve_choose(ply, params, parent_act)
-    # We expect to have a :choice parameter, "discard" or "replace"; and a target player ID
-    if (!params.include? :choice) ||
-       (!params[:choice].in? ["discard", "replace"]) ||
-       !params.include?(:target)
-      return "Invalid parameters"
-    end
-
+  resolves(:choose).validating_params_has(:choice).
+                    validating_param_value_in(:choice, 'discard', 'replace').
+                    validating_params_has(:target).
+                    validating_param_is_player(:target).
+                    with do
     target = Player.find(params[:target])
 
     # Everything looks fine. Carry out the requested choice
     if params[:choice] == "replace"
       # Chose not to discard the target's revealed cards. Create a history
       revealed_names = target.cards.revealed.join(', ')
-      game.histories.create!(:event => "#{ply.name} chose not to discard #{target.name}'s revealed #{revealed_names}.",
-                             :css_class => "player#{ply.seat} player#{target.seat}")
+      game.histories.create!(:event => "#{actor.name} chose not to discard #{target.name}'s revealed #{revealed_names}.",
+                             :css_class => "player#{actor.seat} player#{target.seat}")
 
       raise "Nothing revealed to #{self.class}" if target.cards.revealed.empty?
       raise "More than 2 cards revealed to #{self.class}" if target.cards.revealed.length > 2
@@ -108,8 +105,9 @@ class Hinterlands::Oracle < Card
       else
         # Create pending actions to put the remaining cards back in any
         # order. We don't need an action for the last one.
+        place_act = parent_act
         (2..target.cards.revealed.length).each do |ix|
-          parent_act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_place;posn=#{ix}",
+          place_act = place_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_place;posn=#{ix}",
                                                   :text => "Put a card #{ActiveSupport::Inflector.ordinalize(ix)} from top with #{readable_name}",
                                                   :player => target,
                                                   :game => game)
@@ -118,8 +116,8 @@ class Hinterlands::Oracle < Card
     else
       # Chose to discard the target's cards. Create a history
       revealed_cards = target.cards.revealed
-      game.histories.create!(:event => "#{ply.name} chose to discard #{target.name}'s revealed #{revealed_cards.join(', ')}.",
-                             :css_class => "player#{ply.seat} player#{target.seat}")
+      game.histories.create!(:event => "#{actor.name} chose to discard #{target.name}'s revealed #{revealed_cards.join(', ')}.",
+                             :css_class => "player#{actor.seat} player#{target.seat}")
 
       # And discard them
       revealed_cards.each do |cd|
@@ -127,47 +125,35 @@ class Hinterlands::Oracle < Card
       end
     end
 
-    return "OK"
+    "OK"
   end
 
-  def resolve_place(ply, params, parent_act)
-    # We expect to have been passed a :card_index
-    if not params.include? :card_index
-      return "Invalid parameters"
-    end
-
-    # Processing is surprisingly similar to a Play; code shamelessly yoinked from
-    # Player.play_action.
-    if ((params.include? :card_index) and
-        (params[:card_index].to_i < 0 or
-         params[:card_index].to_i > ply.cards.revealed.length - 1))
-      # Asked to place an invalid card (out of range)
-      return "Invalid request - card index #{params[:card_index]} is out of range"
-    end
-
+  resolves(:place).validating_params_has(:card_index).
+                    validating_param_is_card(:card_index, scope: :revealed).
+                    with do
     # All checks out. Place the selected card on top of the deck (position -1),
     # unreveal it, and renumber.
-    card = ply.cards.revealed[params[:card_index].to_i]
+    card = actor.cards.revealed[params[:card_index].to_i]
     card.location = "deck"
     card.position = -1
     card.revealed = false
     card.save!
-    game.histories.create!(:event => "#{ply.name} placed [#{ply.id}?#{card.class.readable_name}|a card] #{ActiveSupport::Inflector.ordinalize(params[:posn])} from top.",
-                           :css_class => "player#{ply.seat}")
+    game.histories.create!(:event => "#{actor.name} placed [#{actor.id}?#{card.class.readable_name}|a card] #{ActiveSupport::Inflector.ordinalize(params[:posn])} from top.",
+                           :css_class => "player#{actor.seat}")
 
     if params[:posn].to_i == 2
       # That was the card second from top, so only one card remains to be placed. Do so.
-      raise "Wrong number of revealed cards" unless ply.cards.revealed(true).count == 1
-      card = ply.cards.revealed[0]
+      raise "Wrong number of revealed cards" unless actor.cards.revealed(true).count == 1
+      card = actor.cards.revealed[0]
       card.location = "deck"
       card.position = -2
       card.revealed = false
       card.save!
-      game.histories.create!(:event => "#{ply.name} placed [#{ply.id}?#{card.class.readable_name}|a card] on top of their deck.",
-                             :css_class => "player#{ply.seat}")
+      game.histories.create!(:event => "#{actor.name} placed [#{actor.id}?#{card.class.readable_name}|a card] on top of their deck.",
+                             :css_class => "player#{actor.seat}")
     end
 
-    return "OK"
+    "OK"
   end
 
   def drawtwo(params)

@@ -67,33 +67,29 @@ class Hinterlands::JackOfAllTrades < Card
     "OK"
   end
 
-  def resolve_discard(ply, params, parent_act)
-    # We expect to have a :choice parameter, either "discard" or "leave"
-    if (not params.include? :choice) or
-       (not params[:choice].in? ["discard", "leave"])
-      return "Invalid parameters"
-    end
-
+  resolves(:discard).validating_params_has(:choice).
+                      validating_param_value_in(:choice, 'discard', 'leave').
+                      with do
     # Everything looks fine. Carry out the requested choice
-    card = ply.cards.deck(true).first
+    card = actor.cards.deck(true).first
     if params[:choice] == "leave"
       # Chose not to discard the card, so a no-op other than unpeeking.
       card.peeked = false
       card.save!
 
       # Create a history
-      game.histories.create!(:event => "#{ply.name} chose not to discard the top card of their deck.",
-                            :css_class => "player#{ply.seat}")
+      game.histories.create!(:event => "#{actor.name} chose not to discard the top card of their deck.",
+                            :css_class => "player#{actor.seat}")
 
     else
       # Discard the card
       card.discard
 
       # And create a history
-      game.histories.create!(:event => "#{ply.name} discarded #{card} from the top of their deck.",
-                            :css_class => "player#{ply.seat}")
+      game.histories.create!(:event => "#{actor.name} discarded #{card} from the top of their deck.",
+                            :css_class => "player#{actor.seat}")
     end
-    return "OK"
+    "OK"
   end
 
   def triggerdraw(params)
@@ -127,39 +123,21 @@ class Hinterlands::JackOfAllTrades < Card
     "OK"
   end
 
-  def resolve_trash(ply, params, parent_act)
-    # We expect to have been passed a :card_index
-    if !params.include?(:card_index) && !params.include?(:nil_action)
-      return "Invalid parameters"
-    end
-
-    # Processing is pretty much the same as a Play; code shamelessly yoinked from
-    # Player.play_action.
-    if (params.include?(:card_index) &&
-        (params[:card_index].to_i < 0 ||
-         params[:card_index].to_i > ply.cards.hand.length - 1))
-      # Asked to trash an invalid card (out of range)
-      return "Invalid request - card index #{params[:card_index]} is out of range"
-    elsif params.include?(:card_index) &&
-          ply.cards.hand[params[:card_index].to_i].is_treasure?
-      # Asked to trash an invalid card (is a treasure)
-      return "Invalid request - card index #{params[:card_index]} is a treasure"
-    end
-
-    # All checks out. Carry on
-
+  resolves(:trash).validating_params_has_any_of(:card_index, :nil_action).
+                    validating_param_is_card(:card_index, scope: :hand) { !is_treasure? }.
+                    with do
     if params[:nil_action]
       # No trash. Just log
-      game.histories.create!(:event => "#{player.name} trashed nothing.",
-                             :css_class => "player#{player.seat}")
+      game.histories.create!(:event => "#{actor.name} trashed nothing.",
+                             :css_class => "player#{actor.seat}")
     else
     # Trash the selected card, and log
-      card = ply.cards.hand[params[:card_index].to_i]
+      card = actor.cards.hand[params[:card_index].to_i]
       card.trash
-      game.histories.create!(:event => "#{ply.name} trashed a #{card} from hand).",
-                            :css_class => "player#{ply.seat} card_trash")
+      game.histories.create!(:event => "#{actor.name} trashed a #{card} from hand).",
+                            :css_class => "player#{actor.seat} card_trash")
     end
 
-    return "OK"
+    "OK"
   end
 end
