@@ -107,6 +107,7 @@ class Hinterlands::Mandarin < Card
       actor.cards.in_play.select(&:is_treasure?).length.downto(2) do |posn|
         ix = actor.cards.in_play(true).index(&:is_treasure?)
         resolve_return(actor, {:card_index => ix, :posn => posn}, parent_act)
+        actor.renum(:deck)
       end
 
       # Remove all pending actions above this that are for replacing with Mandarin
