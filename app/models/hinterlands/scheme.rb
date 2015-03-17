@@ -63,7 +63,7 @@ class Hinterlands::Scheme < Card
                     with do
     if params.include? :nil_action
       # Not returning anything; just log
-      game.histories.create(:event => "#{actor.name} chose not to return anything with #{self}",
+      game.histories.create(:event => "#{actor.name} chose not to return anything with #{self}.",
                             :css_class => "player#{actor.seat}")
 
       return "OK"
@@ -75,7 +75,7 @@ class Hinterlands::Scheme < Card
     card.position = -1
     card.save!
 
-    game.histories.create(:event => "#{actor.name} put #{card} on top of their deck with #{self}",
+    game.histories.create(:event => "#{actor.name} put #{card} on top of their deck with #{self}.",
                           :css_class => "player#{actor.seat}")
 
     "OK"

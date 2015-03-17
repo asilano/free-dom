@@ -13,7 +13,7 @@ class Hinterlands::Oracle < Card
 
     attack(act)
 
-    return "OK"
+    "OK"
   end
 
   def determine_controls(player, controls, substep, params)
@@ -82,7 +82,7 @@ class Hinterlands::Oracle < Card
     # Everything looks fine. Carry out the requested choice
     if params[:choice] == "replace"
       # Chose not to discard the target's revealed cards. Create a history
-      revealed_names = target.cards.revealed.join(', ')
+      revealed_names = target.cards.revealed.join(' and ')
       game.histories.create!(:event => "#{actor.name} chose not to discard #{target.name}'s revealed #{revealed_names}.",
                              :css_class => "player#{actor.seat} player#{target.seat}")
 
@@ -105,18 +105,21 @@ class Hinterlands::Oracle < Card
       else
         # Create pending actions to put the remaining cards back in any
         # order. We don't need an action for the last one.
-        place_act = parent_act
-        (2..target.cards.revealed.length).each do |ix|
-          place_act = place_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_place;posn=#{ix}",
-                                                  :text => "Put a card #{ActiveSupport::Inflector.ordinalize(ix)} from top with #{readable_name}",
-                                                  :player => target,
-                                                  :game => game)
+        #
+        # We expect there to be exactly 2 cards revealed. 0 would be a possibility,
+        # except _attackeffect_ rules it out; but we'll cope for robustness.
+        if target.cards.revealed.present?
+          raise "Unexpected number of revealed cards (got #{target.cards.revealed.length}, expected 0-2) in #{self}" unless target.cards.revealed.length == 2
+          parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_place;posn=2",
+                                      :text => "Put a card 2nd from top with #{readable_name}",
+                                      :player => target,
+                                      :game => game)
         end
       end
     else
       # Chose to discard the target's cards. Create a history
       revealed_cards = target.cards.revealed
-      game.histories.create!(:event => "#{actor.name} chose to discard #{target.name}'s revealed #{revealed_cards.join(', ')}.",
+      game.histories.create!(:event => "#{actor.name} chose to discard #{target.name}'s revealed #{revealed_cards.join(' and ')}.",
                              :css_class => "player#{actor.seat} player#{target.seat}")
 
       # And discard them

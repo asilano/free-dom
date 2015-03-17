@@ -69,7 +69,7 @@ class Hinterlands::SpiceMerchant < Card
     "OK"
   end
 
-  # We expect to have a :choice parameter, "cards_act" or "cashbuy"
+  # We expect to have a :choice parameter, "cardsact" or "cashbuy"
   resolves(:choose).validating_params_has(:choice).
                     validating_param_value_in(:choice, 'cardsact', 'cashbuy').
                     with do
