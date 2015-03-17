@@ -30,19 +30,19 @@ class Hinterlands::BorderVillage < Card
       if valid_piles.empty?
         # Most likely Border Village costs 0.
         # Create a history that there were no options
-        game.histories.create!(:event => "#{ply.name} couldn't take another card with #{self}.",
+        game.histories.create!(:event => "#{ply.name} couldn't take another card with #{readable_name}.",
                               :css_class => "player#{ply.seat} card_gain")
       elsif valid_piles.one?
         # Just gain the only possible option
         game.histories.create!(:event => "#{ply.name} took " +
-             "#{valid_piles[0].card_class.readable_name} with #{self}.",
+             "#{valid_piles[0].card_class.readable_name} with #{readable_name}.",
                             :css_class => "player#{ply.seat} card_gain")
 
         ply.gain(parent_act, :pile => valid_piles[0])
       else
         # Queue up to choose another card to take
         parent_act.children.create!(:expected_action => "resolve_#{self}#{card.id}_take",
-                                    :text => "Choose a card to gain with #{self}",
+                                    :text => "Choose a card to gain with #{readable_name}",
                                     :player => ply,
                                     :game => game)
       end
