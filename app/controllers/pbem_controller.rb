@@ -119,12 +119,12 @@ private
     /Distribution:[ \t]*(true|false)/i =~ body
     game_params[:specify_distr] = ($1 == 'true') ? 1 : 0
 
-    %w<BaseGame Intrigue Seaside Prosperity Hinterlands>.each do |set|
+    Card.expansions.each do |set|
       /#{set}:[ \t]*(\d+)/i =~ body
-      game_params["num_#{set.underscore}_cards".to_sym] = $1
+      game_params["num_#{set.name.underscore}_cards".to_sym] = $1
 
       /#{set}:[ \t]*(true|false)/i =~ body
-      game_params["#{set.underscore}_present".to_sym] = ($1 == 'true') ? 1 : 0
+      game_params["#{set.name.underscore}_present".to_sym] = ($1 == 'true') ? 1 : 0
     end
 
     /Platinum.*Colony:[ \t]*(yes|no|rules)/i =~ body

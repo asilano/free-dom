@@ -34,8 +34,8 @@ class Game < ActiveRecord::Base
   serialize :facts
 
   attr_accessor :random_select, :specify_distr, :plat_colony
-  attr_accessor *([:base_game, :intrigue, :seaside, :prosperity, :hinterlands].map {|set| "num_#{set}_cards".to_sym})
-  attr_accessor *([:base_game, :intrigue, :seaside, :prosperity, :hinterlands].map {|set| "#{set}_present".to_sym})
+  attr_accessor *(Card.expansions.map {|set| "num_#{set.name.underscore}_cards".to_sym})
+  attr_accessor *(Card.expansions.map {|set| "#{set.name.underscore}_present".to_sym})
   attr_accessor(*(1..10).map{|n| "pile_#{n}".to_sym})
 
   # A game should only ever have one root pending action outstanding
@@ -323,24 +323,20 @@ class Game < ActiveRecord::Base
       if specify_distr.to_i == 1
         # User chose to have a random selection of Kingdom cards, and will have
         # specified a distribution.
-        rand_base_game_cards = BaseGame.kingdom_cards.shuffle
-        rand_intrigue_cards = Intrigue.kingdom_cards.shuffle
-        rand_seaside_cards = Seaside.kingdom_cards.shuffle
-        rand_prosperity_cards = Prosperity.kingdom_cards.shuffle
-        rand_hinterlands_cards = Hinterlands.kingdom_cards.shuffle
+        shuffled_cards = Hash[Card.expansions.map { |set| [set, set.kingdom_cards.shuffle] }]
 
         pile_id = 0
-        [:base_game, :intrigue, :seaside, :prosperity, :hinterlands].each do |set|
-          (0...send("num_#{set}_cards").to_i).each do |ix|
+        Card.expansions.each do |set|
+          (0...send("num_#{set.name.underscore}_cards").to_i).each do |ix|
             pile_id += 1
-            send("pile_#{pile_id}=", eval("rand_#{set}_cards")[ix].name)
+            send("pile_#{pile_id}=", shuffled_cards[set][ix].name)
           end
         end
       else
         # User chose a totally random distibution over specified sets.
         valid_cards = []
 
-        [BaseGame, Intrigue, Seaside, Prosperity, Hinterlands].each do |set|
+        Card.expansions.each do |set|
           valid_cards += set.kingdom_cards if send("#{set.name.underscore}_present").to_i == 1
         end
 
@@ -370,7 +366,7 @@ protected
 
   def total_cards_10
     if random_select.to_i == 1 && specify_distr.to_i == 1
-      sum = [BaseGame, Intrigue, Seaside, Prosperity, Hinterlands].inject(0) {|total, exp| total + self.send("num_#{exp.name.underscore}_cards").to_i}
+      sum = Card.expansions.inject(0) {|total, exp| total + self.send("num_#{exp.name.underscore}_cards").to_i}
       if sum != 10
         errors[:base] << "Number of cards from each set must sum to 10."
       end
@@ -379,7 +375,7 @@ protected
 
   def some_sets_present
     if random_select.to_i == 1 && specify_distr.to_i == 0
-      if [BaseGame, Intrigue, Seaside, Prosperity, Hinterlands].all? {|set| self.send("#{set.name.underscore}_present") == 0}
+      if Card.expansions.all? {|set| self.send("#{set.name.underscore}_present") == 0}
         errors[:base] << "Must select at least one set."
       end
     end
@@ -388,16 +384,13 @@ protected
   def normalise_inputs
     self.random_select = self.random_select.to_i
     self.specify_distr = self.specify_distr.to_i
-    self.num_base_game_cards = self.num_base_game_cards.to_i
-    self.num_intrigue_cards = self.num_intrigue_cards.to_i
-    self.num_seaside_cards = self.num_seaside_cards.to_i
-    self.num_prosperity_cards = self.num_prosperity_cards.to_i
-    self.num_hinterlands_cards = self.num_hinterlands_cards.to_i
-    self.base_game_present = self.base_game_present.to_i
-    self.intrigue_present = self.intrigue_present.to_i
-    self.seaside_present = self.seaside_present.to_i
-    self.prosperity_present = self.prosperity_present.to_i
-    self.hinterlands_present = self.hinterlands_present.to_i
+    Card.expansions.each do |set|
+      meth = "num_#{set.name.underscore}_cards"
+      self.send(meth + '=', self.send(meth).to_i)
+
+      meth = "#{set.name.underscore}_present"
+      self.send(meth + '=', self.send(meth).to_i)
+    end
   end
 
   def init_facts

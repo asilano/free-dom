@@ -36,8 +36,9 @@ class Card < ActiveRecord::Base
     readable_name + " (cost: #{cost})"
   end
 
-  # Valid locations for a card to be in (and hence valid values for .location)
-  # @@locations = %w<deck hand play discard pile trash>
+  def self.expansions
+    [BaseGame, Intrigue, Seaside, Prosperity, Hinterlands]
+  end
 
   # The ever-present Victory cards
   @@basic_victory_types = %w<Estate Duchy Province Curse>.map {|t| ("BasicCards::" + t)}
@@ -45,57 +46,21 @@ class Card < ActiveRecord::Base
   # The ever-present Treasure cards
   @@basic_treasure_types = %w<Copper Silver Gold>.map {|t| ("BasicCards::" + t)}
 
-  # Valid card types from the base set (and hence valid values for [:type], and
-  # valid sub-class names)
-  def self.base_card_types
-    BaseGame.card_classes.sort_by {|c| c.cost}
-  end
-
-  # Valid card types from the Intrigue set (and hence valid values for [:type], and
-  # valid sub-class names)
-  def self.intrigue_card_types
-    Intrigue.card_classes.sort_by {|c| c.cost}
-  end
-
-  # Valid card types from the Seaside set (and hence valid values for [:type], and
-  # valid sub-class names)
-  def self.seaside_card_types
-    Seaside.card_classes.sort_by {|c| c.cost}
-  end
-
-  # Valid card types from the Prosperity set (and hence valid values for [:type], and
-  # valid sub-class names)
-  def self.prosperity_card_types
-    Prosperity.card_classes.sort_by {|c| c.cost}
-  end
-
-  # Valid card types from the Hinterlands set (and hence valid values for [:type], and
-  # valid sub-class names)
-  def self.hinterlands_card_types
-    Hinterlands.card_classes.sort_by {|c| c.cost}
-  end
-
   def self.basic_victory_types
-    @@basic_victory_types.map {|t| t.constantize}
+    @@basic_victory_types.map(&:constantize)
   end
 
   def self.basic_treasure_types
-    @@basic_treasure_types.map {|t| t.constantize}
+    @@basic_treasure_types.map(&:constantize)
   end
 
   def self.all_card_types
-    self.base_card_types + self.intrigue_card_types +
-      self.seaside_card_types + self.prosperity_card_types +
-      self.hinterlands_card_types +
+    @@expansions.inject([]) { |mem, var| mem + var.map(&:constantize) } +
       self.basic_victory_types + self.basic_treasure_types
   end
 
-  # validates :type, :inclusion => Card.all_card_types
-
   def self.all_kingdom_cards
-    BaseGame.kingdom_cards + Intrigue.kingdom_cards +
-      Seaside.kingdom_cards + Prosperity.kingdom_cards +
-      Hinterlands.kingdom_cards
+    @@expansions.inject([]) { |mem, var| mem + var.kingdom_cards }
   end
 
   NonCards = [ "Ace of Spades",
