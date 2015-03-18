@@ -7,6 +7,7 @@ class ApplicationController < ActionController::Base
 
   # Scrub sensitive parameters from your log
   # filter_parameter_logging :password
+  before_filter :custom_headers
   before_filter :check_cookied_user
   before_filter :record_player_pa_ids
 
@@ -17,6 +18,10 @@ class ApplicationController < ActionController::Base
   end
 
 protected
+  def custom_headers
+    response.headers['X-Clacks-Overhead'] = 'GNU Terry Pratchett'
+  end
+
   def check_cookied_user
     if cookies[:userId] && cookies[:userCode]
       begin
