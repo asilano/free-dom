@@ -3,7 +3,7 @@
 #   Bob's hand is empty
 Given(/^(\w*?)(?:'s)? hand is empty/) do |name|
   name = 'Alan' if name == 'my'
-  @players[name].cards.hand.destroy_all
+  @test_players[name].cards.hand.destroy_all
   @hand_contents[name] = []
 end
 
@@ -14,7 +14,7 @@ end
 #   my hand contains Smithy and 4 other cards named "rest of hand"
 Given(/^(\w*?)(?:'s)? hand contains #{CardList}(?: and )?#{NamedRandCards}?/) do |name, fixed_list, num_rand, rand_name|
   name = 'Alan' if name == 'my'
-  player = @players[name]
+  player = @test_players[name]
   player.cards.hand.destroy_all
 
   fixed_list ||= ""
@@ -55,7 +55,7 @@ end
 #   Bob's deck is empty
 Given(/^(\w*?)(?:'s)? deck is empty/) do |name|
   name = 'Alan' if name == 'my'
-  @players[name].cards.deck.destroy_all
+  @test_players[name].cards.deck.destroy_all
   @deck_contents[name] = []
 end
 
@@ -63,7 +63,7 @@ end
 # Each section may be like "Smithy, Witch" or like "4 other cards (named "rest of deck")"
 Given(/^(\w*?)(?:'s)?? deck contains (?:(#{NamedRandCardsNoMatch}|#{CardListNoCapture}) then )?(?:(#{NamedRandCardsNoMatch}|#{CardListNoCapture}) then )?(?:(#{NamedRandCardsNoMatch}|#{CardListNoCapture}))?/) do |name, top, middle, bottom|
   name = 'Alan' if name == 'my'
-  player = @players[name]
+  player = @test_players[name]
 
   player.cards.deck.destroy_all
   @deck_contents[name] = []
@@ -185,7 +185,7 @@ end
 #   Bob has nothing in play
 Given /^(\w*) ha(?:ve|s) nothing in play/ do |name|
   name = 'Alan' if name == 'I'
-  @players[name].cards.in_play.destroy_all
+  @test_players[name].cards.in_play.destroy_all
   @play_contents[name] = []
 end
 
@@ -196,7 +196,7 @@ end
 #   I have Smithy and 4 other cards named "rest of play" in play
 Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? in play/) do |name, fixed_list, num_rand, rand_name|
   name = 'Alan' if name == 'I'
-  player = @players[name]
+  player = @test_players[name]
   player.cards.in_play.destroy_all
 
   fixed_list ||= ""
@@ -231,7 +231,7 @@ end
 #   Bob has nothing in his discard
 Given /^(\w*) ha(?:ve|s) nothing in (?:my |his )?discard/ do |name|
   name = "Alan" if name == "I"
-  @players[name].cards.in_discard.destroy_all
+  @test_players[name].cards.in_discard.destroy_all
   @discard_contents[name] = []
 end
 
@@ -242,7 +242,7 @@ end
 #   I have Smithy and 4 other cards named "rest of discard" in discard
 Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? in (?:my |his )?discard/) do |name, fixed_list, num_rand, rand_name|
   name = 'Alan' if name == 'I'
-  player = @players[name]
+  player = @test_players[name]
   player.cards.in_discard.destroy_all
 
   fixed_list ||= ""
@@ -278,7 +278,7 @@ end
 #   I have Lighthouse and 4 other cards named "rest of durations" as durations
 Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? as (?:a )?durations?/) do |name, fixed_list, num_rand, rand_name|
   name = 'Alan' if name == 'I'
-  player = @players[name]
+  player = @test_players[name]
   player.cards.enduring.destroy_all
 
   fixed_list ||= ""
@@ -310,14 +310,14 @@ end
 
 Given(/the (.*) piles? (?:is|are) empty/) do |kinds|
   kinds.split(/,\s*/).each do |kind|
-    @game.piles.find(:first, :conditions => {:card_type => CARD_TYPES[kind].name}).cards.delete_all
+    @test_game.piles.find(:first, :conditions => {:card_type => CARD_TYPES[kind].name}).cards.delete_all
   end
 end
 
 Given(/the (.*) piles? contains? (\d+) cards?/) do |kinds, number|
   number = number.to_i
   kinds.split(/,\s*/).each do |kind|
-    pile = @game.piles.find(:first, :conditions => {:card_type => CARD_TYPES[kind].name})
+    pile = @test_game.piles.find(:first, :conditions => {:card_type => CARD_TYPES[kind].name})
     if pile.cards.count < number
       flunk "Don't support growing pile yet"
     end

@@ -2,7 +2,7 @@ source 'http://rubygems.org'
 source 'http://gems.github.com'
 
 ruby '1.9.3'
-gem 'rails', '3.1.10'
+gem 'rails', '~> 3.2.1'
 gem 'i18n'
 
 # Bundle edge Rails instead:
@@ -10,20 +10,24 @@ gem 'i18n'
 
 group :production do
   gem 'pg'
-  gem 'thin'
   gem 'newrelic_rpm'
   gem 'unicorn'
   gem 'rails_12factor'
 end
 group :development, :test do
   gem 'sqlite3'
+  gem "quiet_assets"
+  gem "better_errors", '~> 1.0'
+  gem "binding_of_caller"
+
+  gem 'thin'
 end
 
 # Gems used only for assets and not required
 # in production environments by default.
 group :assets do
-  gem 'sass-rails', "   3.1.5"
-  gem 'coffee-rails', "~> 3.1.0"
+  gem 'sass-rails',   '~> 3.2.3'
+  gem 'coffee-rails', '~> 3.2.1'
   gem 'uglifier'
 end
 
@@ -34,6 +38,8 @@ gem 'haml'
 
 gem 'andand'
 gem 'squeel'
+
+gem 'acts_as_tree'
 
 # Use unicorn as the web server
 # gem 'unicorn'

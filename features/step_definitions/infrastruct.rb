@@ -14,7 +14,7 @@ Then /dump actions/ do
 end
 
 Then /dump controls/ do
-    @players.each {|name, ply| Rails.logger.info(ply.determine_controls.inspect)}
+    @test_players.each {|name, ply| Rails.logger.info(ply.determine_controls.inspect)}
 end
 
 Then /dump hands/ do

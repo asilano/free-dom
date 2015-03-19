@@ -6,7 +6,7 @@
 #   I choose Don't trash in my hand  // (Where "Don't trash" is the nil-action text)
 When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in (?:his|my) hand/) do |name, choices|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   # We have to call resolve for the appropriate action with appropriate params.
   # So, really, we need to duplicate the logic of what to do with a control
@@ -71,7 +71,7 @@ end
 #   I choose my revealed Don't trash // (Where "Don't trash" is the nil-action text)
 When(/^(\w*?)(?:'s)? chooses? (?:his|my) (revealed|peeked) (.*)$/) do |name, location, choice|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   location = location.to_sym
 
@@ -131,7 +131,7 @@ end
 #   I choose Don't trash in play  // (Where "Don't trash" is the nil-action text)
 When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in play/) do |name, choices|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   # We have to call resolve for the appropriate action with appropriate params.
   # So, really, we need to duplicate the logic of what to do with a control
@@ -194,7 +194,7 @@ end
 #   I choose the option Top of deck
 When(/^(\w*?) chooses? the option (.*)/) do |name, choice|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   # We have to call resolve for the appropriate action with appropriate params.
   # So, really, we need to duplicate the logic of what to do with a control
@@ -234,7 +234,7 @@ end
 When(/(.*) chooses? for (.*) the option (.*)/) do |name, target, choice|
   name = "Alan" if name == "I"
   target = "Alan" if target == "me"
-  player = @players[name]
+  player = @test_players[name]
 
   # We have to call resolve for the appropriate action with appropriate params.
   # So, really, we need to duplicate the logic of what to do with a control
@@ -246,7 +246,7 @@ When(/(.*) chooses? for (.*) the option (.*)/) do |name, target, choice|
   controls.each do |ctrl|
     params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
     params[:pa_id] = ctrl[:pa_id]
-    next unless params[:target] == @players[target].id.to_s
+    next unless params[:target] == @test_players[target].id.to_s
 
     matching_controls = ctrl[:options].detect do |opt|
       opt[:text] =~ /^#{Regexp.escape(choice)}$/i
@@ -269,7 +269,7 @@ end
 #   I choose the options Draw 1, +1 Action
 When(/^(.*) chooses? the options (.*)$/) do |name, choices|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   # We have to call resolve for the appropriate action with appropriate params.
   # So, really, we need to duplicate the logic of what to do with a control
@@ -296,7 +296,7 @@ end
 #   Bob chooses 2 from the dropdown
 When /^(\w*?) chooses? (.*) from the dropdown/ do |name, choice|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   # We have to call resolve for the appropriate action with appropriate params.
   # So, really, we need to duplicate the logic of what to do with a control
@@ -325,7 +325,7 @@ end
 #   I choose Take nothing for piles  // (Where "Take nothing" is the nil-action text)
 When(/^(\w*?) chooses? (?:the )?(.*?) (?:for )?piles?$/) do |name, choice|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   # We have to call resolve for the appropriate action with appropriate params.
   # So, really, we need to duplicate the logic of what to do with a control
@@ -340,7 +340,7 @@ When(/^(\w*?) chooses? (?:the )?(.*?) (?:for )?piles?$/) do |name, choice|
   if ctrl[:nil_action].andand == choice
     params[:nil_action] = choice
   else
-    possibilities = @game.piles.map{|p| p.card_class.readable_name}
+    possibilities = @test_game.piles.map{|p| p.card_class.readable_name}
     kinds = choice.split(/,\s*/)
     if kinds.length == 1
       params[:pile_index] = possibilities.index(kinds[0])
@@ -364,7 +364,7 @@ end
 #   I choose Take nothing for piles  // (Where "Take nothing" is the nil-action text)
 When(/^(\w*?) chooses? (?:the )?(.*?) (?:for )?piles? labelled (.*)$/) do |name, choice, label|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   # We have to call resolve for the appropriate action with appropriate params.
   # So, really, we need to duplicate the logic of what to do with a control
@@ -380,7 +380,7 @@ When(/^(\w*?) chooses? (?:the )?(.*?) (?:for )?piles? labelled (.*)$/) do |name,
   if ctrl[:nil_action].andand == choice
     params[:nil_action] = true
   else
-    possibilities = @game.piles.map{|p| p.card_class.readable_name}
+    possibilities = @test_game.piles.map{|p| p.card_class.readable_name}
     kinds = choice.split(/,\s*/)
     if kinds.length == 1
       params[:pile_index] = possibilities.index(kinds[0])
@@ -402,14 +402,14 @@ end
 #   Bob chooses Put back for my revealed Market
 When(/^(\w*?) chooses? (.*?) for (\w*?)(?:'s)? revealed (#{SingleCardNoCapture}|nothing)/) do |name, choice, tgt_name, card|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   all_controls = player.determine_controls
   controls = all_controls[:revealed]
 
   tgt_name = "Alan" if tgt_name == "my"
   tgt_name = name if tgt_name == "his"
-  target = @players[tgt_name]
+  target = @test_players[tgt_name]
 
   ctrl = controls.detect {|c| c[:player_id] == target.id}
   params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
@@ -441,7 +441,7 @@ end
 When(/^(\w*?) chooses? the matrix ((?:\w+ the #{SingleCardNoCapture}(?:, )?)+)$/) do |name, choices|
 
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   chosen_actions = choices.split(/,\s*/).map{|choice| choice.split(/ the /)}
 

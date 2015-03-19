@@ -45,11 +45,6 @@ class Module
 
   alias :kingdom_cards :card_classes
 
-  # Same as card_classes, but sorted by cost
-  def card_types
-    card_classes.sort_by(&:cost)
-  end
-
   # Return whether a given class implements (ie overrides) an instance method
   def implements_instance_method?(method_name)
     instance_method(method_name).owner == self

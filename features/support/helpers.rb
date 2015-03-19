@@ -1,12 +1,12 @@
 AfterStep do |scenario|
   # Make sure we have a correct record of each player's attribs
-  @players.values.each(&:reload)
+  @test_players.values.each(&:reload)
 
   # Verify that each player's cards match what we expect
   @skip_card_checking ||= 0
 
   if @skip_card_checking == 0
-    @players.each do |name, player|
+    @test_players.each do |name, player|
       player.renum(:deck)
       assert_same_elements @hand_contents[name], player.cards.hand(true).map(&:readable_name), "#{name}'s hand didn't match"
       assert_same_elements @discard_contents[name], player.cards.in_discard(true).map(&:readable_name), "#{name}'s discard didn't match"

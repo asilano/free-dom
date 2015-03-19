@@ -6,13 +6,13 @@ When(/^(\w*?) gain(?:s)? (.*)/) do |name, kinds|
 
   kinds.split(/,\s+/).each do |kind|
     params = {}
-    params[:pile_id] = @game.piles.where(:card_type => CARD_TYPES[kind].to_s)[0].id
-    pa = @game.pending_actions.where(:parent_id => nil)[0]
+    params[:pile_id] = @test_game.piles.where(:card_type => CARD_TYPES[kind].to_s)[0].id
+    pa = @test_game.pending_actions.where(:parent_id => nil)[0]
     params[:parent_act] = pa.id
-    @players[name].do_gain(params)
+    @test_players[name].do_gain(params)
   end
 
-  @game.process_actions
+  @test_game.process_actions
 
   # Need the test to tell us what card movements are expected; especially since Watchtower etc can step in.
   @skip_card_checking = 1 if @skip_card_checking == 0
@@ -27,15 +27,15 @@ When(/^(\w*)(?:'s)? next turn starts$/) do |name|
   # Assumes we're in either an Action or a Buy phase
   # May also assume treasure-playing is automatic (i.e. no Venture, Mint, Grand Market etc)
 
-  current_name = @game.current_turn_player.name
-  if @game.current_turn_player.active_actions[0].expected_action =~ /play_action/
+  current_name = @test_game.current_turn_player.name
+  if @test_game.current_turn_player.active_actions[0].expected_action =~ /play_action/
     steps "When #{current_name} stops playing actions
       And the game checks actions"
   end
-  if @game.current_turn_player.active_actions(true)[0].expected_action =~ /play_treasure/
+  if @test_game.current_turn_player.active_actions(true)[0].expected_action =~ /play_treasure/
     steps "When #{current_name} stops playing treasures"
   end
-  assert_match /buy/, @game.current_turn_player.active_actions(true)[0].expected_action
+  assert_match /buy/, @test_game.current_turn_player.active_actions(true)[0].expected_action
 
   # Upon stopping buying, expect to have discarded everything from play
   @discard_contents[current_name].concat @play_contents[current_name]
@@ -47,8 +47,8 @@ When(/^(\w*)(?:'s)? next turn starts$/) do |name|
   # Now if we're not at the desired player's turn, do the same again until we are
   loops=0
 
-  while @game.current_turn_player.name != name
-    this_name = @game.current_turn_player.name
+  while @test_game.current_turn_player.name != name
+    this_name = @test_game.current_turn_player.name
     steps "Then it should be #{this_name}'s Play Action phase
       When #{this_name} stops playing actions
       And the game checks actions

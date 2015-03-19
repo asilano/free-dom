@@ -5,7 +5,7 @@
 Then /there should be (\d+) (.*) cards?( not)? in (.*)/ do |num, kind, negate, locations|
   locs = locations.split(/,\s+/)
   locs.map!{|l| l.chomp('s')}
-  result = @game.cards.where(["type = :type and location #{'not' if negate} in (:loc)", {:type => CARD_TYPES[kind].name, :loc => locs}]).count
+  result = @test_game.cards.where(["type = :type and location #{'not' if negate} in (:loc)", {:type => CARD_TYPES[kind].name, :loc => locs}]).count
   assert_equal num.to_i, result
 end
 
@@ -92,7 +92,7 @@ end
 #   Bob should have put Estate, Copper from his hand on top of his deck // (that is, Copper is on top and Estate is underneath)
 Then(/(.*) should have put #{CardList} (?:from (?:his|my) (.*) )?on top of (?:his|my) deck/) do |name, kinds, from_loc|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   deck = @deck_contents[name]
 
@@ -118,7 +118,7 @@ end
 #   Bob should have discarded Copper
 Then(/(.*) should have discarded #{CardList}$/) do |name, kinds|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   kinds.split(/,\s*/).each do |kind|
     /(.*) ?x ?(\d+)/ =~ kind
@@ -138,7 +138,7 @@ end
 #   Bob should have discarded Copper from in play
 Then(/(.*) should have discarded #{CardList} from in play$/) do |name, kinds|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   kinds.split(/,\s*/).each do |kind|
     /(.*) ?x ?(\d+)/ =~ kind
@@ -157,7 +157,7 @@ end
 #   I should have discarded the cards named "rest of hand"
 Then(/(.*) should have discarded the cards named "([^"]*)"/) do |name, grp_name|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   cards = @named_cards[grp_name]
   assert_not_nil cards
@@ -223,7 +223,7 @@ end
 #   I should have moved Copper, Silver x2, Gold from discard to hand
 Then(/^(.*) should have moved #{CardList} from (?:my |his )?(.*) to (?:my |his )?(.*)/) do |name, kinds, from, to|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   kinds.split(/,\s*/).each do |kind|
     /(.*) ?x ?(\d+)/ =~ kind
@@ -253,7 +253,7 @@ end
 #   I should have moved the cards named "named cards" from deck to discard
 Then(/(.*) should have moved the cards named "([^"]*)" from (.*) to (.*)/) do |name, grp_name, from, to|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   cards = @named_cards[grp_name]
   assert_not_nil cards
@@ -280,7 +280,7 @@ end
 # Note: 0-indexed.
 Then /(.*) should have moved cards? ((?:\d+,? ?)*) from deck to (.*)/ do |name, list, to|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   indices = list.split(/,\s*/).map(&:to_i)
 
@@ -305,7 +305,7 @@ end
 #   Bob should have removed Copper, Curse from his discard
 Then(/(.*) should have removed #{CardList} from (?:his |my )?(.*)/) do |name, kinds, location|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   from = instance_variable_get("@#{location}_contents")[name]
   kinds.split(/,\s*/).each do |kind|
@@ -326,7 +326,7 @@ end
 #   Bob should have gained Copper, Curse to his discard
 Then(/(.*) should have (?:placed|gained) #{CardList} (?:in|to|into) (?:his |my )?(.*)/) do |name, kinds, location|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   to = instance_variable_get("@#{location}_contents")[name]
   kinds.split(/,\s*/).each do |kind|
@@ -348,7 +348,7 @@ end
 #   Bob should be revealing nothing
 Then(/(.*) should be revealing (#{CardListNoCapture}|nothing)/) do |name, kinds|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   if kinds == "nothing"
     assert_empty player.cards.revealed(true)
@@ -372,7 +372,7 @@ end
 #   Bob should have seen Copper, Copper, Estate
 Then /^(.*) should have seen (#{CardListNoCapture}|nothing)/ do |name, kinds|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   if kinds == "nothing"
     assert_empty player.cards.peeked(true)
@@ -394,7 +394,7 @@ end
 # is not normally necessary; use it only as a sanity check in unusual cases.
 Then(/^(\w*?)(?:'s)? deck should contain #{CardList}$/) do |name, deck|
   name = "Alan" if name == "my"
-  player = @players[name]
+  player = @test_players[name]
 
   deck_actual = player.cards.deck(true).map &:readable_name
 

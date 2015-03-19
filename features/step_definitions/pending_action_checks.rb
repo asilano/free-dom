@@ -6,14 +6,14 @@ Then(/it should be (.*?)(?:'s)? (.*) phase/) do |name, phase|
     when "Play Action"
       /play_action/
     when "Play Treasure"
-      /(play_treasure|player_play_treasures;player=#{@players[name].id})/
+      /(play_treasure|player_play_treasures;player=#{@test_players[name].id})/
     when "Buy"
       /buy/
     end
 
   assert_not_nil exp_action, "Unknown phase '#{phase}'"
 
-  actions = @game.active_actions(true).map(&:expected_action) + @players[name].active_actions(true).map(&:expected_action)
+  actions = @test_game.active_actions(true).map(&:expected_action) + @test_players[name].active_actions(true).map(&:expected_action)
 
   assert_contains(actions, exp_action, "Actions didn't contain #{phase}")
 end
@@ -21,7 +21,7 @@ end
 # Check for the readable text of a pending action
 Then(/(.*) should (not )?need to (?!act)(.*)/) do |name, negate, action|
   name = "Alan" if name == "I"
-  actions = @players[name].active_actions(true).map(&:text)
+  actions = @test_players[name].active_actions(true).map(&:text)
 
   if negate
     assert_not_contains(actions, /^#{action}$/i)
@@ -33,7 +33,7 @@ end
 # Check the specified player is not currently required to do anything
 Then(/(.*) should not need to act/) do |name|
   name = "Alan" if name == "I"
-  assert_empty @players[name].active_actions(true)
+  assert_empty @test_players[name].active_actions(true)
 end
 
 # Verify that the stated cards in hand are (not) choosable
@@ -43,7 +43,7 @@ end
 #   Bob should not be able to choose Province in his hand
 Then(/(.*) should (not )?be able to choose #{CardListNoRep} in (?:my|his) hand/) do |name, negate, kinds|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   # We want to check the valid options for a hand-based action.
   # These are encoded in the control that that action produces.
@@ -69,7 +69,7 @@ end
 #   Bob should not be able to choose a nil action in his hand
 Then /(.*) should (not )?be able to choose a nil action in (?:my|his) hand/ do |name, negate|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   # We want to check the valid options for a hand-based action.
   # These are encoded in the control that that action produces.
@@ -93,7 +93,7 @@ end
 #   Bob should not be able to choose Province in play
 Then(/(.*) should (not )?be able to choose #{CardListNoRep} in play/) do |name, negate, kinds|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   # We want to check the valid options for a play-based action.
   # These are encoded in the control that that action produces.
@@ -119,7 +119,7 @@ end
 #   Bob should not be able to choose a nil action in play
 Then /(.*) should (not )?be able to choose a nil action in play/ do |name, negate|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   # We want to check the valid options for a play-based action.
   # These are encoded in the control that that action produces.
@@ -143,7 +143,7 @@ end
 #   Bob should not be able to choose the Province pile
 Then(/(.*) should (not )?be able to choose the (.*) piles?$/) do |name, negate, kinds|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   # We want to check the valid options for a pile-based action.
   # These are encoded in the control that that action produces.
@@ -152,7 +152,7 @@ Then(/(.*) should (not )?be able to choose the (.*) piles?$/) do |name, negate, 
   flunk "Unimplemented multi-pile controls in testbed" unless controls.length == 1
 
   ctrl = controls[0]
-  acceptable = ctrl[:piles].map.with_index {|valid, ix| @game.piles[ix].card_class.readable_name if valid}.compact
+  acceptable = ctrl[:piles].map.with_index {|valid, ix| @test_game.piles[ix].card_class.readable_name if valid}.compact
 
   unless negate
     assert_subset kinds.split(/,\s*/), acceptable
@@ -168,7 +168,7 @@ end
 #   I should be able to choose the Silver, Gold, Village piles labelled Give to Bob
 Then(/(.*) should (not )?be able to choose the (.*) piles? labelled (.*)$/) do |name, negate, kinds, label|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   # We want to check the valid options for a pile-based action.
   # These are encoded in the control that that action produces.
@@ -178,7 +178,7 @@ Then(/(.*) should (not )?be able to choose the (.*) piles? labelled (.*)$/) do |
   controls.select! {|c| c[:text] =~ /^#{Regexp.escape(label)}$/i}
   flunk "Multiple pile controls with same button text" unless controls.length == 1
   ctrl = controls[0]
-  acceptable = ctrl[:piles].map.with_index {|valid, ix| @game.piles[ix].card_class.readable_name if valid}.compact
+  acceptable = ctrl[:piles].map.with_index {|valid, ix| @test_game.piles[ix].card_class.readable_name if valid}.compact
 
   unless negate
     assert_subset kinds.split(/,\s*/), acceptable
@@ -194,7 +194,7 @@ end
 #   Bob should not be able to choose a nil action on piles
 Then /(.*) should (not )?be able to choose a nil action on piles/ do |name, negate|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   # We want to check the valid options for a play-based action.
   # These are encoded in the control that that action produces.
@@ -218,7 +218,7 @@ end
 #   Bob should be able to choose 1, 2 from the dropdown // non-exact match
 Then /(.*) should be able to choose (exactly )?(.*) from the dropdown/ do |name, exact, choices|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   # We want to check the valid options for a player-based action.
   # These are encoded in the control that that action produces.
@@ -243,7 +243,7 @@ end
 #   I should not be able to choose the option Reticulate the splines
 Then /(.*) should (not )?be able to choose the option (.*)$/ do |name, negate, choice|
   name = "Alan" if name == "I"
-  player = @players[name]
+  player = @test_players[name]
 
   # We want to check the valid options for a pile-based action.
   # These are encoded in the control that that action produces.

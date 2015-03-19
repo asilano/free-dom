@@ -1,69 +1,58 @@
 Given /I am a player in a (?:([2-6])-player )?standard game(?: with (.*))?/ do |player_count, card_list|
-  unless @players
-    step_text = "Given the following users exist:
-        | Name       | Password | Password Confirmation | Email         |
-        | Alan       | a        | a                     | a@example.com |
-        | Bob        | b        | b                     | b@example.com |
-        | Charlie    | c        | c                     | c@example.com |
-        | Dave       | d        | d                     | d@example.com |
-        | Ethelred   | e        | e                     | e@example.com |
-        | Fred       | f        | f                     | f@example.com |"
-
-    steps step_text
+  unless @test_players
+    [
+      {name: 'Alan', password: 'a', password_confirmation: 'a', email: 'a@example.com'},
+      {name: 'Bob', password: 'b', password_confirmation: 'b', email: 'b@example.com'},
+      {name: 'Charlie', password: 'c', password_confirmation: 'c', email: 'c@example.com'},
+      {name: 'Dave', password: 'd', password_confirmation: 'd', email: 'd@example.com'},
+      {name: 'Ethelred', password: 'e', password_confirmation: 'e', email: 'e@example.com'},
+      {name: 'Fred', password: 'f', password_confirmation: 'f', email: 'f@example.com'}
+    ].each { |u| FactoryGirl.create(:user, u) }
   end
 
-  @game.andand.destroy
+  @test_game.andand.destroy
   player_count ||= 3
 
-  @game = FactoryGirl.create(:fixed_game, :max_players => player_count.to_i)
+  @test_game = FactoryGirl.create(:fixed_game, :max_players => player_count.to_i)
 
   if card_list
     reqd_cards = card_list.split(/,\s*/)
     assert_operator reqd_cards.length, :<=, 10
 
     # Kingdom cards start right after Curse
-    pos = @game.piles.find_index {|p| p.card_type == 'BasicCards::Curse'} + 1
-    cards_needed = reqd_cards + @game.piles[pos..-1].map(&:card_type).map(&:readable_name)
+    pos = @test_game.piles.find_index {|p| p.card_type == 'BasicCards::Curse'} + 1
+    cards_needed = reqd_cards + @test_game.piles[pos..-1].map(&:card_type).map(&:readable_name)
     cards_needed.uniq!
 
-    @game.piles[pos..-1].each_with_index do |pile, ix|
+    @test_game.piles[pos..-1].each_with_index do |pile, ix|
       pile.update_attribute("card_type", ix)
     end
 
     cards_needed.take(10).each do |card|
-      @game.piles[pos].update_attribute("card_type", CARD_TYPES[card].name)
+      @test_game.piles[pos].update_attribute("card_type", CARD_TYPES[card].name)
       pos += 1
     end
   end
 
-  players_array = [
-    "   | User           | Game         |",
-    "   | Name: Alan     | Name: Game 1 |",
-    "   | Name: Bob      | Name: Game 1 |",
-    "   | Name: Charlie  | Name: Game 1 |",
-    "   | Name: Dave     | Name: Game 1 |",
-    "   | Name: Ethelred | Name: Game 1 |",
-    "   | Name: Fred     | Name: Game 1 |"]
-
-  step_text = "Given the following players exist:\n" + players_array[0..player_count.to_i].join("\n")
-
-  steps step_text
-
   names = %w<Alan Bob Charlie Dave Ethelred Fred>[0, player_count.to_i]
-  arr = names.map {|name| [name, @game.players.find(:first, :joins => :user, :conditions => ['users.name = ?', name], :readonly => false)]}
-  @players = Hash[arr]
-  assert_not_nil @players["Alan"]
+  names.each do |n|
+    FactoryGirl.create(:player, user: User.where { name == n }.first, game: @test_game)
+  end
 
-  @game.start_game
+  arr = names.map {|name| [name, @test_game.players.find(:first, :joins => :user, :conditions => ['users.name = ?', name], :readonly => false)]}
+  @test_players = Hash[arr]
+  assert_not_nil @test_players["Alan"]
 
-  Game.current = @game
+  @test_game.reload.start_game
+
+  Game.current = @test_game
 
   # Setup records of the current state of everybody's zones
-  @hand_contents = Hash[names.map {|n| [n, @players[n].cards.hand.map(&:readable_name)]}]
-  @deck_contents = Hash[names.map {|n| [n, @players[n].cards.deck.map(&:readable_name)]}]
-  @play_contents = Hash[names.map {|n| [n, @players[n].cards.in_play.map(&:readable_name)]}]
-  @discard_contents = Hash[names.map {|n| [n, @players[n].cards.in_discard.map(&:readable_name)]}]
-  @enduring_contents = Hash[names.map {|n| [n, @players[n].cards.enduring.map(&:readable_name)]}]
+  @hand_contents = Hash[names.map {|n| [n, @test_players[n].cards.hand.map(&:readable_name)]}]
+  @deck_contents = Hash[names.map {|n| [n, @test_players[n].cards.deck.map(&:readable_name)]}]
+  @play_contents = Hash[names.map {|n| [n, @test_players[n].cards.in_play.map(&:readable_name)]}]
+  @discard_contents = Hash[names.map {|n| [n, @test_players[n].cards.in_discard.map(&:readable_name)]}]
+  @enduring_contents = Hash[names.map {|n| [n, @test_players[n].cards.enduring.map(&:readable_name)]}]
   @named_cards = {}
 end
 
@@ -79,8 +68,8 @@ Given(/^(\w*) ha(?:ve|s) setting (.*) (on|off)/) do |name, setting, value|
              "autoscheme" => :autoscheme=,
              "autobrigand" => :autobrigand=}[setting]
 
-  @players[name].settings.send(set_sym, value == "on")
-  @players[name].settings.save!
+  @test_players[name].settings.send(set_sym, value == "on")
+  @test_players[name].settings.save!
 end
 
 Given(/^(\w*) ha(?:ve|s) setting (.*) set to (.*)/) do |name, setting, value|
@@ -93,8 +82,8 @@ Given(/^(\w*) ha(?:ve|s) setting (.*) set to (.*)/) do |name, setting, value|
     value = Settings.const_get(value)
   end
 
-  @players[name].settings.send(set_sym, value)
-  @players[name].settings.save!
+  @test_players[name].settings.send(set_sym, value)
+  @test_players[name].settings.save!
 end
 
 Given(/^(.*?)(?:'s)? state (\w*) is (.*)$/) do |name, prop, value|
@@ -108,13 +97,13 @@ Given(/^(.*?)(?:'s)? state (\w*) is (.*)$/) do |name, prop, value|
     "bought_victory"   => :bought_victory=  ,
     "played_treasure"  => :played_treasure= }[prop]
 
-  @players[name].state.send(set_sym, value)
-  @players[name].state.save!
+  @test_players[name].state.send(set_sym, value)
+  @test_players[name].state.save!
 end
 
 Given(/^(\w*) ha(?:ve|s) (\d+) cash/) do |name, amount|
   name = "Alan" if name == "I"
 
-  @players[name].cash = amount
-  @players[name].save!
+  @test_players[name].cash = amount
+  @test_players[name].save!
 end
