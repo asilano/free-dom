@@ -42,14 +42,14 @@ class Hinterlands::Stables < Card
       card = actor.cards.hand[params[:card_index].to_i]
       card.discard
 
-      game.histories.create!(:event => "#{actor.name} discarded #{card} to #{self}",
+      game.histories.create!(:event => "#{actor.name} discarded #{card} to #{self}.",
                              :css_class => "player#{actor.seat} card_discard")
 
       actor.draw_cards(3)
       actor.add_actions(1, parent_act)
     else
       # Player chose not to discard. Just log
-      game.histories.create!(:event => "#{actor.name} discarded nothing to #{self}",
+      game.histories.create!(:event => "#{actor.name} discarded nothing to #{self}.",
                              :css_class => "player#{actor.seat}")
 
     end

@@ -41,7 +41,7 @@ class Hinterlands::Scheme < Card
     # Check if we can handle this automatically
     if player.cards.in_play.none? {|c| c.is_action?}
       # No action cards in play. Odd, but hey. Just log and return
-      game.histories.create!(:event => "#{player.name} had nothing to return with #{self}",
+      game.histories.create!(:event => "#{player.name} had nothing to return with #{self}.",
                              :css_class => "player#{player.seat}")
     elsif player.settings.autoscheme && player.cards.in_play.none? {|c| c.is_action? && c.class != self.class}
       # Autoscheme is on, and only Schemes are in play. Call resolve directly

@@ -3,7 +3,7 @@ class Hinterlands::Trader < Card
   reaction :to => :pre_gain
   costs 4
   card_text "Action (Reaction; cost: 4) - Trash a card from your hand. " +
-            "Gain a number of Silvers equal to its cost in coins / " +
+            "Gain a number of Silvers equal to its cost in coins. / " +
             "When you would gain a card, you may reveal this from your hand. If you do, instead gain a Silver."
 
   before_save :check_replacement_action
@@ -68,7 +68,7 @@ class Hinterlands::Trader < Card
     # Now gain as many Silvers as the trashed card's cost
     silver_pile = game.piles.find_by_card_type('BasicCards::Silver')
     silvers_text = silver_pile.card_class.readable_name + (trashed_cost == 1 ? '' : 's')
-    game.histories.create!(:event => "#{actor.name} gained #{trashed_cost} #{silvers_text} from #{self}",
+    game.histories.create!(:event => "#{actor.name} gained #{trashed_cost} #{silvers_text} from #{self}.",
                            :css_class => "player#{actor.seat} card_gain")
     trashed_cost.times { actor.gain(parent_act, :pile => silver_pile) }
 

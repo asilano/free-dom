@@ -18,7 +18,7 @@ class Hinterlands::Crossroads < Card
     # Grant actions if this is the first Crossroads this turn
     if !player.state.played_crossroads
       player.add_actions(3, parent_act)
-      game.histories.create!(:event => "#{player.name} gained 3 actions from first play of #{self}",
+      game.histories.create!(:event => "#{player.name} gained 3 actions from first play of #{self}.",
                              :css_class => "player#{player.seat}")
     end
 

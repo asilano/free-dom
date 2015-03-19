@@ -76,7 +76,7 @@ class Hinterlands::IllGottenGains < Card
     if card.class == self
       curses = game.piles.find_by_card_type("BasicCards::Curse")
       ply.other_players.each do |opp|
-        game.histories.create!(:event => "#{opp.name} gained #{curses.card_class.readable_name} due to #{readable_name}",
+        game.histories.create!(:event => "#{opp.name} gained #{curses.card_class.readable_name} due to #{readable_name}.",
                                :css_class => "player#{opp.seat} card_gain")
         opp.gain(parent_act, :pile => curses)
       end

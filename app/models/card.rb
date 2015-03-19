@@ -55,12 +55,12 @@ class Card < ActiveRecord::Base
   end
 
   def self.all_card_types
-    @@expansions.inject([]) { |mem, var| mem + var.map(&:constantize) } +
+    expansions.inject([]) { |mem, var| mem + var.map(&:constantize) } +
       self.basic_victory_types + self.basic_treasure_types
   end
 
   def self.all_kingdom_cards
-    @@expansions.inject([]) { |mem, var| mem + var.kingdom_cards }
+    expansions.inject([]) { |mem, var| mem + var.kingdom_cards }
   end
 
   NonCards = [ "Ace of Spades",
