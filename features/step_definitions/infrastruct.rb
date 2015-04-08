@@ -14,11 +14,15 @@ Then /dump actions/ do
 end
 
 Then /dump controls/ do
-    @test_players.each {|name, ply| Rails.logger.info(ply.determine_controls.inspect)}
+  @test_players.each {|name, ply| Rails.logger.info(ply.determine_controls.inspect)}
 end
 
 Then /dump hands/ do
-    @hand_contents.each {|plr, cards| Rails.logger.info("#{plr}'s hand was: #{cards.inspect}")}
+  @hand_contents.each {|plr, cards| Rails.logger.info("#{plr}'s hand was: #{cards.inspect}")}
+end
+
+Then /dump in-play/ do
+  @play_contents.each {|plr, cards| Rails.logger.info("#{plr}'s play was: #{cards.inspect}")}
 end
 
 Then /dump histories/ do

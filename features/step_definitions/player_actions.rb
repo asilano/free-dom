@@ -22,6 +22,13 @@ end
 #   my next turn starts
 #   Bob's next turn starts
 When(/^(\w*)(?:'s)? next turn starts$/) do |name|
+  steps "When my next turn is about to start
+  And the game checks actions
+    Then it should be #{name}'s Play Action phase"
+end
+
+# Stops just before the check-actions that would trigger turn-start
+When(/^(\w*)(?:'s)? next turn is about to start$/) do |name|
   name = "Alan" if name == "my"
   # Each player passes until name's next turn
   # Assumes we're in either an Action or a Buy phase
@@ -61,6 +68,22 @@ When(/^(\w*)(?:'s)? next turn starts$/) do |name|
       break
     end
   end
-  steps "When the game checks actions
-    Then it should be #{name}'s Play Action phase"
+end
+
+# Stops just before the check-actions that would trigger turn-end
+When(/^(\w*)(?:'s)? turn is about to end$/) do |name|
+  name = "Alan" if name == "my"
+
+  current_name = @test_game.current_turn_player.name
+  assert_equal name, current_name
+  if @test_game.current_turn_player.active_actions[0].expected_action =~ /play_action/
+    steps "When #{current_name} stops playing actions
+      And the game checks actions"
+  end
+  if @test_game.current_turn_player.active_actions(true)[0].expected_action =~ /play_treasure/
+    steps "When #{current_name} stops playing treasures"
+  end
+  assert_match /buy/, @test_game.current_turn_player.active_actions(true)[0].expected_action
+
+  steps "When #{current_name} stops buying cards"
 end

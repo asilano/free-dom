@@ -4,7 +4,7 @@
 #   I choose Estate in my hand
 #   Bob chooses Estate, Copper in his hand
 #   I choose Don't trash in my hand  // (Where "Don't trash" is the nil-action text)
-When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in (?:his|my) hand/) do |name, choices|
+When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in (?:his|my) hand$/) do |name, choices|
   name = "Alan" if name == "I"
   player = @test_players[name]
 
@@ -129,7 +129,7 @@ end
 #   I choose Estate in play
 #   Bob chooses Estate, Copper in play
 #   I choose Don't trash in play  // (Where "Don't trash" is the nil-action text)
-When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in play/) do |name, choices|
+When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in play$/) do |name, choices|
   name = "Alan" if name == "I"
   player = @test_players[name]
 
