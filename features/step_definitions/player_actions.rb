@@ -22,7 +22,7 @@ end
 #   my next turn starts
 #   Bob's next turn starts
 When(/^(\w*)(?:'s)? next turn starts$/) do |name|
-  steps "When my next turn is about to start
+  steps "When #{name}'s next turn is about to start
   And the game checks actions
     Then it should be #{name}'s Play Action phase"
 end
