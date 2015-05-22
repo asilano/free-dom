@@ -45,10 +45,18 @@ class PromoCards::Prince < Card
 
   resolves(:choose).validating_params_has_any_of(:card_index, :nil_action).
                     validating_param_is_card(:card_index, scope: :hand) { is_action? && cost <= 4 }.
+                    validating_param_satisfies(:nil_action) { |type, card|  type != 'Set Prince aside alone' || card.player.cards.hand.none? { |c| c.is_action? && c.cost <= 4 } }.
                     with do
-    if params.has_key? :nil_action
+    if params[:nil_action].andand == 'Leave Prince in play'
       # Player chose to leave Prince in play. This is legitimate. Just log - nothing else to do.
       game.histories.create!(event: "#{actor.name} chose not to set #{self} aside.",
+                              css_class: "player#{actor.seat}")
+    elsif params[:nil_action].andand == 'Set Prince aside alone'
+      # Player chose to set Prince aside without an action card.
+      self.location = 'prince'
+      save!
+
+      game.histories.create!(event: "#{actor.name} set aside #{self} alone.",
                               css_class: "player#{actor.seat}")
     else
       # Player chose an action card to set aside. Move both Prince and the chosen card to a "prince" zone,
@@ -101,10 +109,13 @@ class PromoCards::Prince < Card
 
     if princed_card.andand.location == 'play'
       # Princed card is still in play - set it aside again.
+      #
+      # TODO: This assumption breaks with Adventures, in the case of cards leaving and re-entering play.
       princed_card.location = 'prince'
       princed_card.save!
     elsif state.andand[:princed_id] && !(princed_card.andand.location == 'prince')
-      # Princed card not found in play. Sever the link
+      # Princed card not found in play (and it isn't already with the Prince, which it will be the very first turn).
+      # Sever the link
       state_will_change!
       state.delete :princed_id
       save!

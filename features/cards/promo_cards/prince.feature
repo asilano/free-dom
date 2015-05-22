@@ -156,8 +156,8 @@ Feature: Prince
       And I should be able to choose a nil action named Leave Prince in play in my hand
       And I should be able to choose a nil action named Set Prince aside alone in my hand
     When I choose Set Prince aside alone in my hand
-      Then it should be my Play Treasure phase
-      And I should have Prince in play
+      Then I should have removed Prince from play
+      And it should be my Play Treasure phase
     When the game checks actions
     And my next turn is about to start
     And the game checks actions
