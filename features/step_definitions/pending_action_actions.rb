@@ -25,8 +25,8 @@ When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in (?:his|my) hand$/) do |name,
     ctrl[:name].to_sym
   end
 
-  if ctrl[:nil_action].andand == choices
-    params[:nil_action] = true
+  if Array(ctrl[:nil_action]).include? choices
+    params[:nil_action] = choices
   else
     possibilities = player.cards.hand.map(&:readable_name)
     assert_not_empty possibilities
@@ -92,8 +92,8 @@ When(/^(\w*?)(?:'s)? chooses? (?:his|my) (revealed|peeked) (.*)$/) do |name, loc
     ctrl[:name].to_sym
   end
 
-  if ctrl[:nil_action].andand == choice
-    params[:nil_action] = true
+  if Array(ctrl[:nil_action]).include? choice
+    params[:nil_action] = choice
   else
     if location == :revealed
       possibilities = player.cards.revealed.map(&:readable_name)
@@ -111,7 +111,8 @@ When(/^(\w*?)(?:'s)? chooses? (?:his|my) (revealed|peeked) (.*)$/) do |name, loc
     end
   end
 
-  player.resolve(params)
+  meth = ctrl[:action] || :resolve
+  player.send(meth, params)
 
   # Probably chosen the card for a reason
   @skip_card_checking = 1 if @skip_card_checking == 0
@@ -150,8 +151,8 @@ When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in play$/) do |name, choices|
     ctrl[:name].to_sym
   end
 
-  if ctrl[:nil_action].andand == choices
-    params[:nil_action] = true
+  if Array(ctrl[:nil_action]).include? choices
+    params[:nil_action] = choices
   else
     possibilities = player.cards.in_play.map(&:readable_name)
     assert_not_empty possibilities
@@ -337,7 +338,7 @@ When(/^(\w*?) chooses? (?:the )?(.*?) (?:for )?piles?$/) do |name, choice|
   params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
   params[:pa_id] = ctrl[:pa_id]
 
-  if ctrl[:nil_action].andand == choice
+  if Array(ctrl[:nil_action]).include? choice
     params[:nil_action] = choice
   else
     possibilities = @test_game.piles.map{|p| p.card_class.readable_name}
@@ -377,8 +378,8 @@ When(/^(\w*?) chooses? (?:the )?(.*?) (?:for )?piles? labelled (.*)$/) do |name,
   params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
   params[:pa_id] = ctrl[:pa_id]
 
-  if ctrl[:nil_action].andand == choice
-    params[:nil_action] = true
+  if Array(ctrl[:nil_action]).include? choice
+    params[:nil_action] = choice
   else
     possibilities = @test_game.piles.map{|p| p.card_class.readable_name}
     kinds = choice.split(/,\s*/)
@@ -415,8 +416,8 @@ When(/^(\w*?) chooses? (.*?) for (\w*?)(?:'s)? revealed (#{SingleCardNoCapture}|
   params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
   params[:pa_id] = ctrl[:pa_id]
 
-  if ctrl[:nil_action].andand == choice
-    params[:choice] = "nil_action"
+  if Array(ctrl[:nil_action]).include? choice
+    params[:nil_action] = choice
   else
     card_ix = target.cards.revealed.map(&:readable_name).index(card)
     flunk "Can't find #{card} in #{tgt_name} revealed" unless card_ix

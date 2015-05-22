@@ -16,6 +16,8 @@ Feature: Loan
     When I stop playing actions
       And the game checks actions
     Then I should need to Play Treasure
+      And I should be able to choose a nil action named Play Simple Treasures in my hand
+      And I should be able to choose a nil action named Stop Playing Treasures in my hand
     When I play Loan as treasure
     Then I should have moved Estate, Smithy, Great Hall from deck to discard
       And I should be revealing Copper

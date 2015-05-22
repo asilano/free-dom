@@ -8,6 +8,7 @@ env:
   - CARD_SET=seaside
   - CARD_SET=prosperity
   - CARD_SET=hinterlands
+  - CARD_SET=promo_cards
   - CARD_SET=interactions
 script:
   - RAILS_ENV=test bundle exec rake db:migrate --trace

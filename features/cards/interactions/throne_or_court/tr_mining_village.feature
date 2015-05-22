@@ -1,6 +1,6 @@
 Feature: Throne Room + Mining Village
-  TR into Goons, can only trash the MV once (after both have resolved)
-    
+  TR into Mining Village, can only trash the MV once (after both have resolved)
+
   Background:
     Given I am a player in a standard game
 
@@ -16,10 +16,10 @@ Feature: Throne Room + Mining Village
       And I should need to Optionally trash Mining Village
     When I choose the option Trash
       Then I should have removed Mining Village from play
-      And I should have 2 cash      
+      And I should have 2 cash
       And it should be my Play Action phase
       And I should have 4 actions available
-      
+
   Scenario: King's Court
     Given my hand contains Mining Village, King's Court
       And it is my Play Action phase
@@ -33,6 +33,6 @@ Feature: Throne Room + Mining Village
       And I should need to Optionally trash Mining Village
     When I choose the option Trash
       Then I should have removed Mining Village from play
-      And I should have 2 cash      
+      And I should have 2 cash
       And it should be my Play Action phase
       And I should have 6 actions available

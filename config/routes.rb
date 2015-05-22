@@ -19,6 +19,7 @@ Dominion::Application.routes.draw do
       post :play_treasure
       post :buy
       post :end_turn
+      post :choose_sot_card
       post :resolve
       get  :check_change
       post :update_player_settings

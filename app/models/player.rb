@@ -81,20 +81,14 @@ class Player < ActiveRecord::Base
                              :css_class => 'play'
                             }]
       when 'play_treasure'
+        have_simples = cards.hand.any? { |card| card.is_treasure? && !card.is_special? }
         controls[:hand] += [{:type => :button,
                              :action => :play_treasure,
                              :text => "Play",
-                             :nil_action => (cards.hand.any?{|card| card.is_treasure? && !card.is_special?} ? "Play Simple Treasures" : nil),
+                             :nil_action => [have_simples ? "Play Simple Treasures" : nil, 'Stop Playing Treasures'],
                              :cards => cards.hand.map{|card| card.is_treasure?},
-                             :pa_id => action.id
-                            },
-                            {:type => :button,
-                             :action => :play_treasure,
-                             :text => "Play",
-                             :nil_action => "Stop Playing Treasures",
-                             :cards => [false] * cards.hand.length,
                              :pa_id => action.id,
-                             :confirm => [:nil_action]
+                             :confirm => [false, true]
                             }]
       when 'buy'
         piles = game.piles.map do |pile|
@@ -121,6 +115,16 @@ class Player < ActiveRecord::Base
                                :label => nil,
                                :options => [{:text => "End Turn"}]
                              }]
+      when 'choose_sot_card'
+        # We've peeked at the cards we can choose between
+        controls[:peeked] += [{type: :button,
+                                action: :choose_sot_card,
+                                text: 'Choose',
+                                params: {},
+                                cards: [true] * cards.peeked.count,
+                                pa_id: action.id
+                              }]
+
       when /^resolve_([[:alpha:]]+::[[:alpha:]]+)([0-9]+)(?:_([[:alnum:]]*))?(;.*)?/
         card_type = $1
         card_id = $2
@@ -494,10 +498,16 @@ class Player < ActiveRecord::Base
                                                :game => game)
     end
 
-    parent_act.queue(:expected_action => "player_clean_up;player=#{id}",
-                     :game => game).queue(
-                    :expected_action => "player_draw_hand;player=#{id}",
+    parent_act = parent_act.children.create!(:expected_action => "player_draw_hand;player=#{id}",
                      :game => game)
+    parent_act = parent_act.children.create!(:expected_action => "player_clean_up;player=#{id}",
+                     :game => game)
+
+    cards.in_location('prince').of_type('PromoCards::Prince').each do |prince|
+      # Add an action to set the action aside again, just before clean-up
+      parent_act.children.create!(:expected_action => "resolve_#{prince.class}#{prince.id}_trigger",
+                                   :game => game)
+    end
 
     return "OK"
   end
@@ -591,14 +601,121 @@ class Player < ActiveRecord::Base
     game.histories.create!(:event => "#{name}'s turn #{game.turn_count} started.",
                           :css_class => "player#{seat} start_turn")
 
-    # Call any enduring cards to come into play
-    cards.enduring.each do |card|
-      game.histories.create!(:event => "#{name}'s #{card.class.readable_name} came off Duration.",
-                            :css_class => "player#{seat} end_duration")
-      card.end_duration(parent_action.reload)
+    # See whether multiple start-of-turn cards, including Prince, need to go off at once.
+    # If so, we'll add an action to queue them up.
+    #
+    # This is a hack, but it should get a lot nicer with a proper notification framework.
+    princes = cards.in_location('prince').of_type('PromoCards::Prince')
+    princed = princes.map do |p|
+      # Technically, a Prince in the prince location could be the Princed card of another Prince (o.O;)
+      princed_id = p.state.andand[:princed_id]
+      c = Card.find_by_id(princed_id)
+      c.andand.location == 'prince' ? c : nil
+    end.compact
+    start_of_turn_cards = cards.enduring + princed
+Rails.logger.info("SOT cards: #{start_of_turn_cards.map(&:readable_name)}")
+    if start_of_turn_cards.count > 1 && princed.present?
+      # Add a callback to resolve the last start-of-turn card
+      parent_action = parent_action.children.create!(expected_action: "player_last_sot_card;player=#{id}",
+                                                      game: game)
+
+      # Peek at the cards we can consider playing, so we can put some controls on them
+      start_of_turn_cards.each { |c| c.peeked = true; c.save! }
+
+      (start_of_turn_cards.count - 2).times do
+        parent_action = parent_action.children.create!(expected_action: 'choose_sot_card',
+                                                        text: 'Choose the next card to play at start of turn',
+                                                        game: game,
+                                                        player: self)
+
+        # Between each pair of choice actions, we need to re-peek the cards because we have to unpeek
+        # them in case the card we're playing needs to do peeking. Ugh.
+        parent_action = parent_action.children.create!(expected_action: "player_repeek_sot_cards;player=#{id}",
+                                                        game: game)
+      end
+      parent_action = parent_action.children.create!(expected_action: 'choose_sot_card',
+                                                      text: 'Choose the first card to play at start of turn',
+                                                      game: game,
+                                                      player: self)
+    else
+      # Call any enduring cards to come into play
+      cards.enduring.each do |card|
+        game.histories.create!(:event => "#{name}'s #{card.class.readable_name} came off Duration.",
+                              :css_class => "player#{seat} end_duration")
+        card.end_duration(parent_action.reload)
+      end
+
+      # Invoke any cards the player has that act at turn-start
+      cards.each do |card|
+        card.witness_turn_start(parent_action.reload)
+      end
     end
 
     return "OK"
+  end
+
+  # Handle the user choosing a card to play at the start of turn.
+  def choose_sot_card(params)
+    # Checks, including retrieving the action.
+    this_act, response = find_action(params[:pa_id])
+
+    if this_act.nil?
+      return response
+    elsif (!params.include?(:card_index))
+       return "Invalid parameters - must specify a card or nil_action"
+    elsif ((params.include? :card_index) &&
+           (params[:card_index].to_i < 0 ||
+            params[:card_index].to_i > cards.peeked.length - 1))
+      # Asked to buy an invalid card (out of range)
+      return "Invalid request - card index #{params[:card_index]} is out of range"
+    end
+
+    # Find the chosen card, then unpeek all cards
+    card = cards.peeked[params[:card_index].to_i]
+    cards.peeked.each { |c| c.peeked = false; c.save! }
+
+    # Remove this action, noting the parent
+    parent_act = this_act.parent
+    Game.current_act_parent = parent_act
+    this_act.destroy
+
+    # Handle the chosen card; if it's a duration, un-endure it. If it's princed,
+    # invoke the start-turn method of its parent Prince.
+    if card.location == 'enduring'
+      game.histories.create!(:event => "#{name}'s #{card.class.readable_name} came off Duration.",
+                            :css_class => "player#{seat} end_duration")
+      card.end_duration(parent_act)
+    else
+      raise "Unexpected location #{card.location} for SOT card" unless card.location == 'prince'
+      prince = cards.in_location('prince').of_type('PromoCards::Prince').detect { |p| p.state.andand[:princed_id] == card.id }
+      raise "Princed card with no Prince" unless prince
+      prince.witness_turn_start(parent_act)
+    end
+
+    "OK"
+  end
+
+  # Peek at the cards necessary for choosing the next start-of-turn card to play
+  def repeek_sot_cards(params)
+    princes = cards.in_location('prince').of_type('PromoCards::Prince')
+    princed = princes.map do |p|
+      c = Card.find_by_id(p.state[:princed_id])
+      c.location == 'prince' ? c : nil
+    end.compact
+    (cards.enduring + princed).each { |c| c.peeked = true; c.save! }
+  end
+
+  # Play the last start-of-turn card
+  def last_sot_card(params)
+    repeek_sot_cards(params)
+
+    # We want to just call choose_sot_card, but that needs the current action to exist, which it doesn't.
+    # Create an action, for the sole purpose of passing it in.
+    # This is just _wrong_.
+    act = params[:parent_act].children.create!(expected_action: '', game: game, player: self)
+    params[:pa_id] = act.id
+    params[:card_index] = 0
+    choose_sot_card(params)
   end
 
   # Grants the player the specified number of Actions, and returns an action suitable

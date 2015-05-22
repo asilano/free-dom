@@ -67,7 +67,7 @@ end
 # Matches:
 #   I should be able to choose a nil action in my hand
 #   Bob should not be able to choose a nil action in his hand
-Then /(.*) should (not )?be able to choose a nil action in (?:my|his) hand/ do |name, negate|
+Then(/^(.*) should (not )?be able to choose a nil action (?:named (.*) )?in (?:my|his) hand$/) do |name, negate, nil_name|
   name = "Alan" if name == "I"
   player = @test_players[name]
 
@@ -79,10 +79,18 @@ Then /(.*) should (not )?be able to choose a nil action in (?:my|his) hand/ do |
 
   ctrl = controls[0]
 
-  unless negate
-    assert_not_nil ctrl[:nil_action]
+  if negate
+    if nil_name
+      assert_not_contains Array(ctrl[:nil_action]), nil_name
+    else
+      refute Array(ctrl[:nil_action]).any?
+    end
   else
-    assert_nil ctrl[:nil_action]
+    if nil_name
+      assert_contains Array(ctrl[:nil_action]), nil_name
+    else
+      assert Array(ctrl[:nil_action]).any?
+    end
   end
 end
 
@@ -117,7 +125,7 @@ end
 # Matches:
 #   I should be able to choose a nil action in play
 #   Bob should not be able to choose a nil action in play
-Then /(.*) should (not )?be able to choose a nil action in play/ do |name, negate|
+Then(/^(.*) should (not )?be able to choose a nil action (?:named (.*) )?in play$/) do |name, negate, nil_name|
   name = "Alan" if name == "I"
   player = @test_players[name]
 
@@ -129,10 +137,18 @@ Then /(.*) should (not )?be able to choose a nil action in play/ do |name, negat
 
   ctrl = controls[0]
 
-  unless negate
-    assert_not_nil ctrl[:nil_action]
+  if negate
+    if nil_name
+      assert_not_contains Array(ctrl[:nil_action]), nil_name
+    else
+      refute Array(ctrl[:nil_action]).any?
+    end
   else
-    assert_nil ctrl[:nil_action]
+    if nil_name
+      assert_contains Array(ctrl[:nil_action]), nil_name
+    else
+      assert Array(ctrl[:nil_action]).any?
+    end
   end
 end
 
@@ -192,7 +208,7 @@ end
 # Matches:
 #   I should be able to choose a nil action on piles
 #   Bob should not be able to choose a nil action on piles
-Then /(.*) should (not )?be able to choose a nil action on piles/ do |name, negate|
+Then(/^(.*) should (not )?be able to choose a nil action (?:named (.*) )?on piles$/) do |name, negate, nil_name|
   name = "Alan" if name == "I"
   player = @test_players[name]
 
@@ -204,10 +220,18 @@ Then /(.*) should (not )?be able to choose a nil action on piles/ do |name, nega
 
   ctrl = controls[0]
 
-  unless negate
-    assert_not_nil ctrl[:nil_action]
+  if negate
+    if nil_name
+      assert_not_contains Array(ctrl[:nil_action]), nil_name
+    else
+      refute Array(ctrl[:nil_action]).any?
+    end
   else
-    assert_nil ctrl[:nil_action]
+    if nil_name
+      assert_contains Array(ctrl[:nil_action]), nil_name
+    else
+      assert Array(ctrl[:nil_action]).any?
+    end
   end
 end
 

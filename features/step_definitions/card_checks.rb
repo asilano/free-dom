@@ -36,17 +36,19 @@ end
 #   Bob should have Copper, Gold in play
 #
 # Note that this sets the exact expected contents; we can do this because "shuffling" is now sorting by unprefixed name
-Then /(.*) should have #{CardList} [io]n (?:my |his )?(.*)/ do |name, kinds, location|
+Then(/(.*) should have (#{CardListNoCapture}|nothing) [io]n (?:my |his )?(.*)/) do |name, kinds, location|
   name = 'Alan' if name == 'I'
   exp = instance_variable_get("@#{location}_contents")[name]
 
   exp.replace([])
-  kinds.split(/,\s*/).each do |kind|
-    /(.*) ?x ?(\d+)/ =~ kind
-    kind = $1.rstrip if $1
-    num = $2.andand.to_i || 1
+  unless kinds == 'nothing'
+    kinds.split(/,\s*/).each do |kind|
+      /(.*) ?x ?(\d+)/ =~ kind
+      kind = $1.rstrip if $1
+      num = $2.andand.to_i || 1
 
-    num.times {exp << kind}
+      num.times {exp << kind}
+    end
   end
 end
 

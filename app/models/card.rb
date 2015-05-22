@@ -37,7 +37,7 @@ class Card < ActiveRecord::Base
   end
 
   def self.expansions
-    [BaseGame, Intrigue, Seaside, Prosperity, Hinterlands]
+    [BaseGame, Intrigue, Seaside, Prosperity, Hinterlands, PromoCards]
   end
 
   # The ever-present Victory cards
@@ -55,7 +55,7 @@ class Card < ActiveRecord::Base
   end
 
   def self.all_card_types
-    expansions.inject([]) { |mem, var| mem + var.map(&:constantize) } +
+    expansions.inject([]) { |mem, var| mem + var.card_classes } +
       self.basic_victory_types + self.basic_treasure_types
   end
 
@@ -326,8 +326,10 @@ class Card < ActiveRecord::Base
         attack_action.save!
       end
     end
+  end
 
-    Rails.logger.info("Moated: #{attack_action.reload.inspect}")
+  # Default no-op for acting at start of turn
+  def witness_turn_start(_)
   end
 
 private

@@ -132,6 +132,10 @@ class GamesController < ApplicationController
     handle_generic_ajax(:end_turn)
   end
 
+  def choose_sot_card
+    handle_generic_ajax(:choose_sot_card)
+  end
+
   def resolve
     handle_generic_ajax(:resolve)
   end

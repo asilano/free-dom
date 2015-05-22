@@ -65,6 +65,7 @@ class Game < ActiveRecord::Base
   validates :turn_phase, :numericality => true, :inclusion => {:in => TurnPhases::AllPhases, :message => 'must be valid'}, :allow_blank => true
 
   validate :unique_valid_piles, :on => :create
+  validate :valid_set_counts, :on => :create
   validate :total_cards_10, :on => :create
   validate :some_sets_present, :on => :create
 
@@ -359,6 +360,17 @@ protected
         end
         if !Card.all_kingdom_cards.map(&:name).include? pile
           errors.add("pile_#{ix+1}", 'must be a Kingdom Card.')
+        end
+      end
+    end
+  end
+
+  def valid_set_counts
+    if random_select.to_i == 1 && specify_distr.to_i == 1
+      Card.expansions.each do |exp|
+        num = send("num_#{exp.name.underscore}_cards").to_i
+        if num < 0 || num > 10 || num > exp.kingdom_cards.count
+          errors[:base] << "Number of cards from #{exp.name} must be between 0 and #{[10, exp.kingdom_cards.count].min}"
         end
       end
     end

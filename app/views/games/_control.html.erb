@@ -60,13 +60,16 @@
   <td>
     <% case control[:type]
        when :button -%>
-      <% if control[:nil_action] %>
-        <%= submit_tag(control[:nil_action],
-                        :name => "nil_action",
-                        :form => "form_#{control.object_id}",
-                        :disable_with => control[:nil_action],
-                        :class => control[:css_class],
-                        :confirm => control[:confirm].andand.include?(:nil_action) ? "Are you sure?" : nil) %>
+      <% Array(control[:nil_action]).each.with_index do |nil_act, ix| %>
+        <% if nil_act %>
+          <%= button_tag(nil_act, :type => 'submit',
+                          :name => "nil_action",
+                          :value => nil_act,
+                          :form => "form_#{control.object_id}",
+                          :disable_with => nil_act,
+                          :class => control[:css_class],
+                          :confirm => control[:confirm].andand[ix] ? "Are you sure?" : nil) %>
+          <% end %>
       <% end %>
     <% when :two_d_radio, :latin_radio -%>
       <% if control[:nil_action] -%>

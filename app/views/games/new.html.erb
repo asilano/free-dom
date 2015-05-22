@@ -42,15 +42,15 @@
             <%= f.label "pile_#{ix}", "Kingdom card #{ix}: " %>
           </td>
           <td>
-          	<div class="field">
-	           <%= f.grouped_collection_select("pile_#{ix}",
-	                                           Card.expansions,
-	                                           :kingdom_cards,
-	                                           :name,
-	                                           :name,
-	                                           :readable_name_with_cost,
-	                                           {}) %>
-	        </div>
+            <div class="field">
+             <%= f.grouped_collection_select("pile_#{ix}",
+                                             Card.expansions,
+                                             :kingdom_cards,
+                                             :name,
+                                             :name,
+                                             :readable_name_with_cost,
+                                             {}) %>
+          </div>
           </td>
           <td class="cardText">
             <div id='<%= "card_text_#{ix}"%>'>
@@ -66,17 +66,17 @@
       <div id="set_distr" style=<%= ((@game.specify_distr == 1) ? "" : "'display: none;'").html_safe %>>
         <p class="indented-left underlined">Set distribution:</p>
         <table>
-          <% Card.expansions.map { |set| set.name.titleize }.each do |set| %>
+          <% Card.expansions.each do |set| %>
             <tr>
               <td>
-              	<div class="field">
-                	<%= f.label "num_#{set.parameterize('_')}_cards", "Number of #{set} cards: " %>
-            	</div>
+                <div class="field">
+                  <%= f.label "num_#{set.name.underscore}_cards", "Number of #{set.name.titleize} cards: " %>
+              </div>
               </td>
               <td>
-              	<div class="field">
-                	<%= f.select "num_#{set.parameterize('_')}_cards", 0..10 %>
-            	</div>
+                <div class="field">
+                  <%= f.select "num_#{set.name.underscore}_cards", (0..[10, set.kingdom_cards.count].min).map { |n| "%2d" % n }, {}, class: 'num_set_cards' %>
+              </div>
               </td>
             </tr>
           <% end %>

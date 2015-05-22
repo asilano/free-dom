@@ -88,7 +88,7 @@ module GamesHelper
   end
 
   def set_aside_area(player, public = true)
-    public_card_types = [Seaside::Island]
+    public_card_types = [Seaside::Island, PromoCards::Prince]
     private_card_types = [Seaside::Haven, Seaside::NativeVillage]
 
     all_card_types = public_card_types + private_card_types
