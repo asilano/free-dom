@@ -232,7 +232,6 @@ module CardDecorators
     end
 
     def add_attack_acts(params, param_string, parent_act, attack_act, attack_state, *steps_to_add)
-      Rails.logger.info("State: #{attack_state}")
       add_attack = steps_to_add.include? :attacks
       add_react = steps_to_add.include? :reactions
 
@@ -258,7 +257,6 @@ module CardDecorators
         end
 
         react_to = attack_act || local_parent
-        Rails.logger.info("Applying Lighthouse and Automoat to: #{react_to.inspect}")
 
         if add_react && !prevent_react
           # Handle automoating here. If the attacked player has a Moat in hand

@@ -138,7 +138,6 @@ class Resolution
 
       # Otherwise, run the block.
       card.instance_exec(card.params[@key], &@block)
-      Rails.logger.info("Params now: #{card.params}")
     end
   end
 

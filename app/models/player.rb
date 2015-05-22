@@ -109,7 +109,7 @@ class Player < ActiveRecord::Base
                             }]
       when 'end_turn'
         # Maintaining as stub in case needed for undo processing
-        Rails.logger.info "Deprecated action"
+        Rails.logger.error "Deprecated action"
         controls[:player] += [{:type => :buttons,
                                :action => :end_turn,
                                :label => nil,
@@ -613,7 +613,6 @@ class Player < ActiveRecord::Base
       c.andand.location == 'prince' ? c : nil
     end.compact
     start_of_turn_cards = cards.enduring + princed
-Rails.logger.info("SOT cards: #{start_of_turn_cards.map(&:readable_name)}")
     if start_of_turn_cards.count > 1 && princed.present?
       # Add a callback to resolve the last start-of-turn card
       parent_action = parent_action.children.create!(expected_action: "player_last_sot_card;player=#{id}",
