@@ -1,0 +1,4 @@
+- [:notice, :warning, :error].each do |type|
+  - if flash[type]
+    p class="flash #{type}" id="flash#{type}"
+      == flash[type]

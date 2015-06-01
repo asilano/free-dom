@@ -288,6 +288,7 @@ button, input[type='submit']
   }
 }
 
+.other-players { vertical-align: top; width: 50% }
 .curr_turn { border: 2px solid green; }
 .gapAbove {padding-top: 5px;}
 
@@ -352,3 +353,5 @@ button, input[type='submit']
   clear: both;
   margin-bottom: 5px;
 }
+
+#pend_actions { margin-left: 65%; }

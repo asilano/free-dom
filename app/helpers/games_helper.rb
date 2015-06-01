@@ -57,6 +57,17 @@ module GamesHelper
     html
   end
 
+  def card_content(card_or_pile)
+    inner_content = card_or_pile.readable_name
+    if card_or_pile.kind_of?(Card) && card_or_pile.location == 'play' &&
+        card_or_pile.player.cards.in_location('prince').of_type('PromoCards::Prince').any? { |p| p.state[:princed_id] == card_or_pile.id }
+      inner_content << tag('br') + '(Princed)'
+    end
+    content_tag(:div, inner_content.html_safe, class: "content") +
+      content_tag(:div, nil, :class => "bg left") +
+      content_tag(:div, nil, :class => "bg right")
+  end
+
   def pile_state(pile)
     return "" if pile.state.nil?
     strs = pile.state.map do |key, value|
@@ -178,5 +189,14 @@ EOS
     end
 
     content_for(:control_forms, raw(form))
+  end
+
+  def rating_history(current, previous, opts = {})
+    swap = opts[:swap] ? -1 : 1
+    arrowDir = ["same", "up", "down"]
+    str = "( "
+    str << content_tag(:span, nil, class: "arrow #{arrowDir[(current <=> previous) * swap]}")
+    str << " #{previous})"
+    str.html_safe
   end
 end

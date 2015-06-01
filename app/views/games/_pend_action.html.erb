@@ -1,7 +1,0 @@
-<li><%= (pend_action.player ? h(pend_action.player.name) : "Game") -%>: <%= h pend_action.expected_action -%>
-  <% if not pend_action.children.empty? -%>
-    <ul>
-      <%= render(:partial => "pend_action", :collection => pend_action.children) -%>
-    </ul>
-  <% end -%></li>
-    

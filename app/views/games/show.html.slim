@@ -1,0 +1,28 @@
+- if @player
+  #playerPrefsHover
+    span Adjust Game Settings
+    #playerPrefs= render partial: "player_settings"
+    javascript:
+      $('#playerPrefsHover').on('click', 'input[type=checkbox]', function() {
+        $(this).closest('form').submit();
+      }).on('change keyup', 'select', function() {
+        $(this).closest('form').submit();
+      });
+h2= @game.name
+#game
+  = render partial: 'game', object: @game, locals: {player: @player, controls: @controls}
+#chat
+  #chatbox= render partial: 'chat_line', collection: @game.chats
+  = form_tag action: :speak do
+    div
+      = text_field_tag("name", nil, placeholder: "Name?") if !@user
+      = text_field_tag("say", nil, placeholder: "What do you want to say?", autocomplete: 'off')
+      = submit_tag "Say", class: 'input-hack'
+javascript:
+  $('#chat form').on('submit', function(e) {
+    $.post($(this).attr('action'),
+            $(this).serialize(), function(){}, "script");
+    $(this).find('[name=say]').val("");
+    e.stopPropagation();
+    e.preventDefault();
+  });

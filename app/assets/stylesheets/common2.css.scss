@@ -24,7 +24,9 @@ $break-small: 640px;
 .underline {text-decoration: underline}
 .pad-under {padding-bottom: 5px;}
 
-#siteLogo, #nav
+.clear { clear: both; }
+
+#siteLogo, nav
 {
   h1, h2
   {
