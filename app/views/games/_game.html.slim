@@ -108,7 +108,7 @@
   - if (@game.players.length >= 2 && @player == @game.players[0] && @game.state == 'waiting')
     #start_button
       = form_tag({action: :start_game }, remote: true, id: 'start_form') do
-        = submit_tag '"Start Game', id: 'start_game_btn'
+        = submit_tag 'Start Game', id: 'start_game_btn'
       javascript:
         $('#start_form').on('ajax:beforeSend', function(){
           $('#gameStartSpinner').show();
