@@ -1,0 +1,31 @@
+$accent-colour: #f0e68c;
+$logo-colour: lighten($accent-colour, 20%);
+$logo-text-colour: navy;
+$button-colour: lighten($logo-text-colour, 20%);
+$explain-colour: SteelBlue;
+$border-colour: DarkGray;
+
+$error-colour: #a50000;
+$notice-colour: #005dff;
+$alert-colour: #eac300;
+$good-colour: #30bb30;
+
+$error-bg-colour: lighten($error-colour, 50%);
+$notice-bg-colour: lighten($notice-colour, 30%);
+$alert-bg-colour: lighten($alert-colour, 40%);
+$input-bg-colour: lighten($logo-colour, 50%);
+
+$bg-blue: #e0f0ff;
+$bg-error: #fdd;
+$bg-grey: #f0f0f0;
+
+.lighter {font-weight: normal; color: #ccc;}
+
+@mixin when-smaller-than($breakpoint) {
+  @if $breakpoint == small {
+    @media (max-width: 650px) { @content; }
+  }
+  @else if $breakpoint == medium {
+    @media (max-width: 850px) { @content; }
+  }
+}

@@ -48,20 +48,23 @@ module Dominion
 
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
-    
+
     config.colorize_logging = false
     config.action_mailer.delivery_method = :smtp
 
     config.active_support.deprecation = :log
+
+    # Include compass extensions
+    config.compass.require 'sassy-buttons'
   end
 end
 
-ActionMailer::Base.smtp_settings = {  
-  :address              => ENV['MAIL_SERV'],  
-  :port                 => ENV['MAIL_PORT'],  
-  :domain               => ENV['MAIL_DOM'],  
-  :user_name            => ENV['MAIL_USER'],  
-  :password             => ENV['MAIL_PASS'],  
-  :authentication       => "plain",  
-  :enable_starttls_auto => true  
-} 
+ActionMailer::Base.smtp_settings = {
+  :address              => ENV['MAIL_SERV'],
+  :port                 => ENV['MAIL_PORT'],
+  :domain               => ENV['MAIL_DOM'],
+  :user_name            => ENV['MAIL_USER'],
+  :password             => ENV['MAIL_PASS'],
+  :authentication       => "plain",
+  :enable_starttls_auto => true
+}

@@ -1,0 +1,177 @@
+//@import "compass/reset";
+@import "normalize";
+@import "compass/css3/box-sizing";
+@import "fonts";
+@import "mixins";
+@import "sassybuttons";
+
+@import "form-styles";
+
+.design {
+  border: 1px solid blue;
+}
+
+* {
+  @include box-sizing(border-box);
+}
+
+html {
+  line-height: 1.2;
+}
+
+body {
+  font-size: 16px;
+  padding: 0.5em 2em 0;
+  font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+}
+
+a {
+  text-decoration: none;
+  font-weight: bold;
+  color: inherit;
+
+  &.unobtrusive {
+    font-weight: normal;
+    font-size: smaller;
+  }
+}
+
+button, input[type=button], input[type=submit], {
+  @include sassy-button;
+  font-family: inherit;
+
+  &.danger {
+    @include sassy-button-gradient('matte', $error-colour)
+  }
+  &.play {
+    @include sassy-button-gradient('matte', $good-colour)
+  }
+
+  @include when-smaller-than(medium) {
+    height: 40px;
+    line-height: 20px;
+  }
+}
+
+button a {
+  font-weight: normal;
+  font-style: normal;
+}
+
+#site-logo {
+  padding: 0 10px;
+  margin-top: 2em;
+  background-color: $logo-colour;
+  background-image: linear-gradient(to left top, #fff 10%, $logo-colour, #fff 90%);
+  border: 3px outset $logo-text-colour;
+  border-radius: 10px;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+  font-style: normal;
+
+  h1, h2 {
+    margin: 0;
+    font-family: 'CloisterBlackLight';
+    font-weight: normal;
+    line-height: 1em;
+  }
+  h1{
+    font-size: 4em;
+    color: blue;
+  }
+  h2 {
+    font-size: 1.5em; color: blue;
+    margin-bottom: 2px;
+  }
+
+  @include when-smaller-than(small) {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+#games-rankings {
+  display: flex;
+  justify-content: space-between;
+  margin: 1em 0;
+  * {
+    margin: 0;
+    font-family: 'CloisterBlackLight';
+    font-weight: normal;
+    line-height: 1em;
+    font-size: 2em;
+    flex: 0 1 auto;
+  }
+}
+
+#userInfo
+{
+  position: fixed;
+  z-index: 1501;
+  top: 0;
+  right: 0;
+  padding: 0 5px 0 10px;
+  height: 1.6em;
+  background-color: $accent-colour;
+  text-align: right;
+  border-bottom-left-radius: 1em;
+
+  .name::after { content: ' | '; }
+
+  @include when-smaller-than(small) {
+    position: relative;
+    margin-top: 2px;
+    width: 100%;
+    min-height: 50px;
+    text-align: center;
+    border-radius: 0;
+
+    .name {
+      &::after { display: none; }
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      vertical-align: middle;
+      height: 20px;
+      line-height: 20px;
+      background-color: $accent-colour;
+    }
+
+    a {
+      position: absolute;
+      top: 20px;
+      height: 30px;
+      line-height: 30px;
+      width: 50%;
+
+      color: black;
+      text-decoration: none;
+      text-transform: capitalize;
+      border-top: 2px solid white;
+
+      &.left {
+        left: 0;
+        border-right: 1px solid white;
+      }
+      &.right {
+        right: 0;
+        border-left: 1px solid white;
+      }
+
+      &:active {
+        background-color: darken($accent-colour, 20%);
+      }
+    }
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+footer {
+  border-top: 1px solid $border-colour;
+  margin-top: 1em;
+}

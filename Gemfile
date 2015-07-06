@@ -25,12 +25,14 @@ end
 
 # Gems used only for assets and not required
 # in production environments by default.
-group :assets do
+#group :assets do
   gem 'sass-rails',   '~> 3.2.3'
+  gem 'compass-rails'
+  gem 'sassy-buttons'
   gem 'sass', '~> 3.2.15'
   gem 'coffee-rails', '~> 3.2.1'
   gem 'uglifier'
-end
+#end
 
 gem 'jquery-rails', :path => "vendor/gems/jquery-rails-1.0.19"
 #gem 'therubyracer'

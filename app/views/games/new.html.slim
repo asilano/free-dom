@@ -19,69 +19,65 @@
         br
         = f.text_field :name
       .field
-        = f.label :max_players, "Maximum number of players"
+        = f.label :max_players, "Maximum players"
         br
         = f.select(:max_players, [2,3,4,5,6])
       .field
         = f.label :random_select, (tweaking ? "Generate another random set of Kingdom Cards" : "Select Kingdom Cards randomly?")
         = f.check_box :random_select
       #card_selects style=((@game.random_select == 1) ? "display: none;" : "")
-        table
-          - (1..10).each do |ix|
-            tr class="row#{(ix % 2 == 0) ? 'Even' : 'Odd'}"
-              td.pileLabel= f.label "pile_#{ix}", "Kingdom card #{ix}: "
-              td
-                .field
-                  = f.grouped_collection_select("pile_#{ix}",
-                                                Card.expansions,
-                                                :kingdom_cards,
-                                                :name,
-                                                :name,
-                                                :readable_name_with_cost,
-                                                {})
-              td.cardText
-                div id="card_text_#{ix}"
+        - (1..10).each do |ix|
+          .card-select-row
+            .pileLabel= f.label "pile_#{ix}", "Kingdom card #{ix}: "
+            .pileSelect= f.grouped_collection_select("pile_#{ix}",
+                                              Card.expansions,
+                                              :kingdom_cards,
+                                              :name,
+                                              :name,
+                                              :readable_name_with_cost,
+                                              {})
+            .cardText id="card_text_#{ix}"
 
       #random_options style=((@game.random_select == 1) ? "" : "display: none;")
-        = f.label :specify_distr, "Specify set distibution?"
-        = f.check_box :specify_distr
+        .field
+          = f.label :specify_distr, "Specify set distibution?"
+          = f.check_box :specify_distr
         #set_distr style=((@game.specify_distr == 1) ? "" : "display: none;")
-          p.indented-left.underlined
-            | Set distribution:
-          table
-            - Card.expansions.each do |set|
-              tr
-                td
-                  .field
-                    = f.label "num_#{set.name.underscore}_cards", "Number of #{set.name.titleize} cards: "
-                td
-                  .field
-                    = f.select "num_#{set.name.underscore}_cards", (0..[10, set.kingdom_cards.count].min).map { |n| "%2d" % n }, {}, class: 'num_set_cards'
+          fieldset
+            legend Set distribution
+            table
+              - Card.expansions.each do |set|
+                tr
+                  td
+                    .field
+                      = f.label "num_#{set.name.underscore}_cards", "Number of #{set.name.titleize} cards: "
+                  td
+                    .field
+                      = f.select "num_#{set.name.underscore}_cards", (0..[10, set.kingdom_cards.count].min).map { |n| "%2d" % n }, {}, class: 'num_set_cards'
         #set_presence style=((@game.specify_distr == 0) ? "" : "display: none;")
-          p.indented-left.underlined
-            | Sets to use:
-          table
-            - Card.expansions.map { |set| set.name.titleize }.each do |set|
-              tr
-                td
-                  .field
-                    = f.label "#{set.parameterize('_')}_present", "Include #{set}? "
-                td
-                  .field
-                    = f.check_box "#{set.parameterize('_')}_present"
+          fieldset
+            legend Sets to use:
+            table
+              - Card.expansions.map { |set| set.name.titleize }.each do |set|
+                tr
+                  td
+                    .field
+                      = f.label "#{set.parameterize('_')}_present", "Include #{set}? "
+                  td
+                    .field
+                      = f.check_box "#{set.parameterize('_')}_present"
       #plat_colony
         |  Include Platinum and Colony?
-        br
-        .field
+        div
           = f.radio_button :plat_colony, "rules", :id => "game_plat_col_rules"
           = f.label "plat_col_rules", "At random, in proportion to number of Prosperity cards present (as in rules)"
-          br
+        div
           = f.radio_button :plat_colony, "yes", :id => "game_plat_col_yes"
           = f.label "plat_col_yes", "Yes"
-          br
+        div
           = f.radio_button :plat_colony, "no", :id => "game_plat_col_no"
           = f.label "plat_col_no", "No"
-          br
+
       div= f.submit 'Create'
 = link_to 'Back', games_path
 - content_for :js_in_head do

@@ -1,6 +1,8 @@
-nav
-  h2.inline User Rankings
-  h2.right= link_to 'View Games', games_path
+- content_for :layout_stylesheet
+  = stylesheet_link_tag 'rankings'
+nav#games-rankings
+  span User Rankings
+  = link_to 'View Games', games_path
 = link_to_function "What's this?", "$('#explain_ranking').slideToggle()", class: 'light'
 #explain_ranking.hidden
   p This table shows the ranking and rating of each registered user by a number of measures.
@@ -11,7 +13,7 @@ nav
     dt Mean normalised position
     dd
       | A player's
-      em normalised position
+      em  normalised position
       |  is a comparable measure of where they finished in a game, regardless of the number of players. The winner has a normalised position of 0.0 for that match, the loser has 1.0, and the remaining players are evenly spaced (so second place in a three-player game has 0.5; in a four-player, 0.333). If multiple players tie, they all receive the appropriate normalised position as if they were a single player (so two players tying for second in a four-player game each get 0.5). The mean normalised position simply returns the total of all a user's positions, divided by the number of games.
     dt Rating
     dd
@@ -60,21 +62,17 @@ table.tablekit.sortable
       td= user.name
       td= rank.num_played
       td
-        = rank.num_won
+        span.thisVal= rank.num_won
         span.lastVal= rating_history(rank.num_won, rank.last_num_won)
       td
-        = number_with_precision(rank.mean_norm_pos)
+        span.thisVal= number_with_precision(rank.mean_norm_pos)
         span.lastVal= rating_history(rank.mean_norm_pos, rank.last_mean_norm_pos, swap: true)
       td
-        = number_with_precision(rank.mean_score)
+        span.thisVal= number_with_precision(rank.mean_score)
         span.lastVal= rating_history(rank.mean_score, rank.last_mean_score)
       td
-        = rank.result_elo.to_i
+        span.thisVal= rank.result_elo.to_i
         span.lastVal= rating_history(rank.result_elo.to_i, rank.last_result_elo.to_i)
       td
-        = rank.score_elo.to_i
+        span.thisVal= rank.score_elo.to_i
         span.lastVal= rating_history(rank.score_elo.to_i, rank.last_score_elo.to_i)
-br
-= link_to 'New user', new_user_path
-|  |
-= link_to 'Game index', games_path

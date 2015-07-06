@@ -1,0 +1,76 @@
+@import "mixins";
+@import "sassybuttons";
+
+#games_list {
+  margin-bottom: 1em;
+
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+
+  th.blank_th {
+    border: none;
+  }
+  tr {
+    td:first-child {
+      &::before {
+        display: inline-block;
+        content: "";
+        width: 15px;
+        height: 15px;
+        background-image: image-url('stop-go-wait.png');
+        vertical-align: middle;
+        margin: -1px 2px 0 0;
+      }
+
+      &.running::before {
+        background-position: -15px 0;
+      }
+
+      &.waiting::before {
+        background-position: -30px 0;
+      }
+    }
+
+    .bold, .current {font-weight: bold;}
+
+    &.ended.rowEven {background-color: #ffe0e0;}
+    &.ended.rowOdd {background-color: #fbb;}
+
+    &.running.rowEven {background-color: #dfd;}
+    &.running.rowOdd {background-color: #afa;}
+
+    &.waiting.rowEven {background-color: #cdf;}
+    &.waiting.rowOdd {background-color: #abf;}
+  }
+}
+
+.card-select-row {
+  display: flex;
+  max-width: 1000px;
+  flex-flow: row wrap;
+  &:nth-child(even) {
+    background-color: $bg-blue;
+  }
+  padding: 5px 0;
+
+  .pileLabel {
+    flex: 0 1 10em;
+  }
+  .pileSelect {
+    flex: 0 1 auto;
+  }
+  .cardText {
+    margin-left: 1em;
+    flex: 0 1 100%;
+  }
+}
+
+#set_distr .field label {
+  flex: 0 1 auto;
+}
+
+.num_set_cards {
+  width: 100%;
+}

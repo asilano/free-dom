@@ -119,16 +119,7 @@
         }).on('ajax:error', function(){
           alert('Sorry, something went wrong. Please refresh and try again');
         });
-#history
-  ul
-    - game.histories.each do |history|
-      - classes = history.css_class
-      - if player && history.css_class =~ /\bplayer#{@player.seat}\b/
-        - classes += ' self'
-      li class=classes = format_history(history, @player)
-#pend_actions.debug class=('hidden' unless ((@user && @user.name == 'Chowlett') || request.host == '127.0.0.1'))
-  - if game.root_action(true)
-    ul= render(partial: 'pend_action', object: game.root_action)
+
 - if game.state == 'ended'
   #resultOverlay.overlay
 

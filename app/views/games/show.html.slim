@@ -9,9 +9,19 @@
         $(this).closest('form').submit();
       });
 h2= @game.name
-#game
+#game_board.design
   = render partial: 'game', object: @game, locals: {player: @player, controls: @controls}
-#chat
+#history.design
+  ul
+    - @game.histories.each do |history|
+      - classes = history.css_class
+      - if @player && history.css_class =~ /\bplayer#{@player.seat}\b/
+        - classes += ' self'
+      li class=classes = format_history(history, @player)
+#pend_actions.debug.design class=('hidden' unless ((@user && @user.name == 'Chowlett') || request.host == '127.0.0.1'))
+  - if @game.root_action(true)
+    ul= render(partial: 'pend_action', object: @game.root_action)
+#chat.design
   #chatbox= render partial: 'chat_line', collection: @game.chats
   = form_tag action: :speak do
     div

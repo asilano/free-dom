@@ -6,11 +6,54 @@ module GamesHelper
   def running_player_list(game)
     game.players.map do |p|
       str = ""
-      str += "<span class='bold'>" unless p.active_actions.empty?
+      str += "<span class='current'>" unless p.active_actions.empty?
       str += p.name
       str += "</span>" unless p.active_actions.empty?
       str
     end.join(', ')
+  end
+
+  def game_buttons_for(game, user)
+    html = ''
+
+    user_games = user.andand.games
+    if game.state == 'ended'
+      # Review button only. Links to Watch or Play depending on whether the user was a player
+      review_path = watch_game_path(game)
+      if user_games.andand.include?(game)
+        review_path = join_game_path(game)
+      end
+
+      html = content_tag(:td, button_tag(link_to('Review', review_path), class: 'look', type: nil))
+      html << tag(:td)
+    elsif game.state == 'waiting'
+      if user_games.andand.include?(game)
+        # User already in game. Just give them a Play button
+        html = tag(:td) + content_tag(:td, button_tag(link_to('Play', play_game_path(game)), class: 'play', type: nil))
+      else
+        # User not in game. Give Watch, and Join if not at max players
+        html = content_tag(:td, button_tag(link_to('Watch', watch_game_path(game)), class: 'look', type: nil))
+        if game.players.length < game.max_players
+          html << content_tag(:td, button_to('Join', join_game_path(game), class: 'play'))
+        else
+          html << tag(:td)
+        end
+      end
+    elsif game.state == 'running'
+      # Game running. Give Watch or Play based on whether user is in game
+      if user_games.andand.include? game
+        html = tag(:td) + content_tag(:td, button_tag(link_to('Play', play_game_path(game)), class: 'play', type: nil))
+      else
+        html = content_tag(:td, button_tag(link_to('Watch', watch_game_path(game)), class: 'look', type: nil)) + tag(:td)
+      end
+    end
+
+    # Delete button if player is in the game, or is me.
+    if (user && (user.name == 'Chowlett' || user.games.include?(game))) # || request.host == '127.0.0.1'
+      html << content_tag(:td, button_to('Destroy', game, confirm: 'Are you sure?', method: :delete, class: 'danger'))
+    end
+
+    html.html_safe
   end
 
   def format_history(history, player)
@@ -189,14 +232,5 @@ EOS
     end
 
     content_for(:control_forms, raw(form))
-  end
-
-  def rating_history(current, previous, opts = {})
-    swap = opts[:swap] ? -1 : 1
-    arrowDir = ["same", "up", "down"]
-    str = "( "
-    str << content_tag(:span, nil, class: "arrow #{arrowDir[(current <=> previous) * swap]}")
-    str << " #{previous})"
-    str.html_safe
   end
 end

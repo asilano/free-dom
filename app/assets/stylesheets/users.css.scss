@@ -1,21 +1,32 @@
-.explain
-{
-	margin: -1px 0 1px 2.5em;
-	font-style: italic;
+@import "mixins";
+
+.explain {
+  font-size: 0.9em;
+  padding-top: 0.2em; // Compensate for text size
+  font-style: italic;
+  color: $explain-colour;
 }
 
-
-dl {margin: 0;}
-dt {font-weight: bold;}
-
-#explain_ranking
-{
-	padding-left: 1em;
-	width: 70em;
-	text-align: justify;
-
-	p {margin-top: 5px; line-height: 15px;}
-	dl {margin-top: 5px;}
+.underline {
+  text-decoration: underline;
 }
 
-.field { margin-top: 10px; }
+.expansion-settings {
+  margin-bottom: 0.5em;
+
+  h1 {
+    text-decoration: underline;
+  }
+
+  .field {
+    margin: 5px 0;
+  }
+
+  .explain + .field {
+    margin-top: 10px;
+  }
+
+  .explain:last-child {
+    margin-bottom: 10px;
+  }
+}

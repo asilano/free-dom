@@ -6,6 +6,7 @@ html
     title
       = @full_title || ("Dominion - " + (@title ? @title : controller.action_name.capitalize))
     = stylesheet_link_tag 'application'
+    = content_for :layout_stylesheet
     = javascript_include_tag "application"
     = favicon_link_tag
     - if protect_against_forgery?
@@ -15,15 +16,21 @@ html
     javascript:
       if (typeof(onLoadFunc) != "undefined") $(onLoadFunc);
   body
-    - if session[:user_id].nil?
-      #userInfo Welcome, Guest. Please #{link_to "login", login_path} or #{link_to "register", new_user_path}
-    - else
-      - user = User.find(session[:user_id])
-      #userInfo Welcome, #{user.name} | #{link_to_unless_current "Preferences", settings_path} | Not #{user.name}? Please #{link_to "logout", logout_path}
-    #contentWrap
-      = link_to(games_path, :id => "siteLogo") do
-        h1 FreeDom
-        h2 Free Dominion Game Server
+    header
+      #site-logo.landscape-card
+        a.content href=games_path
+          h1 FreeDom
+          h2 Free Dominion Game Server
+      - if session[:user_id].nil?
+        #userInfo
+          span.name Welcome, Guest
+          |  Please #{link_to "log in", login_path, class: 'left'} or #{link_to "register", new_user_path, class: 'right'}
+      - else
+        - user = User.find(session[:user_id])
+        #userInfo
+          span.name Welcome, #{user.name}
+          |  #{link_to "Preferences", settings_path, class: 'left'} | Not #{user.name}? Please #{link_to "log out", logout_path, class: 'right'}
+    main
       #flash= render 'flash_area'
       #mainContent= yield
-    #footer== [link_to("Home", games_path), link_to("About", about_path), link_to("Feedback", contact_path)].join(' | ')
+    footer== [link_to("Home", games_path), link_to("About", about_path), link_to("Feedback", contact_path)].join(' | ')
