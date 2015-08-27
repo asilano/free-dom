@@ -72,23 +72,24 @@ class Player < ActiveRecord::Base
     active_actions(true).each do |action|
       case action.expected_action
       when 'play_action'
-        controls[:hand] += [{:type => :button,
-                             :action => :play_action,
-                             :text => "Play",
-                             :nil_action => "Leave Action Phase",
-                             :cards => cards.hand.map{|card| card.is_action?},
-                             :pa_id => action.id,
-                             :css_class => 'play'
+        controls[:hand] += [{type: :button,
+                             action: :play_action,
+                             text: "Play",
+                             nil_action: "Leave Action Phase",
+                             cards: cards.hand.map{|card| card.is_action?},
+                             pa_id: action.id,
+                             css_class: 'play'
                             }]
       when 'play_treasure'
         have_simples = cards.hand.any? { |card| card.is_treasure? && !card.is_special? }
-        controls[:hand] += [{:type => :button,
-                             :action => :play_treasure,
-                             :text => "Play",
-                             :nil_action => [have_simples ? "Play Simple Treasures" : nil, 'Stop Playing Treasures'],
-                             :cards => cards.hand.map{|card| card.is_treasure?},
-                             :pa_id => action.id,
-                             :confirm => [false, true]
+        controls[:hand] += [{type: :button,
+                             action: :play_treasure,
+                             text: "Play",
+                             nil_action: [have_simples ? "Play Simple Treasures" : nil, 'Stop Playing Treasures'],
+                             cards: cards.hand.map{|card| card.is_treasure?},
+                             pa_id: action.id,
+                             confirm_nil: [false, true],
+                             css_class: 'play-treasure'
                             }]
       when 'buy'
         piles = game.piles.map do |pile|
@@ -100,21 +101,13 @@ class Player < ActiveRecord::Base
             (pile.cost <= cash and pile.cards.size != 0)
           end
         end
-        controls[:piles] += [{:type => :button,
-                              :action => :buy,
-                              :text => "Buy",
-                              :nil_action => "Buy no more",
-                              :piles => piles,
-                              :pa_id => action.id
+        controls[:piles] += [{type: :button,
+                              action: :buy,
+                              text: "Buy",
+                              nil_action: "Buy no more",
+                              piles: piles,
+                              pa_id: action.id
                             }]
-      when 'end_turn'
-        # Maintaining as stub in case needed for undo processing
-        Rails.logger.error "Deprecated action"
-        controls[:player] += [{:type => :buttons,
-                               :action => :end_turn,
-                               :label => nil,
-                               :options => [{:text => "End Turn"}]
-                             }]
       when 'choose_sot_card'
         # We've peeked at the cards we can choose between
         controls[:peeked] += [{type: :button,

@@ -31,5 +31,5 @@
         span.explain Stay informed about major updates to the free-dom server. We will only use this to contact you about new versions and items of similar importance.
       p
         => f.submit "Create"
-        button.danger= link_to('Cancel', games_path)
+        a.button.danger[href=games_path] Cancel
 | Already registered? #{link_to 'Log in', login_path} instead.

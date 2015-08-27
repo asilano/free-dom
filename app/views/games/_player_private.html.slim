@@ -15,44 +15,52 @@
       th Hand:
       - if !player_private.cards.hand.empty? || !controls[:hand].empty?
         td
-          table.hand
-            tr= render partial: 'card', collection: player_private.cards.hand
-            = render partial: 'control', collection: controls[:hand]
+          .full_cards
+            = render partial: 'control_preamble', collection: controls[:hand]
+            = render partial: 'card_with_ctrls', collection: zip_cards_and_ctrls(player_private.cards.hand, controls[:hand])
+            = render partial: 'controls_postamble', object: controls[:hand]
+
       - else
         td None
     - if !player_private.cards.in_play.empty?
       tr
         th In Play:
         td
-          table.hand
-            tr= render partial: 'card', collection: player_private.cards.in_play
-            = render partial: 'control', collection: controls[:play]
+          .full_cards
+            = render partial: 'control_preamble', collection: controls[:play]
+            = render partial: 'card_with_ctrls', collection: zip_cards_and_ctrls(player_private.cards.in_play, controls[:play])
+            = render partial: 'controls_postamble', object: controls[:play]
     tr
       th Discard:
       - if !player_private.cards.in_discard.empty?
-        td= player_private.cards.in_discard.join(', ')
+        td
+          .full_cards.ghosted
+            = render partial: 'card_with_ctrls', collection: zip_cards_no_ctrls(player_private.cards.in_discard)
       - else
         td None
     - if (!player_private.cards.enduring.empty?) || (!controls[:durations].empty?)
       tr
         th Durations:
         td
-          table.hand
-            tr= render partial: 'card', collection: player_private.cards.enduring
-    - if (!player_private.cards.revealed.empty?) ||(!controls[:revealed].select {|c| c[:player_id] == player_private.id}.empty?)
+          .full_cards= render partial: 'card', collection: player_private.cards.enduring
+    - if (!player_private.cards.revealed.empty?) || (!controls[:revealed].select { |c| c[:player_id] == player_private.id }.empty?)
       tr
         th Revealed:
         td
-          table.revealed
-            tr= render partial: 'card', collection: player_private.cards.revealed
-            = render partial: 'control', collection: controls[:revealed].select {|c| c[:player_id] == player_private.id}
-    - if (!player_private.cards.peeked.empty?) ||(!controls[:peeked].empty?)
+          .full_cards
+            - revealed_controls = controls[:revealed].select { |c| c[:player_id] == player_private.id }
+            = render partial: 'control_preamble', collection: revealed_controls
+            = render partial: 'card_with_ctrls', collection: zip_cards_and_ctrls(player_private.cards.revealed, revealed_controls)
+            = render partial: 'controls_postamble', object: revealed_controls
+    - if (!player_private.cards.peeked.empty?) || (!controls[:peeked].empty?)
       tr
         th= controls[:peeked].andand[0].andand[:label] || "Looked at:"
         td
-          table.hand.peeked
-            tr= render partial: 'card', collection: player_private.cards.peeked
-            = render partial: 'control', collection: controls[:peeked]
+          .full_cards
+            = render partial: 'control_preamble', collection: controls[:peeked]
+            = render partial: 'card_with_ctrls', collection: zip_cards_and_ctrls(player_private.cards.peeked, controls[:peeked])
+            = render partial: 'controls_postamble', object: controls[:peeked]
+
     - if !player_private.cards.of_type("Seaside::PirateShip").empty?
       tr
         th Pirate Coins:
@@ -62,16 +70,16 @@
         th Score:
         td= player_private.score
     - if player_private.cash
-      tr: td  
-    tr
-      th Actions:
-      td= player_private.actions
-    tr
-      th Buys:
-      td= player_private.buys
-    tr
-      th Cash:
-      td= player_private.cash
+      tr: td &nbsp;
+      tr
+        th Actions:
+        td= player_private.actions
+      tr
+        th Buys:
+        td= player_private.buys
+      tr
+        th Cash:
+        td= player_private.cash
   - if !controls[:player].empty?
     tr
       td[colspan="2"]

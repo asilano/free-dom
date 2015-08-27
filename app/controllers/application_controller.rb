@@ -98,7 +98,7 @@ protected
   def authorise
     unless @user
       flash[:warning] = "Please log in"
-      session[:original_uri] = request.url
+      session[:original_uri] = request.url if request.get?
       redirect_to login_path
       return false
     end

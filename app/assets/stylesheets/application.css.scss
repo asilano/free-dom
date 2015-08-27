@@ -20,9 +20,19 @@ html {
 }
 
 body {
-  font-size: 16px;
+  //font-size: 16px;
   padding: 0.5em 2em 0;
-  font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+  font-family: verdana, arial, helvetica, sans-serif;
+  font-size:   13px;
+  line-height: 18px;
+}
+
+p { margin: 0.5em 0; }
+
+p, span {
+  &.left { float: left; }
+  &.right { float: right; }
+  &.light { color: grey; }
 }
 
 a {
@@ -36,7 +46,7 @@ a {
   }
 }
 
-button, input[type=button], input[type=submit], {
+button, input[type=button], input[type=submit], a.button {
   @include sassy-button;
   font-family: inherit;
 
@@ -48,14 +58,18 @@ button, input[type=button], input[type=submit], {
   }
 
   @include when-smaller-than(medium) {
-    height: 40px;
-    line-height: 20px;
+    min-height: 40px;
   }
 }
 
-button a {
+a.button {
   font-weight: normal;
   font-style: normal;
+
+  @include when-smaller-than(medium) {
+    height: auto;
+    line-height: 30px;
+  }
 }
 
 #site-logo {
@@ -123,16 +137,16 @@ button a {
     position: relative;
     margin-top: 2px;
     width: 100%;
-    min-height: 50px;
     text-align: center;
     border-radius: 0;
+    height: auto;
+    display: flex;
+    flex-flow: row wrap;
+    padding: 0;
 
     .name {
       &::after { display: none; }
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
+      flex: 0 0 100%;
       vertical-align: middle;
       height: 20px;
       line-height: 20px;
@@ -140,29 +154,29 @@ button a {
     }
 
     a {
-      position: absolute;
-      top: 20px;
-      height: 30px;
-      line-height: 30px;
-      width: 50%;
-
+      border: 2px solid white;
+      height: 40px;
+      line-height: 40px;
+      flex: 1 0 48%;
       color: black;
       text-decoration: none;
       text-transform: capitalize;
-      border-top: 2px solid white;
 
       &.left {
-        left: 0;
-        border-right: 1px solid white;
+        border-left: 0;
+        border-right-width: 1px;
       }
       &.right {
-        right: 0;
-        border-left: 1px solid white;
+        border-right: 0;
+        border-left-width: 1px;
       }
-
       &:active {
         background-color: darken($accent-colour, 20%);
       }
+    }
+
+    .verbose {
+      display: none;
     }
   }
 }

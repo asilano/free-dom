@@ -1,0 +1,523 @@
+@import "mixins";
+@import "sassybuttons";
+
+#playerPrefsHover
+{
+  position: fixed;
+  z-index: 1501;
+  top: 1.6em;
+  right: 0;
+  padding: 0 5px 3px 10px;
+  background-color: #f0e68c;
+  text-align: right;
+  border-bottom-left-radius: 1em;
+
+  span {text-decoration: underline;}
+
+  #playerPrefs
+  {
+    padding: 5px 5px 0 10px;
+    height: 0;
+    display: none;
+    text-align: left;
+
+    .js & input[type=submit] { display: none; }
+  }
+
+  &:hover #playerPrefs {
+    height: auto;
+    display: block;
+  }
+
+  .game-setting {
+    margin: 2px 0;
+
+    label {
+      padding-left: 5px;
+    }
+  }
+
+  @include when-smaller-than(small) {
+    position: relative;
+    top: 0;
+    width: 100%;
+    min-height: 40px;
+    line-height: 40px;
+    text-align: center;
+    border-radius: 0;
+    padding: 0;
+
+    #playerPrefs {
+      display: block;
+      max-height: 0px;
+      overflow: hidden;
+      transition: max-height 0.25s ease-out;
+
+      > form {
+        display: flex;
+        flex-flow: row wrap;
+      }
+
+      .game-setting {
+        flex: 0 0 33%;
+        display: flex;
+        flex-flow: row wrap;
+
+        input, select {
+          order: 2;
+        }
+        .setting-label {
+          flex: 0 0 100%;
+          order: 1;
+          line-height: initial;
+          padding: 5px 0 0;
+        }
+      }
+
+      .select-setting select {
+        height: 40px;
+      }
+
+      .toggle-btn,
+      .toggle-checkbox,
+      .toggle-feature {
+        &,
+        &:before,
+        &:after {
+          transition: all 350ms ease-in;
+        }
+      }
+
+      .toggle-setting {
+        .toggle-checkbox {
+          display: none;
+        }
+
+        .toggle-btn {
+          order: 2;
+          position: relative;
+          height: 40px;
+          width: 80%;
+          text-transform: uppercase;
+          background: linear-gradient(90deg, $toggle-on-colour 0%, $toggle-on-colour 50%, $toggle-off-colour 50%, $toggle-off-colour 200%);
+          background-position: -80px 0;
+          background-size: 200% 100%;
+          box-shadow: inset 0 0px 22px -8px #111;
+
+          &, &:before {
+            border-radius: 5px;
+          }
+
+          &:hover {
+            cursor: pointer;
+          }
+
+          //contains the actual knob part of the button and the 'on' text
+          &:before {
+            content: '';
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 52px;
+            height: 40px;
+            transform: translateY(-50%);
+
+            border: 2px solid #202027;
+            background-image: linear-gradient(90deg, transparent 50%, rgba(255,255,255,.15) 100%);
+            background-color: #222;
+
+            background-size: 5px 5px;
+
+            text-indent: -100%;
+          }
+        }
+
+        & .toggle-feature {
+          position: relative;
+          display: block;
+          overflow: hidden;
+          height: 40px;
+          text-shadow: 0 1px 2px #666;
+          color: white;
+
+          &:before,
+          &:after {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+          }
+          &:before {
+            content: attr(data-label-on);
+            left: -60%;
+          }
+          &:after {
+            content: attr(data-label-off);
+            right: 16%;
+          }
+        }
+
+        & .toggle-checkbox:checked ~ .toggle-btn {
+          background-position: 0 0;
+
+          &:before { left: calc(100% - 52px); }
+
+          & .toggle-feature {
+            &:before  { left: 20%; }
+            &:after   { right: -60%; }
+          }
+        }
+      }
+    }
+
+    &:hover #playerPrefs {
+      max-height: 350px;
+      transition: max-height 0.25s ease-out;
+    }
+  }
+}
+
+#game_board {
+  display: flex;
+  flex-flow: row wrap;
+
+  #game_state {
+    flex: 3 0 0;
+  }
+
+  aside {
+    flex: 2 0 0;
+    min-width: 500px;
+    height: calc(100vh - #{$header-height});
+    display: flex;
+    flex-flow: column;
+
+    > div {
+      border-bottom: 1px solid black;
+      &:last-child {
+        border-bottom: 0;
+      }
+      overflow-y: scroll;
+      flex: 3 0 0;
+    }
+    > .debug {
+      flex: 2 0 0;
+    }
+  }
+
+  th, td {
+    margin: 0 5px;
+    padding: 0 5px;
+  }
+
+  h1 {
+    font-size: 1.5em;
+    font-weight: bold;
+  }
+
+  @include when-smaller-than(medium) {
+    #game_state {
+      flex: 0 0 100%;
+    }
+
+    aside {
+      min-width: 0;
+      flex: 0 0 100%;
+    }
+  }
+}
+
+
+#other_players {
+  display: flex;
+  flex-flow: row wrap;
+
+  .player {
+    margin-left: 10px;
+    padding: 5px;
+    &.curr_turn {
+     border: 2px solid green;
+     border-radius: 10px;
+    }
+  }
+}
+
+#piles {
+  display: flex;
+  flex-flow: row wrap;
+
+  .pile {
+    position: relative;
+    border: 1px solid blue;
+    border-radius: 5px;
+    padding: 0 5px 5px;
+    margin: 5px;
+    min-width: 10em;
+
+    &.emptyPile {
+      border: 2px solid red;
+    }
+
+    .pile-name {
+      position: relative;
+      width: calc(100% + 10px);
+      left: -5px;
+      border-bottom: 1px dotted;
+      border-radius: 5px 5px 0 0;
+      text-align: center;
+    }
+    .buttons {
+      position: absolute;
+      bottom: 0;
+      left: 5px;
+      width: calc(100% - 10px);
+
+      button {
+        height: 30px;
+        width: 100%;
+        margin-bottom: 5px;
+      }
+    }
+
+    .button-spacer {
+      display: block;
+      height: 35px;
+
+      @include when-smaller-than(medium) {
+        height: 45px;
+      }
+    }
+  }
+}
+
+#history {
+  ul
+  {
+    margin: 0;
+    padding: 0 0.5em;
+    list-style-type: none;
+  }
+
+  .play_action { font-weight: bold; }
+  .play_attack { color: red; }
+  .play_reaction { color: $reaction-blue }
+  .buy { color: $buy-gold }
+  .card_gain {color: #c70;}
+  .player0 { background-color: $p0col; }
+  .player1 { background-color: $p1col; }
+  .player2 { background-color: $p2col; }
+  .player3 { background-color: $p3col; }
+  .player4 { background-color: $p4col; }
+  .player5 { background-color: $p5col; }
+  .self:before {content: "->";}
+  .score { color: #006e2e; }
+
+  .start_turn
+  {
+    overflow: hidden;
+    border-top: 2px solid black;
+    font-style: italic;
+  }
+
+  .player0.player1 {@include candy_stripe($p0col, $p1col);}
+  .player0.player2 {@include candy_stripe($p0col, $p2col);}
+  .player0.player3 {@include candy_stripe($p0col, $p3col);}
+  .player0.player4 {@include candy_stripe($p0col, $p4col);}
+  .player0.player5 {@include candy_stripe($p0col, $p5col);}
+
+  .player1.player2 {@include candy_stripe($p1col, $p2col);}
+  .player1.player3 {@include candy_stripe($p1col, $p3col);}
+  .player1.player4 {@include candy_stripe($p1col, $p4col);}
+  .player1.player5 {@include candy_stripe($p1col, $p5col);}
+
+  .player2.player3 {@include candy_stripe($p2col, $p3col);}
+  .player2.player4 {@include candy_stripe($p2col, $p4col);}
+  .player2.player5 {@include candy_stripe($p2col, $p5col);}
+
+  .player3.player4 {@include candy_stripe($p3col, $p4col);}
+  .player3.player5 {@include candy_stripe($p3col, $p5col);}
+
+  .player4.player5 {@include candy_stripe($p4col, $p5col);}
+}
+
+#chat {
+  position: relative;
+  form, #chatbox {
+    position: absolute;
+    left: 0.5em;
+    right: 0.5em;
+  }
+
+  form {
+    bottom: 0;
+    height: 2em;
+  }
+  #say { position: absolute; right: 0; width: 85%; }
+  #name { width: 12%; }
+  #say:first-child { width: 100%; }
+  .input-hack { visibility: hidden; }
+}
+#chatbox
+{
+  position: absolute;
+  top: 0;
+  bottom: 2em;
+  border: 1px solid #f0f0f0;
+  overflow: auto;
+
+  .fg-noplayer { color: #aaa; }
+  .fg-player0 { color: $p0fgcol; }
+  .fg-player1 { color: $p1fgcol; }
+  .fg-player2 { color: $p2fgcol; }
+  .fg-player3 { color: $p3fgcol; }
+  .fg-player4 { color: $p4fgcol; }
+  .fg-player5 { color: $p5fgcol; }
+  .turnstamp { font-style:italic; }
+}
+
+#update_freq {
+  margin-left: 1em;
+
+  form {
+    display: inline;
+  }
+}
+
+#waiting_for {
+  margin: 0.5em 0;
+  padding: 5px;
+  display: inline-block;
+  border: 2px dashed $border-colour;
+  border-radius: 5px;
+  span {
+    vertical-align: top;
+  }
+  ul {
+    display: inline-block;
+    margin: 0;
+  }
+}
+
+.player {
+  th { text-align: right; }
+  td {
+    padding-left: 10px;
+  }
+}
+
+.full_cards {
+  display: flex;
+  flex-flow: row wrap;
+
+  .card_with_ctrls, .card_ctrl_spacer {
+    margin: 0 2px 2px 0;
+    border: thin dotted;
+
+    .container, .ctrl {
+      position: relative;
+      padding: 1px;
+      &:not(:last-child) {
+        border-bottom: thin dotted;
+      }
+    }
+    .ctrl {
+      padding: 2px;
+      margin-bottom: -2px;
+      > * {
+        margin-bottom: 2px;
+      }
+
+      label {
+        margin-left: 2px;
+      }
+    }
+  }
+
+  .card_ctrl_spacer {
+    border-color: transparent;
+
+    .container {
+      visibility: hidden;
+    }
+
+    .ctrl {
+      border-color: transparent;
+    }
+  }
+
+  &.ghosted .container::after {
+    content: "";
+    opacity: 0.5;
+    background-color: white;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+}
+
+.placeholder {
+  visibility: hidden;
+}
+
+.container {
+  /* The following section is order-dependent */
+  &.action  {background-color: $action}
+  &.reaction  {background-color: $reaction}
+  &.duration  {background-color: $duration}
+  &.treasure  {background-color: $treasure}
+  &.victory  {background-color: $victory}
+  &.curse  {background-color: $curse}
+  &.attack {color: red; font-weight: bold;}
+
+  &.victory .right {background-color: $victory}
+  &.treasure .right {background-color: $treasure}
+  &.action .right {background-color: $action}
+  &.reaction .right {background-color: $reaction}
+  &.duration .right {background-color: $duration}
+  &.curse .right {background-color: $curse}
+}
+
+/* For browsers with CSS gradient support */
+.cssgradients
+{
+  .container div.bg { display: none; }
+  .victory.action {@include card_grad($victory, $action);}
+  .victory.treasure {@include card_grad($victory, $treasure);}
+  .treasure.reaction {@include card_grad($treasure, $reaction);}
+  .victory.reaction {@include card_grad($victory, $reaction);}
+}
+
+button, input[type=button], input[type=submit], a.button {
+  &.play-treasure {
+    @include sassy-button-gradient('matte', $play-treasure-colour, $text-color: $nearly-black);
+  }
+}
+
+#join_button, #start_button {
+  margin: 5px 0;
+
+  input[type=submit] {
+    min-height: 40px;
+    font-size: 2em;
+  }
+}
+
+#spinner
+{
+  position: fixed;
+  top: 4em;
+  right: 0;
+  z-index: 2000;
+}
+
+#gameStartSpinner
+{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin-top: -50px;
+  margin-left: -50px;
+  z-index: 1000;
+}

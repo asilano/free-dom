@@ -101,5 +101,5 @@
           p.explain If AutoTunnel is set to "Always", you will always gain a Gold if you discard a Tunnel outside of the Clean-Up phase. If AutoTunnel is set to "Never", you will never gain a Gold when you discard a Tunnel. If AutoTunnel is set to "Ask", the game will ask whether you want to reveal your Tunnel and gain a Gold whenever you discard a Tunnel outside of the Clean-Up phase.
       p
         => f.submit "Update"
-        button.danger= link_to('Cancel', games_path)
+        a.button.danger[href=games_path] Cancel
 = link_to 'Back to Lobby', games_path

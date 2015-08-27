@@ -1,22 +1,26 @@
-tr class=('emptyPile' if pile.cards.empty? && pile.game.state != "waiting")
-  td: .container class=pile.card_class.varieties title=pile.card_class.text = card_content(pile.card_class)
-  td= pile.cost
-  td.clear
-    p.left= pile.cards.length
-    p.right.light
+.pile class=('emptyPile' if pile.cards.empty? && pile.game.state != "waiting")
+  .pile-name.container class=pile.card_class.varieties title=pile.card_class.text = card_content(pile.card_class)
+  .cost= "Cost: #{pile.cost}"
+  .remaining
+    | #{pile.cards.length} left
+    span.light
       - start_size = pile.card_class.starting_size(num_players)
       - start_size = '∞' if start_size == :unlimited
-      = "of #{start_size}"
-  td= raw pile_state(pile)
-  - controls[:piles].andand.each do |control|
-    td
-      - if control[:piles][pile.position]
-        - case control[:type]
-          - when :button
-            = button_tag(control[:text], type: 'submit',
-                                          name: 'pile_index',
-                                          value: pile.position,
-                                          form: "form_#{control.object_id}",
-                                          disable_with: control[:text],
-                                          confirm: (pile.card_class == BasicCards::Curse ? "Really choose Curse?" : nil),
-                                          class: control[:css_class])
+      = " of #{start_size}"
+  = raw pile_state(pile)
+  - spacer_count = 0
+  .buttons
+    - controls[:piles].andand.each do |control|
+      - case control[:type]
+        - when :button
+          - spacer_count += 1
+          = button_tag(control[:text], type: 'submit',
+                                        name: 'pile_index',
+                                        value: pile.position,
+                                        form: "form_#{control.object_id}",
+                                        disable_with: control[:text],
+                                        confirm: (pile.card_class == BasicCards::Curse ? "Really choose Curse?" : nil),
+                                        class: (control[:piles][pile.position] ? '' : 'placeholder') + (control[:css_class] || ''),
+                                        disabled: !control[:piles][pile.position])
+  - spacer_count.times do |_|
+    .button-spacer

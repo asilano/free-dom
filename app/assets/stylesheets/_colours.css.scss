@@ -1,0 +1,50 @@
+$nearly-black: #222222;
+$accent-colour: #f0e68c;
+$logo-colour: lighten($accent-colour, 20%);
+$logo-text-colour: navy;
+$button-colour: lighten($logo-text-colour, 20%);
+$explain-colour: SteelBlue;
+$border-colour: DarkGray;
+
+$error-colour: #a50000;
+$notice-colour: #005dff;
+$alert-colour: #eac300;
+$good-colour: #30bb30;
+
+$error-bg-colour: lighten($error-colour, 50%);
+$notice-bg-colour: lighten($notice-colour, 30%);
+$alert-bg-colour: lighten($alert-colour, 40%);
+$input-bg-colour: lighten($logo-colour, 50%);
+
+$bg-blue: #e0f0ff;
+$bg-error: #fdd;
+$bg-grey: #f0f0f0;
+
+$toggle-off-colour: DarkGray;
+$toggle-on-colour: LightSkyBlue;
+
+$action: white;
+$reaction: #87cefa;
+$duration: #ffa500;
+$treasure: #ffd700;
+$victory: lime;
+$curse: #ba55d3;
+
+$play-treasure-colour: darken($treasure, 10%);
+
+$reaction-blue: #337;
+$buy-gold: $treasure * 0.75;
+
+$p0col: #fcc;
+$p1col: #ffd;
+$p2col: #cfc;
+$p3col: #dff;
+$p4col: #ddf;
+$p5col: #fdf;
+
+$p0fgcol: #d00;
+$p1fgcol: #da0;
+$p2fgcol: #0a0;
+$p3fgcol: #0aa;
+$p4fgcol: #00f;
+$p5fgcol: #d0d;

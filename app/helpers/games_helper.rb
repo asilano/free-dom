@@ -24,15 +24,15 @@ module GamesHelper
         review_path = join_game_path(game)
       end
 
-      html = content_tag(:td, button_tag(link_to('Review', review_path), class: 'look', type: nil))
+      html = content_tag(:td, link_to('Review', review_path, class: 'button look'))
       html << tag(:td)
     elsif game.state == 'waiting'
       if user_games.andand.include?(game)
         # User already in game. Just give them a Play button
-        html = tag(:td) + content_tag(:td, button_tag(link_to('Play', play_game_path(game)), class: 'play', type: nil))
+        html = tag(:td) + content_tag(:td, link_to('Play', play_game_path(game), class: 'button play'))
       else
         # User not in game. Give Watch, and Join if not at max players
-        html = content_tag(:td, button_tag(link_to('Watch', watch_game_path(game)), class: 'look', type: nil))
+        html = content_tag(:td, link_to('Watch', watch_game_path(game), class: 'button look', type: nil))
         if game.players.length < game.max_players
           html << content_tag(:td, button_to('Join', join_game_path(game), class: 'play'))
         else
@@ -42,9 +42,9 @@ module GamesHelper
     elsif game.state == 'running'
       # Game running. Give Watch or Play based on whether user is in game
       if user_games.andand.include? game
-        html = tag(:td) + content_tag(:td, button_tag(link_to('Play', play_game_path(game)), class: 'play', type: nil))
+        html = tag(:td) + content_tag(:td, link_to('Play', play_game_path(game), class: 'button play'))
       else
-        html = content_tag(:td, button_tag(link_to('Watch', watch_game_path(game)), class: 'look', type: nil)) + tag(:td)
+        html = content_tag(:td, link_to('Watch', watch_game_path(game), class: 'button look', type: nil)) + tag(:td)
       end
     end
 
@@ -124,7 +124,7 @@ module GamesHelper
       end
     end.compact
 
-    return strs.join('; ')
+    return strs.map { |state| "<div class='fact'>#{state}</div>" }.join()
   end
 
   def game_facts(game)
@@ -159,13 +159,9 @@ module GamesHelper
         html_string += "<td>"
         cards = player.cards.in_location(type.to_s.demodulize.underscore)
         if !cards.empty?
-          html_string += "<table class='hand'>"
-          cards.in_groups_of(5) do |chunk|
-            html_string += "<tr>"
-            html_string += render(:partial => 'card', :collection => chunk.compact)
-            html_string += "</tr>"
-          end
-          html_string += "</table>"
+          html_string += "<div class='full_cards'>"
+          html_string += render(:partial => 'card_with_ctrls', :collection => zip_cards_no_ctrls(cards))
+          html_string += "</div>"
         else
          html_string +=  "None"
         end
@@ -204,13 +200,16 @@ EOS
 
   def setting_checkbox(name, label)
     str = hidden_field_tag("settings[#{name}]", 0)
-    str << check_box_tag(name, 1, @player.settings.__send__(name), :name => "settings[#{name}]")
-    str << label_tag(name, label)
+    str << check_box_tag(name, 1, @player.settings.__send__(name), name: "settings[#{name}]", class: 'toggle-checkbox')
+    str << label_tag(name, label, class: 'setting-label')
+    str << label_tag(name, tag(:span, class: 'toggle-feature', data: {label_on: 'on', label_off: 'off'}), class: 'toggle-btn')
+    content_tag(:div, str, class: 'game-setting toggle-setting')
   end
 
   def setting_dropdown(name, label, options)
-    str = label_tag(name, label)
-    str << select_tag(name, options_for_select(options, @player.settings.__send__(name)), :name => "settings[#{name}]")
+    str = select_tag(name, options_for_select(options, @player.settings.__send__(name)), :name => "settings[#{name}]")
+    str << label_tag(name, label, class: 'setting-label')
+    content_tag(:div, str, class: 'game-setting select-setting')
   end
 
   def control_form(control)
@@ -232,5 +231,25 @@ EOS
     end
 
     content_for(:control_forms, raw(form))
+  end
+
+  # Convert an array of cards and an array of control-hashes into an array of pairs,
+  # each being a card and an array of the control-hashes affecting that card.
+  def zip_cards_and_ctrls(cards, controls)
+    # Create a template return array
+    rtn = cards.zip(Array.new(cards.length) { [] } )
+    controls.each do |ctrl|
+      valid_cards = ctrl.delete(:cards)
+Rails.logger.info("#{rtn.size} vs #{valid_cards.size}")
+      rtn.zip(valid_cards) do |pair, valid|
+        pair[1] << [valid, ctrl]
+      end
+    end
+
+    rtn
+  end
+
+  def zip_cards_no_ctrls(cards)
+    zip_cards_and_ctrls(cards, [])
   end
 end

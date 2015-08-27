@@ -1,0 +1,6 @@
+ul
+  - @game.histories.each do |history|
+    - classes = history.css_class
+    - if @player && history.css_class =~ /\bplayer#{@player.seat}\b/
+      - classes += ' self'
+    li class=classes = format_history(history, @player)

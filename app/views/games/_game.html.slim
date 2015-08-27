@@ -1,125 +1,107 @@
-#game_state
-  #last_changed
-    ' Game state last changed at:
-    span#last_change_value
-      = @last_mod.httpdate
-  #last_refreshed
-    ' Last checked for changes at:
-    span#last_refresh_value
-      = Time.new.httpdate
-  #update_freq.lighter
-    - if @player
-      '  Updating every
-      span#update_freq_value= @player.settings.update_interval
-      span#update_freq_form.hidden
-        = form_tag({action: :update_player_settings, id: @game}, remote: true) do
-          = text_field_tag "settings[update_interval]", @player.settings.update_interval, size: 4
-          = submit_tag "Set"
-      '  seconds.
-      span#change_freq= link_to_function "Change.", "enable_freq_form()"
-      span#cancel_freq.hidden= link_to_function "Cancel.", "disable_freq_form()"
-      javascript:
-        function enable_freq_form() {
-          $('#update_freq').removeClass("lighter");
-          $('#update_freq_value').hide();
-          $('#update_freq_form').show();
-          $('#change_freq').hide();
-          $('#cancel_freq').show();
-        };
-        function disable_freq_form() {
-          $('#update_freq').addClass("lighter");
-          $('#update_freq_value').show();
-          $('#update_freq_form').hide();
-          $('#change_freq').show();
-          $('#cancel_freq').hide();
-        }
-    - else
-      - freq = @user ? @user.settings.update_interval : 60
-      |  Updating every #{freq} seconds.
-  #status
-    #ended.hidden= game.state == 'ended'
-    #locked.hidden false
-    p
-      ' Game state:
-      - if game.state == 'waiting'
-        |  Waiting for players
-      - elsif game.state == 'running'
-        |  In progress
-      - elsif game.state == 'ended'
-        |  Ended
-      - else
-        = game.state
-    - if !game.active_ply_actions.empty?
-      table#waitingForTable
-        tr
-          td Waiting for:
-          td: ul
-            - game.active_ply_actions.each do |act|
-              li= act.player.name + " to " + act.text
-  #players
-    - if player
-      #player_private
-        = render partial: 'player_private', object: player,
-                  locals: {controls: controls}
-      hr
-    = raw game_facts(game)
-    #player_public
-      table.other_players[cellspacing="5"]
-        - other_players = game.players.reject {|p| p == player}
-        - if player && player.seat
-          - other_players = other_players.sort_by {|p| (p.seat - player.seat) % game.players.length}
-        - other_players.in_groups_of(2) do |chunk|
-          tr.other_players= render partial: 'player',
-                                    collection: chunk.compact,
-                                    locals: {:controls => controls}
-  #piles
-    h3 Buy Piles
-    table
-      tr
-        th Card Type
-        th Cost
-        th Remaining
-        th
-
-      - if controls.include? :piles
-        tr
-          td
-          td
-          td
-          td
-          - controls[:piles].each do |control|
-            - control_form(control)
-            td
-              - if control[:nil_action]
-                - case control[:type]
-                  - when :button
-                    = submit_tag(control[:nil_action],
-                                 name: "nil_action",
-                                 form: "form_#{control.object_id}",
-                                 disable_with: control[:nil_action],
-                                 class: control[:css_class])
-      = render partial: 'pile', collection: game.piles, locals: {controls: controls, num_players: game.players.length}
+#last_changed
+  ' Game state last changed at:
+  span#last_change_value
+    = @last_mod.httpdate
+#last_refreshed
+  ' Last checked for changes at:
+  span#last_refresh_value
+    = Time.new.httpdate
+#update_freq.lighter
+  - if @player
+    '  Updating every
+    span#update_freq_value= @player.settings.update_interval
+    span#update_freq_form.hidden
+      = form_tag({action: :update_player_settings, id: @game}, remote: true) do
+        = text_field_tag "settings[update_interval]", @player.settings.update_interval, size: 4
+        = submit_tag "Set"
+    '  seconds.
+    span#change_freq= link_to_function "Change.", "enable_freq_form()"
+    span#cancel_freq.hidden= link_to_function "Cancel.", "disable_freq_form()"
+    javascript:
+      function enable_freq_form() {
+        $('#update_freq').removeClass("lighter");
+        $('#update_freq_value').hide();
+        $('#update_freq_form').show();
+        $('#change_freq').hide();
+        $('#cancel_freq').show();
+      };
+      function disable_freq_form() {
+        $('#update_freq').addClass("lighter");
+        $('#update_freq_value').show();
+        $('#update_freq_form').hide();
+        $('#change_freq').show();
+        $('#cancel_freq').hide();
+      }
+  - else
+    - freq = @user ? @user.settings.update_interval : 60
+    |  Updating every #{freq} seconds.
+#status
+  #ended.hidden= game.state == 'ended'
+  #locked.hidden false
+  - if !game.active_ply_actions.empty?
+    #waiting_for
+      span Waiting for:
+      ul
+        - game.active_ply_actions.each do |act|
+          li= act.player.name + " to " + act.text
+- if player
+  #player_private
+    = render partial: 'player_private', object: player,
+              locals: {controls: controls}
+    / Present a start button to the first-joined player,
+    / so long as there are more than 2 and the game is waiting
+    - if (@game.players.length >= 2 && player == @game.players[0] && @game.state == 'waiting')
+      #start_button
+        = form_tag({action: :start_game }, remote: true, id: 'start_form') do
+          = submit_tag 'Start Game', id: 'start_game_btn', class: 'play'
+        javascript:
+          $('#start_form').on('ajax:beforeSend', function(){
+            $('#gameStartSpinner').show();
+            $(this).attr('disabled', true).val('Please wait...');
+          }).on('ajax:complete', function(){
+            $('#gameStartSpinner').hide();
+            $('#start_button').remove();
+          }).on('ajax:error', function(){
+            alert('Sorry, something went wrong. Please refresh and try again');
+          });
+  hr
+- elsif @user && (game.users.include?(@user) || (game.state == 'waiting' && game.players.length < game.max_players))
   #join_button
-    - if !player && @user && (game.users.include?(@user) || (game.state == 'waiting' && game.players.length < game.max_players))
-      = button_to "Join Game", join_game_path(game)
-  = content_for :control_forms
-  / Present a start button to the first-joined player,
-  / so long as there are more than 2 and the game is waiting
-  - if (@game.players.length >= 2 && @player == @game.players[0] && @game.state == 'waiting')
-    #start_button
-      = form_tag({action: :start_game }, remote: true, id: 'start_form') do
-        = submit_tag 'Start Game', id: 'start_game_btn'
-      javascript:
-        $('#start_form').on('ajax:beforeSend', function(){
-          $('#gameStartSpinner').show();
-          $(this).attr('disabled', true).val('Please wait...');
-        }).on('ajax:complete', function(){
-          $('#gameStartSpinner').hide();
-          $('#start_button').remove();
-        }).on('ajax:error', function(){
-          alert('Sorry, something went wrong. Please refresh and try again');
-        });
+    = button_to "Join Game", join_game_path(game), class: 'play'
+= raw game_facts(game)
+#other_players
+  - other_players = game.players.reject { |p| p == player }
+  - if player && player.seat
+    - other_players = other_players.sort_by { |p| (p.seat - player.seat) % game.players.length }
+  =render partial: 'player', collection: other_players, locals: {controls: controls}
+h1 Buy Piles
+#piles
+  - if controls.include? :piles
+    - controls[:piles].each do |control|
+      - control_form(control)
+    - if controls[:piles].any? { |control| control[:nil_action] }
+      - spacer_count = 0
+      .pile
+        .buttons
+          - controls[:piles].each do |control|
+            - case control[:type]
+              - when :button
+                - spacer_count += 1
+                = button_tag(control[:nil_action],
+                             type: 'submit',
+                             name: "nil_action",
+                             value: control[:nil_action],
+                             form: "form_#{control.object_id}",
+                             disable_with: control[:nil_action],
+                             class: (control[:nil_action] ? '' : ' placeholder') + (control[:css_class] || ''),
+                             disabled: !controls[:nil_action])
+        - spacer_count.times do |_|
+          .button-spacer
+  = render partial: 'pile', collection: game.piles, locals: {controls: controls, num_players: game.players.length}
 
+/ Spinner images here so they get overwritten and disappear on refresh
+= image_tag('start_game_spinner.gif', id: 'gameStartSpinner', class: 'hidden')
+= image_tag('spinner.gif', id: 'spinner', class: 'hidden')
 - if game.state == 'ended'
   #resultOverlay.overlay
 
@@ -149,43 +131,4 @@
       $(this).hide();
       $(this).siblings('.showDeck').show();
       $(this).siblings('.deckList').slideUp();
-    });
-= image_tag('start_game_spinner.gif', id: 'gameStartSpinner', class: 'hidden')
-= image_tag('spinner.gif', id: 'spinner', class: 'hidden')
-- content_for :js_in_head do
-  javascript:
-    // Scroll to bottom of history & chat, and enable controls, every update
-    function onLoadFunc() {
-      $('#history').scrollTop($('#history')[0].scrollHeight);
-
-      // Scroll to bottom of chat
-      $('#chatbox').scrollTop($('#chatbox')[0].scrollHeight);
-
-      // Enable all buttons
-      $('input[type=button], input[type=submit]').removeAttr('disabled');  //'
-      $('.ajaxSpinSmall').on('ajax:beforeSend', function(){
-        $('#spinner').show();
-      }).on('ajax:complete', function(){
-        $('#spinner').hide();
-      });
-    }
-
-    // Enable the game refresh on first load only
-    $(function() {
-      var inProgress = false;
-      setInterval(function() {
-        if (!inProgress && $('#ended').html().indexOf('false') != -1 && $('#locked').html().indexOf('false') != -1) {
-          $.ajax({ url: '#{url_for 'check_change'}',
-                    beforeSend: function(){
-                      $('#spinner').show();
-                      inProgress = true;
-                    },
-                    complete: function(){
-                      $('#spinner').hide(); inProgress = false;
-                    },
-                    data: {since: $('#last_refresh_value').html()}
-                  })
-        }
-      },
-      #{(@player ? @player.settings.update_interval : @user ? @user.settings.update_interval : 60) * 1000});
     });

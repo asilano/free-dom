@@ -17,5 +17,5 @@
         span.explain[] (We will use a cookie to remember your login for 2 weeks)
       p
         => submit_tag "Login", tabindex: 1
-        button.danger= link_to('Cancel', games_path)
+        a.button.danger[href=games_path] Cancel
 p Don't have an account yet? #{link_to 'Register here!', new_user_path}

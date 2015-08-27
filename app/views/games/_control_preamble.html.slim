@@ -1,0 +1,6 @@
+- control_form(control_preamble)
+- if control_preamble[:on_update]
+  javascript:
+    changed_#{control.object_id} = function (){
+      #{raw send(control[:on_update], control)}
+    }

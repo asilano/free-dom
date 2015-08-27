@@ -1,23 +1,6 @@
-$accent-colour: #f0e68c;
-$logo-colour: lighten($accent-colour, 20%);
-$logo-text-colour: navy;
-$button-colour: lighten($logo-text-colour, 20%);
-$explain-colour: SteelBlue;
-$border-colour: DarkGray;
+@import "colours";
 
-$error-colour: #a50000;
-$notice-colour: #005dff;
-$alert-colour: #eac300;
-$good-colour: #30bb30;
-
-$error-bg-colour: lighten($error-colour, 50%);
-$notice-bg-colour: lighten($notice-colour, 30%);
-$alert-bg-colour: lighten($alert-colour, 40%);
-$input-bg-colour: lighten($logo-colour, 50%);
-
-$bg-blue: #e0f0ff;
-$bg-error: #fdd;
-$bg-grey: #f0f0f0;
+$header-height: 230px;
 
 .lighter {font-weight: normal; color: #ccc;}
 
@@ -26,6 +9,30 @@ $bg-grey: #f0f0f0;
     @media (max-width: 650px) { @content; }
   }
   @else if $breakpoint == medium {
-    @media (max-width: 850px) { @content; }
+    @media
+      (max-width: 980px),
+      only screen and (-webkit-min-device-pixel-ratio: 2),
+      only screen and (   min--moz-device-pixel-ratio: 2),
+      only screen and (     -o-min-device-pixel-ratio: 2/1),
+      only screen and (        min-device-pixel-ratio: 2),
+      only screen and (                min-resolution: 192dpi),
+      only screen and (                min-resolution: 2dppx)
+    { @content; }
   }
+}
+
+@mixin bg-gradient($from_loc, $to_loc, $from_c, $to_c, $fstop: 0%, $tstop: 100%) {
+  background-color: $from_c;
+  background-image: linear-gradient(to $to_loc, $from_c $fstop, $to_c $tstop);
+}
+
+@mixin card_grad($from, $to, $fstop: 30%, $tstop: 70%) {
+  background-color: $from;
+  background-image: linear-gradient(to right, $from $fstop, $to $tstop);
+}
+
+@mixin candy_stripe($col1, $col2) {
+  background-color: $col1;
+  background-image: linear-gradient(-45deg, $col1, $col2, $col1, $col2, $col1);
+  background-size: 50px 50px;
 }

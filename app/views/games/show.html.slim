@@ -1,33 +1,71 @@
+- content_for :layout_stylesheet
+  = stylesheet_link_tag 'game_board'
 - if @player
-  #playerPrefsHover
-    span Adjust Game Settings
-    #playerPrefs= render partial: "player_settings"
-    javascript:
-      $('#playerPrefsHover').on('click', 'input[type=checkbox]', function() {
-        $(this).closest('form').submit();
-      }).on('change keyup', 'select', function() {
-        $(this).closest('form').submit();
-      });
+  - content_for :game_prefs
+    #playerPrefsHover
+      span Adjust Game Settings
+      #playerPrefs= render partial: "player_settings"
+      javascript:
+        $('#playerPrefsHover').on('click', 'input[type=checkbox]', function() {
+          $(this).closest('form').submit();
+        }).on('change keyup', 'select', function() {
+          $(this).closest('form').submit();
+        });
 h2= @game.name
-#game_board.design
-  = render partial: 'game', object: @game, locals: {player: @player, controls: @controls}
-#history.design
-  ul
-    - @game.histories.each do |history|
-      - classes = history.css_class
-      - if @player && history.css_class =~ /\bplayer#{@player.seat}\b/
-        - classes += ' self'
-      li class=classes = format_history(history, @player)
-#pend_actions.debug.design class=('hidden' unless ((@user && @user.name == 'Chowlett') || request.host == '127.0.0.1'))
-  - if @game.root_action(true)
-    ul= render(partial: 'pend_action', object: @game.root_action)
-#chat.design
-  #chatbox= render partial: 'chat_line', collection: @game.chats
-  = form_tag action: :speak do
-    div
-      = text_field_tag("name", nil, placeholder: "Name?") if !@user
-      = text_field_tag("say", nil, placeholder: "What do you want to say?", autocomplete: 'off')
-      = submit_tag "Say", class: 'input-hack'
+#game_board
+  #game_state
+    = render partial: 'game', object: @game, locals: {player: @player, controls: @controls}
+  aside
+    #history
+      = render partial: 'history'
+    #pend_actions.debug class=('hidden' unless ((@user && @user.name == 'Chowlett') || request.host == '127.0.0.1'))
+      - if @game.root_action(true)
+        ul= render(partial: 'pend_action', object: @game.root_action)
+    #chat
+      #chatbox= render partial: 'chat_line', collection: @game.chats
+      = form_tag action: :speak do
+        div
+          = text_field_tag("name", nil, placeholder: "Name?") if !@user
+          = text_field_tag("say", nil, placeholder: "What do you want to say?", autocomplete: 'off')
+          = submit_tag "Say", class: 'input-hack'
+  = content_for :control_forms
+  - content_for :js_in_head do
+    javascript:
+      // Scroll to bottom of history & chat, and enable controls, every update
+      function onLoadFunc() {
+        $('#history').scrollTop($('#history')[0].scrollHeight);
+
+        // Scroll to bottom of chat
+        $('#chatbox').scrollTop($('#chatbox')[0].scrollHeight);
+
+        // Enable all buttons
+        $('input[type=button], input[type=submit]').removeAttr('disabled');  //'
+        $('.ajaxSpinSmall').on('ajax:beforeSend', function(){
+          $('#spinner').show();
+        }).on('ajax:complete', function(){
+          $('#spinner').hide();
+        });
+      }
+
+      // Enable the game refresh on first load only
+      $(function() {
+        var inProgress = false;
+        setInterval(function() {
+          if (!inProgress && $('#ended').html().indexOf('false') != -1 && $('#locked').html().indexOf('false') != -1) {
+            $.ajax({ url: '#{url_for 'check_change'}',
+                      beforeSend: function(){
+                        $('#spinner').show();
+                        inProgress = true;
+                      },
+                      complete: function(){
+                        $('#spinner').hide(); inProgress = false;
+                      },
+                      data: {since: $('#last_refresh_value').html()}
+                    })
+          }
+        },
+        #{(@player ? @player.settings.update_interval : @user ? @user.settings.update_interval : 60) * 1000});
+      });
 javascript:
   $('#chat form').on('submit', function(e) {
     $.post($(this).attr('action'),

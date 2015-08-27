@@ -1,6 +1,7 @@
 <% if (!@just_checking || !@player || !@player.lock) %>
   $("#flash").html('<%= escape_javascript(render('flash_area')) -%>');
-  $("#game").html('<%= escape_javascript(render(@game, :player => @player, :controls => @controls)) -%>');
+  $("#game_state").html('<%= escape_javascript(render(@game, :player => @player, :controls => @controls)) -%>');
+  $("#history").html('<%= escape_javascript(render(partial: "history")) -%>');
   <%= render :partial => 'update_chat' %>
   onLoadFunc();
 
