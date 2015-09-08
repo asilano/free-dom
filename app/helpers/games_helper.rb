@@ -21,7 +21,7 @@ module GamesHelper
       # Review button only. Links to Watch or Play depending on whether the user was a player
       review_path = watch_game_path(game)
       if user_games.andand.include?(game)
-        review_path = join_game_path(game)
+        review_path = play_game_path(game)
       end
 
       html = content_tag(:td, link_to('Review', review_path, class: 'button look'))

@@ -103,7 +103,6 @@ h1 Buy Piles
 = image_tag('start_game_spinner.gif', id: 'gameStartSpinner', class: 'hidden')
 = image_tag('spinner.gif', id: 'spinner', class: 'hidden')
 - if game.state == 'ended'
-  #resultOverlay.overlay
 
   #result
     p.centred.header Game Over - Results
@@ -122,6 +121,7 @@ h1 Buy Piles
             = link_to('(hide deck)', '#', class: 'showHideDeck hideDeck')
             p.deckList.hidden= raw ply_ordered[ix].cards_for_decklist
     p.centred.gapAbove= link_to "Back to Index", games_path
+    a.hide-link[href='#'] Close
   javascript:
     $('.resultEntry').on('click', '.showDeck', function() {
       $(this).hide();
@@ -131,4 +131,7 @@ h1 Buy Piles
       $(this).hide();
       $(this).siblings('.showDeck').show();
       $(this).siblings('.deckList').slideUp();
+    });
+    $('#result').on('click', '.hide-link', function() {
+      $('#result').slideUp();
     });

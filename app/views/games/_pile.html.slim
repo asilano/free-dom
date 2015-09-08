@@ -1,5 +1,5 @@
 .pile class=('emptyPile' if pile.cards.empty? && pile.game.state != "waiting")
-  .pile-name.container class=pile.card_class.varieties title=pile.card_class.text = card_content(pile.card_class)
+  .pile-name.container class=pile.card_class.varieties title=pile.card_class.text rel='tooltip' = card_content(pile.card_class)
   .cost= "Cost: #{pile.cost}"
   .remaining
     | #{pile.cards.length} left

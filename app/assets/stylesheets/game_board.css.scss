@@ -1,5 +1,6 @@
 @import "mixins";
 @import "sassybuttons";
+@import "fonts";
 
 #playerPrefsHover
 {
@@ -242,6 +243,11 @@
   }
 }
 
+.scoreRow
+{
+  background-color: #efd;
+}
+
 #piles {
   display: flex;
   flex-flow: row wrap;
@@ -477,6 +483,12 @@
   &.reaction .right {background-color: $reaction}
   &.duration .right {background-color: $duration}
   &.curse .right {background-color: $curse}
+
+  // Make bigger on small screens
+  @include when-smaller-than(small) {
+    height: 2em;
+    line-height: 2em;
+  }
 }
 
 /* For browsers with CSS gradient support */
@@ -520,4 +532,72 @@ button, input[type=button], input[type=submit], a.button {
   margin-top: -50px;
   margin-left: -50px;
   z-index: 1000;
+}
+
+// End-game overlay
+#result
+{
+  position: fixed;
+  width: 450px;
+  top: 50%;
+  left: 50%;
+  margin-top: -180px;
+  margin-left: -225px;
+
+  @include when-smaller-than(small) {
+    width: 90%;
+    left: auto;
+    margin: -180px auto 0;
+  }
+
+  background-color: white;
+  border: 2px solid navy;
+  border-radius: 5px;
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.4);
+  z-index: 2000;
+
+  .header {
+    font-size: 30px;
+    line-height: 32px;
+    color: red;
+    margin: 30px;
+  }
+
+  .hide-link {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+  }
+}
+#resultList
+{
+  list-style-type: none;
+  text-align: center;
+  margin: 0 auto;
+  display: inline;
+  padding: 0;
+
+  .resultEntry {
+    margin: 2px auto;
+    width: 90%;
+    text-align: center;
+    .name { font-weight: bold;}
+  }
+  .winner { font-size: larger; }
+  .showHideDeck {
+    color: grey;
+  }
+
+  .hideDeck {
+    display: none;
+  }
+
+  .deckList {
+    color: grey;
+    display: none;
+    margin: 0;
+    font-size: $base-font-size;
+    span.victory-text {color: #0a0;}
+    span.curse-text {color: $curse;}
+  }
 }
