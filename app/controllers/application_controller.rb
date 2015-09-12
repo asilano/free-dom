@@ -7,6 +7,7 @@ class ApplicationController < ActionController::Base
 
   # Scrub sensitive parameters from your log
   # filter_parameter_logging :password
+  before_filter :set_cache_headers
   before_filter :custom_headers
   before_filter :check_cookied_user
   before_filter :record_player_pa_ids
@@ -18,6 +19,12 @@ class ApplicationController < ActionController::Base
   end
 
 protected
+  def set_cache_headers
+    response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "Mon, 01 Jan 1990 00:00:00 GMT"
+  end
+
   def custom_headers
     response.headers['X-Clacks-Overhead'] = 'GNU Terry Pratchett'
   end

@@ -99,6 +99,8 @@ h1 Buy Piles
           .button-spacer
   = render partial: 'pile', collection: game.piles, locals: {controls: controls, num_players: game.players.length}
 
+= content_for :control_forms
+
 / Spinner images here so they get overwritten and disappear on refresh
 = image_tag('start_game_spinner.gif', id: 'gameStartSpinner', class: 'hidden')
 = image_tag('spinner.gif', id: 'spinner', class: 'hidden')

@@ -7,7 +7,7 @@ table#games_list
     th Name
     th Num Players
     th Players
-    th State
+    th.state State
     th.blank_th
 
   - @games.each_with_index do |game, ix|
@@ -30,7 +30,7 @@ table#games_list
         - else
           = game.players.map{|p| p.name}.join(', ')
 
-      td= game.state.capitalize
+      td.state= game.state.capitalize
       = game_buttons_for(game, @user)
 
 - if session[:user_id]

@@ -28,7 +28,6 @@ h2= @game.name
           = text_field_tag("name", nil, placeholder: "Name?") if !@user
           = text_field_tag("say", nil, placeholder: "What do you want to say?", autocomplete: 'off')
           = submit_tag "Say", class: 'input-hack'
-  = content_for :control_forms
   - content_for :js_in_head do
     javascript:
       // Scroll to bottom of history & chat, and enable controls, every update

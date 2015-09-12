@@ -416,8 +416,9 @@
   flex-flow: row wrap;
 
   .card_with_ctrls, .card_ctrl_spacer {
-    margin: 0 2px 2px 0;
     border: thin dotted;
+    margin: 0 2px 2px 0;
+    @include when-smaller-than(medium) { margin: 0 5px 5px 0; }
 
     .container, .ctrl {
       position: relative;

@@ -44,6 +44,10 @@
     &.waiting.rowEven {background-color: #cdf;}
     &.waiting.rowOdd {background-color: #abf;}
   }
+
+  @include when-smaller-than(small) {
+    .state { display: none; }
+  }
 }
 
 .card-select-row {
