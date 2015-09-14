@@ -100,8 +100,12 @@ module GamesHelper
     html
   end
 
-  def card_content(card_or_pile)
+  def card_content(card_or_pile, cost = nil)
     inner_content = card_or_pile.readable_name
+    if cost
+      inner_content += " [#{cost}]"
+    end
+
     if card_or_pile.kind_of?(Card) && card_or_pile.location == 'play' &&
         card_or_pile.player.cards.in_location('prince').of_type('PromoCards::Prince').any? { |p| p.state[:princed_id] == card_or_pile.id }
       inner_content << tag('br') + '(Princed)'
@@ -125,6 +129,25 @@ module GamesHelper
     end.compact
 
     return strs.map { |state| "<div class='fact'>#{state}</div>" }.join()
+  end
+
+  def pile_class(pile)
+    if pile.game.state == 'waiting'
+      'one-card'
+    elsif pile.cards.empty?
+      'emptyPile'
+    else
+      case pile.cards.count
+      when 1
+        'one-card'
+      when 2
+        'two-cards'
+      when 3..5
+        'few-cards'
+      when 6..Float::INFINITY
+        'many-cards'
+      end
+    end
   end
 
   def game_facts(game)
@@ -240,7 +263,6 @@ EOS
     rtn = cards.zip(Array.new(cards.length) { [] } )
     controls.each do |ctrl|
       valid_cards = ctrl.delete(:cards)
-Rails.logger.info("#{rtn.size} vs #{valid_cards.size}")
       rtn.zip(valid_cards) do |pair, valid|
         pair[1] << [valid, ctrl]
       end

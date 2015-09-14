@@ -17,7 +17,7 @@ $( function()
         target.removeAttr( 'title' );
         tooltip.css( 'opacity', 0 )
                .html( tip )
-               .appendTo( 'body' );
+               .appendTo( '#game_state' );
 
         var init_tooltip = function()
         {

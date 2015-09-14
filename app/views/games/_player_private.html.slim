@@ -42,7 +42,7 @@
       tr
         th Durations:
         td
-          .full_cards= render partial: 'card', collection: player_private.cards.enduring
+          .full_cards= render partial: 'card_with_ctrls', collection: zip_cards_no_ctrls(player_private.cards.enduring)
     - if (!player_private.cards.revealed.empty?) || (!controls[:revealed].select { |c| c[:player_id] == player_private.id }.empty?)
       tr
         th Revealed:

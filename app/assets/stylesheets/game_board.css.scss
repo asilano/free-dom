@@ -261,7 +261,17 @@
     min-width: 10em;
 
     &.emptyPile {
-      border: 2px solid red;
+      border: 2px inset red;
+      background-color: #fcc;
+    }
+    &.two-cards {
+      box-shadow: 1px 1px 0 white, 2px 2px 0 blue;
+    }
+    &.few-cards {
+      box-shadow: 1px 1px 0 white, 2px 2px 0 blue, 3px 3px 0 white, 4px 4px 0 blue;
+    }
+    &.many-cards {
+      box-shadow: 1px 1px 0 white, 2px 2px 0 blue, 3px 3px 0 white, 4px 4px 0 blue, 5px 5px 0 white, 6px 6px 0 blue;
     }
 
     .pile-name {
