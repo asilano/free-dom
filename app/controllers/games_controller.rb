@@ -22,7 +22,11 @@ class GamesController < ApplicationController
   #end
 
   def legacy
-    self.class.prepend_view_path "app/views/old" if @user.andand.name == 'Clive'
+    if @user.andand.name == 'Clive'
+      self.class.prepend_view_path "app/views/old"
+    else
+      self.class.view_paths = ['app/views']
+    end
   end
 
   # GET /games
