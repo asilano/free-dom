@@ -1,0 +1,84 @@
+- control_form(control)
+tr
+  - if control[:on_update]
+    javascript:
+      changed_#{control.object_id} = function (){
+        #{raw send(control[:on_update], control)}
+      }
+  - control[:cards].each_with_index do |card_ctrl, ix|
+    td
+      - if card_ctrl
+        - case control[:type]
+          - when :button
+            = button_tag(control[:text], type: 'submit',
+                                          name: 'card_index',
+                                          value: ix,
+                                          form: "form_#{control.object_id}",
+                                          disable_with: control[:text],
+                                          class: control[:css_class],
+                                          confirm: control[:confirm].andand.include?(ix) ? "Are you sure?" : nil)
+          - when :two_d_radio
+            - control[:options].each_with_index do |opt, optix|
+              = radio_button_tag(:choice, "#{ix}.#{optix}", false,
+                                  onclick: ("changed_#{control.object_id}()" if control[:on_update]),
+                                  form: "form_#{control.object_id}",
+                                  class: control[:css_class])
+              = opt
+              br
+          - when :latin_radio
+            - control[:options].each_with_index do |opt, optix|
+              = radio_button_tag("choice[#{ix}]",
+                                  "#{optix}",
+                                  false,
+                                  :"data-rowid" => "#{optix}",
+                                  class: "latin-radio",
+                                  onclick: ("changed_#{control.object_id}()" if control[:on_update]),
+                                  form: "form_#{control.object_id}",
+                                  class: control[:css_class])
+              = opt
+              br
+            javascript:
+              $('.latin-radio').on('click', function() {
+                $('input[data-rowid=' + $(this).data('rowid') + ']').not($(this)).prop('checked', false);
+              });
+          - when :checkboxes
+            = check_box_tag(control[:name] + "[]", ix, nil,
+                                    id: "#{control.object_id}_#{ix}",
+                                    onclick: ("changed_#{control.object_id}()" if control[:on_update]),
+                                    :"data-js" => (control[:data][ix] if control[:data]),
+                                    form: "form_#{control.object_id}",
+                                    class: control[:css_class])
+            = label_tag("#{control.object_id}_#{ix}", control[:choice_text])
+  - if (control[:type] != :button) || control[:nil_action] || control[:on_update]
+    td
+      - case control[:type]
+        - when :button
+          - Array(control[:nil_action]).each.with_index do |nil_act, ix|
+            - if nil_act
+              = button_tag(nil_act, type: 'submit',
+                                     name: 'nil_action',
+                                     value: nil_act,
+                                     form: "form_#{control.object_id}",
+                                     disable_with: nil_act,
+                                     class: control[:css_class],
+                                     confirm: control[:confirm].andand[ix] ? 'Are you sure?' : nil)
+        - when :two_d_radio, :latin_radio
+          - if control[:nil_action]
+            = radio_button_tag(:choice, 'nil_action', true,
+                                form: "form_#{control.object_id}",
+                                class: control[:css_class])
+            = control[:nil_action]
+            br
+          = submit_tag(control[:text],
+                        form: "form_#{control.object_id}",
+                        disable_with: control[:text],
+                        class: control[:css_class])
+        - when :checkboxes
+          = submit_tag(control[:button_text],
+                        form: "form_#{control.object_id}",
+                        disable_with: control[:button_text],
+                        class: control[:css_class])
+        - if control[:on_update]
+          span id="#{control.object_id}_js"
+          javascript:
+            changed_#{control.object_id}()

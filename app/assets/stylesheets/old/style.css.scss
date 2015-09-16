@@ -1,0 +1,45 @@
+table.tablekit {
+	border-collapse: collapse;
+	table-layout: fixed;
+
+  td, th {
+    padding: 0.5em;
+    border: 1px solid #CCC;
+    /*white-space: nowrap;
+    overflow: hidden;*/
+  }
+
+  /*th {
+     white-space: pre;
+  }*/
+
+  thead, tfoot {
+    background-color: #ccf;
+  }
+
+  tr.rowodd {
+    background-color: #F0F0Ff;
+  }
+
+  tr.roweven {
+    background-color: #e8e8Ff;
+  }
+
+  .sortcol {
+    cursor: pointer;
+    padding-right: 20px;
+    background-repeat: no-repeat;
+    background-position: right center;
+  }
+  .sortasc {
+    background-color: #DDFFAC;
+    background-image: image-url('up.gif');
+  }
+  .sortdesc {
+    background-color: #B9DDFF;
+    background-image: image-url('down.gif');
+  }
+  .nosort {
+    cursor: default;
+  }
+}

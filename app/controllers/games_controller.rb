@@ -9,6 +9,7 @@ class GamesController < ApplicationController
   # * In all cases, set up the HTML title string.
   before_filter :find_game, :except => [:index, :new, :create, :card_text]
   before_filter :find_user, :except => [:card_text]
+  before_filter :legacy
   before_filter :authorise, :except => [:index, :watch, :speak, :check_change, :card_text]
   before_filter :setup_title, :except => [:card_text]
 
@@ -19,6 +20,10 @@ class GamesController < ApplicationController
   #    act.call
   #  end
   #end
+
+  def legacy
+    self.class.prepend_view_path "app/views/old" if @user.andand.name == 'Clive'
+  end
 
   # GET /games
   # GET /games.xml

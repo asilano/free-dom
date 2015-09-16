@@ -1,0 +1,6 @@
+li
+  = pend_action.player.andand.name || "Game"
+  ' :
+  = pend_action.expected_action
+  - if !pend_action.children.empty?
+    ul= render(partial: "pend_action", collection: pend_action.children)
