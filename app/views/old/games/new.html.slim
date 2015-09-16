@@ -1,9 +1,8 @@
 .form
   - tweaking = false
-  -   if @game.random_select == 'tweak'
-  -     @game.random_select = "0"
-  -     tweaking = true
-  -   end
+  - if @game.random_select == 'tweak'
+    - @game.random_select = "0"
+    - tweaking = true
   = form_for @game do |f|
     - if @game.errors.any?
       #errorExplanation
@@ -43,7 +42,7 @@
               td.cardText
                 div id="card_text_#{ix}"
 
-      #random_options style=((@game.random_select == 1) ? "" : "display: none;"))
+      #random_options style=((@game.random_select == 1) ? "" : "display: none;")
         = f.label :specify_distr, "Specify set distibution?"
         = f.check_box :specify_distr
         #set_distr style=((@game.specify_distr == 1) ? "" : "display: none;")
@@ -62,7 +61,7 @@
           p.indented-left.underlined
             | Sets to use:
           table
-            - Card.expansions.map do |set| set.name.titleize }.each do |set|
+            - Card.expansions.map { |set| set.name.titleize }.each do |set|
               tr
                 td
                   .field
@@ -86,8 +85,16 @@
       div= f.submit 'Create'
 = link_to 'Back', games_path
 - content_for :js_in_head do
-  |  var choices = new Array(); function onLoadFunc() { for (i = 1; i <= 10 ; i++) { value = $('#game_pile_' + i).val(); choices[i] = value; $('#card_text_' + i).text(card_dict[value]); } }
-:javascript
+  javascript:
+    var choices = new Array();
+    function onLoadFunc() {
+      for (i = 1; i <= 10 ; i++) {
+        value = $('#game_pile_' + i).val();
+        choices[i] = value;
+        $('#card_text_' + i).text(card_dict[value]);
+      }
+    }
+javascript:
   $('#game_random_select').change(function() {
     if (this.checked) {
       $('#card_selects').slideUp(function() {
