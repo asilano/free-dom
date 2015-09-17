@@ -1,4 +1,6 @@
 Dominion::Application.routes.draw do
+  themes_for_rails
+
   match 'users/login', :controller => 'users', :action => 'login', :as => 'login'
   match 'users/logout', :controller => 'users', :action => 'logout', :as => 'logout'
   match 'users/settings', :method => :get, :controller => 'users', :action => 'edit', :as => 'settings'

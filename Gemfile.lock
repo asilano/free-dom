@@ -193,6 +193,8 @@ GEM
       activesupport (>= 3.0)
       polyamorous (~> 1.1.0)
     temple (0.7.5)
+    themes_for_rails (0.5.1)
+      rails (>= 3.0.0)
     thin (1.6.3)
       daemons (~> 1.0, >= 1.0.9)
       eventmachine (~> 1.0)
@@ -248,6 +250,7 @@ DEPENDENCIES
   slim-rails
   sqlite3
   squeel
+  themes_for_rails
   thin
   turn
   uglifier

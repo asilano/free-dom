@@ -23,9 +23,7 @@ class GamesController < ApplicationController
 
   def legacy
     if @user.andand.name == 'Clive'
-      self.class.prepend_view_path "app/views/old"
-    else
-      self.class.view_paths = ['app/views']
+      theme 'legacy'
     end
   end
 

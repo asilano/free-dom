@@ -44,6 +44,8 @@ gem 'squeel'
 
 gem 'acts_as_tree'
 
+gem 'themes_for_rails'
+
 # Use unicorn as the web server
 # gem 'unicorn'
 
