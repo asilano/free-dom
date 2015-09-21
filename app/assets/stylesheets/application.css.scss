@@ -22,6 +22,11 @@ html {
 body {
   //font-size: 16px;
   padding: 0.5em 2em 0;
+
+  @include when-smaller-than(small) {
+    padding: 0.5em 0.5em 0;
+  }
+
   font-family: verdana, arial, helvetica, sans-serif;
   font-size:   $base-font-size;
   line-height: 18px;

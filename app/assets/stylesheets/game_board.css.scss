@@ -251,6 +251,7 @@
 #piles {
   display: flex;
   flex-flow: row wrap;
+  margin-bottom: 6px; // Necessary because of pile-depth shadows
 
   .pile {
     position: relative;
@@ -259,6 +260,11 @@
     padding: 0 5px 5px;
     margin: 5px;
     min-width: 11.5em;
+
+    &.non-pile {
+      background-color: silver;
+      border: 1px solid black;
+    }
 
     &.emptyPile {
       border: 2px inset red;

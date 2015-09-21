@@ -79,24 +79,23 @@ h1 Buy Piles
   - if controls.include? :piles
     - controls[:piles].each do |control|
       - control_form(control)
-    - if controls[:piles].any? { |control| control[:nil_action] }
-      - spacer_count = 0
-      .pile
-        .buttons
-          - controls[:piles].each do |control|
-            - case control[:type]
-              - when :button
-                - spacer_count += 1
-                = button_tag(control[:nil_action],
-                             type: 'submit',
-                             name: "nil_action",
-                             value: control[:nil_action],
-                             form: "form_#{control.object_id}",
-                             disable_with: control[:nil_action],
-                             class: (control[:nil_action] ? '' : ' placeholder') + (control[:css_class] || ''),
-                             disabled: !controls[:nil_action])
-        - spacer_count.times do |_|
-          .button-spacer
+  - spacer_count = 0
+  .pile.non-pile
+    .buttons
+      - controls[:piles].each do |control|
+        - case control[:type]
+          - when :button
+            - spacer_count += 1
+            = button_tag(control[:nil_action],
+                         type: 'submit',
+                         name: "nil_action",
+                         value: control[:nil_action],
+                         form: "form_#{control.object_id}",
+                         disable_with: control[:nil_action],
+                         class: (control[:nil_action] ? '' : ' placeholder') + (control[:css_class] || ''),
+                         disabled: !controls[:nil_action])
+    - spacer_count.times do |_|
+      .button-spacer
   = render partial: 'pile', collection: game.piles, locals: {controls: controls, num_players: game.players.length}
 
 = content_for :control_forms
