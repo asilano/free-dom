@@ -1,8 +1,8 @@
 source 'http://rubygems.org'
 source 'http://gems.github.com'
 
-ruby '1.9.3'
-gem 'rails', '~> 3.2.1'
+ruby '2.0.0'
+gem 'rails', '~> 4.0.0'
 gem 'i18n'
 
 # Bundle edge Rails instead:
@@ -26,15 +26,15 @@ end
 # Gems used only for assets and not required
 # in production environments by default.
 #group :assets do
-  gem 'sass-rails',   '~> 3.2.3'
+  gem 'sass-rails'
   gem 'compass-rails'
   gem 'sassy-buttons'
-  gem 'sass', '~> 3.2.15'
-  gem 'coffee-rails', '~> 3.2.1'
+  gem 'sass'
+  gem 'coffee-rails'
   gem 'uglifier'
 #end
 
-gem 'jquery-rails', :path => "vendor/gems/jquery-rails-1.0.19"
+gem 'jquery-rails'#, :path => "vendor/gems/jquery-rails-1.0.19"
 #gem 'therubyracer'
 gem 'actionmailer-with-request'
 gem 'slim-rails'
