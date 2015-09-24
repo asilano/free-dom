@@ -38,6 +38,7 @@ gem 'jquery-rails'#, :path => "vendor/gems/jquery-rails-1.0.19"
 gem 'actionmailer-with-request'
 gem 'slim-rails'
 
+gem 'figaro'
 gem 'andand'
 gem 'squeel'
 
