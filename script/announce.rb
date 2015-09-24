@@ -28,6 +28,6 @@ if text.nil?
   end
 end
 
-User.find(:all, :conditions => ['contact_me = ?', true]).each do |u|
+User.where { contact_me == true }.each do |u|
   UserMailer.announce(u, text, {:subject => subj}).deliver
 end

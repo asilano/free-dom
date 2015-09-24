@@ -312,11 +312,11 @@ class Game < ActiveRecord::Base
   end
 
   def card_types
-    cards.find(:all, :select => 'type', :group => "cards.type").map {|c| c[:type]}
+    cards.pluck(:type).uniq
   end
 
   def pile_types
-    piles.map(&:card_type)
+    piles.pluck(:card_type)
   end
 
   def expand_random_choices
@@ -459,9 +459,8 @@ protected
 
   def age_oldest
     while Game.count > 5
-      oldest_finished = Game.find(:first,
-                                  :conditions => ["state = 'ended' and (end_time is null or end_time < ?)", 3.days.until(Time.now)],
-                                  :order => "end_time, id")
+      oldest_finished = Game.where { (state == 'ended') & ((end_time == nil) | (end_time < Time.now - 3.days)) }.
+                              order(:end_time, :id).first
       if oldest_finished
         oldest_finished.destroy
       else

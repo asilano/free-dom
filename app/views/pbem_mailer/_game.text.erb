@@ -31,12 +31,12 @@ Game number <%= @game.id %>: <%= @game.name.html_safe %> (<%= {"waiting" => "wai
 
 <% end -%>
 Events since last update:
-<% @game.histories.find(:all, :conditions => ['created_at > ?', @player.last_emailed]).each do |hist| -%>
+<% @game.histories.where { created_at > my{@player}.last_emailed }.each do |hist| -%>
  - <%= format_history(hist, @player).html_safe %>
 <% end -%>
 
 Chat since last update:
-<% @game.chats.find(:all, :conditions => ['created_at > ?', @player.last_emailed]).each do |chat| -%>
+<% @game.chats.where { created_at > my{@player}.last_emailed }.each do |chat| -%>
  - <%= (chat.player ? chat.player.name : chat.non_ply_name).html_safe %> said: <%= chat.statement.html_safe %>
 <% end -%>
 
