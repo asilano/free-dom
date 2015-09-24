@@ -1,15 +1,23 @@
 Dominion::Application.routes.draw do
-  themes_for_rails
+  # themes_for_rails
+  theme_dir = ThemesForRails.config.themes_routes_dir
+  constraints = { :theme => /[\w\.]*/ }
 
-  match 'users/login', :controller => 'users', :action => 'login', :as => 'login'
-  match 'users/logout', :controller => 'users', :action => 'logout', :as => 'logout'
-  match 'users/settings', :method => :get, :controller => 'users', :action => 'edit', :as => 'settings'
-  match 'users/password_reset', :controller => 'users', :action => 'password_reset', :as => 'password_reset'
-  match 'users/registered', :controller => 'users', :action => 'registered', :as => 'registered'
+  get "#{theme_dir}/:theme/stylesheets/*asset" => 'themes_for_rails/assets#stylesheets',
+    :as => :base_theme_stylesheet, :constraints => constraints
+  get "#{theme_dir}/:theme/javascripts/*asset" => 'themes_for_rails/assets#javascripts',
+    :as => :base_theme_javascript, :constraints => constraints
+  get "#{theme_dir}/:theme/images/*asset" => 'themes_for_rails/assets#images',
+    :as => :base_theme_image, :constraints => constraints
+
+  match 'users/login', :controller => 'users', :action => 'login', :as => 'login', via: [:get, :post]
+  get 'users/logout', :controller => 'users', :action => 'logout', :as => 'logout'
+  get 'users/settings', :method => :get, :controller => 'users', :action => 'edit', :as => 'settings'
+  match 'users/password_reset', :controller => 'users', :action => 'password_reset', :as => 'password_reset', via: [:get, :post]
+  get 'users/registered', :controller => 'users', :action => 'registered', :as => 'registered'
   resources :users, :except => [:edit]
 
-  match 'dominion/clear_player', :controller => 'games', :action => 'clear_player', :as => 'clear_player'
-  match 'dominion/card_text', :controller => 'games', :action => 'card_text', :as => 'card_text'
+  get 'dominion/card_text', :controller => 'games', :action => 'card_text', :as => 'card_text'
   resources :dominion, :as => :games, :controller => 'games' do
     member do
       post :join
@@ -29,14 +37,14 @@ Dominion::Application.routes.draw do
       post :perform
     end
   end
-  match 'dominion/:action', :controller => 'games'
+  #match 'dominion/:action', :controller => 'games'
 
-  match 'about', :controller => 'users', :action => 'about', :as => 'about'
-  match 'contact', :controller => 'users', :action => 'contact', :as => 'contact'
+  get 'about', :controller => 'users', :action => 'about', :as => 'about'
+  get 'contact', :controller => 'users', :action => 'contact', :as => 'contact'
 
   # Email interface
-  match 'pbem', :controller => 'pbem', :action => 'handle' #,:method => :post, :as => 'pbem'
-  match 'nop', :controller => 'pbem', :action => 'nop' #,:method => :post, :as => 'nop'
+  #match 'pbem', :controller => 'pbem', :action => 'handle' #,:method => :post, :as => 'pbem'
+  #match 'nop', :controller => 'pbem', :action => 'nop' #,:method => :post, :as => 'nop'
 
   # Announcements interface
   resources :announcements, :only => [:new, :create]
