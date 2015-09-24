@@ -50,7 +50,7 @@ module GamesHelper
 
     # Delete button if player is in the game, or is me.
     if (user && (user.name == 'Chowlett' || user.games.include?(game))) # || request.host == '127.0.0.1'
-      html << content_tag(:td, button_to('Destroy', game, confirm: 'Are you sure?', method: :delete, class: 'danger'))
+      html << content_tag(:td, button_to('Destroy', game, data: { confirm: 'Are you sure?'}, method: :delete, class: 'danger'))
     end
 
     html.html_safe

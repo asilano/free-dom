@@ -17,9 +17,9 @@
                                         name: 'pile_index',
                                         value: pile.position,
                                         form: "form_#{control.object_id}",
-                                        disable_with: control[:text],
-                                        confirm: (pile.card_class == BasicCards::Curse ? "Really choose Curse?" : nil),
                                         class: (control[:piles][pile.position] ? '' : 'placeholder') + (control[:css_class] || ''),
-                                        disabled: !control[:piles][pile.position])
+                                        disabled: !control[:piles][pile.position],
+                                        data: {disable_with: control[:text],
+                                              confirm: (pile.card_class == BasicCards::Curse ? "Really choose Curse?" : nil)})
   - spacer_count.times do |_|
     .button-spacer

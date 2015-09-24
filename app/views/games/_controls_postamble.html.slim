@@ -11,9 +11,9 @@
                                            name: 'nil_action',
                                            value: nil_act,
                                            form: "form_#{control.object_id}",
-                                           disable_with: nil_act,
                                            class: control[:css_class],
-                                           confirm: control[:confirm].andand[ix] ? 'Are you sure?' : nil)
+                                           data: {disable_with: nil_act,
+                                                  confirm: control[:confirm].andand[ix] ? 'Are you sure?' : nil})
               - when :two_d_radio, :latin_radio
                 - if control[:nil_action]
                   = radio_button_tag(:choice, 'nil_action', true,
@@ -23,12 +23,12 @@
                   br
                 = submit_tag(control[:text],
                               form: "form_#{control.object_id}",
-                              disable_with: control[:text],
+                              data: {disable_with: control[:text]},
                               class: control[:css_class])
               - when :checkboxes
                 = submit_tag(control[:button_text],
                               form: "form_#{control.object_id}",
-                              disable_with: control[:button_text],
+                              data: {disable_with: control[:button_text]},
                               class: control[:css_class])
             - if control[:on_update]
               span id="#{control.object_id}_js"

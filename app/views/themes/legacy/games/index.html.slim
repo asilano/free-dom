@@ -36,7 +36,7 @@ nav
         - if session[:user_id]
           td= button_to 'Join', join_game_path(game)
           - if (@user && (@user.name == 'Chowlett' || @user.games.include?(game))) # || request.host == '127.0.0.1'
-            td= button_to 'Destroy', game, confirm: 'Are you sure?', method: :delete
+            td= button_to 'Destroy', game, data: {confirm: 'Are you sure?'}, method: :delete
 br
 
 - if session[:user_id]
