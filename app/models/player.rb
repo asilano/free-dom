@@ -24,7 +24,7 @@ class Player < ActiveRecord::Base
     if user and user.settings.nil?
       user.create_settings
     end
-    self.build_settings(user.settings.attributes)
+    self.build_settings(user.settings.attributes.delete(:id))
     self.settings.user_id = nil
     self.settings.save!
 

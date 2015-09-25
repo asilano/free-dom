@@ -1,8 +1,6 @@
 require 'digest/sha1'
 
 class User < ActiveRecord::Base
-  attr_accessible :name, :email, :password, :password_confirmation, :contact_me, :pbem, :settings_attributes
-
   validates_presence_of :name
   validates_uniqueness_of :name, :case_sensitive => false
 
@@ -11,7 +9,7 @@ class User < ActiveRecord::Base
   #validate :password_non_blank
   validates :hashed_password, :presence => true
   validates :password_confirmation, :presence => {:if => :hashed_password_changed?}
-  validates :email, :presence => true, :uniqueness => true, :format => /^$|^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,4}$/i
+  validates :email, :presence => true, :uniqueness => true, :format => /\A\z|\A[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,4}\z/i
 
   has_many :players, :dependent => :destroy
   has_many :games, :through => :players

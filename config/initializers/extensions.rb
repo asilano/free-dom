@@ -1,31 +1,9 @@
-class Array
-  #def shuffle
-  #  sort_by { rand }
-  #end
-
-  #def shuffle!
-  #  replace shuffle
-  #end
-
-  def chunk(chunk_size)
-    chunked = []
-    0.upto((length.to_f / chunk_size).ceil - 1) do |n|
-      chunked << self[n * chunk_size, chunk_size]
-    end
-    chunked
-  end
-end
-
 # Add a method to Object, that reverses the sense of include?
 class Object
   def in?(enum)
     raise TypeError, "expected Enumerable parameter" unless enum.is_a? Enumerable
     enum.include? self
   end
-end
-
-class Class
-
 end
 
 class String
@@ -56,27 +34,5 @@ end
 module Prosperity
   def self.kingdom_cards
     self.card_classes - [Prosperity::Colony, Prosperity::Platinum]
-  end
-end
-
-module ActionView
-  module Helpers
-    module FormHelper
-      def email_field(object_name, method, options = {})
-        InstanceTag.new(object_name, method, self, options.delete(:object)).to_input_field_tag("email", options)
-      end
-    end
-
-    class FormBuilder
-      def email_field(method, options = {})
-        @template.email_field(@object_name, method, objectify_options(options))
-      end
-    end
-
-    module PrototypeHelper
-      def method_option_to_s(method)
-        (method.is_a?(String) and !method.index("'").nil?) ? method : "'#{method}'"
-      end
-    end
   end
 end
