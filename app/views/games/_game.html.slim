@@ -38,11 +38,11 @@
 #status
   #ended.hidden= game.state == 'ended'
   #locked.hidden false
-  - if !game.active_ply_actions.empty?
+  - if game.pending_actions.active.owned.present?
     #waiting_for
       span Waiting for:
       ul
-        - game.active_ply_actions.each do |act|
+        - game.pending_actions.active.owned.each do |act|
           li= act.player.name + " to " + act.text
 - if player
   #player_private

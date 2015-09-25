@@ -49,12 +49,12 @@
         |  Ended
       - else
         = game.state
-    - if !game.active_ply_actions.empty?
+    - if game.pending_actions.active.owned.present?
       table#waitingForTable
         tr
           td Waiting for:
           td: ul
-            - game.active_ply_actions.each do |act|
+            - game.pending_actions.active.owned.each do |act|
               li= act.player.name + " to " + act.text
   #players
     - if player

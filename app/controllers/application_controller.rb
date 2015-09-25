@@ -58,13 +58,13 @@ protected
   def record_player_pa_ids
     @pa_ids = {}
     Player.all.each do |ply|
-      @pa_ids[ply.id] = ply.active_actions(true).map(&:id)
+      @pa_ids[ply.id] = ply.pending_actions(true).active.pluck(:id)
     end
   end
 
   def check_player_pa_ids
     Game.current and Game.current.players.each do |ply|
-      new_ids = ply.active_actions(true).map(&:id)
+      new_ids = ply.pending_actions(true).active.pluck(:id)
       diff = new_ids - (@pa_ids[ply.id] || [])
 
       if !diff.empty? && ply.user.pbem? &&

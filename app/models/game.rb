@@ -21,16 +21,15 @@ class Game < ActiveRecord::Base
     AllPhases = [ACTION, BUY, CLEAN_UP]
   end
 
-  has_many :piles, :order => "position", :dependent => :destroy
+  has_many :piles, -> { order :position }, :dependent => :destroy
   #accepts_nested_attributes_for :piles
   has_many :cards, :dependent => :delete_all
 
-  has_many :players, :order => "seat, id", :dependent => :destroy
-  has_one :current_turn_player, :class_name => 'Player',
-                                :conditions => 'cash is not null'
+  has_many :players, -> { order :seat, :id }, :dependent => :destroy
+  has_one :current_turn_player, -> { where { cash != nil } }, :class_name => 'Player'
   has_many :users, :through => :players
-  has_many :histories, :dependent => :delete_all, :order => "created_at"
-  has_many :chats, :dependent => :delete_all, :order => "created_at"
+  has_many :histories, -> { order :created_at }, :dependent => :delete_all
+  has_many :chats, -> { order :created_at }, :dependent => :delete_all
   serialize :facts
 
   attr_accessor :random_select, :specify_distr, :plat_colony
@@ -40,25 +39,8 @@ class Game < ActiveRecord::Base
 
   # A game should only ever have one root pending action outstanding
   # - which will usually be "end the turn".
-  has_one :root_action, :class_name => "PendingAction",
-                        :conditions => "parent_id is null"
+  has_one :root_action, -> { where(parent_id: nil) }, :class_name => "PendingAction"
   has_many :pending_actions, :dependent => :delete_all
-  has_many :active_actions, :class_name => "PendingAction",
-                            :finder_sql => proc {"select p.* from pending_actions p where game_id = #{id} and player_id is null and (select count(*) from pending_actions where parent_id = p.id) = 0"},
-                            :counter_sql => proc {"select count(*) from pending_actions p where game_id = #{id} and player_id is null and (select count(*) from pending_actions where parent_id = p.id) = 0"}
-  has_many :active_ply_actions, :class_name => "PendingAction",
-                            :finder_sql => proc {"select p.* from pending_actions p
-                                                    where game_id = #{id} and
-                                                          player_id is not null and
-                                                          text is not null and
-                                                          text != '' and
-                                                          (select count(*) from pending_actions where parent_id = p.id) = 0"},
-                            :counter_sql => proc {"select count(*) from pending_actions p
-                                                    where game_id = #{id} and
-                                                          player_id is not null and
-                                                          text is not null and
-                                                          text != '' and
-                                                          (select count(*) from pending_actions where parent_id = p.id) = 0"}
 
   validates :name, :presence => true
   validates :max_players, :presence => true, :numericality => true, :inclusion => { :in => 2..6, :message => 'must be between 2 and 6 inclusive' }
@@ -158,8 +140,8 @@ class Game < ActiveRecord::Base
 
     self.pending_actions(true)
 
-    until active_actions(true).empty?
-      active_actions(true).each do |action|
+    until (acts = pending_actions(true).active.unowned).empty?
+      acts.each do |action|
         check_game_end
         case action.expected_action
         when /^resolve_([[:alpha:]]+::[[:alpha:]]+)([0-9]+)(?:_([[:alnum:]_]*))?(;.*)?/
@@ -308,7 +290,7 @@ class Game < ActiveRecord::Base
   end
 
   def waiting_for?(action)
-    active_actions.map {|act| act.expected_action}.any? {|exp| exp =~ Regexp.new("^" + action + "(;.*)?")}
+    pending_actions.active.owned.pluck(:expected_action).any? { |exp| exp =~ Regexp.new("^" + action + "(;.*)?") }
   end
 
   def card_types

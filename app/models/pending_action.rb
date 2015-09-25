@@ -4,6 +4,10 @@ class PendingAction < ActiveRecord::Base
   acts_as_tree
   serialize :state
 
+  scope :active, -> { includes(:children).where(children: {id: nil}) }
+  scope :owned, -> { where { player_id != nil } }
+  scope :unowned, -> { where { player_id == nil } }
+
   after_create :email_owner
 
   before_create do

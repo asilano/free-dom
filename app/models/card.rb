@@ -19,8 +19,8 @@ class Card < ActiveRecord::Base
   end
   scope :revealed, -> { where(revealed: true) }
   scope :peeked, -> { where(peeked: true) }
-  scope :of_type, -> { |*types| where(type: => types) }
-  scope :in_location, -> { |*locs| where(location: locs) }
+  scope :of_type, -> (*types) { where(type: types) }
+  scope :in_location, -> (*locs) { where(location: locs) }
 
   before_save :clear_visibility, :check_end
 

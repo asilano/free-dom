@@ -6,9 +6,9 @@ module GamesHelper
   def running_player_list(game)
     game.players.map do |p|
       str = ""
-      str += "<span class='current'>" unless p.active_actions.empty?
+      str += "<span class='current'>" if p.pending_actions.active.present?
       str += p.name
-      str += "</span>" unless p.active_actions.empty?
+      str += "</span>" if p.pending_actions.active.present?
       str
     end.join(', ')
   end

@@ -292,7 +292,7 @@ private
     @full_title = ""
 
     if @game.state == 'running'
-      waiting_players = @game.active_ply_actions.map {|a| a.player}
+      waiting_players = @game.pending_actions.owned.active.map &:player
 
       # Ensure the current player is on the front of the list.
       if waiting_players.delete(@player)

@@ -11,12 +11,8 @@ class Player < ActiveRecord::Base
   has_many :cards
 
   has_many :pending_actions
-  has_many :active_actions, :class_name => "PendingAction",
-                            :finder_sql => proc {"select p.* from pending_actions p where player_id = #{id} and (select count(*) from pending_actions where parent_id = p.id) = 0"},
-                            :counter_sql => proc {"select count(*) from pending_actions p where player_id = #{id} and (select count(*) from pending_actions where parent_id = p.id) = 0"}
-
   has_one :state, :class_name => "PlayerState", :dependent => :destroy
-  has_many :chats, :dependent => :delete_all, :order => "created_at"
+  has_many :chats, -> { order(:created_at) }, :dependent => :delete_all
   has_one :settings, :dependent => :destroy
   accepts_nested_attributes_for :settings
 
@@ -69,7 +65,7 @@ class Player < ActiveRecord::Base
   def determine_controls
     self.reload
     controls = Hash.new([])
-    active_actions(true).each do |action|
+    pending_actions(true).active.each do |action|
       case action.expected_action
       when 'play_action'
         controls[:hand] += [{type: :button,
@@ -576,7 +572,7 @@ class Player < ActiveRecord::Base
                      :expected_action => "buy",
                       :game => game,
                       :player => self)
-    parent_action = active_actions[0]
+    parent_action = pending_actions.active.first
     raise "Unexpected action at start of turn" unless parent_action.expected_action == "play_action"
 
     # Advance the turn counter when the first player starts their turn.
@@ -1154,7 +1150,7 @@ class Player < ActiveRecord::Base
   end
 
   def waiting_for?(action)
-    active_actions.map {|act| act.expected_action}.any? {|exp| exp =~ Regexp.new("^" + action + "(;.*)?")}
+    pending_actions.active.pluck(:expected_action).any? { |exp| exp =~ Regexp.new("^" + action + "(;.*)?") }
   end
 
 #  def queue(parent_act, act, opts={})
@@ -1242,8 +1238,8 @@ private
     begin
       pa = PendingAction.find(action_id.to_i)
 
-      active_actions.reload
-      if !active_actions.include? pa
+      pending_actions.active.reload
+      if !pending_actions.active.include? pa
         error = "Not expecting you to #{pa.text} at this time"
         pa = nil
       end

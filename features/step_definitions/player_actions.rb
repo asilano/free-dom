@@ -35,14 +35,14 @@ When(/^(\w*)(?:'s)? next turn is about to start$/) do |name|
   # May also assume treasure-playing is automatic (i.e. no Venture, Mint, Grand Market etc)
 
   current_name = @test_game.current_turn_player.name
-  if @test_game.current_turn_player.active_actions[0].expected_action =~ /play_action/
+  if @test_game.current_turn_player.pending_actions.active.first.expected_action =~ /play_action/
     steps "When #{current_name} stops playing actions
       And the game checks actions"
   end
-  if @test_game.current_turn_player.active_actions(true)[0].expected_action =~ /play_treasure/
+  if @test_game.current_turn_player.pending_actions(true).active.first.expected_action =~ /play_treasure/
     steps "When #{current_name} stops playing treasures"
   end
-  assert_match /buy/, @test_game.current_turn_player.active_actions(true)[0].expected_action
+  assert_match /buy/, @test_game.current_turn_player.pending_actions(true).active.first.expected_action
 
   # Upon stopping buying, expect to have discarded everything from play
   @discard_contents[current_name].concat @play_contents[current_name]
@@ -76,14 +76,14 @@ When(/^(\w*)(?:'s)? turn is about to end$/) do |name|
 
   current_name = @test_game.current_turn_player.name
   assert_equal name, current_name
-  if @test_game.current_turn_player.active_actions[0].expected_action =~ /play_action/
+  if @test_game.current_turn_player.pending_actions.active.first.expected_action =~ /play_action/
     steps "When #{current_name} stops playing actions
       And the game checks actions"
   end
-  if @test_game.current_turn_player.active_actions(true)[0].expected_action =~ /play_treasure/
+  if @test_game.current_turn_player.pending_actions(true).active.first.expected_action =~ /play_treasure/
     steps "When #{current_name} stops playing treasures"
   end
-  assert_match /buy/, @test_game.current_turn_player.active_actions(true)[0].expected_action
+  assert_match /buy/, @test_game.current_turn_player.pending_actions(true).active.first.expected_action
 
   steps "When #{current_name} stops buying cards"
 end

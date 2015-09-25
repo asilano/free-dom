@@ -13,7 +13,7 @@ Then(/it should be (.*?)(?:'s)? (.*) phase/) do |name, phase|
 
   assert_not_nil exp_action, "Unknown phase '#{phase}'"
 
-  actions = @test_game.active_actions(true).map(&:expected_action) + @test_players[name].active_actions(true).map(&:expected_action)
+  actions = @test_game.pending_actions(true).active.unowned.map(&:expected_action) + @test_players[name].pending_actions(true).active.map(&:expected_action)
 
   assert_contains(actions, exp_action, "Actions didn't contain #{phase}")
 end
@@ -21,7 +21,7 @@ end
 # Check for the readable text of a pending action
 Then(/(.*) should (not )?need to (?!act)(.*)/) do |name, negate, action|
   name = "Alan" if name == "I"
-  actions = @test_players[name].active_actions(true).map(&:text)
+  actions = @test_players[name].pending_actions(true).active.map(&:text)
 
   if negate
     assert_not_contains(actions, /^#{action}$/i)
@@ -33,7 +33,7 @@ end
 # Check the specified player is not currently required to do anything
 Then(/(.*) should not need to act/) do |name|
   name = "Alan" if name == "I"
-  assert_empty @test_players[name].active_actions(true)
+  assert_empty @test_players[name].pending_actions(true).active
 end
 
 # Verify that the stated cards in hand are (not) choosable

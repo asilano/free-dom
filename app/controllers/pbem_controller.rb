@@ -189,7 +189,7 @@ private
           raise ActiveRecord::Rollback
         end
 
-        if !@player.active_actions.include? pa
+        if !@player.pending_actions.active.include? pa
           process_result "Not expecting you to #{pa.text} at this time"
           raise ActiveRecord::Rollback
         end

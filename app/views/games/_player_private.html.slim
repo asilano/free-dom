@@ -4,10 +4,10 @@
     tr
       th Playing as:
       td= player_private.name
-    - if not player_private.active_actions.empty?
+    - if player_private.pending_actions.active.present?
       tr
         th Waiting for you to:
-        td= player_private.active_actions.reject{|a| a.text.nil? or a.text.empty?}.map {|a| a.text}.join(', ')
+        td= player_private.pending_actions.active.reject{|a| a.text.nil? || a.text.empty?}.map {|a| a.text}.join(', ')
     tr
       th Deck:
       td= "#{player_private.cards.deck.length} cards"
