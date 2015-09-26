@@ -105,10 +105,10 @@ GEM
     factory_girl_rails (4.5.0)
       factory_girl (~> 4.5.0)
       railties (>= 3.0.0)
-    ffi (1.9.10-x86-mingw32)
+    ffi (1.9.10)
     figaro (1.1.1)
       thor (~> 0.14)
-    gherkin (2.12.2-x86-mingw32)
+    gherkin (2.12.2)
       multi_json (~> 1.3)
     hike (1.2.3)
     i18n (0.7.0)
@@ -127,9 +127,9 @@ GEM
     multi_json (1.11.2)
     multi_test (0.1.2)
     newrelic_rpm (3.13.1.300)
-    nokogiri (1.6.6.2-x86-mingw32)
+    nokogiri (1.6.6.2)
       mini_portile (~> 0.6.0)
-    pg (0.18.3-x86-mingw32)
+    pg (0.18.3)
     polyamorous (1.1.0)
       activerecord (>= 3.0)
     quiet_assets (1.1.0)
@@ -193,7 +193,7 @@ GEM
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (>= 2.8, < 4.0)
-    sqlite3 (1.3.10-x86-mingw32)
+    sqlite3 (1.3.10)
     squeel (1.2.3)
       activerecord (>= 3.0)
       activesupport (>= 3.0)
@@ -223,6 +223,7 @@ GEM
       nokogiri (~> 1.3)
 
 PLATFORMS
+  ruby
   x86-mingw32
 
 DEPENDENCIES
