@@ -136,7 +136,7 @@ class Seaside::Navigator < Card
 
     if params[:posn].to_i == 2
       # That was the card second from top, so only one card remains to be placed. Do so.
-      raise "Wrong number of revealed cards" unless ply.cards.peeked(true).count == 1
+      raise "Wrong number of revealed cards" unless ply.cards(true).peeked.count == 1
       card = ply.cards.peeked[0]
       card.location = "deck"
       card.position = -2

@@ -65,14 +65,14 @@ class Intrigue::Torturer < Card
 
   def resolve_choose(ply, params, parent_act)
     # We expect to have a :choice parameter, one of "discard" and "curse"
-    if (not params.include? :choice) or
-       (not params[:choice].in? ["discard", "curse"])
+    if (!params.include? :choice) ||
+       (!params[:choice].in? ["discard", "curse"])
       return "Invalid parameters"
     end
 
     # Everything looks fine. Carry out the requested choice
     if params[:choice] == "discard"
-      if ply.cards.hand(true).length >= 1
+      if ply.cards(true).hand.length >= 1
         # Create a pair of actions to request the discard, similar to Militia.
         # The choice has held up other players' attack effects, but the discard
         # doesn't need to. So step back until we reach an action that isn't our
@@ -85,7 +85,7 @@ class Intrigue::Torturer < Card
                                                 :player => ply,
                                                 :game => game)
 
-        if ply.cards.hand(true).length >= 2
+        if ply.cards.hand.length >= 2
           # Player has at least two cards, so should have the second action created
           parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_discard",
                                      :text => "Discard 2 cards",

@@ -15,7 +15,7 @@ end
 
 Then /(.*) should have (\d+) cards in hand/ do |name, cards|
   name = "Alan" if name == "I"
-  assert_equal cards.to_i, @test_players[name].cards.hand(true).length
+  assert_equal cards.to_i, @test_players[name].cards(true).hand.length
 end
 
 Then(/(.*?)(?:'s)? score should be (-)?(\d+)/) do |name, neg, score|

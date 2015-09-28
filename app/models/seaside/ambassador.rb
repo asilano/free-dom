@@ -17,7 +17,7 @@ class Seaside::Ambassador < Card
   def play(parent_act)
     super
 
-    if player.cards.hand(true).map(&:class).uniq.length == 1
+    if player.cards(true).hand.map(&:class).uniq.length == 1
       # Only holding one type of card. Call resolve_reveal directly
       return resolve_reveal(player, {:card_index => 0}, parent_act)
     elsif player.cards.hand.empty?

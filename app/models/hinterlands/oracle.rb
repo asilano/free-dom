@@ -146,7 +146,7 @@ class Hinterlands::Oracle < Card
 
     if params[:posn].to_i == 2
       # That was the card second from top, so only one card remains to be placed. Do so.
-      raise "Wrong number of revealed cards" unless actor.cards.revealed(true).count == 1
+      raise "Wrong number of revealed cards" unless actor.cards(true).revealed.count == 1
       card = actor.cards.revealed[0]
       card.location = "deck"
       card.position = -2

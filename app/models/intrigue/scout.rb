@@ -16,9 +16,8 @@ class Intrigue::Scout < Card
     player.reveal_from_deck(4)
 
     # Move any Victories into hand
-    player.cards.hand(true)
     cards_moved = []
-    player.cards.revealed.select {|c| c.is_victory?}.each do |vic|
+    player.cards(true).revealed.select(&:is_victory?).each do |vic|
       if player.cards.hand.empty?
         vic.position = 0
       else
@@ -40,7 +39,7 @@ class Intrigue::Scout < Card
                             :css_class => "player#{player.seat}")
     end
 
-    if player.cards.revealed(true).length == 1
+    if player.cards(true).revealed.length == 1
       # Only one other card - it has to go on top. In fact, it already is, so just log and unreveal it.
       card = player.cards.revealed[0]
       game.histories.create!(:event => "#{player.name} placed #{card} on top of their deck.",
@@ -50,7 +49,7 @@ class Intrigue::Scout < Card
     elsif player.cards.revealed.length > 1
       # Finally, create pending actions to put the remaining cards back in any
       # order. We don't need an action for the last one.
-      (2..player.cards.revealed(true).length).each do |ix|
+      (2..player.cards.revealed.length).each do |ix|
         parent_act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_place;posn=#{ix}",
                                                 :text => "Put a card #{ActiveSupport::Inflector.ordinalize(ix)} from top with #{readable_name}",
                                                 :player => player,
@@ -94,7 +93,7 @@ class Intrigue::Scout < Card
     # All checks out. Place the selected card on top of the deck (position -1),
     # unreveal it, and renumber.
     card = ply.cards.revealed[params[:card_index].to_i]
-    ply.cards.deck(true) << card
+    ply.cards(true).deck << card
     card.location = "deck"
     card.position = -1
     card.revealed = false
@@ -104,8 +103,8 @@ class Intrigue::Scout < Card
 
     if params[:posn].to_i == 2
       # That was the card second from top, so only one card remains to be placed. Do so.
-      raise "Wrong number of revealed cards" unless ply.cards.revealed(true).count == 1
-      card = ply.cards.revealed(true)[0]
+      raise "Wrong number of revealed cards" unless ply.cards(true).revealed.count == 1
+      card = ply.cards.revealed[0]
       card.location = "deck"
       card.position = -2
       card.revealed = false

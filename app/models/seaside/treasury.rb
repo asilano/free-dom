@@ -91,7 +91,7 @@ class Seaside::Treasury < Card
     # All looks fine, process the choice
     if params[:choice] == "deck"
       # Return this card to the top of the deck
-      player.cards.deck(true) << self
+      player.cards(true).deck << self
       self.location = "deck"
       self.position = -1
       save!

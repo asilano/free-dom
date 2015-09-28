@@ -11,7 +11,7 @@ class Seaside::Salvager < Card
     # +1 buy
     player.add_buys(1, parent_act)
 
-    if player.cards.hand(true).map(&:class).uniq.length == 1
+    if player.cards(true).hand.map(&:class).uniq.length == 1
       # Only holding one type of card. Call resolve_trash directly
       return resolve_trash(player, {:card_index => 0}, parent_act)
     elsif player.cards.hand.empty?

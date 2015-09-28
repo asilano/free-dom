@@ -8,7 +8,7 @@ class BaseGame::Mine < Card
   def play(parent_act)
     super
 
-    if player.cards.hand(true).select {|c| c.is_treasure?}.map(&:class).uniq.length == 1
+    if player.cards(true).hand.select {|c| c.is_treasure?}.map(&:class).uniq.length == 1
       # Only holding one type of card. Call resolve_trash directly
       ix = player.cards.hand.index {|c| c.is_treasure?}
       return resolve_trash(player, {:card_index => ix}, parent_act)

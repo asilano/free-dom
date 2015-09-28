@@ -49,7 +49,7 @@ class Intrigue::Saboteur < Card
     #
     # So, check whether there are any? cards in deck with cost >= 3.
     shuffle_point = target.cards.deck.count
-    if not target.cards.deck(true).any? {|c| c.cost >= 3}
+    if target.cards(true).deck.none? { |c| c.cost >= 3 }
       target.shuffle_discard_under_deck(:log => shuffle_point == 0)
     end
 

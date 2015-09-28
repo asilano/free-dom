@@ -14,7 +14,7 @@ class BaseGame::ThroneRoom < Card
   def play(parent_act)
     super
 
-    if player.cards.hand(true).select {|c| c.is_action?}.map(&:class).uniq.length == 1
+    if player.cards(true).hand.select {|c| c.is_action?}.map(&:class).uniq.length == 1
       # Only holding one type of card. Call resolve directly
       ix = player.cards.hand.index {|c| c.is_action?}
       return resolve_choose(player, {:card_index => ix}, parent_act)

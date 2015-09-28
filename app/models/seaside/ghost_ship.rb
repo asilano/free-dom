@@ -44,7 +44,7 @@ class Seaside::GhostShip < Card
     parent_act = params[:parent_act]
 
     # Determine how many cards to place - never negative
-    num_places = [0, target.cards.hand(true).size - 3].max
+    num_places = [0, target.cards(true).hand.size - 3].max
 
     # Hang that many actions off the parent to ask the target to place a card
     1.upto(num_places) do |num|

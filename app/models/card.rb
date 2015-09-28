@@ -273,7 +273,7 @@ class Card < ActiveRecord::Base
     self.peeked = false
 
     if location != "trash"
-      game.cards.in_trash(true) << self
+      game.cards(true).in_trash << self
       self.location = "trash"
       self.position = game.cards.in_trash.size - 1
 

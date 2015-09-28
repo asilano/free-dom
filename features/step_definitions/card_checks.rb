@@ -353,7 +353,7 @@ Then(/(.*) should be revealing (#{CardListNoCapture}|nothing)/) do |name, kinds|
   player = @test_players[name]
 
   if kinds == "nothing"
-    assert_empty player.cards.revealed(true)
+    assert_empty player.cards(true).revealed
   else
     expected = []
     kinds.split(/,\s*/).each do |kind|
@@ -363,7 +363,7 @@ Then(/(.*) should be revealing (#{CardListNoCapture}|nothing)/) do |name, kinds|
 
       num.times {expected << kind}
     end
-    assert_same_elements expected, player.cards.revealed(true).map(&:readable_name)
+    assert_same_elements expected, player.cards(true).revealed.map(&:readable_name)
   end
 end
 
@@ -377,7 +377,7 @@ Then /^(.*) should have seen (#{CardListNoCapture}|nothing)/ do |name, kinds|
   player = @test_players[name]
 
   if kinds == "nothing"
-    assert_empty player.cards.peeked(true)
+    assert_empty player.cards(true).peeked
   else
     expected = []
     kinds.split(/,\s*/).each do |kind|
@@ -387,7 +387,7 @@ Then /^(.*) should have seen (#{CardListNoCapture}|nothing)/ do |name, kinds|
 
       num.times {expected << kind}
     end
-    assert_same_elements expected, player.cards.peeked(true).map(&:readable_name)
+    assert_same_elements expected, player.cards(true).peeked.map(&:readable_name)
   end
 end
 
@@ -398,7 +398,7 @@ Then(/^(\w*?)(?:'s)? deck should contain #{CardList}$/) do |name, deck|
   name = "Alan" if name == "my"
   player = @test_players[name]
 
-  deck_actual = player.cards.deck(true).map &:readable_name
+  deck_actual = player.cards(true).deck.map &:readable_name
 
   deck_expected = []
   deck.split(/,\s*/).each do |kind|

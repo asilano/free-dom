@@ -42,9 +42,10 @@ class Seaside::NativeVillage < Card
     end
 
     # Everything looks fine. Carry out the requested choice
+    ply.cards.reload
     if params[:choice] == "setaside"
       # Chose to set aside the top card of the deck - that is, move it to "native_village"
-      if ply.cards.deck(true).size < 1
+      if ply.cards.deck.size < 1
         ply.shuffle_discard_under_deck
       end
 
@@ -61,7 +62,6 @@ class Seaside::NativeVillage < Card
       end
     else
       # Chose to reclaim the cards - that is, move all "native_village" cards to "hand"
-      ply.cards.hand(true)
       ply.cards.in_location("native_village").each do |card|
         ply.cards.hand << card
         card.location = "hand"

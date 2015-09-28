@@ -14,7 +14,7 @@ class Prosperity::TradeRoute < Card
     player.cash += game.facts[:trade_route_value]
     player.save!
 
-    if player.cards.hand(true).map(&:class).uniq.length == 1
+    if player.cards(true).hand.map(&:class).uniq.length == 1
       # Only holding one type of card. Call resolve_trash directly
       return resolve_trash(player, {:card_index => 0}, parent_act)
     elsif player.cards.hand.empty?

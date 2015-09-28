@@ -110,7 +110,6 @@ class BaseGame::Thief < Card
       card = target.cards.revealed[card_index]
       if option_index == 0
         # Chose to just trash the card.
-        game.cards.in_trash(true)
         card.trash
         game.histories.create!(:event => "#{actor.name} chose to trash #{target.name}'s #{card.class.readable_name}.",
                               :css_class => "player#{actor.seat} player#{target.seat} card_trash")

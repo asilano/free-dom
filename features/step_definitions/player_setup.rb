@@ -39,7 +39,7 @@ Given /I am a player in a (?:([2-6])-player )?standard game(?: with (.*))?/ do |
     FactoryGirl.create(:player, user: User.where { name == n }.first, game: @test_game)
   end
 
-  arr = names.map { |name| [name, @test_game.players.joins { user }.where { users.name == name }.readonly()] }
+  arr = names.map { |name| [name, @test_game.players.joins { user }.where { users.name == name }.readonly(false).first] }
   @test_players = Hash[arr]
   assert_not_nil @test_players["Alan"]
 

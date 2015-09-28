@@ -13,7 +13,7 @@ class Seaside::TreasureMap < Card
     already_trashed = (location == "trash")
     # Trash this card, and look for another Treasure Map in hand
     trash
-    other = ply.cards.hand(true).of_type("Seaside::TreasureMap")[0]
+    other = ply.cards(true).hand.of_type("Seaside::TreasureMap").first
 
     if other
       # Found a second Treasure Map

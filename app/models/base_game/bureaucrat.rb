@@ -46,7 +46,7 @@ class BaseGame::Bureaucrat < Card
     parent_act = params[:parent_act]
 
     # Handle autocratting
-    target_victories = target.cards.hand(true).select {|c| c.is_victory?}
+    target_victories = target.cards(true).hand.select {|c| c.is_victory?}
 
     if (target.settings.autocrat_victory &&
         target_victories.map {|c| c.class}.uniq.length == 1)

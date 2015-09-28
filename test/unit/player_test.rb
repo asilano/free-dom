@@ -138,7 +138,7 @@ class PlayerTest < ActiveSupport::TestCase
           @ply.pending_actions.active.first.destroy
           rc = @ply.play_treasures(:parent_act => PendingAction.find_by_expected_action("buy"))
           assert_equal "OK", rc
-          assert_equal ["BasicCards::Estate"] * 3, @ply.cards.hand(true).map(&:type)
+          assert_equal ["BasicCards::Estate"] * 3, @ply.cards(true).hand.map(&:type)
           assert_equal 2, @ply.cash
           assert_equal "#{@ply.name} played Copper, Copper as Treasures. (2 total).", @game.histories(true).last.event
         end
@@ -225,11 +225,11 @@ EOF
             assert_pend_acts_like(patt, @game.pending_actions(true))
 
             @ply.clean_up(:parent_act => nil)
-            assert_equal [], @ply.cards.hand(true)
-            assert_equal(["BasicCards::Estate"] * 3 + ["BasicCards::Copper"] * 2, @ply.cards.in_discard(true).map(&:type))
+            assert_equal [], @ply.cards(true).hand
+            assert_equal(["BasicCards::Estate"] * 3 + ["BasicCards::Copper"] * 2, @ply.cards(true).in_discard.map(&:type))
 
             @ply.draw_hand(:parent_act => nil)
-            assert_equal(["BasicCards::Copper"] * 5, @ply.cards.hand(true).map(&:type))
+            assert_equal(["BasicCards::Copper"] * 5, @ply.cards(true).hand.map(&:type))
           end
 
           should "set up next turn" do
@@ -354,7 +354,7 @@ EOF
 
         should "draw cards" do
           assert_equal ["Adventurer", "Bazaar", "Chancellor"], @ply.draw_cards(3, " for testing")
-          assert_same_elements(["BasicCards::Estate"] * 3 + ["BasicCards::Copper"] * 2 + ["BaseGame::Adventurer", "Seaside::Bazaar", "BaseGame::Chancellor"], @ply.cards.hand(true).map(&:type))
+          assert_same_elements(["BasicCards::Estate"] * 3 + ["BasicCards::Copper"] * 2 + ["BaseGame::Adventurer", "Seaside::Bazaar", "BaseGame::Chancellor"], @ply.cards(true).hand.map(&:type))
           assert_match(/drew \[#{@ply.id}\?Adventurer, Bazaar, Chancellor\|3 cards\] for testing/, @game.histories(true)[-1].event)
         end
 
@@ -363,7 +363,7 @@ EOF
                         "Duchy", "Explorer"], @ply.draw_cards(7))
           assert_same_elements(["BasicCards::Estate"] * 3 + ["BasicCards::Copper"] * 2 +
                                ["BaseGame::Adventurer", "Seaside::Bazaar", "BaseGame::Chancellor",
-                                "BasicCards::Duchy", "Seaside::Explorer"], @ply.cards.hand(true).map(&:type))
+                                "BasicCards::Duchy", "Seaside::Explorer"], @ply.cards(true).hand.map(&:type))
           assert_match(/drew \[#{@ply.id}\?Adventurer, Bazaar, Chancellor, Duchy, Explorer\|5 cards\]/, @game.histories(true)[-2].event)
           assert_match(/tried to draw 2 more cards/, @game.histories[-1].event)
         end
@@ -376,7 +376,7 @@ EOF
                         "Copper", "Estate", "Copper"], @ply.draw_cards(8))
           assert_same_elements(["BasicCards::Estate", "BasicCards::Copper", "BasicCards::Copper",
                                 "BaseGame::Adventurer", "Seaside::Bazaar", "BaseGame::Chancellor",
-                                "BasicCards::Duchy", "Seaside::Explorer"], @ply.cards.hand(true).map(&:type))
+                                "BasicCards::Duchy", "Seaside::Explorer"], @ply.cards(true).hand.map(&:type))
           assert_match(/drew \[#{@ply.id}\?Adventurer, Bazaar, Chancellor, Duchy, Explorer\|5 cards\], shuffled.* \[#{@ply.id}\?Copper, Estate, Copper\|3 cards\]/, @game.histories(true)[-1].event)
         end
 
@@ -384,7 +384,7 @@ EOF
           @ply.cards.deck.each {|c| c.location = "discard"; c.save!}
           qshuffle([[0,1,2,3,4], /player\.rb.*under/])
           assert_equal ["Adventurer", "Bazaar", "Chancellor"], @ply.draw_cards(3, " for testing")
-          assert_same_elements(["BasicCards::Estate"] * 3 + ["BasicCards::Copper"] * 2 + ["BaseGame::Adventurer", "Seaside::Bazaar", "BaseGame::Chancellor"], @ply.cards.hand(true).map(&:type))
+          assert_same_elements(["BasicCards::Estate"] * 3 + ["BasicCards::Copper"] * 2 + ["BaseGame::Adventurer", "Seaside::Bazaar", "BaseGame::Chancellor"], @ply.cards(true).hand.map(&:type))
           assert_match(/drew \[#{@ply.id}\?Adventurer, Bazaar, Chancellor\|3 cards\] for testing/, @game.histories(true)[-1].event)
           assert_match(/#{@ply.name} shuffled their discard pile/, @game.histories[-2].event)
         end
@@ -403,7 +403,7 @@ EOF
 
         should "reveal cards" do
           assert_equal ["Adventurer", "Bazaar", "Chancellor"], @ply.reveal_from_deck(3)
-          assert_same_elements(["BaseGame::Adventurer", "Seaside::Bazaar", "BaseGame::Chancellor"], @ply.cards.revealed(true).map(&:type))
+          assert_same_elements(["BaseGame::Adventurer", "Seaside::Bazaar", "BaseGame::Chancellor"], @ply.cards(true).revealed.map(&:type))
           assert_match(/revealed Adventurer, Bazaar, Chancellor\./, @game.histories(true)[-1].event)
         end
 
@@ -411,7 +411,7 @@ EOF
           assert_equal(["Adventurer", "Bazaar", "Chancellor",
                         "Duchy", "Explorer"], @ply.reveal_from_deck(7))
           assert_same_elements(["BaseGame::Adventurer", "Seaside::Bazaar", "BaseGame::Chancellor",
-                                "BasicCards::Duchy", "Seaside::Explorer"], @ply.cards.revealed(true).map(&:type))
+                                "BasicCards::Duchy", "Seaside::Explorer"], @ply.cards(true).revealed.map(&:type))
           assert_match(/revealed Adventurer, Bazaar, Chancellor, Duchy, Explorer./, @game.histories(true)[-2].event)
           assert_match(/tried to reveal 2 more cards/, @game.histories[-1].event)
         end
@@ -424,7 +424,7 @@ EOF
                         "Copper", "Estate", "Copper"], @ply.reveal_from_deck(8))
           assert_same_elements(["BasicCards::Estate", "BasicCards::Copper", "BasicCards::Copper",
                                 "BaseGame::Adventurer", "Seaside::Bazaar", "BaseGame::Chancellor",
-                                "BasicCards::Duchy", "Seaside::Explorer"], @ply.cards.revealed(true).map(&:type))
+                                "BasicCards::Duchy", "Seaside::Explorer"], @ply.cards(true).revealed.map(&:type))
           assert_match(/revealed Adventurer, Bazaar, Chancellor, Duchy, Explorer, shuffled.*Copper, Estate, Copper/, @game.histories(true)[-1].event)
         end
       end
@@ -442,14 +442,14 @@ EOF
 
         should "peek at cards" do
           assert_equal ["Adventurer", "Bazaar", "Chancellor"], @ply.peek_at_deck(3)
-          assert_same_elements(["BaseGame::Adventurer", "Seaside::Bazaar", "BaseGame::Chancellor"], @ply.cards.peeked(true).map(&:type))
+          assert_same_elements(["BaseGame::Adventurer", "Seaside::Bazaar", "BaseGame::Chancellor"], @ply.cards(true).peeked.map(&:type))
           assert_match(/saw \[#{@ply.id}\?Adventurer, Bazaar, Chancellor\|3 cards\] on the top/, @game.histories(true)[-1].event)
           assert_equal [0,1,2], @ply.peeked_card_ixes
         end
 
         should "peek at cards at bottom" do
           assert_equal ["Chancellor", "Duchy", "Explorer"], @ply.peek_at_deck(3, :bottom)
-          assert_same_elements(["BaseGame::Chancellor", "BasicCards::Duchy", "Seaside::Explorer"], @ply.cards.peeked(true).map(&:type))
+          assert_same_elements(["BaseGame::Chancellor", "BasicCards::Duchy", "Seaside::Explorer"], @ply.cards(true).peeked.map(&:type))
           assert_match(/saw \[#{@ply.id}\?Chancellor, Duchy, Explorer\|3 cards\] on the bottom/, @game.histories(true)[-1].event)
         end
 
@@ -457,7 +457,7 @@ EOF
           assert_equal(["Adventurer", "Bazaar", "Chancellor",
                         "Duchy", "Explorer"], @ply.peek_at_deck(7))
           assert_same_elements(["BaseGame::Adventurer", "Seaside::Bazaar", "BaseGame::Chancellor",
-                                "BasicCards::Duchy", "Seaside::Explorer"], @ply.cards.peeked(true).map(&:type))
+                                "BasicCards::Duchy", "Seaside::Explorer"], @ply.cards(true).peeked.map(&:type))
           assert_match(/saw \[#{@ply.id}\?Adventurer, Bazaar, Chancellor, Duchy, Explorer\|5 cards\]/, @game.histories(true)[-2].event)
           assert_match(/tried to look at 2 more cards/, @game.histories[-1].event)
         end
@@ -470,7 +470,7 @@ EOF
                         "Copper", "Estate", "Copper"], @ply.peek_at_deck(8))
           assert_same_elements(["BasicCards::Estate", "BasicCards::Copper", "BasicCards::Copper",
                                 "BaseGame::Adventurer", "Seaside::Bazaar", "BaseGame::Chancellor",
-                                "BasicCards::Duchy", "Seaside::Explorer"], @ply.cards.peeked(true).map(&:type))
+                                "BasicCards::Duchy", "Seaside::Explorer"], @ply.cards(true).peeked.map(&:type))
           assert_match(/saw \[#{@ply.id}\?Adventurer, Bazaar, Chancellor, Duchy, Explorer\|5 cards\], shuffled.* \[#{@ply.id}\?Copper, Estate, Copper\|3 cards\]/, @game.histories(true)[-1].event)
         end
       end

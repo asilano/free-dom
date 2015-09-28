@@ -16,7 +16,7 @@ class Seaside::Haven < Card
     player.draw_cards(1)
     parent_act = player.add_actions(1, parent_act)
 
-    if player.cards.hand(true).map(&:class).uniq.length == 1
+    if player.cards(true).hand.map(&:class).uniq.length == 1
       # Only holding one type of card. Call resolve directly
       return resolve_setaside(player, {:card_index => 0}, parent_act)
     elsif player.cards.hand.empty?

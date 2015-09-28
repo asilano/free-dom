@@ -105,7 +105,7 @@ class Hinterlands::Mandarin < Card
     if params.include? :nil_action
       # Returning the remaining cards in any order. Y'know what? Let's just call ourselves to do it.
       actor.cards.in_play.select(&:is_treasure?).length.downto(2) do |posn|
-        ix = actor.cards.in_play(true).index(&:is_treasure?)
+        ix = actor.cards(true).in_play.index(&:is_treasure?)
         resolve_return(actor, {:card_index => ix, :posn => posn}, parent_act)
         actor.renum(:deck)
       end

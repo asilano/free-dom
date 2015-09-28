@@ -71,7 +71,7 @@ class Hinterlands::JackOfAllTrades < Card
                       validating_param_value_in(:choice, 'discard', 'leave').
                       with do
     # Everything looks fine. Carry out the requested choice
-    card = actor.cards.deck(true).first
+    card = actor.cards(true).deck.first
     if params[:choice] == "leave"
       # Chose not to discard the card, so a no-op other than unpeeking.
       card.peeked = false
@@ -93,7 +93,7 @@ class Hinterlands::JackOfAllTrades < Card
   end
 
   def triggerdraw(params)
-    num_to_draw = 5 - player.cards.hand(true).count
+    num_to_draw = 5 - player.cards(true).hand.count
 
     if num_to_draw > 0
       player.draw_cards(num_to_draw)

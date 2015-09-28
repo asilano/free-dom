@@ -942,11 +942,11 @@ EOF
       c.type = "BasicCards::Copper"
       c.location = "discard"
       c.save!
-      c = @player.cards.deck(true)[0]
+      c = @player.cards(true).deck[0]
       c.type = "BasicCards::Copper"
       c.location = "discard"
       c.save!
-      c = @player.cards.deck(true)[0]
+      c = @player.cards(true).deck[0]
       c.type = "BasicCards::Copper"
       c.location = "discard"
       c.save!

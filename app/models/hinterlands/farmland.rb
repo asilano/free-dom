@@ -19,7 +19,7 @@ class Hinterlands::Farmland < Card
     # Check whether the card bought is Farmland, and if so queue to do the upgrade
     if pile.card_class == self
       farmland = pile.cards.first
-      if ply.cards.hand(true).map(&:class).uniq.length == 1
+      if ply.cards(true).hand.map(&:class).uniq.length == 1
         # Only holding one type of card. Call resolve_trash directly
         farmland.resolve_trash(ply, {:card_index => 0}, parent_act)
       elsif ply.cards.hand.empty?

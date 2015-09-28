@@ -16,7 +16,7 @@ class BaseGame::Adventurer < Card
     # shuffle the discard pile under. Then step through the deck (possibly plus
     # old discard) and move each card to hand or discard until we're done.
     treasure_count = 0
-    for card in player.cards.deck(true)
+    for card in player.cards(true).deck
       treasure_count += 1 if card.is_treasure?
       break if treasure_count == 2
     end
@@ -28,8 +28,6 @@ class BaseGame::Adventurer < Card
 
     treasure_count = 0
     cards_revealed = []
-    player.cards.hand(true)
-    player.cards.in_discard(true)
     for card in player.cards.deck
       cards_revealed << card.class.readable_name
       if card.is_treasure?

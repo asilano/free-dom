@@ -19,7 +19,7 @@ class BaseGame::Library < Card
   def process(parent_act)
     # Assume we're just going to draw up to 7 cards; we'll break out of the loop
     # if we hit an action
-    num_to_draw = 7 - player.cards.hand(true).size
+    num_to_draw = 7 - player.cards(true).hand.size
     clear_up = true
 
     1.upto(num_to_draw) do |n|
@@ -79,7 +79,7 @@ class BaseGame::Library < Card
                             :css_class => "player#{actor.seat}")
     else
       card = actor.cards.hand[-1]
-      actor.cards.revealed(true) << card
+      actor.cards.revealed << card
       card.location = "library"
       card.revealed = true
       card.save!

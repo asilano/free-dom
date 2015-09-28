@@ -9,7 +9,7 @@ class Prosperity::Watchtower < Card
   def play(parent_act)
     super
 
-    num_to_draw = 6 - player.cards.hand(true).count
+    num_to_draw = 6 - player.cards(true).hand.count
 
     if num_to_draw > 0
       player.draw_cards(num_to_draw)

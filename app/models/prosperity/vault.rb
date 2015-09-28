@@ -10,7 +10,7 @@ class Prosperity::Vault < Card
 
     player.draw_cards(2)
 
-    if player.cards.hand(true).empty?
+    if player.cards(true).hand.empty?
       # No cards in hand to discard. Just log
       game.histories.create!(:event => "#{player.name} had no cards in hand to discard to #{readable_name}")
     else
@@ -119,7 +119,7 @@ class Prosperity::Vault < Card
       game.histories.create!(:event => "#{ply.name} discarded a #{card}.",
                             :css_class => "player#{ply.seat} card_discard")
 
-      if ply.cards.hand(true).map(&:class).uniq.length == 1
+      if ply.cards.hand.map(&:class).uniq.length == 1
         # Player must discard and has only one type left in hand. Call discardtwo directly
         resolve_discardtwo(ply, {:card_index => 0}, parent_act)
       elsif ply.cards.hand.count > 0

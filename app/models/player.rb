@@ -504,12 +504,12 @@ class Player < ActiveRecord::Base
   def clean_up(params)
     # Move all cards in Play or Hand to Discard
     # Force a reload of all affected areas
-    cards.in_discard(true)
+    cards(true).in_discard
 
-    cards.hand(true).each do |card|
+    cards.hand.each do |card|
       card.discard
     end
-    cards.in_play(true).each do |card|
+    cards.in_play.each do |card|
       card.discard_from_play(params[:parent_act])
     end
   end
@@ -795,9 +795,7 @@ class Player < ActiveRecord::Base
   # Return the array of cards actually drawn
   def draw_cards(num, reason = nil)
     # We need to force the deck, hand and discard arrays to be populated
-    cards.deck(true)
-    cards.in_discard(true)
-    cards.hand(true)
+    cards(true)
     cards_drawn = []
 
     if nil==reason
@@ -862,8 +860,7 @@ class Player < ActiveRecord::Base
     silent = options[:silent]
 
     # We need to force the deck and discard arrays to be populated
-    cards.deck(true)
-    cards.in_discard(true)
+    cards(true)
     cards_revealed = []
 
     shuffle_point = cards.deck.size
@@ -910,8 +907,7 @@ class Player < ActiveRecord::Base
   def peek_at_deck(num, t_or_b = :top)
     raise "Bad parameters to peek" unless [:top, :bottom].include? t_or_b
     # We need to force the deck and discard arrays to be populated
-    cards.deck(true)
-    cards.in_discard(true)
+    cards(true)
     cards_peeked = []
 
     shuffle_point = cards.deck.size
@@ -1023,7 +1019,7 @@ class Player < ActiveRecord::Base
   end
 
   def peeked_card_ixes
-    return (0..(cards.deck(true).length - 1)).select {|ix| cards.deck[ix].peeked}
+    return (0..(cards(true).deck.length - 1)).select {|ix| cards.deck[ix].peeked}
   end
 
   def other_players
@@ -1060,13 +1056,12 @@ class Player < ActiveRecord::Base
     # Take all the cards in the discard pile and put them, in random order,
     # at the end of the deck array.
     renum(:deck)
-    cards.in_discard(true).shuffle.each do |card|
+    cards(true).in_discard.shuffle.each do |card|
       cards.deck << card
       card.location = "deck"
       card.position = cards.deck.count
       card.save
     end
-    cards.in_discard(true)
 
     if options[:log]
       game.histories.create!(:event => "#{name} shuffled their discard pile.",

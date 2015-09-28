@@ -61,7 +61,7 @@ class Intrigue::WishingWell < Card
 
     # Now  "reveal" the top card of the deck - actually, just write it to
     # history - after making sure the deck has a card in it.
-    if ply.cards.deck(true).length == 0
+    if ply.cards(true).deck.length == 0
       ply.shuffle_discard_under_deck
     end
 
@@ -75,13 +75,13 @@ class Intrigue::WishingWell < Card
       game.histories.create!(:event => "#{ply.name} revealed a #{card.readable_name} to the Wishing Well.",
                             :css_class => "player#{ply.seat} card_reveal")
 
-      if not params.include? :nil_action and card.class == pile.card_class
+      if !params.include? :nil_action && card.class == pile.card_class
         # Named card matches the top card - put it into the player's hand.
         # Note that this is not a "draw" - which is irrelevant at the moment,
         # but you can never be too careful.
         game.histories.create!(:event => "Named card matches top of deck - #{ply.name} puts the card into their hand.",
                             :css_class => "player#{ply.seat}")
-        if ply.cards.hand(true).empty?
+        if ply.cards.hand.empty?
           card.position = 0
         else
           card.position = ply.cards.hand[-1].position + 1

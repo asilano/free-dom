@@ -69,7 +69,7 @@ class Hinterlands::Cartographer < Card
                              :css_class => "player#{actor.seat} card_discard")
     end
 
-    remain = actor.cards.peeked(true).count
+    remain = actor.cards(true).peeked.count
     if remain == 0
       # Nothing to put back
     elsif remain == 1
@@ -112,7 +112,7 @@ class Hinterlands::Cartographer < Card
 
     if params[:posn].to_i == 2
       # That was the card second from top, so only one card remains to be placed. Do so.
-      raise "Wrong number of revealed cards" unless actor.cards.peeked(true).count == 1
+      raise "Wrong number of revealed cards" unless actor.cards(true).peeked.count == 1
       card = actor.cards.peeked[0]
       card.location = "deck"
       card.position = -2

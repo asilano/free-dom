@@ -26,7 +26,7 @@ class Seaside::SeaHag < Card
     ply = Player.find(params[:target])
     parent_act = params[:parent_act]
 
-    if ply.cards.deck(true).empty?
+    if ply.cards(true).deck.empty?
       ply.shuffle_discard_under_deck
     end
 

@@ -41,7 +41,7 @@ class BaseGame::Militia < Card
     parent_act = params[:parent_act]
 
     # Determine how many cards to discard - never negative
-    num_discards = [0, target.cards.hand(true).size - 3].max
+    num_discards = [0, target.cards(true).hand.size - 3].max
 
     # Hang that many actions off the parent to ask the target to discard a card
     1.upto(num_discards) do |num|

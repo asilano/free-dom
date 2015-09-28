@@ -8,7 +8,7 @@ class Prosperity::Forge < Card
   def play(parent_act)
     super
 
-    if player.cards.hand(true).empty?
+    if player.cards(true).hand.empty?
       # No cards in hand. Just call resolve_trash with no card indices.
       resolve_trash(player, {}, parent_act)
     else

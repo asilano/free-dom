@@ -7,7 +7,7 @@ class Hinterlands::Develop < Card
   def play(parent_act)
     super
 
-    if player.cards.hand(true).map(&:class).uniq.length == 1
+    if player.cards(true).hand.map(&:class).uniq.length == 1
       # Only holding one type of card. Call resolve_trash directly
       return resolve_trash(player, {:card_index => 0}, parent_act)
     elsif player.cards.hand.empty?

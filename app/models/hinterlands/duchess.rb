@@ -52,7 +52,7 @@ class Hinterlands::Duchess < Card
                     validating_param_value_in(:choice, 'discard', 'leave').
                     with do
     # Everything looks fine. Carry out the requested choice
-    card = actor.cards.deck(true)[0]
+    card = actor.cards(true).deck[0]
     if params[:choice] == "leave"
       # Chose not to discard the card, so a no-op other than unpeeking.
       card.peeked = false

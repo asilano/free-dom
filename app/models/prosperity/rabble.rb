@@ -38,7 +38,7 @@ class Prosperity::Rabble < Card
 
     # Ensure they have 3 cards to reveal, if possible
     shuffle_point = target.cards.deck.count
-    if target.cards.deck(true).count < 3
+    if target.cards(true).deck.count < 3
       target.shuffle_discard_under_deck(:log => shuffle_point == 0)
     end
 
@@ -125,8 +125,8 @@ class Prosperity::Rabble < Card
 
     if params[:posn].to_i == 2
       # That was the card second from top, so only one card remains to be placed. Do so.
-      raise "Wrong number of revealed cards" unless ply.cards.revealed(true).count == 1
-      card = ply.cards.revealed(true)[0]
+      raise "Wrong number of revealed cards" unless ply.cards(true).revealed.count == 1
+      card = ply.cards.revealed[0]
       card.location = "deck"
       card.position = -2
       card.revealed = false
@@ -138,7 +138,7 @@ class Prosperity::Rabble < Card
     ply.renum(:deck)
 
     # Now, if the revealed cards are all of the same type, we can put them back as well
-    if ply.cards.revealed(true).map(&:class).uniq.length == 1
+    if ply.cards.revealed.map(&:class).uniq.length == 1
       resolve_place(ply, {card_index: 0, posn: params[:posn].to_i - 1}, parent_act)
       ply.pending_actions.where('expected_action LIKE ?', "resolve_#{self.class}#{id}_place;posn=%").destroy_all
     end

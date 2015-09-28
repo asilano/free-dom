@@ -12,7 +12,7 @@ class Intrigue::SecretChamber < Card
   def play(parent_act)
     super
 
-    if player.cards.hand(true).empty?
+    if player.cards(true).hand.empty?
       # No cards in hand to discard. Just log
       game.histories.create!(:event => "#{player.name} had no cards in hand to discard to #{readable_name}")
     else

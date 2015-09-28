@@ -56,7 +56,7 @@ class Seaside::PearlDiver < Card
     end
 
     # Everything looks fine. Carry out the requested choice
-    card = ply.cards.deck(true)[-1]
+    card = ply.cards(true).deck.last
     if params[:choice] == "leave"
       # Chose not to move the card to the top, so a no-op other than unpeeking.
       # Create a history

@@ -9,7 +9,7 @@ class Intrigue::TradingPost < Card
 
     # Set up the right number of pending actions (2 if possible, no more than
     # cards in hand)
-    if player.cards.hand(true).length == 0
+    if player.cards(true).hand.length == 0
       # No cards in hand. Just write a history.
       game.histories.create!(:event => "#{player.name} had no cards in hand to trash.",
                             :css_class => "player#{player.seat} card_trash")

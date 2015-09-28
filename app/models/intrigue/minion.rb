@@ -67,7 +67,7 @@ class Intrigue::Minion < Card
               :expected_action => "resolve_#{self.class}#{id}_draw_4;tgt=#{player.id}",
               :game => game)
 
-      ply.cards.hand(true).each do |card|
+      ply.cards(true).hand.each do |card|
         card.discard
       end
     end
@@ -87,7 +87,7 @@ class Intrigue::Minion < Card
     parent_act = params[:parent_act]
 
 
-    if target.cards.hand(true).length > 4
+    if target.cards(true).hand.length > 4
       # Queue up the draw action in case discarding causes anything to trigger
       # (such as Hinterlands::Tunnel)
       Game.parent_act = parent_act.children.create!(

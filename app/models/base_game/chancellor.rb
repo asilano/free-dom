@@ -43,7 +43,7 @@ class BaseGame::Chancellor < Card
       game.histories.create!(:event => "#{actor.name} chose not to discard their deck.",
                             :css_class => "player#{actor.seat}")
     else
-      actor.cards.deck(true).each do |card|
+      actor.cards(true).deck.each do |card|
         # Move card to discard _without tripping callbacks_
         card.update_column(:location, 'discard')
       end

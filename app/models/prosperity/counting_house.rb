@@ -55,7 +55,7 @@ class Prosperity::CountingHouse < Card
     end
 
     # Right, all looks good. Move them Coppers.
-    player.cards.hand(true)
+    player.cards(true)
     discarded_coppers[0, count].each do |copper|
       if player.cards.hand.empty?
         copper.position = 0

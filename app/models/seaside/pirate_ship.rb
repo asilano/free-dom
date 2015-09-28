@@ -144,7 +144,7 @@ class Seaside::PirateShip < Card
     save!
 
     # Discard the remaining cards.
-    target.cards.revealed(true).each do |c|
+    target.cards(true).revealed.each do |c|
       target.cards.in_discard << c
       c.discard
     end

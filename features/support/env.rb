@@ -8,6 +8,9 @@ ENV["RAILS_ENV"] = "test"
 
 require 'cucumber/rails'
 require 'factory_girl_rails'
+require 'test/unit/assertions'
+
+World(Test::Unit::Assertions)
 
 # Capybara defaults to XPath selectors rather than Webrat's default of CSS3. In
 # order to ease the transition to Capybara we set the default here. If you'd
@@ -77,7 +80,7 @@ class Array
   end
 end
 
-class Card
+class Card < ActiveRecord::Base
   def <=>(rhs)
     return readable_name <=> rhs.readable_name
   end
