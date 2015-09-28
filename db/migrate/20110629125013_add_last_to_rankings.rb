@@ -5,18 +5,18 @@ class AddLastToRankings < ActiveRecord::Migration
     add_column :rankings, :last_total_score, :integer, :default => 0
     add_column :rankings, :last_result_elo, :float, :default => 1600
     add_column :rankings, :last_score_elo, :float, :default => 1600
-    
-    Ranking.update_all('last_num_won = num_won,
+
+    Ranking.where { num_played != 0}.update_all('last_num_won = num_won,
                         last_total_norm_pos = total_normalised_pos - (total_normalised_pos / num_played),
                         last_total_score = total_score - (total_score / num_played),
                         last_result_elo = result_elo,
-                        last_score_elo = score_elo', 'num_played != 0')
-                        
-    Ranking.update_all('last_num_won = 0,
+                        last_score_elo = score_elo')
+
+    Ranking.where { num_played != 0}.update_all('last_num_won = 0,
                         last_total_norm_pos = 0,
                         last_total_score = 0,
                         last_result_elo = 1600,
-                        last_score_elo = 1600', 'num_played = 0')
+                        last_score_elo = 1600')
   end
 
   def self.down

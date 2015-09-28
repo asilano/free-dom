@@ -6,6 +6,6 @@ class Intrigue::Duke < Card
                             when 3..6
                               12
                             end}
-  victory {player.cards(true).count(:conditions => "type = 'BasicCards::Duchy'")}
+  victory { player.cards(true).of_type('BasicCards::Duchy').count }
   card_text "Victory (cost: 5) - 1 point per Duchy in your deck."
 end

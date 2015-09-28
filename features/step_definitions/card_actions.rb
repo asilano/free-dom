@@ -1,7 +1,7 @@
 When(/^(\w*?) plays? #{SingleCard}$/) do |name, kind|
   name = 'Alan' if name == 'I'
   assert_contains @hand_contents[name], kind
-  card = @test_players[name].cards.hand.first(:conditions => ['type = ?', CARD_TYPES[kind].name])
+  card = @test_players[name].cards.hand.of_type(CARD_TYPES[kind].name).first
   assert_not_nil card
 
   @hand_contents[name].delete_first(kind)
@@ -31,7 +31,7 @@ end
 When(/^(\w*?) plays? #{SingleCard} as treasure$/) do |name, kind|
   name = 'Alan' if name == 'I'
   assert_contains @hand_contents[name], kind
-  card = @test_players[name].cards.hand.first(:conditions => ['type = ?', CARD_TYPES[kind].name])
+  card = @test_players[name].cards.hand.of_type(CARD_TYPES[kind].name).first
   assert_not_nil card
 
   @hand_contents[name].delete_first(kind)
@@ -96,7 +96,7 @@ When(/^(\w*?) buys? #{SingleCard}$/) do |name, kind|
   name = 'Alan' if name == 'I'
 
   assert_contains @test_game.piles.map{|p| p.card_class.readable_name}, kind
-  pile = @test_game.piles.first(:conditions => ['card_type = ?', CARD_TYPES[kind].name])
+  pile = @test_game.piles.where { card_type == CARD_TYPES[kind].name }.first
   assert_not_nil pile
 
   parent_act = @test_players[name].pending_actions.active.first
