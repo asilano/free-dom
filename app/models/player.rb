@@ -94,7 +94,7 @@ class Player < ActiveRecord::Base
           elsif pile.card_type == "Prosperity::GrandMarket" && !cards.in_play.of_type("BasicCards::Copper").empty?
             false
           else
-            (pile.cost <= cash and pile.cards.size != 0)
+            (pile.cost <= cash && pile.cards.size != 0)
           end
         end
         controls[:piles] += [{type: :button,

@@ -1,5 +1,3 @@
-require Rails.root.join('app/models/card')
-
 CARD_TYPES = {"Cellar" => BaseGame::Cellar,
 "Chapel" => BaseGame::Chapel,
 "Moat" => BaseGame::Moat,

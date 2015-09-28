@@ -344,7 +344,11 @@ When(/^(\w*?) chooses? (?:the )?(.*?) (?:for )?piles?$/) do |name, choice|
     possibilities = @test_game.piles.map{|p| p.card_class.readable_name}
     kinds = choice.split(/,\s*/)
     if kinds.length == 1
-      params[:pile_index] = possibilities.index(kinds[0])
+      if possibilities.index(kinds[0])
+        params[:pile_index] = possibilities.index(kinds[0])
+      else
+        flunk "Chose a pile that doesn't exist"
+      end
     else
       flunk "Can't think of any multiple-pile cards at the mo..."
     end

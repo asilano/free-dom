@@ -94,7 +94,7 @@ class BaseGame::Library < Card
   def discard_set_aside
     # Move all revealed cards to Discard, and unreveal them
     # Force a reload of all affected areas
-    player.cards.revealed(true).each do |card|
+    player.cards(true).revealed.each do |card|
       card.discard
     end
   end

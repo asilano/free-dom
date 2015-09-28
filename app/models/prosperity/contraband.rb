@@ -35,24 +35,13 @@ class Prosperity::Contraband < Card
     end
   end
 
-  def resolve_ban(ply, params, parent_act)
-    # We expect to have been passed a :pile_index or :nil_action
-    if not params.include? :pile_index and not params.include? :nil_action
-      return "Invalid parameters"
-    end
-
-    # Check that the pile is in range
-    if ((params.include? :pile_index) and
-           (params[:pile_index].to_i < 0 or
-            params[:pile_index].to_i > game.piles.length - 1))
-      # Asked to name an invalid card (out of range)
-      return "Invalid request - pile index #{params[:pile_index]} is out of range"
-    end
-
-    if params.include? :nil_action
+  resolves(:ban).validating_params_has_any_of(:pile_index, :nil_action).
+                  validating_param_is_pile(:pile_index).
+                  with do
+    if params.include?(:nil_action)
       # Player named a nonsense card.
-      game.histories.create!(:event => "#{ply.name} banned #{params[:nil_action].match(/Ban '(.*)'/)[1]}.",
-                            :css_class => "player#{ply.seat}")
+      game.histories.create!(:event => "#{actor.name} banned #{params[:nil_action].match(/Ban '(.*)'/)[1]}.",
+                            :css_class => "player#{actor.seat}")
     else
       # Player has named a card. Write the name to the game's facts. It will be used in Player#determine_controls
       # for the Buy action.
@@ -62,8 +51,8 @@ class Prosperity::Contraband < Card
       game.facts[:contraband] << pile.card_type
       game.save!
 
-      game.histories.create!(:event => "#{ply.name} banned '#{pile.card_type.readable_name}'.",
-                            :css_class => "player#{ply.seat}")
+      game.histories.create!(:event => "#{actor.name} banned '#{pile.card_type.readable_name}'.",
+                            :css_class => "player#{actor.seat}")
     end
 
     return "OK"

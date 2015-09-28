@@ -75,7 +75,7 @@ class Intrigue::WishingWell < Card
       game.histories.create!(:event => "#{ply.name} revealed a #{card.readable_name} to the Wishing Well.",
                             :css_class => "player#{ply.seat} card_reveal")
 
-      if !params.include? :nil_action && card.class == pile.card_class
+      if !params.include?(:nil_action) && card.class == pile.card_class
         # Named card matches the top card - put it into the player's hand.
         # Note that this is not a "draw" - which is irrelevant at the moment,
         # but you can never be too careful.
