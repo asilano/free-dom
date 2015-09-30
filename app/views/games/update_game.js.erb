@@ -2,6 +2,9 @@
   $("#flash").html('<%= escape_javascript(render('flash_area')) -%>');
   $("#game_state").html('<%= escape_javascript(render(@game, :player => @player, :controls => @controls)) -%>');
   $("#history").html('<%= escape_javascript(render(partial: "history")) -%>');
+  <% if (@game.root_action) %>
+    $("#pend_actions").html('<ul><%= escape_javascript(render(partial: "pend_action", object: @game.root_action) -%></ul>');
+  <% end %>
   <%= render :partial => 'update_chat' %>
   onLoadFunc();
 

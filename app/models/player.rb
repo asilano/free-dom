@@ -339,7 +339,7 @@ class Player < ActiveRecord::Base
       return response
     elsif (!params.include?(:nil_action) &&
            !params.include?(:pile_index))
-       return "Invalid parameters - must specify a card or nil_action"
+       return "Invalid parameters - must specify a pile or nil_action"
     elsif ((params.include? :pile_index) &&
            (params[:pile_index].to_i < 0 ||
             params[:pile_index].to_i > game.piles.length - 1))
