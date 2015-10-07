@@ -33,7 +33,7 @@ end
   gem 'uglifier'
 #end
 
-gem 'jquery-rails'#, :path => "vendor/gems/jquery-rails-1.0.19"
+gem 'jquery-rails', :path => "vendor/gems/jquery-rails-3.1.4"
 #gem 'therubyracer'
 gem 'actionmailer-with-request'
 gem 'slim-rails'
