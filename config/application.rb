@@ -23,7 +23,7 @@ module Dominion
     config.autoload_paths << Rails.root.join('lib')
     config.action_view.embed_authenticity_token_in_remote_forms = true
 
-    config.assets.precompile += %w<games.css users.css game_board.css rankings.css>
+    config.assets.precompile += %w<games.css users.css game_board.css rankings.css legacy/stylesheets/application.css>
   end
 end
 
