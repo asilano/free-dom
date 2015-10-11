@@ -22,7 +22,7 @@ class GamesController < ApplicationController
   #end
 
   def legacy
-    if @user.andand.name == 'Clive'
+    if @user.andand.name == 'Clive' || params[:force_legacy]
       theme 'legacy'
     end
   end
