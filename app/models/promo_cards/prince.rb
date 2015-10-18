@@ -98,7 +98,7 @@ class PromoCards::Prince < Card
     # Ok, log and play the Princed card. It expects to be in the hand, like Throne Room, so
     # oblige.
     game.histories.create!(event: "#{player.name}'s #{self} played #{princed_card}.",
-                            css_class: "player#{player.seat}")
+                            css_class: "player#{player.seat}#{" play_attack" if princed_card.is_attack?}")
     princed_card.location = 'hand'
     princed_card.play(parent_act)
   end

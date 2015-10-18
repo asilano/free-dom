@@ -54,7 +54,7 @@ class BaseGame::ThroneRoom < Card
     # to play that card.
     chosen = actor.cards.hand[params[:card_index].to_i]
     game.histories.create!(:event => "#{actor.name} chose #{chosen.class.readable_name} to double.",
-                          :css_class => "player#{actor.seat}")
+                          :css_class => "player#{actor.seat}#{" play_attack" if chosen.is_attack?}")
     act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}" +
                                                          "_playaction;" +
                                                          "type=#{chosen[:type]};id=#{chosen.id}",
