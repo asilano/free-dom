@@ -59,7 +59,7 @@ class BaseGame::Library < Card
       # needs two clicks, and is likely to get irritating.
       controls[:hand] += [{:type => :button,
                           :action => :resolve,
-                          :text => "Set Aside",
+                          :text => "Set aside",
                           :nil_action => "Keep",
                           :params => {:card => "#{self.class}#{id}",
                                       :substep => "choose"},

@@ -4,7 +4,7 @@ File.open("#{Rails.root}/app/assets/javascripts/card_dict.js", "w") do |f|
   f.write(dict)
 end
 
-File.open("#{Rails.root}/features/support/card_types.rb", "w") do |f|
+File.open("#{Rails.root}/features/support/hashed_card_types.rb", "w") do |f|
   f.write("CARD_TYPES = {")
   str = Card.all_card_types.map {|ty| "\"#{ty.readable_name}\" => #{ty.name}"}.join(",\n")
   f.write(str)

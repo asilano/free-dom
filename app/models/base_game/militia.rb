@@ -1,7 +1,7 @@
 class BaseGame::Militia < Card
   costs 4
   action :attack => true
-  card_text "Action (Attack; cost: 4) - +2 cash. Each other player discards down " +
+  card_text "Action (Attack; cost: 4) - +2 Cash. Each other player discards down " +
                                         "to 3 cards."
 
   def play(parent_act)
