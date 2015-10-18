@@ -13,8 +13,6 @@ Feature: Explorer
     Given my hand contains Explorer, Estate, Duchy, Colony, Gold
       And it is my Play Action phase
     When I play Explorer
-      Then I should need to Choose a province to reveal
-    When I choose Choose no Province in my hand
       And the game checks actions
       Then I should have gained Silver to my hand
       And it should be my Play Treasure phase

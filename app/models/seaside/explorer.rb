@@ -9,11 +9,17 @@ class Seaside::Explorer < Card
   # * On resolution of that choice, if they chose a province, give them a gold, otherwise a silver.
   def play(parent_act)
     super
-    act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}",
-                                     :text => "Choose a province to reveal")
-    act.player = player
-    act.game = game
-    act.save!
+
+    if player.cards.hand.of_type('BasicCards::Province').empty?
+      # No Province. Act automatically
+      resolve_choose(player, {nil_action: true}, parent_act)
+    else
+      act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_choose",
+                                       :text => "Choose a province to reveal")
+      act.player = player
+      act.game = game
+      act.save!
+    end
 
     return "OK"
   end
@@ -24,28 +30,29 @@ class Seaside::Explorer < Card
                          :action => :resolve,
                          :text => "Choose",
                          :nil_action => "Choose no Province",
-                         :params => {:card => "#{self.class}#{id}"},
+                         :params => {card:  "#{self.class}#{id}",
+                                      substep: 'choose'},
                          :cards => player.cards.hand.map do |card|
                            card.class == BasicCards::Province
                          end
                         }]
   end
 
-  def resolve(ply, params, parent_act)
+  def resolve_choose(ply, params, parent_act)
     # Player has made a choice of what to reveal.
     # We expect to have been passed either :nil_action or a :card_index
-    if (not params.include? :nil_action) and (not params.include? :card_index)
+    if !params.include?(:nil_action) && !params.include?(:card_index)
       return "Invalid parameters"
     end
 
     # Processing is pretty much the same as a Play; code shamelessly yoinked from
     # Player.play_action.
-    if ((params.include? :card_index) and
-        (params[:card_index].to_i < 0 or
+    if ((params.include? :card_index) &&
+        (params[:card_index].to_i < 0 ||
          params[:card_index].to_i > ply.cards.hand.length - 1))
       # Asked to play an invalid card (out of range)
       return "Invalid request - card index #{params[:card_index]} is out of range"
-    elsif params.include? :card_index and ply.cards.hand[params[:card_index].to_i].class != BasicCards::Province
+    elsif params.include? :card_index && ply.cards.hand[params[:card_index].to_i].class != BasicCards::Province
       # Asked to play an invalid card (not a province)
       return "Invalid request - card index #{params[:card_index]} is not a province"
     end
