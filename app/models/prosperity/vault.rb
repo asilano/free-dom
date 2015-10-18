@@ -3,7 +3,7 @@
 class Prosperity::Vault < Card
   action
   costs 5
-  card_text "Action (cost: 5) - Draw 2 Cards. Discard any number of cards; +1 cash per card discarded. Each other player may discard 2 cards; if he does, he draws a card."
+  card_text "Action (cost: 5) - Draw 2 cards. Discard any number of cards; +1 cash per card discarded. Each other player may discard 2 cards; if he does, he draws a card."
 
   def play(parent_act)
     super

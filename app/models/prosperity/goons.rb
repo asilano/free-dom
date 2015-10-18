@@ -3,7 +3,7 @@
 class Prosperity::Goons < Card
   action :attack => true
   costs 6
-  card_text "Action (Attack; cost: 6) - +1 Buy, +2 Cash. Each other player discards down to 3 cards. / While this is in play, when you buy a card, +1 VP"
+  card_text "Action (Attack; cost: 6) - +1 Buy, +2 Cash. Each other player discards down to 3 cards. / While this is in play, when you buy a card, +1 VP."
 
   def play(parent_act)
     super

@@ -3,7 +3,7 @@
 class Prosperity::Peddler < Card
   action
   costs 8
-  card_text "Action (cost: 8) - Draw a card, +1 Action, +1 Cash. / During your Buy phase, this costs 2 less per Action card you have in play, but not less than 0."
+  card_text "Action (cost: 8) - Draw 1 card, +1 Action, +1 Cash. / During your Buy phase, this costs 2 less per Action card you have in play, but not less than 0."
 
   def play(parent_act)
     super

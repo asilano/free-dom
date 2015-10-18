@@ -3,7 +3,7 @@
 class Prosperity::Bishop < Card
   action
   costs 4
-  card_text "Action (cost: 4) +1 Cash, +1 VP. Trash a card from your hand. +VP equal to half its cost in coins, rounded down. Each other player may trash a card from his hand."
+  card_text "Action (cost: 4) - +1 Cash, +1 VP. Trash a card from your hand. +VP equal to half its cost in coins, rounded down. Each other player may trash a card from his hand."
 
   def play(parent_act)
     super

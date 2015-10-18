@@ -3,7 +3,7 @@
 class Prosperity::Monument < Card
   action
   costs 4
-  card_text "Action (cost: 4) - +2 Cash, +1 VP"
+  card_text "Action (cost: 4) - +2 Cash, +1 VP."
 
   def play(parent_act)
     super

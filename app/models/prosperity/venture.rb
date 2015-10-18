@@ -3,7 +3,7 @@
 class Prosperity::Venture < Card
   treasure :special => true
   costs 5
-  card_text "Treasure (cost: 5) - 1 Cash. When you play this, reveal cards from your deck until you reveal a Treasure. Discard the other cards. Play that Treasure"
+  card_text "Treasure (cost: 5) - 1 Cash. When you play this, reveal cards from your deck until you reveal a Treasure. Discard the other cards. Play that Treasure."
 
   def play_treasure(parent_act)
     super

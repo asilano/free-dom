@@ -3,7 +3,7 @@
 class Prosperity::CountingHouse < Card
   action
   costs 5
-  card_text "Action (Cost: 5) - Look through your discard pile, reveal any number of Copper cards from it, and put them into your hand."
+  card_text "Action (cost: 5) - Look through your discard pile, reveal any number of Copper cards from it, and put them into your hand."
 
   def play(parent_act)
     super

@@ -3,7 +3,7 @@
 class Prosperity::Rabble < Card
   action :attack => true
   costs 5
-  card_text "Action (Attack; cost: 5) - Draw 3 Cards. Each other player reveals the top 3 cards of his deck, discards the revealed Actions and Treasures, and puts the rest back on top in any order."
+  card_text "Action (Attack; cost: 5) - Draw 3 cards. Each other player reveals the top 3 cards of his deck, discards the revealed Actions and Treasures, and puts the rest back on top in any order."
 
   def play(parent_act)
     super
@@ -73,7 +73,7 @@ class Prosperity::Rabble < Card
 
       if revealed_cards.length < 3
         # Couldn't do all three. Log it.
-        game.histories.create!(:event => "#{target.name} tried to reveal #{3 - revealed_cards.length} more cards, but their deck was empty.",
+        game.histories.create!(:event => "#{target.name} tried to reveal #{3 - revealed_cards.length} more card#{'s' unless revealed_cards.length == 2}, but their deck was empty.",
                               :css_class => "player#{target.seat}")
       end
 

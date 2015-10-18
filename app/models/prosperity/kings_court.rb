@@ -3,7 +3,7 @@
 class Prosperity::KingsCourt < Card
   action
   costs 7
-  card_text "Action (cost: 7) - You may choose an Action card in you hand. Play it three times"
+  card_text "Action (cost: 7) - You may choose an Action card in your hand. Play it three times."
 
   serialize :state
 

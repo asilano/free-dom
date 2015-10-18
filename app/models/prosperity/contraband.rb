@@ -3,7 +3,7 @@
 class Prosperity::Contraband < Card
   costs 5
   treasure :special => true
-  card_text "Treasure (Cost: 5) - 3 Cash, +1 Buy. When you play this, the next player names a card. You can't buy that card this turn."
+  card_text "Treasure (cost: 5) - 3 Cash, +1 Buy. When you play this, the next player names a card. You can't buy that card this turn."
 
   def play_treasure(parent_act)
     super
