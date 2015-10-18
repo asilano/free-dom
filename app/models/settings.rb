@@ -1,4 +1,10 @@
 class Settings < ActiveRecord::Base
+  PermittedFields = [:automoat, :autocrat_victory, :update_interval,
+                      :autobaron, :autotorture_curse, :automountebank,
+                      :autotreasury, :autoduchess, :autofoolsgold,
+                      :autooracle, :autoscheme, :autotunnel,
+                      :autobrigand, :autoigg]
+
   ASK = 0
   ALWAYS = 1
   NEVER = 2

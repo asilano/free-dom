@@ -167,11 +167,7 @@ private
 
   def allow_params
     params.require(:user).permit(:name, :email, :password, :password_confirmation, :contact_me, :pbem,
-                                  :settings_attributes => [:automoat, :autocrat_victory, :update_interval,
-                                                            :autobaron, :autotorture_curse, :automountebank,
-                                                            :autotreasury, :autoduchess, :autofoolsgold,
-                                                            :autooracle, :autoscheme, :autotunnel,
-                                                            :autobrigand, :autoigg])
+                                  :settings_attributes => [Settings::PermittedFields])
   end
 
   def ensure_settings

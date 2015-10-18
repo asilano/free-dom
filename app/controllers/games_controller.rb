@@ -196,7 +196,7 @@ class GamesController < ApplicationController
   end
 
   def update_player_settings
-    @player.settings.update_attributes(params[:settings])
+    @player.settings.update_attributes(params[:settings].permit(Settings::PermittedFields))
 
     respond_to do |format|
       format.js do
