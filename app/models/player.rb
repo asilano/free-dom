@@ -20,19 +20,7 @@ class Player < ActiveRecord::Base
   validates :seat, :uniqueness => {:scope => 'game_id', :allow_nil => true}
   after_save :email_creator
 
-  before_create do
-    if user and user.settings.nil?
-      user.create_settings
-    end
-    self.build_settings(user.settings.attributes.delete(:id))
-    self.settings.user_id = nil
-    self.settings.save!
-
-    self.create_state
-
-    self.score = 0
-    self.vp_chips = 0
-  end
+  before_create :init_player
 
   def name
     user.name
@@ -1226,6 +1214,18 @@ class Player < ActiveRecord::Base
   end
 
 private
+
+  def init_player
+    if user && user.settings.nil?
+      user.create_settings
+    end
+
+    create_settings!(user.settings.attributes.except('id', 'user_id'))
+    create_state!
+
+    self.score = 0
+    self.vp_chips = 0
+  end
 
   def find_action(action_id)
     pa = nil
