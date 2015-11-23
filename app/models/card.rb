@@ -1,28 +1,28 @@
-class Card < ActiveRecord::Base
+class Card
   extend Passthrough
   extend CardDecorators
   include GamesHelper
   include Resolvable
 
-  belongs_to :player
-  belongs_to :game
-  belongs_to :pile
+  #belongs_to :player
+  #belongs_to :game
+  #belongs_to :pile
 
-  validates :revealed, :peeked, :inclusion => [true, false]
+  #validates :revealed, :peeked, :inclusion => [true, false]
 
-  default_scope { order(:location, :position) }
+  #default_scope { order(:location, :position) }
   %w<deck hand enduring pile>.each do |loc|
-    scope loc.to_sym, -> { where(location: loc) }
+    #scope loc.to_sym, -> { where(location: loc) }
   end
   %w<play discard trash>.each do |loc|
-    scope "in_#{loc}".to_sym, -> { where(location: loc) }
+    #scope "in_#{loc}".to_sym, -> { where(location: loc) }
   end
-  scope :revealed, -> { where(revealed: true) }
-  scope :peeked, -> { where(peeked: true) }
-  scope :of_type, -> (*types) { where(type: types) }
-  scope :in_location, -> (*locs) { where(location: locs) }
+  #scope :revealed, -> { where(revealed: true) }
+  #scope :peeked, -> { where(peeked: true) }
+  #scope :of_type, -> (*types) { where(type: types) }
+  #scope :in_location, -> (*locs) { where(location: locs) }
 
-  before_save :clear_visibility, :check_end
+  #before_save :clear_visibility, :check_end
 
   def to_s
     readable_name

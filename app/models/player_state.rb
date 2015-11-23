@@ -1,8 +1,8 @@
-class PlayerState < ActiveRecord::Base
-  belongs_to :player
-  serialize :gained_last_turn, Array
+class PlayerState
+  #belongs_to :player
+  #serialize :gained_last_turn, Array
 
-  before_validation :init_fields, :on => :create
+  #before_validation :init_fields, :on => :create
 
   def init_fields
     self.gained_last_turn ||= []

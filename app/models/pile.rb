@@ -1,15 +1,15 @@
 class Pile < ActiveRecord::Base
   include GamesHelper
 
-  belongs_to :game
-  has_many :cards, -> { where(location: 'pile') },
-                   :dependent => :delete_all
+  #belongs_to :game
+  #has_many :cards, -> { where(location: 'pile') },
+  #                 :dependent => :delete_all
 
-  serialize :state, Hash
+  #serialize :state, Hash
 
-  validates :card_type, :uniqueness => {:scope => "game_id", :message => "of Kingdom cards must be different"}
+  #validates :card_type, :uniqueness => {:scope => "game_id", :message => "of Kingdom cards must be different"}
 
-  before_create :init_state
+  #before_create :init_state
 
   def populate(num_players)
     # Create the appropriate number of Card objects for the given type and

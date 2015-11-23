@@ -1,20 +1,20 @@
-class PendingAction < ActiveRecord::Base
-  belongs_to :game
-  belongs_to :player
-  acts_as_tree
-  serialize :state
+class PendingAction
+  #belongs_to :game
+  #belongs_to :player
+  #acts_as_tree
+  #serialize :state
 
-  scope :active, -> { includes(:children).where(children: {id: nil}) }
-  scope :owned, -> { where { player_id != nil } }
-  scope :unowned, -> { where { player_id == nil } }
+  #scope :active, -> { includes(:children).where(children: {id: nil}) }
+  #scope :owned, -> { where { player_id != nil } }
+  #scope :unowned, -> { where { player_id == nil } }
 
-  after_create :email_owner
+  #after_create :email_owner
 
-  before_create do
+  #before_create do
     # If a :text hasn't been specified, set it to the humanized version of the
     # :expected_action string
-    self.text ||= expected_action.humanize
-  end
+  #  self.text ||= expected_action.humanize
+  #end
 
   def queue(attribs)
     insert_child!(attribs)
