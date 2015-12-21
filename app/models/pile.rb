@@ -1,4 +1,5 @@
-class Pile < ActiveRecord::Base
+class Pile
+  include ActiveModel::Model
   include GamesHelper
 
   #belongs_to :game
@@ -10,6 +11,14 @@ class Pile < ActiveRecord::Base
   #validates :card_type, :uniqueness => {:scope => "game_id", :message => "of Kingdom cards must be different"}
 
   #before_create :init_state
+
+  # Fields that used to be database attribs
+  attr_accessor :card_type, :position, :state, :game, :cards
+
+  def initialize(attribs={})
+    super
+    @cards = []
+  end
 
   def populate(num_players)
     # Create the appropriate number of Card objects for the given type and
@@ -34,7 +43,7 @@ class Pile < ActiveRecord::Base
     #
     # If there are no instances (before the start of the game, say), call the
     # class method.
-    card = card_class.find_by_game_id(game)
+    card = game.cards.detect { |c| c.class == card_class }
     card ? card.cost : card_class.cost
   end
 
@@ -49,7 +58,7 @@ class Pile < ActiveRecord::Base
   # Pile state notionally contains whether a pile is Contraband this turn; but that's actually stored on the Game object
   # because we wipe that clean each turn. Synthesise it onto the pile.
   def state
-    ret = self[:state] || {}
+    ret = @state || {}
     if game.facts[:contraband] && game.facts[:contraband].include?(card_type)
       ret[:contraband] = true
     end

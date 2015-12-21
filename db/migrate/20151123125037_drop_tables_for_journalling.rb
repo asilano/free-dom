@@ -7,6 +7,6 @@ class DropTablesForJournalling < ActiveRecord::Migration
     drop_table :histories
 
     remove_columns :games, :state, :facts, :turn_count, :turn_phase
-    remove_columns :players, :cash, :seat, :vp_chips
+    remove_columns :players, :cash, :vp_chips
   end
 end

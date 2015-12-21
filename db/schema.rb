@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151123125037) do
+ActiveRecord::Schema.define(version: 20151125163512) do
 
   create_table "chats", force: true do |t|
     t.integer  "game_id"
@@ -28,7 +28,18 @@ ActiveRecord::Schema.define(version: 20151123125037) do
     t.string   "name"
     t.integer  "max_players"
     t.datetime "end_time"
+    t.datetime "created_at"
   end
+
+  create_table "journals", force: true do |t|
+    t.integer  "game_id"
+    t.integer  "player_id"
+    t.text     "event"
+    t.datetime "created_at"
+  end
+
+  add_index "journals", ["game_id"], name: "index_journals_on_game_id"
+  add_index "journals", ["player_id"], name: "index_journals_on_player_id"
 
   create_table "old_scores", force: true do |t|
     t.integer "game_id"
@@ -40,6 +51,8 @@ ActiveRecord::Schema.define(version: 20151123125037) do
 
   create_table "players", force: true do |t|
     t.integer  "game_id"
+    t.integer  "seat"
+    t.integer  "score"
     t.integer  "user_id"
     t.boolean  "lock"
     t.datetime "last_emailed", default: '2011-01-01 00:00:00'

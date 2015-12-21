@@ -5,7 +5,7 @@ class PromoCards::Prince < Card
             "At the start of each of your turns, play that Action, setting it aside again when you discard it from play. " +
             "(Stop playing it if you fail to set it aside on a turn you play it.)"
 
-  serialize :state
+  #serialize :state
 
   def play(parent_act)
     super

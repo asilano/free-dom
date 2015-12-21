@@ -6,7 +6,7 @@ class Hinterlands::Trader < Card
             "Gain a number of Silvers equal to its cost in coins. / " +
             "When you would gain a card, you may reveal this from your hand. If you do, instead gain a Silver."
 
-  before_save :check_replacement_action
+  #before_save :check_replacement_action
 
   def play(parent_act)
     super

@@ -1,3 +1,4 @@
+require 'continuation'
 # Add a method to Object, that reverses the sense of include?
 class Object
   def in?(enum)

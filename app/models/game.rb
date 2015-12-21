@@ -1,6 +1,9 @@
 class Game < ActiveRecord::Base
   class_attribute :current
   class_attribute :current_act_parent
+  class_attribute :question_hash
+
+  self.question_hash = Hash.new { |_| [] }
 
   def self.parent_act
     return nil unless self.current_act_parent
@@ -21,16 +24,19 @@ class Game < ActiveRecord::Base
     AllPhases = [ACTION, BUY, CLEAN_UP]
   end
 
-  has_many :piles, -> { order :position }, :dependent => :destroy
+  #has_many :piles, -> { order :position }, :dependent => :destroy
   #accepts_nested_attributes_for :piles
-  has_many :cards, :dependent => :delete_all
-
-  has_many :players, -> { order :seat, :id }, :dependent => :destroy
-  has_one :current_turn_player, -> { where { cash != nil } }, :class_name => 'Player'
+  #has_many :cards, :dependent => :delete_all
+  has_many :journals
+  has_many :players, -> { order :seat, :id }, :dependent => :destroy, inverse_of: :game
+  #has_one :current_turn_player, -> { where { cash != nil } }, :class_name => 'Player'
   has_many :users, :through => :players
-  has_many :histories, -> { order :created_at }, :dependent => :delete_all
+  #has_many :histories, -> { order :created_at }, :dependent => :delete_all
   has_many :chats, -> { order :created_at }, :dependent => :delete_all
-  serialize :facts
+  #serialize :facts
+
+  # Things that used to be database fields and relations
+  attr_accessor :state, :facts, :turn_count, :piles, :histories, :cards, :current_turn_player
 
   attr_accessor :random_select, :specify_distr, :plat_colony
   attr_accessor *(Card.expansions.map {|set| "num_#{set.name.underscore}_cards".to_sym})
@@ -39,12 +45,12 @@ class Game < ActiveRecord::Base
 
   # A game should only ever have one root pending action outstanding
   # - which will usually be "end the turn".
-  has_one :root_action, -> { where(parent_id: nil) }, :class_name => "PendingAction"
-  has_many :pending_actions, :dependent => :delete_all
+  #has_one :root_action, -> { where(parent_id: nil) }, :class_name => "PendingAction"
+  #has_many :pending_actions, :dependent => :delete_all
 
   validates :name, :presence => true
   validates :max_players, :presence => true, :numericality => true, :inclusion => { :in => 2..6, :message => 'must be between 2 and 6 inclusive' }
-  validates :turn_phase, :numericality => true, :inclusion => {:in => TurnPhases::AllPhases, :message => 'must be valid'}, :allow_blank => true
+  #validates :turn_phase, :numericality => true, :inclusion => {:in => TurnPhases::AllPhases, :message => 'must be valid'}, :allow_blank => true
 
   validate :unique_valid_piles, :on => :create
   validate :valid_set_counts, :on => :create
@@ -52,21 +58,128 @@ class Game < ActiveRecord::Base
   validate :some_sets_present, :on => :create
 
   before_validation :normalise_inputs, :on => :create
-  before_create :init_facts
-  after_create :expand_random_choices, :make_piles, :log_creation, :age_oldest
+  #before_create :init_facts
+  after_create :journal_setup, :age_oldest
 
   # Add a player to game, raising if there's no space
   def add_player(player)
     if players.length < max_players
-      #player.seat = players.length
       players << player
-      histories.create!(:event => "#{player.name} joined the game.",
-                       :css_class => "meta new_player")
-
-      "OK"
     else
       raise "Game already full!"
     end
+  end
+
+  # Return this game's entry in the class questions hash
+  def questions
+    Game.question_hash[id]
+  end
+
+  def questions=(arr)
+    Game.question_hash[id] = arr
+  end
+
+  # Process the journals for a game, determining its complete state ex nihilo
+  def process_journals
+    # First, seed the RNG with a good, pseudo-random seed. The nanosecond count of the creation timestamp should do
+    srand(created_at.nsec)
+
+    @state = 'waiting'
+    @facts = {}
+    @histories = [History.new(event: "Game #{name} created.", css_class: "meta game_create")]
+    @piles = []
+    @cards = []
+    @current_turn_player = nil
+
+    # Initial questions: What is the platinum-colony rule, and what piles do we have?
+    self.questions = [Question.new(object: self, method: :set_plat_col), Question.new(object: self, method: :set_piles)]
+    if players.count >= 2
+      self.questions << Question.new(object: self, method: :start_game, actor: players[0], text: 'Start game')
+    end
+
+    # Main loop. For each journal in turn, look for an extant question which wants it as an answer.
+    # We shouldn't ever have a journal which doesn't match a question; if we have a question without
+    # a journal, then we need to render controls for that question.
+    @journal_arr = journals.to_a
+    until @journal_arr.empty?
+      journal = @journal_arr.shift
+      callcc do |cont|
+        @cont = cont
+        apply_to = questions.detect do |q|
+          q.object.send(q.method, journal, q.actor)
+        end
+
+        if apply_to.nil?
+          raise "Need better error handling here"
+        end
+      end
+
+      # Strategy - apply a Continuation around sending the journal to the receiver
+      # Triggers can then tell Game about any Questions they have; Game must check
+      # all its remaining journals for a match (because they may be out of order).
+      # If there's a match, carry on; if not, the trigger invokes the continuation.
+      # That lets the Game process any other waiting journals while still posting for
+      # info on the triggers.
+    end
+  end
+
+  def set_plat_col(journal, actor)
+    match = /Setup Platinum\/Colony option: (yes|no|rules)/.match(journal.event)
+    unless actor.nil? && match
+      return false
+    end
+
+    @plat_colony = match[1]
+  end
+
+  def set_piles(journal, actor)
+    match = /Setup piles: ((\w+::\w+,? ?){10})/.match(journal.event)
+    unless actor.nil? && match
+      return false
+    end
+
+    piles_array = match[1].split(', ')
+
+    # Prepare to add Platinum and Colony cards if the user (or the rules) say we should
+    test_pile = piles_array[rand(10)]
+    using_plat_col = false
+    if @plat_colony == "yes" ||
+        (@plat_colony == "rules" && test_pile.match(/(.*)::/)[1] == "Prosperity")
+      using_plat_col = true
+    end
+
+    # Create the piles in order, so that the common cards appear first, then the Kingdom
+    # Cards sorted by cost. Update their position fields
+    posn = 0
+    %w<Estate Duchy Province>.each do |vic|
+      @piles << Pile.new(card_type: "BasicCards::#{vic}", position: posn)
+      posn += 1
+    end
+    if using_plat_col
+      @piles << Pile.new(card_type: "Prosperity::Colony", position: posn)
+      posn += 1
+    end
+    %w<Copper Silver Gold>.each do |treas|
+      @piles << Pile.new(card_type: "BasicCards::#{treas}", position: posn)
+      posn += 1
+    end
+    if using_plat_col
+      @piles << Pile.new(card_type: "Prosperity::Platinum", position: posn)
+      posn += 1
+    end
+    @piles << Pile.new(card_type: "BasicCards::Curse", position: posn)
+    posn += 1
+
+    sorted_piles = piles_array.sort do |a_str,b_str|
+      a = a_str.constantize
+      b = b_str.constantize
+      (a.cost == b.cost) ? a.name <=> b.name : a.cost <=> b.cost
+    end
+    sorted_piles.each_with_index do |typ, ix|
+      @piles << Pile.new(card_type: typ, position: posn + ix)
+    end
+
+    @piles.each { |p| p.game = self }
   end
 
   # If the game hasn't started, delete the player object
@@ -265,7 +378,7 @@ class Game < ActiveRecord::Base
   end
 
   def last_modified
-    [self.histories.last.created_at, chats.last.created_at].max
+    [(self.journals.last.andand.created_at || Time.at(0)), (chats.last.andand.created_at || Time.at(0))].max
   end
 
   def reset_facts
@@ -298,7 +411,7 @@ class Game < ActiveRecord::Base
   end
 
   def pile_types
-    piles.pluck(:card_type)
+    @piles.map(&:card_type)
   end
 
   def expand_random_choices
@@ -335,7 +448,7 @@ class Game < ActiveRecord::Base
 
 protected
   def unique_valid_piles
-    if not random_select.to_i == 1
+    if random_select.to_i != 1
       piles_array.each_with_index do |pile, ix|
         if piles_array.select {|p| p == pile}.length > 1
           errors.add("pile_#{ix+1}", 'must be unique.')
@@ -387,49 +500,14 @@ protected
     end
   end
 
-  def init_facts
-    self.facts ||= Hash.new
-  end
+  def journal_setup
+    journals.create!(event: "Setup Platinum/Colony option: #{plat_colony}")
 
-  def make_piles
-    # Prepare to add Platinum and Colony cards if the user (or the rules) say we should
-    test_pile = piles_array[rand(10)]
-    using_plat_col = false
-    if plat_colony == "yes" ||
-        (plat_colony == "rules" && test_pile.match(/(.*)::/)[1] == "Prosperity")
-      using_plat_col = true
+    sorted_piles = piles_array.sort_by do |str|
+      type = str.constantize
+      [type.cost, type.name]
     end
-
-    # Create the piles in order, so that the common cards appear first, then the Kingdom
-    # Cards sorted by cost. Update their position fields
-    posn = 0
-    %w<Estate Duchy Province>.each do |vic|
-      piles.create!(:card_type => "BasicCards::#{vic}", :position => posn)
-      posn += 1
-    end
-    if using_plat_col
-      piles.create!(:card_type => "Prosperity::Colony", :position => posn)
-      posn += 1
-    end
-    %w<Copper Silver Gold>.each do |treas|
-      piles.create!(:card_type => "BasicCards::#{treas}", :position => posn)
-      posn += 1
-    end
-    if using_plat_col
-      piles.create!(:card_type => "Prosperity::Platinum", :position => posn)
-      posn += 1
-    end
-    piles.create!(:card_type => "BasicCards::Curse", :position => posn)
-    posn += 1
-
-    sorted_piles = piles_array.sort do |a_str,b_str|
-      a = a_str.constantize
-      b = b_str.constantize
-      (a.cost == b.cost) ? a.name <=> b.name : a.cost <=> b.cost
-    end
-    sorted_piles.each_with_index do |typ, ix|
-      piles.create(:card_type => typ, :position => posn + ix)
-    end
+    journals.create!(event: "Setup piles: #{sorted_piles.join(', ')}")
   end
 
   def log_creation

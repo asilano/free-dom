@@ -59,17 +59,17 @@ module CardDecorators
         :unlimited
       end
 
-      before_save do
-        if location_changed? && location_was.present?
-          if location_was == 'pile'
-            # Moved out of pile. Duplicate
-            self.class.create!(attributes.merge(changed_attributes).reject{|k| k == "id" || k == "type"})
-          elsif location == 'pile'
-            # Moved back to pile. Destroy
-            destroy
-          end
-        end
-      end
+      #before_save do
+      #  if location_changed? && location_was.present?
+      #    if location_was == 'pile'
+      #      # Moved out of pile. Duplicate
+      #      self.class.create!(attributes.merge(changed_attributes).reject{|k| k == "id" || k == "type"})
+      #    elsif location == 'pile'
+      #      # Moved back to pile. Destroy
+      #      destroy
+      #    end
+      #  end
+      #end
     elsif block_given?
       @size_proc = block
       def self.starting_size(num_players)
@@ -126,7 +126,7 @@ module CardDecorators
       end
     end
 
-    before_update meth, :if => condition
+    #before_update meth, :if => condition
   end
 
   module AttackMethods

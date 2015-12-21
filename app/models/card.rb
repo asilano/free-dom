@@ -1,4 +1,5 @@
 class Card
+  include ActiveModel::Model
   extend Passthrough
   extend CardDecorators
   include GamesHelper

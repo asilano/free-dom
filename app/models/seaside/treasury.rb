@@ -5,9 +5,9 @@ class Seaside::Treasury < Card
   action
   card_text "Action (cost: 5) - Draw 1 card, +1 Action, +1 Cash. When you discard this from play, if you didn't buy a Victory card this turn, you may put this on top of your deck."
 
-  serialize :state, Hash
+  #serialize :state, Hash
 
-  trigger :handle_on_discard, :on => {:location => ['play', 'discard']}
+  #trigger :handle_on_discard, :on => {:location => ['play', 'discard']}
 
   def play(parent_act)
     super

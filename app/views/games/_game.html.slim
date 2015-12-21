@@ -38,12 +38,12 @@
 #status
   #ended.hidden= game.state == 'ended'
   #locked.hidden false
-  - if game.pending_actions.active.owned.present?
+  - if game.questions.any? { |q| q.actor }
     #waiting_for
       span Waiting for:
       ul
-        - game.pending_actions.active.owned.each do |act|
-          li= act.player.name + " to " + act.text
+        - game.questions.select { |q| q.actor }.each do |q|
+          li= q.actor.name + " to " + q.text
 - if player
   #player_private
     = render partial: 'player_private', object: player,

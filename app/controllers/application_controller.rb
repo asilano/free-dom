@@ -10,9 +10,9 @@ class ApplicationController < ActionController::Base
   before_filter :set_cache_headers
   before_filter :custom_headers
   before_filter :check_cookied_user
-  before_filter :record_player_pa_ids
+  #before_filter :record_player_pa_ids
 
-  after_filter {check_player_pa_ids; email_pbem_players}
+  #after_filter {check_player_pa_ids; email_pbem_players}
 
   def nop
     render :text => ""

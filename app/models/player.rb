@@ -8,22 +8,33 @@ class Player < ActiveRecord::Base
   belongs_to :game
   belongs_to :user
 
-  has_many :cards
+  #has_many :cards
 
-  has_many :pending_actions
-  has_one :state, :class_name => "PlayerState", :dependent => :destroy
+  #has_many :pending_actions
+  #has_one :state, :class_name => "PlayerState", :dependent => :destroy
+  has_many :journals
   has_many :chats, -> { order(:created_at) }, :dependent => :delete_all
   has_one :settings, :dependent => :destroy
   accepts_nested_attributes_for :settings
 
+  # Things that used to be database fields and relations
+  attr_reader :cards, :cash, :vp_chips
   validates :user_id, :uniqueness => {:scope => 'game_id'}
   validates :seat, :uniqueness => {:scope => 'game_id', :allow_nil => true}
+  after_create :init_player
   after_save :email_creator
+  after_initialize :init
 
-  before_create :init_player
+  def init
+    @cards = Collections::CardsCollection.new
+  end
 
   def name
     user.name
+  end
+
+  def questions
+    game.questions.select { |q| q.actor == self }
   end
 
   def start_game
@@ -51,10 +62,12 @@ class Player < ActiveRecord::Base
   end
 
   def determine_controls
+    return Hash.new([]) if questions.blank?
+
     self.reload
     controls = Hash.new([])
-    pending_actions(true).active.each do |action|
-      case action.expected_action
+    questions.each do |action|
+      case action#.expected_action
       when 'play_action'
         controls[:hand] += [{type: :button,
                              action: :play_action,
@@ -1221,10 +1234,6 @@ private
     end
 
     create_settings!(user.settings.attributes.except('id', 'user_id'))
-    create_state!
-
-    self.score = 0
-    self.vp_chips = 0
   end
 
   def find_action(action_id)

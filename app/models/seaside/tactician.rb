@@ -5,7 +5,7 @@ class Seaside::Tactician < Card
   action :duration => true
   card_text "Action (Duration; Cost: 5) - Discard your hand. If you discarded any cards this way, then at the start of your next turn, +5 Cards, +1 Buy, and +1 Action."
 
-  serialize :state
+  #serialize :state
 
   def play(parent_act)
     super

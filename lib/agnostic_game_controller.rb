@@ -37,6 +37,7 @@ module AgnosticGameController
   end
 
   def ag_join
+    @game.process_journals
     if @game.users.include? @user
       return :already
     end

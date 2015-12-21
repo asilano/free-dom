@@ -32,6 +32,8 @@ class GamesController < ApplicationController
   def index
     @games = Game.all.sort_by(&:id)
 
+    @games.each { |g| g.process_journals unless g.players.any? { |p| !p.score.nil? } }
+
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @games }
@@ -42,6 +44,7 @@ class GamesController < ApplicationController
   # Watch a game; that is, see all the public information, but no player-private
   # information
   def watch
+    @game.process_journals
     @player = nil
     @controls = Hash.new([])
     @last_mod = @game.last_modified
@@ -55,13 +58,12 @@ class GamesController < ApplicationController
   # Play a game; that is, see all the public information, together with the
   # player-private information associated with the current session
   def play
-    @game.process_actions
+    @game.process_journals
     @controls = (@player ? @player.determine_controls : Hash.new([]))
     @last_mod = @game.last_modified
     headers["Last-Modified"] = @last_mod.httpdate
 
     setup_full_title
-
     render :action => :show
     @unloadFunc = nil
   end

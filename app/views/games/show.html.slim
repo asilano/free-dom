@@ -18,9 +18,15 @@ h2= @game.name
   aside
     #history
       = render partial: 'history'
-    #pend_actions.debug class=('hidden' unless ((@user && @user.name == 'Chowlett') || request.host == '127.0.0.1'))
-      - if @game.root_action(true)
-        ul= render(partial: 'pend_action', object: @game.root_action)
+    /#pend_actions.debug class=('hidden' unless ((@user && @user.name == 'Chowlett') || request.host == '127.0.0.1'))
+    /  - if @game.questions.present?
+    /    ul
+        /render(partial: 'pend_action', object: @game.root_action)
+    #journals
+      | Game Journals
+      ul
+        - @game.journals.each do |j|
+          li= j.event
     #chat
       #chatbox= render partial: 'chat_line', collection: @game.chats
       = form_tag action: :speak do
