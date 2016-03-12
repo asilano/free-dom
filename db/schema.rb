@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151125163512) do
+ActiveRecord::Schema.define(version: 20160202160833) do
 
   create_table "chats", force: true do |t|
     t.integer  "game_id"
@@ -36,6 +36,7 @@ ActiveRecord::Schema.define(version: 20151125163512) do
     t.integer  "player_id"
     t.text     "event"
     t.datetime "created_at"
+    t.integer  "order"
   end
 
   add_index "journals", ["game_id"], name: "index_journals_on_game_id"

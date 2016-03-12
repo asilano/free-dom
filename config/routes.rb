@@ -35,8 +35,10 @@ Dominion::Application.routes.draw do
       post :update_player_settings
       post :speak
       post :perform
+      get :process_result
     end
   end
+  resources :journals
   #match 'dominion/:action', :controller => 'games'
 
   get 'about', :controller => 'users', :action => 'about', :as => 'about'

@@ -16,17 +16,14 @@ h2= @game.name
   #game_state
     = render partial: 'game', object: @game, locals: {player: @player, controls: @controls}
   aside
-    #history
-      = render partial: 'history'
+    #journals
+      = render partial: 'journals'
     /#pend_actions.debug class=('hidden' unless ((@user && @user.name == 'Chowlett') || request.host == '127.0.0.1'))
     /  - if @game.questions.present?
     /    ul
         /render(partial: 'pend_action', object: @game.root_action)
-    #journals
-      | Game Journals
-      ul
-        - @game.journals.each do |j|
-          li= j.event
+    /#journals
+    /  = render partial: 'journals', object: @game.journals
     #chat
       #chatbox= render partial: 'chat_line', collection: @game.chats
       = form_tag action: :speak do
@@ -36,9 +33,27 @@ h2= @game.name
           = submit_tag "Say", class: 'input-hack'
   - content_for :js_in_head do
     javascript:
+      // Best-in-place handling
+      $(function()
+      {
+        $(".best_in_place").best_in_place();
+        $('#journals').on("ajax:success", '.change_journal', function ()
+        {
+          $.getScript('#{play_game_path(@game)}');
+        })
+        .on("click", '.journal .insert', function ()
+        {
+          var newLi = $('<li class="journal">').insertBefore($(this).parent()); //'
+          var bipField = $("#{escape_javascript best_in_place(Journal.new, :event, class: 'change_journal', method: 'post', html_attrs: {style: 'width: 100%', autocomplete: 'off'})}");
+          bipField.attr('data-bip-other-fields', $.param({journal: {order: $(this).data('order')}}));
+          bipField.insertAfter(newLi);
+          bipField.best_in_place().click();
+        });
+      });
+
       // Scroll to bottom of history & chat, and enable controls, every update
       function onLoadFunc() {
-        $('#history').scrollTop($('#history')[0].scrollHeight);
+        $('#journals').scrollTop($('#journals')[0].scrollHeight);
 
         // Scroll to bottom of chat
         $('#chatbox').scrollTop($('#chatbox')[0].scrollHeight);

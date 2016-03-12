@@ -8,5 +8,6 @@ tmp/
 .sass-cache/
 .svn/
 .settings/
+.tags*
 # Ignore application configuration
 /config/application.yml

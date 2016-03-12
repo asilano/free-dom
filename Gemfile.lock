@@ -9,6 +9,13 @@ GIT
       sprockets (< 2.13)
 
 PATH
+  remote: d:/Documents/best_in_place
+  specs:
+    best_in_place (3.1.0)
+      actionpack (>= 3.2)
+      railties (>= 3.2)
+
+PATH
   remote: vendor/gems/jquery-rails-3.1.4
   specs:
     jquery-rails (3.1.4)
@@ -242,6 +249,7 @@ DEPENDENCIES
   activerecord-session_store
   acts_as_tree
   andand
+  best_in_place!
   better_errors (~> 1.0)
   binding_of_caller
   capybara

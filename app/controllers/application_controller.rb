@@ -125,6 +125,17 @@ protected
     true
   end
 
+  def find_game
+    @game = Game.find(params[:game_id] || params[:id])
+    Game.current = @game
+    @omit_onload = false
+    @just_checking = false
+  rescue ActiveRecord::RecordNotFound
+    Rails.logger.error("Attempt to access non-existant game #{params[:id]}" )
+    flash[:warning] = "That Game doesn't exist"
+    redirect_to :action => 'index'
+  end
+
   def find_user
     #raise
     @user = User.find_by_id(session[:user_id])

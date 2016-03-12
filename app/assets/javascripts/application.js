@@ -7,6 +7,7 @@
 //= require jquery
 //= require jquery_ujs
 //= require jqTablekit
+//= require best_in_place
 // require prototype
 // require effects
 // require dragdrop

@@ -52,8 +52,10 @@
     / so long as there are more than 2 and the game is waiting
     - if (@game.players.length >= 2 && player == @game.players[0] && @game.state == 'waiting')
       #start_button
-        = form_tag({action: :start_game }, remote: true, id: 'start_form') do
-          = submit_tag 'Start Game', id: 'start_game_btn', class: 'play'
+        = form_for(Journal.new, html: { remote: true, id: 'start_form'}) do |f|
+          = f.hidden_field :game_id, value: @game.id
+          = f.hidden_field :event, value: "#{player.name} started the game"
+          = f.submit 'Start Game', id: 'start_game_btn', class: 'play'
         javascript:
           $('#start_form').on('ajax:beforeSend', function(){
             $('#gameStartSpinner').show();

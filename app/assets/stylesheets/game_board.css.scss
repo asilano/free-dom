@@ -312,12 +312,35 @@
   }
 }
 
-#history {
-  ul
-  {
+#journals {
+  ul {
     margin: 0;
     padding: 0 0.5em;
     list-style-type: none;
+  }
+  li  {
+    padding-left: 2em;
+  }
+
+  .journal {
+    position: relative;
+
+    .immutable {
+      font-style: italic;
+    }
+
+    .insert {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 2em;
+      height: 1.5em;
+      background: image_url('insert.svg') 0/1.5em no-repeat;
+    }
+  }
+  .journal_errors
+  {
+    margin-left: 1em;
   }
 
   .play_action { font-weight: bold; }

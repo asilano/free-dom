@@ -1,9 +1,11 @@
 class Game < ActiveRecord::Base
   class_attribute :current
   class_attribute :current_act_parent
-  class_attribute :question_hash
+  #class_attribute :question_hash
 
-  self.question_hash = Hash.new { |_| [] }
+  #self.question_hash = Hash.new { |_| [] }
+
+  extend FauxField
 
   def self.parent_act
     return nil unless self.current_act_parent
@@ -27,7 +29,7 @@ class Game < ActiveRecord::Base
   #has_many :piles, -> { order :position }, :dependent => :destroy
   #accepts_nested_attributes_for :piles
   #has_many :cards, :dependent => :delete_all
-  has_many :journals
+  has_many :journals, -> { order :order }
   has_many :players, -> { order :seat, :id }, :dependent => :destroy, inverse_of: :game
   #has_one :current_turn_player, -> { where { cash != nil } }, :class_name => 'Player'
   has_many :users, :through => :players
@@ -36,7 +38,8 @@ class Game < ActiveRecord::Base
   #serialize :facts
 
   # Things that used to be database fields and relations
-  attr_accessor :state, :facts, :turn_count, :piles, :histories, :cards, :current_turn_player
+  faux_field [:questions, []], [:state, {}], [:facts, {}], :turn_count, [:piles, []], [:cards, []],
+              :current_turn_player, :turn_phase, :last_blocked_journal
 
   attr_accessor :random_select, :specify_distr, :plat_colony
   attr_accessor *(Card.expansions.map {|set| "num_#{set.name.underscore}_cards".to_sym})
@@ -70,26 +73,17 @@ class Game < ActiveRecord::Base
     end
   end
 
-  # Return this game's entry in the class questions hash
-  def questions
-    Game.question_hash[id]
-  end
-
-  def questions=(arr)
-    Game.question_hash[id] = arr
-  end
-
   # Process the journals for a game, determining its complete state ex nihilo
   def process_journals
     # First, seed the RNG with a good, pseudo-random seed. The nanosecond count of the creation timestamp should do
     srand(created_at.nsec)
 
-    @state = 'waiting'
-    @facts = {}
-    @histories = [History.new(event: "Game #{name} created.", css_class: "meta game_create")]
-    @piles = []
-    @cards = []
-    @current_turn_player = nil
+    self.state = 'waiting'
+    self.facts = {}
+    self.piles = []
+    self.cards = Collections::CardsCollection.new
+    self.current_turn_player = nil
+    self.last_blocked_journal = 0
 
     # Initial questions: What is the platinum-colony rule, and what piles do we have?
     self.questions = [Question.new(object: self, method: :set_plat_col), Question.new(object: self, method: :set_piles)]
@@ -102,15 +96,29 @@ class Game < ActiveRecord::Base
     # a journal, then we need to render controls for that question.
     @journal_arr = journals.to_a
     until @journal_arr.empty?
-      journal = @journal_arr.shift
+      @current_journal = @journal_arr.shift
+      @current_journal.histories = []
       callcc do |cont|
         @cont = cont
-        apply_to = questions.detect do |q|
-          q.object.send(q.method, journal, q.actor)
+        apply_to, index = questions.each_with_index.detect do |q, ix|
+          if (q.actor != @current_journal.player)
+            false
+          else
+            q.object.send(q.method, @current_journal, q.actor)
+          end
         end
 
-        if apply_to.nil?
-          raise "Need better error handling here"
+        # If nothing else wants it, try the debug hook for adjusting game state
+        apply_to ||= hack_game_state(@current_journal)
+
+        if !apply_to
+          @current_journal.errors.add(:base, :no_question)
+        else
+          questions.delete_at(index) unless index.nil?
+        end
+
+        if @current_journal.errors.any?
+          return
         end
       end
 
@@ -139,6 +147,14 @@ class Game < ActiveRecord::Base
     end
 
     piles_array = match[1].split(', ')
+    piles_array.each do |p|
+      begin
+        p.constantize
+      rescue
+        journal.errors.add(:event, ": #{p} is not a card-type.")
+        return
+      end
+    end
 
     # Prepare to add Platinum and Colony cards if the user (or the rules) say we should
     test_pile = piles_array[rand(10)]
@@ -152,22 +168,22 @@ class Game < ActiveRecord::Base
     # Cards sorted by cost. Update their position fields
     posn = 0
     %w<Estate Duchy Province>.each do |vic|
-      @piles << Pile.new(card_type: "BasicCards::#{vic}", position: posn)
+      piles << Pile.new(card_type: "BasicCards::#{vic}", position: posn)
       posn += 1
     end
     if using_plat_col
-      @piles << Pile.new(card_type: "Prosperity::Colony", position: posn)
+      piles << Pile.new(card_type: "Prosperity::Colony", position: posn)
       posn += 1
     end
     %w<Copper Silver Gold>.each do |treas|
-      @piles << Pile.new(card_type: "BasicCards::#{treas}", position: posn)
+      piles << Pile.new(card_type: "BasicCards::#{treas}", position: posn)
       posn += 1
     end
     if using_plat_col
-      @piles << Pile.new(card_type: "Prosperity::Platinum", position: posn)
+      piles << Pile.new(card_type: "Prosperity::Platinum", position: posn)
       posn += 1
     end
-    @piles << Pile.new(card_type: "BasicCards::Curse", position: posn)
+    piles << Pile.new(card_type: "BasicCards::Curse", position: posn)
     posn += 1
 
     sorted_piles = piles_array.sort do |a_str,b_str|
@@ -176,10 +192,10 @@ class Game < ActiveRecord::Base
       (a.cost == b.cost) ? a.name <=> b.name : a.cost <=> b.cost
     end
     sorted_piles.each_with_index do |typ, ix|
-      @piles << Pile.new(card_type: typ, position: posn + ix)
+      piles << Pile.new(card_type: typ, position: posn + ix)
     end
 
-    @piles.each { |p| p.game = self }
+    piles.each { |p| p.game = self }
   end
 
   # If the game hasn't started, delete the player object
@@ -191,38 +207,37 @@ class Game < ActiveRecord::Base
     end
   end
 
-  def start_game
+  def start_game(journal, actor)
+    unless actor == players[0] && journal.event == "#{players[0].name} started the game"
+      return false
+    end
+
     if state == "running"
-      # Game is already running. Odd, but maybe we got a double submission
-      # somehow. Log and exit.
-      return "OK"
+      # Game is already running. Odd. Error, and consume the event
+      journal.errors.add(:event, ': Game already running')
+      return true
     elsif players.length < 2 or players.length > max_players
       return "Invalid number of players (#{players.length})"
-    else
-      # To prevent anyone starting the game while we're working, update
-      # the state and save now.
-      reset_facts
-      histories.create!(:event => "Game started.",
-                       :css_class => "meta game_start")
-      self.state = "running"
-      self.turn_count = 0
-      save!
     end
+
+    # Setup initial state
+    reset_facts
+    journal.histories << History.new(:event => "Game started.",
+                              :css_class => "meta game_start")
+    self.state = "running"
+    self.turn_count = 0
 
     # Populate the piles with the right number of cards.
     piles.each { |pile| pile.populate(players.length) }
 
     # Initialise tokens for Trade Route mat
-    if !cards(true).of_type("Prosperity::TradeRoute").empty?
-      self.facts_will_change!
+    if !cards.of_type("Prosperity::TradeRoute").empty?
       self.facts[:trade_route_value] = 0
 
       piles.each do |pile|
         if pile.card_class.is_victory?
-          pile.state_will_change!
           pile.state = {} if pile.state.blank?
           pile.state[:trade_route_token] = true
-          pile.save!
         end
       end
     end
@@ -234,15 +249,24 @@ class Game < ActiveRecord::Base
     seat_order = players.shuffle
     seat_order.each_with_index do |ply, seat|
       ply.seat = seat
-      ply.save!
-      histories.create!(:event => "#{ply.name} will play #{(seat + 1).ordinalize}.",
-                       :css_class => "meta player#{seat} start_game")
+      journal.histories << History.new(:event => "#{ply.name} will play #{(seat + 1).ordinalize}.",
+                                        :css_class => "meta player#{seat} start_game")
     end
 
+    save!
     seat_order[0].start_turn
 
-    save!
     return "OK"
+  end
+
+  def add_history(history_params)
+    if @current_journal
+      @current_journal.histories << History.new(history_params)
+    end
+  end
+
+  def apply_journal_block
+    self.last_blocked_journal = @current_journal.order
   end
 
   # Process any leaf pending_actions which aren't associated with a player.
@@ -384,7 +408,6 @@ class Game < ActiveRecord::Base
   def reset_facts
     # Reset Game facts which count things per turn. No point storing more
     # info than needed, though.
-    facts_will_change!
     self.facts ||= {}
     if self.facts.include? :bridges
       self.facts[:bridges] = 0
@@ -398,8 +421,6 @@ class Game < ActiveRecord::Base
     if self.facts.include? :contraband
       self.facts[:contraband] = []
     end
-
-    save!
   end
 
   def waiting_for?(action)
@@ -411,7 +432,7 @@ class Game < ActiveRecord::Base
   end
 
   def pile_types
-    @piles.map(&:card_type)
+    piles.map(&:card_type)
   end
 
   def expand_random_choices
@@ -528,4 +549,33 @@ protected
       end
     end
   end
+
+private
+  def hack_game_state(journal)
+    return false unless journal.event =~ /^Hack: /
+
+    case journal.event
+    when /^Hack: (.*) (hand) \+ ([a-zA-Z]*::[a-zA-Z]*)/
+      player = players.joins { user }.where { user.name == $1 }.first
+      location = $2
+      card_class = nil
+      begin
+        card_class = $3.constantize
+      rescue
+        journal.errors.add(:event, "Hack mentions bad card type")
+        return false
+      end
+
+      player.cards << card_class.new(game: self,
+                                      player: player,
+                                      location: location,
+                                      position: player.cards.hand.length)
+
+    else
+      return false
+    end
+
+    return true
+  end
+
 end

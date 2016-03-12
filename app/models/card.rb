@@ -25,6 +25,9 @@ class Card
 
   #before_save :clear_visibility, :check_end
 
+  # Attributes that used to be in the database
+  attr_accessor :game, :player, :pile, :location, :position, :revealed, :peeked, :state
+
   def to_s
     readable_name
   end
@@ -35,6 +38,10 @@ class Card
 
   def self.readable_name_with_cost
     readable_name + " (cost: #{cost})"
+  end
+
+  def modifiers
+    []
   end
 
   def self.expansions
@@ -212,7 +219,22 @@ class Card
   # function should likely add a "resolve_<card-name><card-ID>[_<substep>]" action to the
   # player. Player can then pass responsibility for the controls through to the
   # card by regexp.
-  def play(parent_act)
+  def play
+    raise "Card not an action" unless is_action?
+    game.facts[:actions_played] ||= 0
+    game.facts[:actions_played] += 1
+
+    # Only move the card if it's currently in-hand.
+    if @location == "hand"
+      if is_duration?
+        @location = "enduring"
+      else
+        @location = "play"
+      end
+    end
+  end
+
+  def play_old(parent_act)
     raise "Card not an action" unless is_action?
 
     game.facts_will_change!

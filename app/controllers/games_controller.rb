@@ -59,13 +59,20 @@ class GamesController < ApplicationController
   # player-private information associated with the current session
   def play
     @game.process_journals
-    @controls = (@player ? @player.determine_controls : Hash.new([]))
+    if @player && @game.journals.none? { |j| j.errors.any? }
+      @controls = @player.determine_controls
+    else
+      @controls = Hash.new([])
+    end
     @last_mod = @game.last_modified
     headers["Last-Modified"] = @last_mod.httpdate
 
     setup_full_title
-    render :action => :show
     @unloadFunc = nil
+    respond_to do |format|
+      format.js { render :action => 'update_game' }
+      format.html { render action: :show }
+    end
   end
 
   def join
@@ -119,10 +126,8 @@ class GamesController < ApplicationController
   end
 
   def start_game
-    # Call through to the game's controller to start the game
-    rc = nil
-    Game.transaction {rc = @game.start_game}
-    process_result rc
+    @game.journals.create!(player: @player, event: 'Started the game')
+    redirect_to action: :play
   end
 
   def play_action
@@ -219,17 +224,6 @@ class GamesController < ApplicationController
   end
 
 protected
-  def find_game
-    @game = Game.find(params[:id])
-    Game.current = @game
-    @omit_onload = false
-    @just_checking = false
-  rescue ActiveRecord::RecordNotFound
-    Rails.logger.error("Attempt to access non-existant game #{params[:id]}" )
-    flash[:warning] = "That Game doesn't exist"
-    redirect_to :action => 'index'
-  end
-
   def setup_title
     @title = action_name.humanize
   end
@@ -263,10 +257,11 @@ private
   end
 
   def process_result(rc, do_actions = true)
-    if rc =~ /^OK ?(.*)?/
-      flash[:warning] = $1 if $1 != ""
+    if rc #=~ /^OK ?(.*)?/
+      #flash[:warning] = $1 if $1 != ""
 
-      @game.process_actions if do_actions
+      #@game.process_actions if do_actions
+      @game.process_journals
       if not @player.nil?
         @controls = @player.determine_controls
       else
@@ -279,7 +274,7 @@ private
 
       respond_to do |format|
         format.js { render :action => 'update_game' }
-        format.html { redirect_to :back }
+        format.html { render action: :show }
       end
     else
       flash[:warning] = rc
@@ -294,7 +289,7 @@ private
     @full_title = ""
 
     if @game.state == 'running'
-      waiting_players = @game.pending_actions.owned.active.map &:player
+      waiting_players = @game.questions.map(&:actor).compact
 
       # Ensure the current player is on the front of the list.
       if waiting_players.delete(@player)

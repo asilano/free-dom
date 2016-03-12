@@ -6,9 +6,9 @@ module GamesHelper
   def running_player_list(game)
     game.players.map do |p|
       str = ""
-      str += "<span class='current'>" if p.pending_actions.active.present?
+      str += "<span class='current'>" if p.questions.any?
       str += p.name
-      str += "</span>" if p.pending_actions.active.present?
+      str += "</span>" if p.questions.any?
       str
     end.join(', ')
   end
@@ -243,14 +243,13 @@ EOS
       end
     end
 
-    # Add the PendingAction ID as a hidden field, so we can correlate accurately on return
-    str << raw(hidden_field_tag("pa_id", control[:pa_id], :id => "pa_id_#{control[:name]}_#{control.object_id}"))
-
-    form = form_tag({:action => control[:action] || :resolve},
-                        :remote => true,
-                        :id => "form_#{control.object_id}",
-                        :class => 'ajaxSpinSmall') do
-      raw(str)
+    form = form_for(Journal.new,
+                    html: {
+                      :remote => true,
+                      :id => "form_#{control.object_id}",
+                      :class => 'ajaxSpinSmall'
+                    }) do |f|
+      hidden_field_tag(:game_id, @game.id) + raw(str)
     end
 
     content_for(:control_forms, raw(form))
@@ -262,9 +261,9 @@ EOS
     # Create a template return array
     rtn = cards.zip(Array.new(cards.length) { [] } )
     controls.each do |ctrl|
-      valid_cards = ctrl.delete(:cards)
-      rtn.zip(valid_cards) do |pair, valid|
-        pair[1] << [valid, ctrl]
+      journals = ctrl.delete(:journals)
+      rtn.zip(journals) do |pair, journal|
+        pair[1] << [journal, ctrl]
       end
     end
 

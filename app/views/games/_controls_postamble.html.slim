@@ -7,12 +7,12 @@
               - when :button
                 - Array(control[:nil_action]).each.with_index do |nil_act, ix|
                   - if nil_act
-                    = button_tag(nil_act, type: 'submit',
-                                           name: 'nil_action',
-                                           value: nil_act,
+                    = button_tag(nil_act[0], type: 'submit',
+                                           name: 'journal[event]',
+                                           value: nil_act[1],
                                            form: "form_#{control.object_id}",
                                            class: control[:css_class],
-                                           data: {disable_with: nil_act,
+                                           data: {disable_with: nil_act[0],
                                                   confirm: control[:confirm].andand[ix] ? 'Are you sure?' : nil})
               - when :two_d_radio, :latin_radio
                 - if control[:nil_action]

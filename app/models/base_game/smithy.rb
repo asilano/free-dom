@@ -3,7 +3,7 @@ class BaseGame::Smithy < Card
   action
   card_text "Action (cost: 4) - Draw 3 cards."
 
-  def play(parent_act)
+  def play
     super
 
     # Just draw 3 cards.

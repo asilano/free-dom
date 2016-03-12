@@ -28,11 +28,11 @@ class Pile
     start_size = card_class.starting_size(num_players)
     start_size = 10 if start_size == :unlimited
     1.upto(start_size) do |ix|
-      card_params = {"game_id" => game.id,
-                     "pile_id" => id,
-                     "location" => 'pile',
-                     "position" => 0}
-      card_class.create!(card_params)
+      card_params = {game: self.game,
+                     pile: self,
+                     location: 'pile',
+                     position: 0}
+      self.cards << card_class.new(card_params)
     end
   end
 

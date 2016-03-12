@@ -24,14 +24,21 @@ en:
     attributes:
       user:
         hashed_password: "Password"
-        email: "E-mail address"   
+        email: "E-mail address"
     errors:
       models:
         settings:
           attributes:
-            update_interval: 
+            update_interval:
               greater_than_or_equal_to: "must be at least %{count} seconds."
-  errors:
+        journal:
+          attributes:
+            base:
+              no_question: '%{model} does not match an existing question.'
+              card_multi_position: '%{model} has more than one card position specified.'
+              card_no_match: '%{model} does not match a card.'
+              card_ambiguous: '%{model} matches more than one (distinct) card.'
+              card_wrong: '%{model} specifies a card that is not acceptable because:'
     attributes:
       email:
         invalid: "doesn't appear to be a valid email address. Please use the Contact Me link if you're sure it is."

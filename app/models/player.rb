@@ -1,6 +1,8 @@
 class Player < ActiveRecord::Base
 
   include GamesHelper
+  include CardsHelper
+  extend FauxField
 
   @@to_email = {}
   cattr_accessor :to_email
@@ -18,15 +20,17 @@ class Player < ActiveRecord::Base
   accepts_nested_attributes_for :settings
 
   # Things that used to be database fields and relations
-  attr_reader :cards, :cash, :vp_chips
+  faux_field [:cards, Collections::CardsCollection.new], :cash, :vp_chips, :state
   validates :user_id, :uniqueness => {:scope => 'game_id'}
   validates :seat, :uniqueness => {:scope => 'game_id', :allow_nil => true}
   after_create :init_player
-  after_save :email_creator
+  #after_save :email_creator
   after_initialize :init
 
   def init
     @cards = Collections::CardsCollection.new
+    @state = PlayerState.new
+    @state.init_fields
   end
 
   def name
@@ -40,6 +44,7 @@ class Player < ActiveRecord::Base
   def start_game
     # To start the game, each player needs a deck of 7 copper and 3 estate,
     # 5 of which are in hand.
+    self.cards = Collections::CardsCollection.new
     card_order = ["BasicCards::Copper"] * 7 + ["BasicCards::Estate"] * 3
     card_order.shuffle!
 
@@ -47,17 +52,17 @@ class Player < ActiveRecord::Base
     deck_order = card_order[5,10]
 
     hand_order.each_with_index do |card_type, ix|
-      to_class(card_type).create!("game_id" => game.id,
-                                 "player_id" => id,
-                                 "location" => "hand",
-                                 "position" => ix)
+      self.cards << to_class(card_type).new(game: game,
+                                        player: self,
+                                        location: "hand",
+                                        position: ix)
     end
 
     deck_order.each_with_index do |card_type, ix|
-      to_class(card_type).create!("game_id" => game.id,
-                                 "player_id" => id,
-                                 "location" => "deck",
-                                 "position" => ix)
+      self.cards << to_class(card_type).new(game: game,
+                                        player: self,
+                                        location: "deck",
+                                        position: ix)
     end
   end
 
@@ -67,14 +72,12 @@ class Player < ActiveRecord::Base
     self.reload
     controls = Hash.new([])
     questions.each do |action|
-      case action#.expected_action
-      when 'play_action'
+      case action.method
+      when :play_action
         controls[:hand] += [{type: :button,
-                             action: :play_action,
                              text: "Play",
-                             nil_action: "Leave Action Phase",
-                             cards: cards.hand.map{|card| card.is_action?},
-                             pa_id: action.id,
+                             nil_action: {"Leave Action Phase" => "#{name} plays nothing"},
+                             journals: cards.hand.each_with_index.map { |c, ix| "#{name} plays #{c.readable_name} (#{ix})" if c.is_action? },
                              css_class: 'play'
                             }]
       when 'play_treasure'
@@ -138,7 +141,43 @@ class Player < ActiveRecord::Base
     return controls
   end
 
-  def play_action(params)
+  def play_action(journal, actor)
+    match = /#{name} plays (.*)/.match(journal.event)
+    unless actor == self && match
+      return false
+    end
+
+    # Check for playing nothing
+    card_req = match.captures[0].sub(/\.*$/, '')
+    if card_req == 'nothing'
+      # TODO: Move to Play Treasure phase
+      return true
+    end
+
+    # Check we have the specified card in hand
+    ret, card = find_card_for_journal(cards.hand, card_req)
+    if ret != :ok
+      journal.card_error ret
+      return true
+    end
+
+    # Check the specified card is an action
+    if !card.is_action?
+      journal.card_error :wrong
+      journal.errors.add(:base, 'Specified card is not an action')
+      return true
+    end
+
+    # Play the card
+    begin
+      card.play
+    rescue ArgumentError
+      journal.errors.add(:base, 'Card not updated to journal system')
+    end
+    true
+  end
+
+  def play_actionold(params)
     # Checks, including retrieving the action.
     this_act, response = find_action(params[:pa_id])
 
@@ -554,42 +593,25 @@ class Player < ActiveRecord::Base
     # Start this player's turn. They should already have a hand.
 
     # Set up cash and create their pending_actions
-    self.cash = 0
+    @cash = 0
 
-    save!
-
-    # Create the root action, to end the turn.
-    root_action = game.pending_actions.create!(:expected_action => "player_end_turn;player=#{id}",
-                                              :game => game,
-                                              :player => nil)
-
-    # Now queue up playing an action, playing treasures and buying a card
-    root_action.queue(:expected_action => "play_action",
-                      :game => game,
-                      :player => self).queue(
-                     :expected_action => "player_play_treasures;player=#{id}",
-                      :game => game,
-                      :player => nil).queue(
-                     :expected_action => "buy",
-                      :game => game,
-                      :player => self)
-    parent_action = pending_actions.active.first
-    raise "Unexpected action at start of turn" unless parent_action.expected_action == "play_action"
+    # Ask the question - play action
+    game.questions << Question.new(object: self, actor: self, method: :play_action, text: 'Play an action')
 
     # Advance the turn counter when the first player starts their turn.
     if seat == 0
-      game.reload.turn_count += 1
+      game.turn_count += 1
     end
 
     # Tell the game it's in the Action phase
     game.turn_phase = Game::TurnPhases::ACTION
-    game.save!
+    game.current_turn_player = self
 
     game.reset_facts
-    state(true).reset_fields
+    @state.reset_fields
 
-    game.histories.create!(:event => "#{name}'s turn #{game.turn_count} started.",
-                          :css_class => "player#{seat} start_turn")
+    game.add_history(event: "#{name}'s turn #{game.turn_count} started.",
+                     css_class: "player#{seat} start_turn")
 
     # See whether multiple start-of-turn cards, including Prince, need to go off at once.
     # If so, we'll add an action to queue them up.
@@ -636,7 +658,7 @@ class Player < ActiveRecord::Base
 
       # Invoke any cards the player has that act at turn-start
       cards.each do |card|
-        card.witness_turn_start(parent_action.reload)
+        #card.witness_turn_start(parent_action.reload)
       end
     end
 
@@ -795,8 +817,6 @@ class Player < ActiveRecord::Base
   #
   # Return the array of cards actually drawn
   def draw_cards(num, reason = nil)
-    # We need to force the deck, hand and discard arrays to be populated
-    cards(true)
     cards_drawn = []
 
     if nil==reason
@@ -804,7 +824,7 @@ class Player < ActiveRecord::Base
     end
 
     shuffle_point = cards.deck.size
-    if cards.deck.size < num and not cards.in_discard.empty?
+    if cards.deck.size < num && !cards.in_discard.empty?
       shuffle_discard_under_deck(:log => shuffle_point == 0)
     end
 
@@ -818,15 +838,16 @@ class Player < ActiveRecord::Base
       cards.hand << card
       card.location = "hand"
       cards_drawn << card
-      card.save
     end
 
     renum(:deck)
 
     if cards_drawn.empty?
-      game.histories.create!(:event => "#{name} drew no cards#{reason}.",
+      game.add_history(:event => "#{name} drew no cards#{reason}.",
                             :css_class => "player#{seat} card_draw")
     else
+      game.apply_journal_block
+
       drawn_string = "[#{id}?"
       if shuffle_point > 0 && shuffle_point < cards_drawn.length
         drawn_string << cards_drawn[0,shuffle_point].join(', ')
@@ -837,17 +858,16 @@ class Player < ActiveRecord::Base
       else
         drawn_string << "#{cards_drawn.join(', ')}|#{cards_drawn.length} card#{cards_drawn.length == 1 ? '' : 's'}]"
       end
-
-      game.histories.create!(:event => "#{name} drew #{drawn_string}#{reason}.",
+raise
+      game.add_history(:event => "#{name} drew #{drawn_string}#{reason}.",
                             :css_class => "player#{seat} card_draw #{'shuffle' if (shuffle_point > 0 && shuffle_point < cards_drawn.length)}")
     end
 
     if cards_drawn.length < num
       excess = num - cards_drawn.length
-      game.histories.create!(:event => "#{name} tried to draw #{excess} more card#{'s' unless excess == 1}#{reason}, but their deck was empty.",
+      game.add_history(:event => "#{name} tried to draw #{excess} more card#{'s' unless excess == 1}#{reason}, but their deck was empty.",
                             :css_class => "player#{seat} card_draw")
     end
-    save!
 
     return cards_drawn
   end
@@ -1041,14 +1061,13 @@ class Player < ActiveRecord::Base
   end
 
   def renum(location, hole_at=nil)
-    set = cards(true).in_location(location.to_s)
+    set = cards.in_location(location.to_s)
     set.each_with_index do |card, ix|
       card.position = ix
 
       # Leave a gap at the specified offset, allowing cards to "slot in" to
       # the deck
       card.position += 1 if hole_at && ix >= hole_at
-      card.save
     end
   end
 
