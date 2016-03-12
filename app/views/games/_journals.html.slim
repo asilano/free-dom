@@ -1,17 +1,19 @@
 ul
   - @game.journals.each do |journal|
-    li.journal class=('red' if journal.errors.any?)
+    li.journal class=('error' if journal.errors.any?)
+      - if journal.modified
+        span.bold>[] (Edited)
       - if journal.player == @player && journal.order > @game.last_blocked_journal
         span.insert data-order=journal.order
         = best_in_place journal, :event, class: 'change_journal', other_fields: {game_id: @game.id}, html_attrs: {style: 'width: 100%', autocomplete: 'off'}
       - else
         span.immutable= journal.event
-    -if journal.errors.any?
-      ul.journal_errors
-        - journal.errors.full_messages.each do |msg|
-          li= msg
-    - journal.histories.each do |history|
-      - classes = history.css_class
-      - if @player && history.css_class =~ /\bplayer#{@player.seat}\b/
-        - classes += ' self'
-      li class=classes = format_history(history, @player)
+      -if journal.errors.any?
+        ul.journal_errors.error
+          - journal.errors.full_messages.each do |msg|
+            li= msg
+      - journal.histories.each do |history|
+        - classes = history.css_class
+        - if @player && history.css_class =~ /\bplayer#{@player.seat}\b/
+          - classes += ' self'
+        li class=classes = format_history(history, @player)

@@ -52,7 +52,7 @@ class JournalsController < ApplicationController
     if params[:journal].andand[:event].andand.blank?
       @journal.destroy
     else
-      @journal.update(journal_params)
+      @journal.update(journal_params.merge({ modified: true }))
     end
     respond_to do |format|
         format.html { redirect_to play_game_path(@journal.game), status: :see_other }

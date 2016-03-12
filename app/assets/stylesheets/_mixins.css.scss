@@ -3,6 +3,9 @@
 $header-height: 230px;
 
 .lighter {font-weight: normal; color: #ccc;}
+.bold {font-weight: bold;}
+.red { color: red; }
+.error { background-color: lighten(red, 25%); }
 
 @mixin when-smaller-than($breakpoint) {
   @if $breakpoint == small {

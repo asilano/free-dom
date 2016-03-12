@@ -858,7 +858,7 @@ class Player < ActiveRecord::Base
       else
         drawn_string << "#{cards_drawn.join(', ')}|#{cards_drawn.length} card#{cards_drawn.length == 1 ? '' : 's'}]"
       end
-raise
+
       game.add_history(:event => "#{name} drew #{drawn_string}#{reason}.",
                             :css_class => "player#{seat} card_draw #{'shuffle' if (shuffle_point > 0 && shuffle_point < cards_drawn.length)}")
     end
