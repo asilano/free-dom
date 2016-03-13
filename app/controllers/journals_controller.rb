@@ -75,6 +75,6 @@ private
 
     # Only allow a trusted parameter "white list" through.
     def journal_params
-      params[:journal].permit :game_id, :event, :order
+      params[:journal].permit :game_id, :event, :order, :modified
     end
 end
