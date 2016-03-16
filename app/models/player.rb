@@ -21,6 +21,7 @@ class Player < ActiveRecord::Base
 
   # Things that used to be database fields and relations
   faux_field [:cards, Collections::CardsCollection.new], :cash, :vp_chips, :state
+  faux_field :num_actions, :num_buys
   validates :user_id, :uniqueness => {:scope => 'game_id'}
   validates :seat, :uniqueness => {:scope => 'game_id', :allow_nil => true}
   after_create :init_player
@@ -592,8 +593,10 @@ class Player < ActiveRecord::Base
   def start_turn
     # Start this player's turn. They should already have a hand.
 
-    # Set up cash and create their pending_actions
-    @cash = 0
+    # Set up cash and action-buy counts
+    self.cash = 0
+    self.num_actions = 1
+    self.num_buys = 1
 
     # Ask the question - play action
     game.questions << Question.new(object: self, actor: self, method: :play_action, text: 'Play an action')
