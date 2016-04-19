@@ -43,7 +43,7 @@ h2= @game.name
         })
         .on("click", '.journal .insert', function ()
         {
-          var newLi = $('<li class="journal">').insertBefore($(this).parent()); //'
+          var newLi = $('<li class="journal">').insertAfter($(this).parent()); //'
           var bipField = $("#{escape_javascript best_in_place(Journal.new, :event, class: 'change_journal', method: 'post', html_attrs: {style: 'width: 100%', autocomplete: 'off'})}");
           bipField.attr('data-bip-other-fields', $.param({game_id: #{@game.id}, journal: {modified: true, order: $(this).data('order')}}));
           bipField.insertAfter(newLi);

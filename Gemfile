@@ -34,7 +34,7 @@ end
 #end
 
 gem 'jquery-rails', :path => "vendor/gems/jquery-rails-3.1.4"
-gem 'best_in_place', path: 'd:\Documents\best_in_place'#'https://github.com/asilano/best_in_place'#, '~> 3.0.1'
+gem 'best_in_place', git: 'https://github.com/asilano/best_in_place'#, '~> 3.0.1'
 #gem 'therubyracer'
 gem 'actionmailer-with-request'
 gem 'slim-rails'

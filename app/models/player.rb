@@ -73,66 +73,57 @@ class Player < ActiveRecord::Base
     self.reload
     controls = Hash.new([])
     questions.each do |action|
-      case action.method
-      when :play_action
-        controls[:hand] += [{type: :button,
-                             text: "Play",
-                             nil_action: {"Leave Action Phase" => "#{name} plays nothing"},
-                             journals: cards.hand.each_with_index.map { |c, ix| "#{name} plays #{c.readable_name} (#{ix})" if c.is_action? },
-                             css_class: 'play'
-                            }]
-      when 'play_treasure'
-        have_simples = cards.hand.any? { |card| card.is_treasure? && !card.is_special? }
-        controls[:hand] += [{type: :button,
-                             action: :play_treasure,
-                             text: "Play",
-                             nil_action: [have_simples ? "Play Simple Treasures" : nil, 'Stop Playing Treasures'],
-                             cards: cards.hand.map{|card| card.is_treasure?},
-                             pa_id: action.id,
-                             confirm_nil: [false, true],
-                             css_class: 'play-treasure'
-                            }]
-      when 'buy'
-        piles = game.piles.map do |pile|
-          if game.facts[:contraband] && game.facts[:contraband].include?(pile.card_type)
-            false
-          elsif pile.card_type == "Prosperity::GrandMarket" && !cards.in_play.of_type("BasicCards::Copper").empty?
-            false
-          else
-            (pile.cost <= cash && pile.cards.size != 0)
+      if action.object == self
+        case action.method
+        when :play_action
+          controls[:hand] += [{type: :button,
+                               text: "Play",
+                               nil_action: {"Leave Action Phase" => "#{name} played nothing."},
+                               journals: cards.hand.each_with_index.map { |c, ix| "#{name} played #{c.readable_name} (#{ix})." if c.is_action? },
+                               css_class: 'play'
+                              }]
+        when 'play_treasure'
+          have_simples = cards.hand.any? { |card| card.is_treasure? && !card.is_special? }
+          controls[:hand] += [{type: :button,
+                               action: :play_treasure,
+                               text: "Play",
+                               nil_action: [have_simples ? "Play Simple Treasures" : nil, 'Stop Playing Treasures'],
+                               cards: cards.hand.map{|card| card.is_treasure?},
+                               pa_id: action.id,
+                               confirm_nil: [false, true],
+                               css_class: 'play-treasure'
+                              }]
+        when 'buy'
+          piles = game.piles.map do |pile|
+            if game.facts[:contraband] && game.facts[:contraband].include?(pile.card_type)
+              false
+            elsif pile.card_type == "Prosperity::GrandMarket" && !cards.in_play.of_type("BasicCards::Copper").empty?
+              false
+            else
+              (pile.cost <= cash && pile.cards.size != 0)
+            end
           end
-        end
-        controls[:piles] += [{type: :button,
-                              action: :buy,
-                              text: "Buy",
-                              nil_action: "Buy no more",
-                              piles: piles,
-                              pa_id: action.id
-                            }]
-      when 'choose_sot_card'
-        # We've peeked at the cards we can choose between
-        controls[:peeked] += [{type: :button,
-                                action: :choose_sot_card,
-                                text: 'Choose',
-                                params: {},
-                                cards: [true] * cards.peeked.count,
+          controls[:piles] += [{type: :button,
+                                action: :buy,
+                                text: "Buy",
+                                nil_action: "Buy no more",
+                                piles: piles,
                                 pa_id: action.id
                               }]
-
-      when /^resolve_([[:alpha:]]+::[[:alpha:]]+)([0-9]+)(?:_([[:alnum:]]*))?(;.*)?/
-        card_type = $1
-        card_id = $2
-        substep = $3
-        param_string = $4
-        params = {}
-        if param_string
-          param_string.scan(/;([^;=]*)=([^;=]*)/) {|m| params[m[0].to_sym] = m[1]}
+        when 'choose_sot_card'
+          # We've peeked at the cards we can choose between
+          controls[:peeked] += [{type: :button,
+                                  action: :choose_sot_card,
+                                  text: 'Choose',
+                                  params: {},
+                                  cards: [true] * cards.peeked.count,
+                                  pa_id: action.id
+                                }]
         end
-        card = card_type.constantize.find(card_id)
+      else
         tmp_ctrls = Hash.new([])
-        card.determine_controls(self, tmp_ctrls, substep, params)
+        action.object.determine_controls(self, tmp_ctrls, action)
         tmp_ctrls.each do |key, ctrl_array|
-          ctrl_array.each {|ctrl| ctrl[:pa_id] = action.id}
           controls[key] ||= []
           controls[key] += ctrl_array
         end
@@ -142,10 +133,11 @@ class Player < ActiveRecord::Base
     return controls
   end
 
-  def play_action(journal, actor)
-    match = /#{name} plays (.*)/.match(journal.event)
-    unless actor == self && match
-      return false
+  def play_action(journal, actor, check: false)
+    match = /#{name} played (.*)/.match(journal.event)
+    ok = actor == self && match
+    if !ok || check
+      return ok
     end
 
     # Check for playing nothing
@@ -170,9 +162,11 @@ class Player < ActiveRecord::Base
     end
 
     # Play the card
+    self.num_actions -= 1
     begin
       card.play
     rescue ArgumentError
+      raise
       journal.errors.add(:base, 'Card not updated to journal system')
     end
     true
@@ -598,9 +592,6 @@ class Player < ActiveRecord::Base
     self.num_actions = 1
     self.num_buys = 1
 
-    # Ask the question - play action
-    game.questions << Question.new(object: self, actor: self, method: :play_action, text: 'Play an action')
-
     # Advance the turn counter when the first player starts their turn.
     if seat == 0
       game.turn_count += 1
@@ -664,8 +655,19 @@ class Player < ActiveRecord::Base
         #card.witness_turn_start(parent_action.reload)
       end
     end
+  end
 
-    return "OK"
+  # Called by the game when it has nothing left to ask about, to see if the player needs to act or buy
+  def prompt_for_questions
+    if num_actions > 0
+      # Ask the question - play action
+      game.ask_question(object: self, actor: self, method: :play_action, text: 'Play an action')
+    elsif num_buys > 0
+      # Ask the question - buy card
+      game.ask_question(object: self, actor: self, method: :buy, text: 'Buy')
+    else
+      # Next turn
+    end
   end
 
   # Handle the user choosing a card to play at the start of turn.
@@ -732,9 +734,17 @@ class Player < ActiveRecord::Base
     choose_sot_card(params)
   end
 
+  # Grants the player the specified number of Actions
+  def add_actions(num)
+    # First, check that it's the player's turn
+    raise RuntimeError.new("Not Player #{id}'s turn") unless cash
+
+    self.num_actions += num
+  end
+
   # Grants the player the specified number of Actions, and returns an action suitable
   # for hanging more things off.
-  def add_actions(num, parent_act)
+  def add_actionsold(num, parent_act)
     # Add _num_ actions to the Player.
     # First, check that it's the player's turn
     raise RuntimeError.new("Not Player #{id}'s turn") unless cash
@@ -1180,10 +1190,52 @@ class Player < ActiveRecord::Base
 #                     :game => game)
 #  end
 
+  def gain(opts = {})
+    raise "No :card or :pile to gain" unless (opts.include?(:card) || opts.include?(:pile))
+    raise "Both :card and :pile given to gain" if (opts.include?(:card) && opts.include?(:pile))
+    raise ":card supplied but not a Card" if (opts[:card] && !opts[:card].is_a?(Card))
+    raise ":pile supplied but not a Pile" if (opts[:pile] && !opts[:pile].is_a?(Pile))
+    raise "Object to be gained not in this game" if ((opts[:pile] && opts[:pile].game != game) ||
+                                                      (opts[:card] && opts[:card].game != game))
+
+    # Trip any cards that need to trigger before the gain to change the details of the gain
+    # (as for, say, Nomad Camp)
+    card_types = game.cards.map(&:type).uniq.map(&:constantize)
+    gain_params = {:gainer => self,
+                   :card => opts[:card], # Can be nil
+                   :pile => opts[:pile], # Can be nil
+                   journal: opts[:journal],
+                   :location => opts[:location] || 'discard',
+                   :position => opts[:position] || 0}
+
+    # TODO: Publish pre-gain event here
+
+    pile = gain_params[:pile]
+    card = gain_params[:card] || pile.cards[0]
+    journal = gain_params[:journal]
+
+    if pile.andand.empty?
+      # Can't gain this card
+      gain_params[:journal].add_history(:event => "#{name} couldn't gain a #{pile.card_class.readable_name}, as the pile was empty.",
+                                    :css_class => "player#{seat}")
+      return
+    end
+
+    raise "Couldn't determine card to gain" if card.nil?
+    raise "Card not in this game" if card.game != game
+
+    # Move the chosen card to the chosen position.
+    # Card#gain defaults to discard, -1
+    #
+    # Get the card to do it, so that we mint a fresh instance of infinite cards
+    card.gain(self, journal, locn: gain_params[:location], posn: gain_params[:position])
+
+  end
+
   # Queue up an action in order to gain a card. This needs to handle gaining both
   # from a pile, and of a specific card (as in Thief). opts must contain either
   # :pile => <Pile object> or :card => <Card object>
-  def gain(parent_act, opts = {})
+  def gainold(opts = {})
     raise "No :card or :pile to gain" unless (opts.include?(:card) || opts.include?(:pile))
     raise "Both :card and :pile given to gain" if (opts.include?(:card) && opts.include?(:pile))
     raise ":card supplied but not a Card" if (opts[:card] && !opts[:card].is_a?(Card))

@@ -69,6 +69,7 @@ class GamesController < ApplicationController
 
     setup_full_title
     @unloadFunc = nil
+
     respond_to do |format|
       format.js { render :action => 'update_game' }
       format.html { render action: :show }

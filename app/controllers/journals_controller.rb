@@ -44,6 +44,7 @@ class JournalsController < ApplicationController
     respond_to do |format|
         format.html { redirect_to play_game_path(@game), status: :see_other }
         format.json { respond_with_bip(@journal) }
+        format.js { redirect_to play_game_path(@game), status: :see_other }
     end
   end
 

@@ -5,6 +5,9 @@ class Journal < ActiveRecord::Base
   belongs_to :player
 
   faux_field [:histories, []]
+  attr_accessor :params
+
+  after_initialize :blank_histories
 
   def =~(ptn)
     event =~ ptn
@@ -12,5 +15,33 @@ class Journal < ActiveRecord::Base
 
   def card_error(error)
     errors.add(:base, "card_#{error}".to_sym)
+  end
+
+  def add_history(params)
+    self.histories << History.new(params)
+  end
+
+  class Template
+    def initialize(templ)
+      @template = templ
+    end
+
+    def fill(fields)
+      @template.gsub(/{{(.*?)}}/) { |m| fields[$1.to_sym] }
+    end
+
+    def match(*args)
+      to_re.match(*args)
+    end
+
+    def to_re
+      pattern = @template.gsub(/{{(.*?)}}/) { |m| "(?<#{$1}>.*)" }
+      Regexp.new pattern
+    end
+  end
+
+private
+  def blank_histories
+    self.histories = []
   end
 end

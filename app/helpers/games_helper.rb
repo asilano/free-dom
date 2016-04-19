@@ -273,4 +273,14 @@ EOS
   def zip_cards_no_ctrls(cards)
     zip_cards_and_ctrls(cards, [])
   end
+
+  def classes_for_journal(journal, player)
+    classes = []
+    classes << 'error' if journal.errors.any?
+    if journal.player
+      classes << "player#{journal.player.seat}" if journal.player.seat
+      classes << 'self' if player == journal.player
+    end
+    classes
+  end
 end

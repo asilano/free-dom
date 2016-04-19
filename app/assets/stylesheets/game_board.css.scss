@@ -315,11 +315,17 @@
 #journals {
   ul {
     margin: 0;
-    padding: 0 0.5em;
+    padding: 0 0.5em 0 0;
     list-style-type: none;
+    position: relative;
   }
   li  {
     padding-left: 2em;
+
+    ul {
+      margin-left: -2em;
+      padding-left: 2em;
+    }
   }
 
   .journal {

@@ -7,7 +7,7 @@
                                     name: 'journal[event]',
                                     value: journal,
                                     form: "form_#{control.object_id}",
-                                    disable_with: control[:text],
+                                    data: { disable_with: control[:text] },
                                     class: control[:css_class],
                                     disabled: !journal)
     - when :two_d_radio

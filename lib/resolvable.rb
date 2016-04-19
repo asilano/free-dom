@@ -4,7 +4,7 @@ module Resolvable
   end
 
   def method_missing(sym, *args, &block)
-    m = sym.to_s.match /^resolve_(.*)$/
+    m = sym.to_s.match(/^resolve_(.*)$/)
     if m && self.class.resolutions.present?
       name = m[1]
       resolution = self.class.resolutions.detect { |r| r.name == name.to_sym }
@@ -52,6 +52,12 @@ class Resolution
     @klass.send(:define_method, "resolution_#{@name}_occurs", block)
   end
 
+  def using(template)
+    @template = template.to_re
+    @journal_valdn = JournalMatchValidator.new(@template)
+    self
+  end
+
   def prepare_param(*args, &block)
     @preps << ParamPreparator.new(*args, &block)
     self
@@ -68,7 +74,7 @@ class Resolution
   end
 
   def validating_param_is_card(*args, &block)
-    @validations << ParamCardValidator.new(*args, &block)
+    @validations << ParamCardValidator.new(@template, *args, &block)
     self
   end
 
@@ -102,24 +108,28 @@ class Resolution
     self
   end
 
-  def resolve(card, actor, params, parent_act)
+  def resolve(card, actor, journal)
     # Give card access to the necessary resolve arguments
     card.instance_variable_set(:@res_actor, actor)
-    card.instance_variable_set(:@res_params, params)
-    card.instance_variable_set(:@res_parent_act, parent_act)
+    card.instance_variable_set(:@res_journal, journal)
 
     def card.actor; @res_actor; end
-    def card.params; @res_params; end
-    def card.parent_act; @res_parent_act; end
+    def card.journal; @res_journal; end
 
     # Run the preparations
     @preps.each { |prep| prep.prepare(card) }
 
+    # Run the special Journal Match validation, and deny ownership if it fails
+    if !@journal_valdn.validate(card, journal)
+      @journal.errors.add(:base, :no_question)
+      return false
+    end
+
     # Run the validations
-    failure_messages = @validations.map do |validation|
-      validation.failure_msg unless validation.validate(card)
-    end.compact
-    return failure_messages.join("\n") if failure_messages.present?
+    failures = @validations.map do |validation|
+      !validation.validate(card, journal)
+    end
+    return true if failures.any?
 
     card.send("resolution_#{@name}_occurs")
   end
@@ -143,7 +153,19 @@ class Resolution
 
   # Validation classes
   class Validator
+    include CardsHelper
     attr_reader :failure_msg
+  end
+
+  class JournalMatchValidator < Validator
+    def initialize(template)
+      @template = template
+      @failure_msg = "Supplied journal doesn't match expected pattern"
+    end
+
+    def validate(card, journal)
+      journal =~ @template
+    end
   end
 
   class ParamPresenceValidator < Validator
@@ -167,8 +189,9 @@ class Resolution
   end
 
   class ParamCardValidator < Validator
-    def initialize(key, options, &condition)
+    def initialize(template, key, options, &condition)
       raise "Must supply :scope parameter to validating_param_is_card" unless options.has_key? :scope
+      @template = template
       @key = key
       @player_key = options[:player]
       @scope = options[:scope]
@@ -177,36 +200,39 @@ class Resolution
       @custom_message = @failure_msg.present?
     end
 
-    def validate(card)
-      params = card.params
-      return true if !params.has_key? @key
+    def validate(card, journal)
+      match = @template.match(journal.event)
+      return true if !match.names.include? @key.to_s
       valid = true
 
-      player = @player_key ? Player.find(params[@player_key]) : card.actor
-      # Set failure message according to the test we're about to perform
-      @failure_msg = "Invalid parameters - #{@key} is not an integer" unless @custom_message
-      index = nil
-      begin
-        index = params[@key].to_i
-      rescue
+      player = @player_key ? Player.find(match[@player_key]) : card.actor
+      candidates = (@scope == :supply) ? player.game.supply_cards : player.cards.send(@scope)
+      find_type, test_card = find_card_for_journal(candidates, match[@key])
+
+      if find_type != :ok
+        journal.card_error find_type
         valid = false
       end
 
-      @failure_msg = "Invalid parameters - #{@key} #{index} is out of range for #{@scope} cards" if valid && !@custom_message
-      valid &&= index >= 0
-      valid &&= index < player.cards.send(@scope).count
-
       if @condition && valid
-        @failure_msg = "Invalid parameters - #{@scope} card #{index} doesn't satisfy the required conditions" unless @custom_message
+        @failure_msg = "Invalid parameters - card doesn't satisfy the required conditions" unless @custom_message
 
         # We need a way for the card under test to examine the state of the resolving card.
         # The following trick is borrowed from squeel.
-        test_card = player.cards.send(@scope)[index]
         test_card.instance_variable_set(:@res_card, card)
         def test_card.my(&block)
           @res_card.instance_eval &block
         end
         valid = test_card.instance_eval &@condition
+        if !valid
+          journal.errors.add(:base, @failure_msg)
+        end
+      end
+
+      if valid
+        sym = "@#{@key}".to_sym
+        journal.instance_variable_set(sym, test_card)
+        journal.define_singleton_method(@key) { instance_variable_get(sym) }
       end
 
       valid

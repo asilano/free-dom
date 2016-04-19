@@ -75,7 +75,8 @@ class Game < ActiveRecord::Base
 
   # Process the journals for a game, determining its complete state ex nihilo
   def process_journals
-    # First, seed the RNG with a good, pseudo-random seed. The nanosecond count of the creation timestamp should do
+    # First, seed the RNG with a good, pseudo-random seed. The nanosecond count of the creation
+    # timestamp should do
     srand(created_at.nsec)
 
     self.state = 'waiting'
@@ -84,11 +85,13 @@ class Game < ActiveRecord::Base
     self.cards = Collections::CardsCollection.new
     self.current_turn_player = nil
     self.last_blocked_journal = 0
+    self.questions = []
 
     # Initial questions: What is the platinum-colony rule, and what piles do we have?
-    self.questions = [Question.new(object: self, method: :set_plat_col), Question.new(object: self, method: :set_piles)]
+    ask_question(object: self, method: :set_plat_col)
+    ask_question(object: self, method: :set_piles)
     if players.count >= 2
-      self.questions << Question.new(object: self, method: :start_game, actor: players[0], text: 'Start game')
+      ask_question(object: self, method: :start_game, actor: players.unscoped[0], text: 'Start game')
     end
 
     # Main loop. For each journal in turn, look for an extant question which wants it as an answer.
@@ -96,6 +99,7 @@ class Game < ActiveRecord::Base
     # a journal, then we need to render controls for that question.
     @journal_arr = journals.to_a
     until @journal_arr.empty?
+
       @current_journal = @journal_arr.shift
       @current_journal.histories = []
       callcc do |cont|
@@ -104,46 +108,110 @@ class Game < ActiveRecord::Base
           if (q.actor != @current_journal.player)
             false
           else
-            q.object.send(q.method, @current_journal, q.actor)
+            q.object.send(q.method, @current_journal, q.actor, check: true)
           end
         end
 
-        # If nothing else wants it, try the debug hook for adjusting game state
-        apply_to ||= hack_game_state(@current_journal)
-
-        if !apply_to
-          @current_journal.errors.add(:base, :no_question)
-        else
+        if apply_to
+          # Found a question that wants it
           questions.delete_at(index) unless index.nil?
+          apply_to.object.send(apply_to.method, @current_journal, apply_to.actor)
+        elsif hack_game_state(@current_journal, check: true)
+          # If nothing else wants it, try the debug hook for adjusting game state
+          hack_game_state(@current_journal)
+        else
+          @current_journal.errors.add(:base, :no_question)
         end
 
         if @current_journal.errors.any?
           return
         end
+
+        # Check to see if we need to ask for an Action or Buy
+        if questions.empty?
+          current_turn_player.prompt_for_questions
+        end
       end
 
-      # Strategy - apply a Continuation around sending the journal to the receiver
-      # Triggers can then tell Game about any Questions they have; Game must check
-      # all its remaining journals for a match (because they may be out of order).
-      # If there's a match, carry on; if not, the trigger invokes the continuation.
-      # That lets the Game process any other waiting journals while still posting for
-      # info on the triggers.
+      # Strategy - apply a Continuation around sending the journal to the receiver.
+      #
+      # Triggers can then tell Game about any Questions they have; Game must check all its remaining
+      # journals for a match (because they may be out of order). If there's a match, carry on; if
+      # not, the trigger invokes the continuation. That lets the Game process any other waiting
+      # journals while still posting for info on the triggers.
+    end
+
+  end
+
+  # Called to stop processing of a journal by invoking the continuation wrapping it.
+  def abort_journal
+    @cont.call if @cont
+  end
+
+  # Called to see if the game-log already has a journal satisfying a question that needs to be
+  # asked. If so, removes it from processing and returns it.
+  #
+  # Expects a template which will be checked against journals to see if they match.
+  def find_journal(template)
+    desired_journal = @journal_arr.detect { |j| template.match(j.event) }
+    if desired_journal
+      @journal_arr.delete desired_journal
+    end
+
+    desired_journal
+  end
+
+  def find_journal_or_ask(template: nil, qn_params: {})
+    desired_journal = find_journal(template)
+    if desired_journal
+      @journal_arr.delete desired_journal
+      return desired_journal
+    else
+      ask_question qn_params
+      abort_journal
     end
   end
 
-  def set_plat_col(journal, actor)
+  # Add a journal to the games journals association - but _not_ to its @journal_arr. This means the
+  # caller is free to process the journal immediately.
+  def add_journal(journal_params)
+    journals.create!(journal_params.merge(order: journals.map(&:order).max + 1))
+  end
+
+  # Add a history to the current journal - a record of something that happened as a result of a
+  # player choice.
+  def add_history(history_params, to_journal = nil)
+    to_journal ||= @current_journal
+    if to_journal
+      to_journal.histories << History.new(history_params)
+    end
+  end
+
+  def apply_journal_block
+    self.last_blocked_journal = @current_journal.order
+  end
+
+  def ask_question(q_params)
+    q = Question.new(q_params)
+    self.questions << q
+    q
+  end
+
+  def set_plat_col(journal, actor, check: false)
     match = /Setup Platinum\/Colony option: (yes|no|rules)/.match(journal.event)
-    unless actor.nil? && match
-      return false
+    ok = actor.nil? && match
+    if !ok || check
+      return ok
     end
 
     @plat_colony = match[1]
   end
 
-  def set_piles(journal, actor)
+  def set_piles(journal, actor, check: false)
     match = /Setup piles: ((\w+::\w+,? ?){10})/.match(journal.event)
-    unless actor.nil? && match
-      return false
+    ok = actor.nil? && match
+    if !ok || check
+      return ok
     end
 
     piles_array = match[1].split(', ')
@@ -207,17 +275,19 @@ class Game < ActiveRecord::Base
     end
   end
 
-  def start_game(journal, actor)
-    unless actor == players[0] && journal.event == "#{players[0].name} started the game"
-      return false
+  def start_game(journal, actor, check: false)
+    ok = (actor == players.unscoped[0] && journal.event == "#{players.unscoped[0].name} started the game")
+    if !ok || check
+      return ok
     end
 
     if state == "running"
       # Game is already running. Odd. Error, and consume the event
       journal.errors.add(:event, ': Game already running')
-      return true
+      return
     elsif players.length < 2 or players.length > max_players
-      return "Invalid number of players (#{players.length})"
+      journal.errors.add(:event, "Invalid number of players (#{players.length})")
+      return
     end
 
     # Setup initial state
@@ -245,28 +315,23 @@ class Game < ActiveRecord::Base
     # Initialise each player's deck and hand
     players.each { |player| player.start_game }
 
-    # Seat the players randomly and set up the initial tree of Pending Actions
-    seat_order = players.shuffle
-    seat_order.each_with_index do |ply, seat|
-      ply.seat = seat
-      journal.histories << History.new(:event => "#{ply.name} will play #{(seat + 1).ordinalize}.",
-                                        :css_class => "meta player#{seat} start_game")
+    # Seat the players randomly.
+    if players[0].seat.nil?
+      seat_order = players.shuffle
+      seat_order.each_with_index do |ply, seat|
+        ply.seat = seat
+        ply.save!
+        journal.histories << History.new(:event => "#{ply.name} will play #{(seat + 1).ordinalize}.",
+                                          :css_class => "meta player#{seat} start_game")
+      end
+    else
+      seat_order = players
     end
 
     save!
     seat_order[0].start_turn
 
-    return "OK"
-  end
-
-  def add_history(history_params)
-    if @current_journal
-      @current_journal.histories << History.new(history_params)
-    end
-  end
-
-  def apply_journal_block
-    self.last_blocked_journal = @current_journal.order
+    return
   end
 
   # Process any leaf pending_actions which aren't associated with a player.
@@ -435,6 +500,10 @@ class Game < ActiveRecord::Base
     piles.map(&:card_type)
   end
 
+  def supply_cards
+    piles.map { |p| p.cards[0] }
+  end
+
   def expand_random_choices
     if random_select.to_i == 1
       if specify_distr.to_i == 1
@@ -551,8 +620,10 @@ protected
   end
 
 private
-  def hack_game_state(journal)
-    return false unless journal.event =~ /^Hack: /
+  def hack_game_state(journal, check: false)
+    if check || journal.event !~ /^Hack: /
+      return journal.event =~ /^Hack: /
+    end
 
     case journal.event
     when /^Hack: (.*) (hand) \+ ([a-zA-Z]*::[a-zA-Z]*)/
@@ -563,7 +634,6 @@ private
         card_class = $3.constantize
       rescue
         journal.errors.add(:event, "Hack mentions bad card type")
-        return false
       end
 
       player.cards << card_class.new(game: self,
@@ -572,10 +642,8 @@ private
                                       position: player.cards.hand.length)
 
     else
-      return false
+      journal.errors.add(:event, "Hack of unknown type")
     end
-
-    return true
   end
 
 end

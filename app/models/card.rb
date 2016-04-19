@@ -167,48 +167,30 @@ class Card
 
   # Default function to buy a card. Can be overridden by card-types which are
   # infinite in size.
-  def gain(player, parent_act, new_location="discard", position=-1)
+  def gain(actor, journal, locn: 'discard', posn: -1)
     if pile.andand.state.andand[:trade_route_token]
       # Card's pile currently has a Trade Route token on it. Remove that token
       # and increment the game's Trade Route value
-      pile.state_will_change!
-      game.facts_will_change!
       pile.state[:trade_route_token] = false
       game.facts[:trade_route_value] ||= 0
       game.facts[:trade_route_value] += 1
-      pile.save!
-      game.save!
     end
 
-    player.renum(new_location, position)
+    actor.renum(locn, posn)
     self.pile = nil
-    self.location = new_location || "discard"
-    self.player = player
-    self.position = position || -1
-    save!
+    self.location = locn
+    self.player = actor
+    self.position = posn
+    actor.cards << self
 
     if !game.cards.of_type("Seaside::Smuggler").empty?
       # Game has the Smugglers card in it, so we need to track the
       # card types gained
-      player.state.gained_last_turn_will_change!
-      player.state.gained_last_turn << self.class.to_s
-      player.state.save!
+      actor.state.gained_last_turn << self.class.to_s
     end
 
-    # Trip any cards that need to trigger after a card is gained
-    card_types = game.cards.unscoped.select('distinct type').map(&:type).map(&:constantize)
-    gain_params = {:gainer => player,
-                   :card => self,
-                   :parent_act => parent_act,
-                   :location => new_location,
-                   :position => position}
-    card_types.each do |type|
-      if type.respond_to?(:witness_post_gain)
-        type.witness_post_gain(gain_params)
-      end
-    end
+    # TODO: publish post-gain event
 
-    return parent_act
   end
 
   # We expect to override play for every action; but having it here allows us
@@ -296,14 +278,12 @@ class Card
     self.peeked = false
 
     if location != "trash"
-      game.cards(true).in_trash << self
+      game.cards.in_trash << self
       self.location = "trash"
       self.position = game.cards.in_trash.size - 1
 
-      save!
       return true
     else
-      save!
       return false
     end
   end

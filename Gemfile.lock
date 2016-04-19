@@ -8,8 +8,9 @@ GIT
       sass-rails (< 5.1)
       sprockets (< 2.13)
 
-PATH
-  remote: d:/Documents/best_in_place
+GIT
+  remote: https://github.com/asilano/best_in_place
+  revision: 8ee3d0d137600a6ddaccae114ebc06c71afb7457
   specs:
     best_in_place (3.1.0)
       actionpack (>= 3.2)

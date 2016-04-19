@@ -14,11 +14,11 @@
         - when :button
           - spacer_count += 1
           = button_tag(control[:text], type: 'submit',
-                                        name: 'pile_index',
-                                        value: pile.position,
+                                        name: 'journal[event]',
+                                        value: control[:journals][pile.position],
                                         form: "form_#{control.object_id}",
-                                        class: (control[:piles][pile.position] ? '' : 'placeholder') + (control[:css_class] || ''),
-                                        disabled: !control[:piles][pile.position],
+                                        class: (control[:journals][pile.position] ? '' : 'placeholder') + (control[:css_class] || ''),
+                                        disabled: !control[:journals][pile.position],
                                         data: {disable_with: control[:text],
                                               confirm: (pile.card_class == BasicCards::Curse ? "Really choose Curse?" : nil)})
   - spacer_count.times do |_|
