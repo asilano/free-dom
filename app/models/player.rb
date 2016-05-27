@@ -20,7 +20,7 @@ class Player < ActiveRecord::Base
   accepts_nested_attributes_for :settings
 
   # Things that used to be database fields and relations
-  faux_field [:cards, Collections::CardsCollection.new], :cash, :vp_chips, :state
+  faux_field [:cards, Collections::CardsCollection.new], :cash, :vp_chips, [:state, PlayerState.new]
   faux_field :num_actions, :num_buys
   validates :user_id, :uniqueness => {:scope => 'game_id'}
   validates :seat, :uniqueness => {:scope => 'game_id', :allow_nil => true}
@@ -78,37 +78,46 @@ class Player < ActiveRecord::Base
         when :play_action
           controls[:hand] += [{type: :button,
                                text: "Play",
-                               nil_action: {"Leave Action Phase" => "#{name} played nothing."},
+                               nil_action: {text: "Leave Action Phase",
+                                            journal: "#{name} played no further actions."},
                                journals: cards.hand.each_with_index.map { |c, ix| "#{name} played #{c.readable_name} (#{ix})." if c.is_action? },
                                css_class: 'play'
                               }]
-        when 'play_treasure'
-          have_simples = cards.hand.any? { |card| card.is_treasure? && !card.is_special? }
-          controls[:hand] += [{type: :button,
-                               action: :play_treasure,
-                               text: "Play",
-                               nil_action: [have_simples ? "Play Simple Treasures" : nil, 'Stop Playing Treasures'],
-                               cards: cards.hand.map{|card| card.is_treasure?},
-                               pa_id: action.id,
-                               confirm_nil: [false, true],
+        when :play_treasure
+          nil_actions = []
+          if cards.hand.any? { |card| card.is_treasure? && !card.is_special? }
+            card_list = cards.hand.each_with_index.map { |c, ix| "#{c.readable_name} (#{ix})" if c.is_treasure? && !c.is_special? }
+            nil_actions << {text: 'Play Simple Treasures',
+                            journal: "#{name} played #{card_list.compact.join(', ')} as treasures."}
+          end
+          nil_actions << {text: 'Stop Playing Treasures',
+                          journal: "#{name} played no further treasures.",
+                          confirm: true}
+          controls[:hand] += [{type: :checkboxes,
+                               choice_text: "Play",
+                               button_text: 'Play selected',
+                               nil_action: nil_actions,
+                               journal_template: "#{name} played {{cards}} as treasures.",
+                               journals: cards.hand.each_with_index.map { |c, ix| {k: :cards, v: "#{c.readable_name} (#{ix})"} if c.is_treasure?},
                                css_class: 'play-treasure'
                               }]
-        when 'buy'
-          piles = game.piles.map do |pile|
+        when :buy
+          piles = game.piles.each_with_index.map do |pile, ix|
             if game.facts[:contraband] && game.facts[:contraband].include?(pile.card_type)
-              false
+              nil
             elsif pile.card_type == "Prosperity::GrandMarket" && !cards.in_play.of_type("BasicCards::Copper").empty?
-              false
+              nil
+            elsif pile.cost > cash || pile.cards.empty?
+              nil
             else
-              (pile.cost <= cash && pile.cards.size != 0)
+              "#{name} bought #{pile.cards[0].readable_name} (#{ix})."
             end
           end
-          controls[:piles] += [{type: :button,
-                                action: :buy,
-                                text: "Buy",
-                                nil_action: "Buy no more",
-                                piles: piles,
-                                pa_id: action.id
+          controls[:piles] += [{:type => :button,
+                                :text => "Buy",
+                                :nil_action => {text: 'Buy no more',
+                                                journal: "#{name} bought no more cards"},
+                                journals: piles
                               }]
         when 'choose_sot_card'
           # We've peeked at the cards we can choose between
@@ -140,10 +149,17 @@ class Player < ActiveRecord::Base
       return ok
     end
 
+    # Check we still have an action available
+    if num_actions < 1
+      journal.errors.add(:base, 'No available actions remaining')
+      return true
+    end
+
     # Check for playing nothing
     card_req = match.captures[0].sub(/\.*$/, '')
-    if card_req == 'nothing'
-      # TODO: Move to Play Treasure phase
+    if card_req == 'no further actions'
+      self.num_actions = 0
+      game.treasure_step = true
       return true
     end
 
@@ -217,6 +233,60 @@ class Player < ActiveRecord::Base
     #save!
 
     return rc
+  end
+
+  def play_treasure(journal, actor, check: false)
+    match = /#{name} played (.*) treasures/.match(journal.event)
+    ok = actor == self && match
+    if !ok || check
+      return ok
+    end
+
+    # Check for playing nothing
+    card_req = match.captures[0]
+    if card_req == 'no further'
+      game.treasure_step = false
+      return true
+    end
+
+    # Split out the card strings requested
+    card_strings = card_req.split(',').map(&:strip)
+
+    # Check we have the specified cards in hand
+    card_arr = card_strings.map do |card_s|
+      ret, card = find_card_for_journal(cards.hand, card_s)
+      if ret != :ok
+        journal.card_error ret
+        return true
+      end
+      card
+    end
+
+    # Check the specified cards are all treasures
+    if !card_arr.all?(&:is_treasure?)
+      journal.card_error :wrong
+      journal.errors.add(:base, 'Specified card is not a treasure')
+      return true
+    end
+
+    # Play the cards
+    ok = true
+    cash_added = 0
+    card_arr.each do |card|
+      begin
+        cash_added += card.play_treasure
+      rescue ArgumentError
+        ok = false
+        journal.errors.add(:base, "Card #{card.readable_name} not updated to journal system")
+      end
+    end
+
+    if ok
+      journal.add_history(event: "Cash added: #{cash_added}. Total cash: #{cash}.",
+                          css_class: "player#{seat}")
+    end
+
+    ok
   end
 
   # If the player has any special treasures in hand, queue an action to play a treasure.
@@ -296,7 +366,7 @@ class Player < ActiveRecord::Base
   end
 
   # Play a specific treasure from hand, or play all simple treasures, or stop playing.
-  def play_treasure(params)
+  def play_treasureold(params)
     return "Cash unexpectedly nil for Player #{id}" if cash.nil?
     # Unsurprisingly, this is much like play_action.
     # Checks, including retrieving the action.
@@ -366,7 +436,53 @@ class Player < ActiveRecord::Base
     return rc
   end
 
-  def buy(params)
+  def buy(journal, actor, check: false)
+    match = /#{name} bought (.*)/.match(journal.event)
+    ok = actor == self && match
+    if !ok || check
+      return ok
+    end
+
+    # Check we still have a buy available
+    if num_buys < 1
+      journal.errors.add(:base, 'No buys remaining')
+      return true
+    end
+
+    # Check for buying nothing
+    card_req = match.captures[0].sub(/\.*$/, '')
+    if card_req == 'no more cards'
+      self.num_buys = 0
+      return true
+    end
+
+    # Check we can find the specified card in piles
+    ret, card = find_card_for_journal(game.supply_cards, card_req)
+    if ret != :ok
+      journal.card_error ret
+      return true
+    end
+
+    # Check the specified card costs no more than our current cash
+    if card.cost > cash
+      journal.card_error :wrong
+      journal.errors.add(:base, 'Specified card is too expensive')
+      return true
+    end
+
+    # Buy the card.
+    # TODO: Trigger "on-buy" here
+
+    # Pay the cash, use up a buy
+    self.cash -= card.cost
+    self.num_buys -= 1
+
+    # Gain the card
+    actor.gain(card: card, journal: journal)
+    true
+  end
+
+  def buyold(params)
     # Checks, including retrieving the action.
     this_act, response = find_action(params[:pa_id])
 
@@ -500,7 +616,7 @@ class Player < ActiveRecord::Base
 
   end
 
-  def end_turn(params)
+  def end_turnold(params)
     # Check the player doesn't have any pending actions left
     if !pending_actions.empty?
       return "You unexpectedly have actions pending when ending turn"
@@ -536,20 +652,17 @@ class Player < ActiveRecord::Base
     return "OK"
   end
 
-  def clean_up(params)
+  def clean_up
     # Move all cards in Play or Hand to Discard
-    # Force a reload of all affected areas
-    cards(true).in_discard
-
     cards.hand.each do |card|
       card.discard
     end
     cards.in_play.each do |card|
-      card.discard_from_play(params[:parent_act])
+      card.discard_from_play
     end
   end
 
-  def draw_hand(params)
+  def draw_hand
     # Draw a new hand of 5 cards (or 3 if they played Outpost) ...
     if state.outpost_queued
       draw_cards(3)
@@ -558,13 +671,14 @@ class Player < ActiveRecord::Base
     end
   end
 
-  def next_turn(params)
-    # ... nil off the Cash parameter for this player ...
+  def next_turn
+    # ... nil off the turn parameters for this player ...
     self.cash = nil
-    save!
+    self.num_actions = nil
+    self.num_buys = nil
 
     # ... stop here if the game's ended ...
-    if not game.check_game_end
+    if !game.check_game_end
       # ... and ask the next player to start their turn.
       # (or this player if Outpost is letting them take another).
       if state.outpost_queued && !state.outpost_prevent
@@ -574,14 +688,9 @@ class Player < ActiveRecord::Base
         next_seat = (seat + 1) % game.players.length
         state.outpost_prevent = false
       end
-      state.save!
 
-      rc = game.players[next_seat].start_turn
-    else
-      rc = "OK"
+      game.players[next_seat].start_turn
     end
-
-    return rc
   end
 
   def start_turn
@@ -599,10 +708,11 @@ class Player < ActiveRecord::Base
 
     # Tell the game it's in the Action phase
     game.turn_phase = Game::TurnPhases::ACTION
+    game.treasure_step = false
     game.current_turn_player = self
 
     game.reset_facts
-    @state.reset_fields
+    state.reset_fields
 
     game.add_history(event: "#{name}'s turn #{game.turn_count} started.",
                      css_class: "player#{seat} start_turn")
@@ -655,19 +765,42 @@ class Player < ActiveRecord::Base
         #card.witness_turn_start(parent_action.reload)
       end
     end
+
+    prompt_for_questions
   end
 
   # Called by the game when it has nothing left to ask about, to see if the player needs to act or buy
   def prompt_for_questions
     if num_actions > 0
       # Ask the question - play action
+      game.turn_phase = Game::TurnPhases::ACTION
       game.ask_question(object: self, actor: self, method: :play_action, text: 'Play an action')
+    elsif game.treasure_step && cards.hand.any?(&:is_treasure?)
+      game.turn_phase = Game::TurnPhases::BUY
+
+      # Ask the question - play treasures
+      game.ask_question(object: self, actor: self, method: :play_treasure, text: 'Play treasures')
     elsif num_buys > 0
+      # Just to be sure, force us out of treasure step
+      game.turn_phase = Game::TurnPhases::BUY
+      game.treasure_step = false
+
       # Ask the question - buy card
       game.ask_question(object: self, actor: self, method: :buy, text: 'Buy')
     else
       # Next turn
+      game.turn_phase = Game::TurnPhases::CLEAN_UP
+      end_turn
     end
+  end
+
+  def end_turn
+    game.add_history(:event => "#{name} ended their turn.",
+                     :css_class => "player#{seat} end_turn")
+
+    clean_up
+    draw_hand
+    next_turn
   end
 
   # Handle the user choosing a card to play at the start of turn.
@@ -1089,16 +1222,15 @@ class Player < ActiveRecord::Base
     # Take all the cards in the discard pile and put them, in random order,
     # at the end of the deck array.
     renum(:deck)
-    cards(true).in_discard.shuffle.each do |card|
+    cards.in_discard.shuffle.each do |card|
       cards.deck << card
       card.location = "deck"
       card.position = cards.deck.count
-      card.save
     end
 
     if options[:log]
-      game.histories.create!(:event => "#{name} shuffled their discard pile.",
-                            :css_class => "player#{seat} shuffle")
+      game.add_history(:event => "#{name} shuffled their discard pile.",
+                       :css_class => "player#{seat} shuffle")
     end
   end
 
@@ -1216,14 +1348,16 @@ class Player < ActiveRecord::Base
 
     if pile.andand.empty?
       # Can't gain this card
-      gain_params[:journal].add_history(:event => "#{name} couldn't gain a #{pile.card_class.readable_name}, as the pile was empty.",
-                                    :css_class => "player#{seat}")
+      journal.add_history(:event => "#{name} couldn't gain a #{pile.card_class.readable_name}, as the pile was empty.",
+                          :css_class => "player#{seat}")
       return
     end
 
     raise "Couldn't determine card to gain" if card.nil?
     raise "Card not in this game" if card.game != game
 
+    journal.add_history(event: "#{name} gained #{card.readable_name}.",
+                        css_class: "player#{seat} card_gain")
     # Move the chosen card to the chosen position.
     # Card#gain defaults to discard, -1
     #

@@ -23,7 +23,13 @@ class JournalsController < ApplicationController
 
   # POST /journals
   def create
-    if params[:journal] && params[:journal][:event] && @game
+    event = params[:journal].andand[:event]
+    if event.blank? && params[:journal].andand[:template]
+      template = Journal::Template.new(params[:journal][:template])
+      event = template.fill(params[:journal])
+    end
+
+    if event && @game
       new_order = params[:journal][:order].andand.to_i
       if new_order && @game.journals.any? { |j| j.order == new_order }
         # Inserting a journal. Renumber all following journals
@@ -33,7 +39,9 @@ class JournalsController < ApplicationController
         end
       end
 
-      @journal = @game.journals.build(journal_params)
+      create_params = journal_params
+      create_params[:event] = event
+      @journal = @game.journals.build(create_params)
       @journal.player = @player
       if !@journal.order
         @journal.order = @journal.game.journals.map(&:order).max + 1

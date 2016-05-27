@@ -280,6 +280,7 @@ EOS
     if journal.player
       classes << "player#{journal.player.seat}" if journal.player.seat
       classes << 'self' if player == journal.player
+      classes << journal.css_class.split if journal.css_class
     end
     classes
   end

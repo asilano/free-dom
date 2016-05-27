@@ -4,16 +4,13 @@
       - if (control[:type] != :button) || control[:nil_action] || control[:on_update]
           .ctrl
             - case control[:type]
-              - when :button
-                - Array(control[:nil_action]).each.with_index do |nil_act, ix|
-                  - if nil_act
-                    = button_tag(nil_act[0], type: 'submit',
-                                           name: 'journal[event]',
-                                           value: nil_act[1],
-                                           form: "form_#{control.object_id}",
-                                           class: control[:css_class],
-                                           data: {disable_with: nil_act[0],
-                                                  confirm: control[:confirm].andand[ix] ? 'Are you sure?' : nil})
+              - when :checkboxes
+                = button_tag(control[:button_text], type: 'submit',
+                              name: 'journal[template]',
+                              value: control[:journal_template],
+                              form: "form_#{control.object_id}",
+                              data: {disable_with: control[:button_text]},
+                              class: control[:css_class])
               - when :two_d_radio, :latin_radio
                 - if control[:nil_action]
                   = radio_button_tag(:choice, 'nil_action', true,
@@ -25,11 +22,16 @@
                               form: "form_#{control.object_id}",
                               data: {disable_with: control[:text]},
                               class: control[:css_class])
-              - when :checkboxes
-                = submit_tag(control[:button_text],
-                              form: "form_#{control.object_id}",
-                              data: {disable_with: control[:button_text]},
-                              class: control[:css_class])
+
+            - Array.wrap(control[:nil_action]).each.with_index do |nil_act, ix|
+              - if nil_act
+                = button_tag(nil_act[:text], type: 'submit',
+                                       name: 'journal[event]',
+                                       value: nil_act[:journal],
+                                       form: "form_#{control.object_id}",
+                                       class: control[:css_class],
+                                       data: {disable_with: nil_act[:text],
+                                              confirm: nil_act[:confirm] ? 'Are you sure?' : nil})
             - if control[:on_update]
               span id="#{control.object_id}_js"
               javascript:

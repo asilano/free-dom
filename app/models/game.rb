@@ -39,7 +39,7 @@ class Game < ActiveRecord::Base
 
   # Things that used to be database fields and relations
   faux_field [:questions, []], [:state, {}], [:facts, {}], :turn_count, [:piles, []], [:cards, []],
-              :current_turn_player, :turn_phase, :last_blocked_journal
+              :current_turn_player, :turn_phase, :treasure_step, :last_blocked_journal
 
   attr_accessor :random_select, :specify_distr, :plat_colony
   attr_accessor *(Card.expansions.map {|set| "num_#{set.name.underscore}_cards".to_sym})
@@ -393,7 +393,6 @@ class Game < ActiveRecord::Base
     # Determine if the game should end. This is if either
     # - the Province pile is empty
     # - three other piles are empty
-    self.reload
     due_to_end = false
     if self.state == "running"
       count = 0

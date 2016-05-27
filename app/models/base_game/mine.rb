@@ -17,7 +17,7 @@ class BaseGame::Mine < Card
       if player.cards.hand.select(&:is_treasure?).map(&:class).uniq.length == 1
         # Only holding one type of treasure card. Pre-create the journal
         ix = player.cards.hand.index(&:is_treasure?)
-        journal = game.add_journal(player_id: player,
+        journal = game.add_journal(player_id: player.id,
                                     event: TrashEventTempl.fill(player: player.name, card: "#{player.cards.hand[ix].readable_name} (#{ix})"))
       elsif !(player.cards.hand.any? {|c| c.is_treasure?})
         # Holding no treasure cards. Just log
@@ -86,9 +86,6 @@ class BaseGame::Mine < Card
                                                                             cost <= my{journal.params}[:trashed_cost].to_i + 3 }.
                   with do
     # Process the take.
-    journal.add_history(:event => "#{actor.name} took " +
-                                  "#{journal.supply_card.readable_name} with Mine.",
-                          :css_class => "player#{actor.seat} card_gain")
     actor.gain(:card => journal.supply_card, :location => "hand", journal: journal)
   end
 end

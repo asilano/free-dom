@@ -18,8 +18,5 @@ ul
             - if @player && history.css_class =~ /\bplayer#{@player.seat}\b/
               - classes += ' self'
             li class=classes = format_history(history, @player)
-          - if journal.order >= @game.last_blocked_journal
-            span.insert data-order=journal.order+1
-      - else
-        - if journal.order >= @game.last_blocked_journal
-          span.insert data-order=journal.order+1
+      - if journal.order >= @game.last_blocked_journal
+        span.insert data-order=journal.order+1

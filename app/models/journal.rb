@@ -1,10 +1,11 @@
+
 class Journal < ActiveRecord::Base
   extend FauxField
 
   belongs_to :game
   belongs_to :player
 
-  faux_field [:histories, []]
+  faux_field [:histories, []], :css_class
   attr_accessor :params
 
   after_initialize :blank_histories
@@ -27,7 +28,14 @@ class Journal < ActiveRecord::Base
     end
 
     def fill(fields)
-      @template.gsub(/{{(.*?)}}/) { |m| fields[$1.to_sym] }
+      @template.gsub(/{{(.*?)}}/) do |m|
+        field = fields[$1.to_sym]
+        if field.kind_of? Array
+          field = field.join(', ')
+        end
+
+        field
+      end
     end
 
     def match(*args)

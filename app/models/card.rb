@@ -257,14 +257,18 @@ class Card
     discard
   end
 
-  # This just moves a treasure card to play. The caller should do the rest
-  # (in practice, that will be Player adding the treasure's cash).
-  def play_treasure(parent_act)
+  # This moves a treasure card to play, and adds its reported cash to the owning player, unless
+  # call_through is true (meaning a subclass has invoked super). The cash added is returned.
+  def play_treasure(call_through: false)
     raise "Card not a treasure" unless is_treasure?
     self.location = "play"
-    save!
 
-    return "OK"
+    if !call_through
+      player.cash += cash
+      cash
+    else
+      nil
+    end
   end
 
   # Trash a card - move it from its current location to game.cards.in_trash
@@ -295,7 +299,6 @@ class Card
     player.cards.in_discard << self
     self.location = 'discard'
     self.position = -1
-    save!
   end
 
   # Peek at a card - mark it as peeked, so its owner can see it.

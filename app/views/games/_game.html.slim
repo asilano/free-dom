@@ -88,14 +88,16 @@ h1 Buy Piles
         - case control[:type]
           - when :button
             - spacer_count += 1
-            = button_tag(control[:nil_action],
-                         type: 'submit',
-                         name: "nil_action",
-                         value: control[:nil_action],
-                         form: "form_#{control.object_id}",
-                         disable_with: control[:nil_action],
-                         class: (control[:nil_action] ? '' : ' placeholder') + (control[:css_class] || ''),
-                         disabled: !controls[:nil_action])
+            - nil_act = control[:nil_action]
+            = button_tag(nil_act[:text],
+                          type: 'submit',
+                          name: "journal[event]",
+                          value: nil_act[:journal],
+                          form: "form_#{control.object_id}",
+                          class: (nil_act ? '' : ' placeholder') + (control[:css_class] || ''),
+                          data: {disable_with: nil_act[:text],
+                                  confirm: nil_act[:confirm] ? 'Are you sure?' : nil},
+                          disabled: !nil_act)
     - spacer_count.times do |_|
       .button-spacer
   = render partial: 'pile', collection: game.piles, locals: {controls: controls, num_players: game.players.length}
