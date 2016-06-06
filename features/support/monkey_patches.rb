@@ -18,7 +18,7 @@ class Array
   end
 end
 
-class Card < ActiveRecord::Base
+class Card
   def <=>(rhs)
     return readable_name <=> rhs.readable_name
   end

@@ -2,31 +2,19 @@ class Pile
   include ActiveModel::Model
   include GamesHelper
 
-  #belongs_to :game
-  #has_many :cards, -> { where(location: 'pile') },
-  #                 :dependent => :delete_all
-
-  #serialize :state, Hash
-
-  #validates :card_type, :uniqueness => {:scope => "game_id", :message => "of Kingdom cards must be different"}
-
-  #before_create :init_state
-
   # Fields that used to be database attribs
   attr_accessor :card_type, :position, :state, :game, :cards
 
   def initialize(attribs={})
     super
     @cards = []
+    @state ||= Hash.new(0)
   end
 
   def populate(num_players)
     # Create the appropriate number of Card objects for the given type and
     # number of players in the game.
-    #
-    # If a card-type reports -1, it's unlimited - start with 10.
     start_size = card_class.starting_size(num_players)
-    start_size = 10 if start_size == :unlimited
     1.upto(start_size) do |ix|
       card_params = {game: self.game,
                      pile: self,
@@ -67,12 +55,6 @@ class Pile
 
   def state=(value)
     self[:state] = value.reject{|k,v| k == :contraband}
-  end
-
-private
-
-  def init_state
-    self.state ||= Hash.new(0)
   end
 
 end

@@ -9,6 +9,7 @@ class Journal < ActiveRecord::Base
   attr_accessor :params
 
   after_initialize :blank_histories
+  before_save :set_order
 
   def =~(ptn)
     event =~ ptn
@@ -51,5 +52,11 @@ class Journal < ActiveRecord::Base
 private
   def blank_histories
     self.histories = []
+  end
+
+  def set_order
+    if !self.order
+      self.order = game.journals.any? ? game.journals.map(&:order).max + 1 : 1
+    end
   end
 end

@@ -32,7 +32,7 @@ class GamesController < ApplicationController
   def index
     @games = Game.all.sort_by(&:id)
 
-    @games.each { |g| g.process_journals unless g.players.any? { |p| !p.score.nil? } }
+    @games.each { |g| g.process_journals if g.players.all? { |p| p.score.nil? } }
 
     respond_to do |format|
       format.html # index.html.erb
@@ -255,35 +255,6 @@ private
       rc = "You've lost your session details. Please log in again."
     end
     process_result rc
-  end
-
-  def process_result(rc, do_actions = true)
-    if rc #=~ /^OK ?(.*)?/
-      #flash[:warning] = $1 if $1 != ""
-
-      #@game.process_actions if do_actions
-      @game.process_journals
-      if not @player.nil?
-        @controls = @player.determine_controls
-      else
-        @controls = Hash.new([])
-      end
-
-      @last_mod = @game.last_modified
-      setup_full_title
-      headers["Last-Modified"] = @last_mod.httpdate
-
-      respond_to do |format|
-        format.js { render :action => 'update_game' }
-        format.html { render action: :show }
-      end
-    else
-      flash[:warning] = rc
-      respond_to do |format|
-        format.js { render :action => 'update_flash' }
-        format.html { redirect_to :back }
-      end
-    end
   end
 
   def setup_full_title

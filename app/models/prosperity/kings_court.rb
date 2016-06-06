@@ -5,8 +5,6 @@ class Prosperity::KingsCourt < Card
   costs 7
   card_text "Action (cost: 7) - You may choose an Action card in your hand. Play it three times."
 
-  #serialize :state
-
   def self.readable_name
     "King's Court"
   end

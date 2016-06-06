@@ -4,7 +4,6 @@
     | #{pile.cards.length} left
     span.light
       - start_size = pile.card_class.starting_size(num_players)
-      - start_size = '∞' if start_size == :unlimited
       = " of #{start_size}"
   = raw pile_state(pile)
   - spacer_count = 0

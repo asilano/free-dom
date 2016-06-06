@@ -49,16 +49,6 @@ FactoryGirl.define do
     association :game
   end
 
-  # Pending Actions
-  factory :pending_action do
-    expected_action "action_which_is_expected"
-  end
-
-  # Piles
-  factory :pile do
-    card_type "Intrigue::GreatHall"
-  end
-
   # Rankings
   factory :ranking do
     num_played            5

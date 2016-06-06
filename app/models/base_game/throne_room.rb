@@ -3,8 +3,6 @@ class BaseGame::ThroneRoom < Card
   action
   card_text "Action (cost: 4) - Choose an Action card in hand. Play it twice."
 
-  #serialize :state
-
   # Throne room is a touch complicated. We will need to:
   # * On Play, ask the player to choose an Action card in hand
   # * On resolution of that choice, create two Game actions, one the child of

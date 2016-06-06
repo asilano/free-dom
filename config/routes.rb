@@ -25,21 +25,14 @@ Dominion::Application.routes.draw do
       get  :play
       post :start_game
       get  :update_game
-      post :play_action
-      post :play_treasure
-      post :buy
-      post :end_turn
       post :choose_sot_card
-      post :resolve
       get  :check_change
       post :update_player_settings
       post :speak
       post :perform
-      get :process_result
     end
   end
   resources :journals
-  #match 'dominion/:action', :controller => 'games'
 
   get 'about', :controller => 'users', :action => 'about', :as => 'about'
   get 'contact', :controller => 'users', :action => 'contact', :as => 'contact'

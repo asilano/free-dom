@@ -5,26 +5,6 @@ class Card
   include GamesHelper
   include Resolvable
 
-  #belongs_to :player
-  #belongs_to :game
-  #belongs_to :pile
-
-  #validates :revealed, :peeked, :inclusion => [true, false]
-
-  #default_scope { order(:location, :position) }
-  %w<deck hand enduring pile>.each do |loc|
-    #scope loc.to_sym, -> { where(location: loc) }
-  end
-  %w<play discard trash>.each do |loc|
-    #scope "in_#{loc}".to_sym, -> { where(location: loc) }
-  end
-  #scope :revealed, -> { where(revealed: true) }
-  #scope :peeked, -> { where(peeked: true) }
-  #scope :of_type, -> (*types) { where(type: types) }
-  #scope :in_location, -> (*locs) { where(location: locs) }
-
-  #before_save :clear_visibility, :check_end
-
   # Attributes that used to be in the database
   attr_accessor :game, :player, :pile, :location, :position, :revealed, :peeked, :state
 
@@ -90,7 +70,6 @@ class Card
 
   def self.starting_size(num_players)
     # Unless overridden, start with 10 cards
-    # A card may override this to ":unlimited"
     10
   end
 
@@ -177,6 +156,7 @@ class Card
     end
 
     actor.renum(locn, posn)
+    self.pile.cards.delete(self)
     self.pile = nil
     self.location = locn
     self.player = actor
@@ -214,26 +194,6 @@ class Card
         @location = "play"
       end
     end
-  end
-
-  def play_old(parent_act)
-    raise "Card not an action" unless is_action?
-
-    game.facts_will_change!
-    game.facts[:actions_played] ||= 0
-    game.facts[:actions_played] += 1
-    game.save!
-
-    # Only move the card if it's currently in-hand.
-    if location == "hand"
-      if is_duration?
-        self.location = "enduring"
-      else
-        self.location = "play"
-      end
-    end
-
-    save!
   end
 
   # Base-class function for a Duration coming off-duration at the start of the
@@ -343,13 +303,6 @@ private
     if changed.include?('location') || changed.include?('player')
       self.revealed = false unless changed.include? 'revealed'
       self.peeked = false unless changed.include? 'peeked'
-    end
-    nil
-  end
-
-  def check_end
-    if location_changed? && location_was == 'pile'
-      game.check_game_end
     end
     nil
   end

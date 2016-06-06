@@ -52,24 +52,12 @@ module CardDecorators
     self.react_trigger = opts[:to] || :attack
   end
 
-  # Define starting pile sizes; and instate before_save hook for :unlimited cards
+  # Define starting pile sizes
   def pile_size(size = nil, &block)
-    if size == :unlimited
-      def self.starting_size(num_players)
-        :unlimited
+    if size
+      define_singleton_method(:starting_size) do |n_ply|
+        size
       end
-
-      #before_save do
-      #  if location_changed? && location_was.present?
-      #    if location_was == 'pile'
-      #      # Moved out of pile. Duplicate
-      #      self.class.create!(attributes.merge(changed_attributes).reject{|k| k == "id" || k == "type"})
-      #    elsif location == 'pile'
-      #      # Moved back to pile. Destroy
-      #      destroy
-      #    end
-      #  end
-      #end
     elsif block_given?
       @size_proc = block
       def self.starting_size(num_players)
@@ -125,8 +113,6 @@ module CardDecorators
         changed
       end
     end
-
-    #before_update meth, :if => condition
   end
 
   module AttackMethods

@@ -1,22 +1,8 @@
 class Game < ActiveRecord::Base
   class_attribute :current
   class_attribute :current_act_parent
-  #class_attribute :question_hash
-
-  #self.question_hash = Hash.new { |_| [] }
 
   extend FauxField
-
-  def self.parent_act
-    return nil unless self.current_act_parent
-    raise "ID mismatch on parent_act" if self.current_act_parent.game.id != self.current.id
-    self.current_act_parent
-  end
-
-  def self.parent_act=(act)
-    raise "ID mismatch on setting parent_act" if self.current.id != act.game.id
-    self.current_act_parent = act
-  end
 
   module TurnPhases
     ACTION = 1
@@ -26,16 +12,10 @@ class Game < ActiveRecord::Base
     AllPhases = [ACTION, BUY, CLEAN_UP]
   end
 
-  #has_many :piles, -> { order :position }, :dependent => :destroy
-  #accepts_nested_attributes_for :piles
-  #has_many :cards, :dependent => :delete_all
   has_many :journals, -> { order :order }
   has_many :players, -> { order :seat, :id }, :dependent => :destroy, inverse_of: :game
-  #has_one :current_turn_player, -> { where { cash != nil } }, :class_name => 'Player'
   has_many :users, :through => :players
-  #has_many :histories, -> { order :created_at }, :dependent => :delete_all
   has_many :chats, -> { order :created_at }, :dependent => :delete_all
-  #serialize :facts
 
   # Things that used to be database fields and relations
   faux_field [:questions, []], [:state, {}], [:facts, {}], :turn_count, [:piles, []], [:cards, []],
@@ -46,14 +26,8 @@ class Game < ActiveRecord::Base
   attr_accessor *(Card.expansions.map {|set| "#{set.name.underscore}_present".to_sym})
   attr_accessor(*(1..10).map{|n| "pile_#{n}".to_sym})
 
-  # A game should only ever have one root pending action outstanding
-  # - which will usually be "end the turn".
-  #has_one :root_action, -> { where(parent_id: nil) }, :class_name => "PendingAction"
-  #has_many :pending_actions, :dependent => :delete_all
-
   validates :name, :presence => true
   validates :max_players, :presence => true, :numericality => true, :inclusion => { :in => 2..6, :message => 'must be between 2 and 6 inclusive' }
-  #validates :turn_phase, :numericality => true, :inclusion => {:in => TurnPhases::AllPhases, :message => 'must be valid'}, :allow_blank => true
 
   validate :unique_valid_piles, :on => :create
   validate :valid_set_counts, :on => :create
@@ -61,8 +35,7 @@ class Game < ActiveRecord::Base
   validate :some_sets_present, :on => :create
 
   before_validation :normalise_inputs, :on => :create
-  #before_create :init_facts
-  after_create :journal_setup, :age_oldest
+  after_create :journal_setup, :age_oldest, :welcome_chat
 
   # Add a player to game, raising if there's no space
   def add_player(player)
@@ -128,7 +101,7 @@ class Game < ActiveRecord::Base
         end
 
         # Check to see if we need to ask for an Action or Buy
-        if questions.empty?
+        if questions.empty? && current_turn_player
           current_turn_player.prompt_for_questions
         end
       end
@@ -172,7 +145,7 @@ class Game < ActiveRecord::Base
     end
   end
 
-  # Add a journal to the games journals association - but _not_ to its @journal_arr. This means the
+  # Add a journal to the game's journals association - but _not_ to its @journal_arr. This means the
   # caller is free to process the journal immediately.
   def add_journal(journal_params)
     journals.create!(journal_params.merge(order: journals.map(&:order).max + 1))
@@ -187,6 +160,8 @@ class Game < ActiveRecord::Base
     end
   end
 
+  # Set that this journal, and all journals before it, are not free for edit (because hidden
+  # information was revealed).
   def apply_journal_block
     self.last_blocked_journal = @current_journal.order
   end
@@ -197,6 +172,7 @@ class Game < ActiveRecord::Base
     q
   end
 
+  # Read the "Use Platinum & Colony" setting from its journal
   def set_plat_col(journal, actor, check: false)
     match = /Setup Platinum\/Colony option: (yes|no|rules)/.match(journal.event)
     ok = actor.nil? && match
@@ -207,6 +183,7 @@ class Game < ActiveRecord::Base
     @plat_colony = match[1]
   end
 
+  # Read the piles to use from its journal
   def set_piles(journal, actor, check: false)
     match = /Setup piles: ((\w+::\w+,? ?){10})/.match(journal.event)
     ok = actor.nil? && match
@@ -334,64 +311,9 @@ class Game < ActiveRecord::Base
     return
   end
 
-  # Process any leaf pending_actions which aren't associated with a player.
-  def process_actions
-    # First, check if we meet the endgame condition. If we do, we'll need a
-    # Game-scope action to perform game-end steps
-    check_game_end
-
-    self.pending_actions(true)
-
-    until (acts = pending_actions(true).active.unowned).empty?
-      acts.each do |action|
-        check_game_end
-        case action.expected_action
-        when /^resolve_([[:alpha:]]+::[[:alpha:]]+)([0-9]+)(?:_([[:alnum:]_]*))?(;.*)?/
-          card_type = $1
-          card_id = $2
-          substep = $3
-          param_string = $4 || ""
-
-          card = card_type.constantize.find(card_id)
-          params = {}
-          param_string.scan(/;([^;=]*)=([^;=]*)/) {|m| params[m[0].to_sym] = m[1]}
-          params[:parent_act] = action.parent
-          params[:this_act_id] = action.id
-          params[:state] = action.state
-          Game.current_act_parent = action.parent
-          action.destroy
-
-          if not card.respond_to? substep.to_sym
-            return "Unexpected substep #{substep} for #{card_type}"
-          end
-
-          card.method(substep.to_sym).call(params)
-        when /^player_([[:alpha:]_]+);player=([0-9]+)(;.*)?$/
-          player = Player.find($2)
-          task = $1
-          param_string = $3 || ""
-          Game.current_act_parent = action.parent
-          params = {:parent_act => action.parent, :this_act_id => action.id}
-          param_string.scan(/;([^;=]*)=([^;=]*)/) {|m| params[m[0].to_sym] = m[1]}
-          action.destroy
-
-          player.method(task.to_sym).call(params)
-        when /^end_game$/
-          action.destroy
-          end_game
-        end
-      end
-    end
-
-    # Force each player's cards to be renumbered
-    players.each do |ply|
-      [:deck, :hand, :discard].each {|loc| ply.renum(loc)}
-    end
-  end
-
   def check_game_end
     # Determine if the game should end. This is if either
-    # - the Province pile is empty
+    # - the Province or Colony pile is empty
     # - three other piles are empty
     due_to_end = false
     if self.state == "running"
@@ -485,10 +407,6 @@ class Game < ActiveRecord::Base
     if self.facts.include? :contraband
       self.facts[:contraband] = []
     end
-  end
-
-  def waiting_for?(action)
-    pending_actions.active.owned.pluck(:expected_action).any? { |exp| exp =~ Regexp.new("^" + action + "(;.*)?") }
   end
 
   def card_types
@@ -599,16 +517,13 @@ protected
     journals.create!(event: "Setup piles: #{sorted_piles.join(', ')}")
   end
 
-  def log_creation
-    histories.create!(:event => "Game #{name} created.",
-                     :css_class => "meta game_create")
-
+  def welcome_chat
     chats.create!(:non_ply_name => "Game", :turn => 0, :statement => "Welcome to '#{name}'!")
   end
 
   def age_oldest
     while Game.count > 5
-      oldest_finished = Game.where { (state == 'ended') & ((end_time == nil) | (end_time < Time.now - 3.days)) }.
+      oldest_finished = Game.where { end_time < Time.now - 3.days }.
                               order(:end_time, :id).first
       if oldest_finished
         oldest_finished.destroy

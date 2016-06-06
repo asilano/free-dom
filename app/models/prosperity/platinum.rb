@@ -3,6 +3,6 @@
 class Prosperity::Platinum < Card
   treasure :cash => 5
   costs 9
-  pile_size :unlimited
+  pile_size 12
   card_text "Treasure (cost: 9) - 5 cash"
 end

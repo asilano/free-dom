@@ -1,10 +1,7 @@
 class PlayerState
-  #belongs_to :player
-  #serialize :gained_last_turn, Array
 
-  #before_validation :init_fields, :on => :create
-
-  attr_accessor :outpost_queued, :outpost_prevent, :pirate_coins, :gained_last_turn, :bought_victory, :created_at, :updated_at, :played_treasure, :played_crossroads, :played_fools_gold
+  attr_accessor :outpost_queued, :outpost_prevent, :pirate_coins, :gained_last_turn,
+                :bought_victory, :played_treasure, :played_crossroads, :played_fools_gold
 
   def init_fields
     @gained_last_turn ||= []

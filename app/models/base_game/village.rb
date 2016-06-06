@@ -11,8 +11,6 @@ class BaseGame::Village < Card
 
     # Now create two new Actions
     player.add_actions(2)
-
-    "OK"
   end
 
 end

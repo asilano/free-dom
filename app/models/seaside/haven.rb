@@ -5,8 +5,6 @@ class Seaside::Haven < Card
   action :duration => true
   card_text "Action (Duration; cost: 2) - Draw 1 Card, +1 Action. Set aside a card from your hand face down. At the start of your next turn, put it into your hand."
 
-  #serialize :state
-
   def play(parent_act)
     super
 
