@@ -79,9 +79,9 @@ class Prosperity::Mint < Card
 
         ply.gain(parent_act, :pile => pile)
       end
-
-      return "OK"
     end
+
+    return "OK"
   end
 
   # Notice a buy action. If it's Mint itself, queue up an action to trash treasures
