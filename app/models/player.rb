@@ -16,7 +16,7 @@ class Player < ActiveRecord::Base
   accepts_nested_attributes_for :settings
 
   # Things that used to be database fields and relations
-  faux_field [:cards, Collections::CardsCollection.new], :cash, :vp_chips, [:state, PlayerState.new]
+  faux_field :cash, :vp_chips, [:state, PlayerState.new]
   faux_field :num_actions, :num_buys
   validates :user_id, :uniqueness => {:scope => 'game_id'}
   validates :seat, :uniqueness => {:scope => 'game_id', :allow_nil => true}
@@ -37,10 +37,13 @@ class Player < ActiveRecord::Base
     game.questions.select { |q| q.actor == self }
   end
 
+  def cards
+    game.cards.belonging_to_player(self)
+  end
+
   def start_game
     # To start the game, each player needs a deck of 7 copper and 3 estate,
     # 5 of which are in hand.
-    self.cards = Collections::CardsCollection.new
     card_order = ["BasicCards::Copper"] * 7 + ["BasicCards::Estate"] * 3
     card_order.shuffle!
 
@@ -48,14 +51,14 @@ class Player < ActiveRecord::Base
     deck_order = card_order[5,10]
 
     hand_order.each_with_index do |card_type, ix|
-      self.cards << to_class(card_type).new(game: game,
+      game.cards << to_class(card_type).new(game: game,
                                         player: self,
                                         location: "hand",
                                         position: ix)
     end
 
     deck_order.each_with_index do |card_type, ix|
-      self.cards << to_class(card_type).new(game: game,
+      game.cards << to_class(card_type).new(game: game,
                                         player: self,
                                         location: "deck",
                                         position: ix)
@@ -138,6 +141,7 @@ class Player < ActiveRecord::Base
   end
 
   def play_action(journal, actor, check: false)
+    Rails.logger.info("Processing play-action: #{journal.inspect}")
     match = /#{name} played (.*)/.match(journal.event)
     ok = actor == self && match
     if !ok || check
@@ -856,7 +860,7 @@ class Player < ActiveRecord::Base
 
     # Trip any cards that need to trigger before the gain to change the details of the gain
     # (as for, say, Nomad Camp)
-    card_types = game.cards.map(&:type).uniq.map(&:constantize)
+    card_types = game.cards.map(&:class).uniq
     gain_params = {:gainer => self,
                    :card => opts[:card], # Can be nil
                    :pile => opts[:pile], # Can be nil

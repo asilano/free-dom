@@ -3,12 +3,16 @@ class Pile
   include GamesHelper
 
   # Fields that used to be database attribs
-  attr_accessor :card_type, :position, :state, :game, :cards
+  attr_accessor :card_type, :position, :game
 
   def initialize(attribs={})
     super
     @cards = []
     @state ||= Hash.new(0)
+  end
+
+  def cards
+    game.cards.in_pile(self)
   end
 
   def populate(num_players)
@@ -20,7 +24,7 @@ class Pile
                      pile: self,
                      location: 'pile',
                      position: 0}
-      self.cards << card_class.new(card_params)
+      game.cards << card_class.new(card_params)
     end
   end
 
@@ -54,7 +58,7 @@ class Pile
   end
 
   def state=(value)
-    self[:state] = value.reject{|k,v| k == :contraband}
+    @state = value.reject{|k,v| k == :contraband}
   end
 
 end

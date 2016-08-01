@@ -13,26 +13,18 @@ Given /I am a player in a (?:([2-6])-player )?standard game(?: with (.*))?/ do |
   @test_game.andand.destroy
   player_count ||= 3
 
-  @test_game = FactoryGirl.create(:fixed_game, :max_players => player_count.to_i)
+  @test_game = FactoryGirl.build(:fixed_game, :max_players => player_count.to_i)
 
   if card_list
     reqd_cards = card_list.split(/,\s*/)
     assert_operator reqd_cards.length, :<=, 10
 
-    # Kingdom cards start right after Curse
-    pos = @test_game.piles.find_index {|p| p.card_type == 'BasicCards::Curse'} + 1
-    cards_needed = reqd_cards + @test_game.piles[pos..-1].map(&:card_type).map(&:readable_name)
-    cards_needed.uniq!
-
-    @test_game.piles[pos..-1].each_with_index do |pile, ix|
-      pile.update_attribute("card_type", ix)
-    end
-
-    cards_needed.take(10).each do |card|
-      @test_game.piles[pos].update_attribute("card_type", CARD_TYPES[card].name)
-      pos += 1
+    reqd_cards.each.with_index do |type, ix|
+      @test_game.send("pile_#{ix+1}=", CARD_TYPES[type].name)
     end
   end
+
+  @test_game.save!
 
   names = %w<Alan Bob Charlie Dave Ethelred Fred>[0, player_count.to_i]
   names.each do |n|
@@ -43,7 +35,8 @@ Given /I am a player in a (?:([2-6])-player )?standard game(?: with (.*))?/ do |
   @test_players = Hash[arr]
   assert_not_nil @test_players["Alan"]
 
-  @test_game.reload.start_game
+  @test_game.add_journal(event: "Alan started the game", player: @test_players["Alan"])
+  @test_game.reload.process_journals
 
   Game.current = @test_game
 

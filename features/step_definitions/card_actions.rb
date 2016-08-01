@@ -1,7 +1,8 @@
 When(/^(\w*?) plays? #{SingleCard}$/) do |name, kind|
   name = 'Alan' if name == 'I'
   assert_contains @hand_contents[name], kind
-  card = @test_players[name].cards.hand.of_type(CARD_TYPES[kind].name).first
+  player = @test_players[name]
+  card = player.cards.hand.of_type(CARD_TYPES[kind].name).first
   assert_not_nil card
 
   @hand_contents[name].delete_first(kind)
@@ -10,11 +11,11 @@ When(/^(\w*?) plays? #{SingleCard}$/) do |name, kind|
   else
     @play_contents[name] << kind
   end
-  parent_act = @test_players[name].pending_actions.active.first
-  assert_match /play_action/, parent_act.expected_action
+  assert(player.questions.any? { |q| q.text == 'Play an action' })
 
-  card_ix = @test_players[name].cards.hand.index {|c| c.type == card.type}
-  @test_players[name].play_action(:card_index => card_ix, :pa_id => parent_act.id)
+  card_ix = player.cards.hand.index { |c| c.class == card.class }
+  @test_game.add_journal(event: "#{name} played #{kind} (#{card_ix}).", player: player)
+  @test_game.process_journals
 
   # Playing the card is likely to do something. Skip checking this step
   @skip_card_checking = 1 if @skip_card_checking == 0

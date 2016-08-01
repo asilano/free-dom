@@ -18,7 +18,7 @@ class Game < ActiveRecord::Base
   has_many :chats, -> { order :created_at }, :dependent => :delete_all
 
   # Things that used to be database fields and relations
-  faux_field [:questions, []], [:state, {}], [:facts, {}], :turn_count, [:piles, []], [:cards, []],
+  faux_field [:questions, []], [:state, {}], [:facts, {}], :turn_count, [:piles, []], [:cards, Collections::CardsCollection.new],
               :current_turn_player, :turn_phase, :treasure_step, :last_blocked_journal
 
   attr_accessor :random_select, :specify_distr, :plat_colony
@@ -75,6 +75,8 @@ class Game < ActiveRecord::Base
 
       @current_journal = @journal_arr.shift
       @current_journal.histories = []
+
+      Rails.logger.info("Processing journal: #{@current_journal.inspect}")
       callcc do |cont|
         @cont = cont
         apply_to, index = questions.each_with_index.detect do |q, ix|
@@ -540,21 +542,29 @@ private
     end
 
     case journal.event
-    when /^Hack: (.*) (hand) \+ ([a-zA-Z]*::[a-zA-Z]*)/
+    when /^Hack: (.*) (hand) (\+|=) ((?:[a-zA-Z]*::[a-zA-Z]*(?:,\ )?)*)/
       player = players.joins { user }.where { user.name == $1 }.first
       location = $2
-      card_class = nil
-      begin
-        card_class = $3.constantize
-      rescue
-        journal.errors.add(:event, "Hack mentions bad card type")
+
+      if $3 == '='
+        # Setting hand completely. So throw away existing cards
+        cards.delete_if { |card| card.player == player && card.location == location }
       end
 
-      player.cards << card_class.new(game: self,
+      card_list = $4.split(/,\s*/)
+      card_list.each do |card|
+        card_class = nil
+        begin
+          card_class = card.constantize
+        rescue
+          journal.errors.add(:event, "Hack mentions bad card type #{card}")
+        end
+
+        self.cards << card_class.new(game: self,
                                       player: player,
                                       location: location,
                                       position: player.cards.hand.length)
-
+      end
     else
       journal.errors.add(:event, "Hack of unknown type")
     end

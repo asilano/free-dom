@@ -24,8 +24,31 @@ module Collections
       CardsCollection.new(select { |c| locs.include? c.location })
     end
 
+    def in_pile(pile)
+      CardsCollection.new(select { |c| c.pile == pile })
+    end
+
+    def belonging_to_player(player)
+      CardsCollection.new(select { |c| c.player && c.player.id == player.id })
+    end
+
+    def not
+      Negation.new(self)
+    end
+
     def +(arr)
       CardsCollection.new(select{|_|true} + arr)
+    end
+  end
+
+  class Negation
+    def initialize(obj)
+      @obj = obj
+    end
+
+    def method_missing(name, *args, &block)
+      positive = @obj.send(name, *args, &block)
+      @obj - positive
     end
   end
 end

@@ -1,7 +1,7 @@
 Given(/it is (.*?)(?:'s)? (.*) phase/) do |name, phase|
   name = 'Alan' if name == 'my'
   player = @test_players[name]
-  @test_game.pending_actions.destroy_all
+  @test_game.questions = []
   player.start_turn
 
   case phase

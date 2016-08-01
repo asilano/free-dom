@@ -5,7 +5,13 @@
 Then /there should be (\d+) (.*) cards?( not)? in (.*)/ do |num, kind, negate, locations|
   locs = locations.split(/,\s+/)
   locs.map!{|l| l.chomp('s')}
-  result = @test_game.cards.where(["type = :type and location #{'not' if negate} in (:loc)", {:type => CARD_TYPES[kind].name, :loc => locs}]).count
+  cards = @test_game.cards.of_type(CARD_TYPES[kind].name)
+  if negate
+    cards = cards.not.in_location(*locs)
+  else
+    cards = cards.in_location(*locs)
+  end
+  result = cards.count
   assert_equal num.to_i, result
 end
 

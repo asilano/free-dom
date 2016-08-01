@@ -1,16 +1,16 @@
 Then /(.*) should have (\d+) actions? available/ do |name, actions|
   name = "Alan" if name == "I"
-  assert_equal actions.to_i, @test_players[name].reload.actions
+  assert_equal actions.to_i, @test_players[name].num_actions
 end
 
 Then /(.*) should have (\d+) buys? available/ do |name, buys|
   name = "Alan" if name == "I"
-  assert_equal buys.to_i, @test_players[name].reload.buys
+  assert_equal buys.to_i, @test_players[name].num_buys
 end
 
 Then /(.*) should have (\d+) cash/ do |name, cash|
   name = "Alan" if name == "I"
-  assert_equal cash.to_i, @test_players[name].reload.cash
+  assert_equal cash.to_i, @test_players[name].cash
 end
 
 Then /(.*) should have (\d+) cards in hand/ do |name, cards|

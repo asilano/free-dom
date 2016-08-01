@@ -136,6 +136,7 @@ GEM
       addressable (~> 2.3)
     mail (2.6.3)
       mime-types (>= 1.16, < 3)
+    method_source (0.8.2)
     mime-types (2.6.2)
     mini_portile (0.6.2)
     minitest (4.7.5)
@@ -150,6 +151,10 @@ GEM
     pg (0.18.3-x86-mingw32)
     polyamorous (1.1.0)
       activerecord (>= 3.0)
+    pry (0.10.4)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+      slop (~> 3.4)
     quiet_assets (1.1.0)
       railties (>= 3.1, < 5.0)
     rack (1.5.5)
@@ -202,6 +207,7 @@ GEM
       activesupport (>= 3.1, < 5.0)
       railties (>= 3.1, < 5.0)
       slim (~> 3.0)
+    slop (3.6.0)
     sprockets (2.12.4)
       hike (~> 1.2)
       multi_json (~> 1.0)
@@ -266,6 +272,7 @@ DEPENDENCIES
   minitest
   newrelic_rpm
   pg
+  pry
   quiet_assets
   rails (~> 4.0.0)
   rails_12factor

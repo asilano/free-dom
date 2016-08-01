@@ -2,20 +2,18 @@
 # Checks for Play Action, Play Treasure and Buy phases
 Then(/it should be (.*?)(?:'s)? (.*) phase/) do |name, phase|
   name = 'Alan' if name == 'my'
-  exp_action = case phase
+  exp_text = case phase
     when "Play Action"
-      /play_action/
+      'Play an action'
     when "Play Treasure"
       /(play_treasure|player_play_treasures;player=#{@test_players[name].id})/
     when "Buy"
       /buy/
     end
 
-  assert_not_nil exp_action, "Unknown phase '#{phase}'"
+  assert_not_nil exp_text, "Unknown phase '#{phase}'"
 
-  actions = @test_game.pending_actions(true).active.unowned.map(&:expected_action) + @test_players[name].pending_actions(true).active.map(&:expected_action)
-
-  assert_contains(actions, exp_action, "Actions didn't contain #{phase}")
+  assert_contains(@test_players[name].questions.map(&:text), exp_text, "Questions didn't contain #{exp_text}")
 end
 
 # Check for the readable text of a pending action

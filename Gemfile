@@ -18,6 +18,7 @@ group :development, :test do
   gem "quiet_assets"
   gem "better_errors", '~> 1.0'
   gem "binding_of_caller"
+  gem 'pry'
 
   gem 'thin'
 end

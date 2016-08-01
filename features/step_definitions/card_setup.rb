@@ -15,11 +15,11 @@ end
 Given(/^(\w*?)(?:'s)? hand contains #{CardList}(?: and )?#{NamedRandCards}?/) do |name, fixed_list, num_rand, rand_name|
   name = 'Alan' if name == 'my'
   player = @test_players[name]
-  player.cards.hand.destroy_all
 
   fixed_list ||= ""
   @hand_contents[name] = []
-  position = 0
+  hack_journal = "Hack: #{name} hand = "
+  hack_cards = []
   fixed_list.split(/,\s*/).each do |kind|
     num = 1
     card_name = kind
@@ -30,24 +30,25 @@ Given(/^(\w*?)(?:'s)? hand contains #{CardList}(?: and )?#{NamedRandCards}?/) do
 
     num.times do
       @hand_contents[name] << card_name
-      CARD_TYPES[card_name].create(:location => 'hand', :player => player, :game => player.game, :position => position)
-      position += 1
+      hack_cards << CARD_TYPES[card_name].name
     end
   end
 
   @named_cards[rand_name] = [] if rand_name
   num_rand.to_i.times do |i|
     type = CARD_TYPES.keys[rand(CARD_TYPES.length)]
-    # Watchtower in hand messes up any test that wants to gain a card;
+    # Watchtower in hand messes up any test that wants to gain a card
     redo if type == "Watchtower"
     redo if CARD_TYPES[type].is_treasure? && CARD_TYPES[type].is_special?
     @hand_contents[name] << type
     @named_cards[rand_name].andand << type
-    CARD_TYPES[type].create(:location => 'hand', :player => player, :game => player.game, :position => position)
-    position += 1
+    hack_cards << CARD_TYPES[type].name
   end
 
-  player.renum(:hand)
+  hack_journal << hack_cards.join(", ")
+  @test_game.add_journal(event: hack_journal)
+  @test_game.process_journals
+
 end
 
 # Matches:
