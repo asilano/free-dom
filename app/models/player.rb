@@ -141,7 +141,6 @@ class Player < ActiveRecord::Base
   end
 
   def play_action(journal, actor, check: false)
-    Rails.logger.info("Processing play-action: #{journal.inspect}")
     match = /#{name} played (.*)/.match(journal.event)
     ok = actor == self && match
     if !ok || check
@@ -184,6 +183,11 @@ class Player < ActiveRecord::Base
       raise
       journal.errors.add(:base, 'Card not updated to journal system')
     end
+
+    if num_actions == 0
+      game.treasure_step = true
+    end
+
     true
   end
 
@@ -416,22 +420,23 @@ class Player < ActiveRecord::Base
 
   # Called by the game when it has nothing left to ask about, to see if the player needs to act or buy
   def prompt_for_questions
+    Rails.logger.info("Prompting with #{num_actions} actions")
     if num_actions > 0
       # Ask the question - play action
       game.turn_phase = Game::TurnPhases::ACTION
-      game.ask_question(object: self, actor: self, method: :play_action, text: 'Play an action')
+      game.ask_question(object: self, actor: self, method: :play_action, text: 'Play an action.')
     elsif game.treasure_step && cards.hand.any?(&:is_treasure?)
       game.turn_phase = Game::TurnPhases::BUY
 
       # Ask the question - play treasures
-      game.ask_question(object: self, actor: self, method: :play_treasure, text: 'Play treasures')
+      game.ask_question(object: self, actor: self, method: :play_treasure, text: 'Play treasures.')
     elsif num_buys > 0
       # Just to be sure, force us out of treasure step
       game.turn_phase = Game::TurnPhases::BUY
       game.treasure_step = false
 
       # Ask the question - buy card
-      game.ask_question(object: self, actor: self, method: :buy, text: 'Buy')
+      game.ask_question(object: self, actor: self, method: :buy, text: 'Buy.')
     else
       # Next turn
       game.turn_phase = Game::TurnPhases::CLEAN_UP

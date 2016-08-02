@@ -4,11 +4,11 @@ Then(/it should be (.*?)(?:'s)? (.*) phase/) do |name, phase|
   name = 'Alan' if name == 'my'
   exp_text = case phase
     when "Play Action"
-      'Play an action'
+      'Play an action.'
     when "Play Treasure"
       /(play_treasure|player_play_treasures;player=#{@test_players[name].id})/
     when "Buy"
-      /buy/
+      'Buy.'
     end
 
   assert_not_nil exp_text, "Unknown phase '#{phase}'"
@@ -19,12 +19,12 @@ end
 # Check for the readable text of a pending action
 Then(/(.*) should (not )?need to (?!act)(.*)/) do |name, negate, action|
   name = "Alan" if name == "I"
-  actions = @test_players[name].pending_actions(true).active.map(&:text)
+  questions = @test_players[name].questions.map(&:text)
 
   if negate
-    assert_not_contains(actions, /^#{action}$/i)
+    assert_not_contains(questions, /^#{action}\.?$/i)
   else
-    assert_contains(actions, /^#{action}$/i)
+    assert_contains(questions, /^#{action}\.?$/i)
   end
 end
 
@@ -51,7 +51,7 @@ Then(/(.*) should (not )?be able to choose #{CardListNoRep} in (?:my|his) hand/)
   flunk "Too many controls in #{name}'s hand" unless controls.length == 1
 
   ctrl = controls[0]
-  acceptable = ctrl[:cards].map.with_index {|valid, ix| player.cards.hand[ix].readable_name if valid}.compact
+  acceptable = ctrl[:journals].map.with_index {|valid, ix| player.cards.hand[ix].readable_name if valid}.compact
 
   unless negate
     assert_subset kinds.split(/,\s*/), acceptable
@@ -166,7 +166,7 @@ Then(/(.*) should (not )?be able to choose the (.*) piles?$/) do |name, negate, 
   flunk "Unimplemented multi-pile controls in testbed" unless controls.length == 1
 
   ctrl = controls[0]
-  acceptable = ctrl[:piles].map.with_index {|valid, ix| @test_game.piles[ix].card_class.readable_name if valid}.compact
+  acceptable = ctrl[:journals].map.with_index {|valid, ix| @test_game.piles[ix].card_class.readable_name if valid}.compact
 
   unless negate
     assert_subset kinds.split(/,\s*/), acceptable

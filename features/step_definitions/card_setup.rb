@@ -311,7 +311,8 @@ end
 
 Given(/the (.*) piles? (?:is|are) empty/) do |kinds|
   kinds.split(/,\s*/).each do |kind|
-    @test_game.piles.where { card_type == CARD_TYPES[kind].name}.first.cards.delete_all
+    @test_game.add_journal(event: 'Hack: Prosperity::Talisman in pile remove all')
+    @test_game.process_journals
   end
 end
 

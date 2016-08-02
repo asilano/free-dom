@@ -542,7 +542,7 @@ private
     end
 
     case journal.event
-    when /^Hack: (.*) (hand) (\+|=) ((?:[a-zA-Z]*::[a-zA-Z]*(?:,\ )?)*)/
+    when /^Hack: (.*) (hand) (\+|=) ((?:[a-zA-Z]*::[a-zA-Z]*(?:,\ )?)*)$/
       player = players.joins { user }.where { user.name == $1 }.first
       location = $2
 
@@ -564,6 +564,19 @@ private
                                       player: player,
                                       location: location,
                                       position: player.cards.hand.length)
+      end
+    when /^Hack: ([a-zA-Z]*::[a-zA-Z]*) in (.*) remove (\d*|all)$/
+      card_type = $1
+      location = $2
+      quantity = $3
+      if quantity == 'all'
+        cards.delete_if { |card| card.class.to_s == card_type && card.location == location }
+      else
+        $3.to_i.times do |_|
+          ix = cards.index { |card| card.class.to_s == card_type && card.location == location }
+          break unless ix
+          cards.delete_at(ix)
+        end
       end
     else
       journal.errors.add(:event, "Hack of unknown type")

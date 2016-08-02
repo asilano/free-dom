@@ -16,14 +16,14 @@ When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in (?:his|my) hand$/) do |name,
   flunk "Unimplemented multi-hand controls in testbed" unless controls.length == 1
 
   ctrl = controls[0]
-  params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
-  params[:pa_id] = ctrl[:pa_id]
+  #params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
+  #params[:pa_id] = ctrl[:pa_id]
 
-  key = if ctrl[:type] == :button
-    :card_index
-  else
-    ctrl[:name].to_sym
-  end
+  #key = if ctrl[:type] == :button
+  #  :card_index
+  #else
+  #  ctrl[:name].to_sym
+  #end
 
   if Array(ctrl[:nil_action]).include? choices
     params[:nil_action] = choices
@@ -33,8 +33,9 @@ When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in (?:his|my) hand$/) do |name,
 
     kinds = choices.split(/,\s*/)
     if kinds.length == 1 && kinds[0] !~ /.* ?x ?\d*/
-      params[key] = possibilities.index(kinds[0])
-      assert_not_nil params[key], "Couldn't find #{kinds[0]} in hand (#{possibilities.inspect})"
+      ix = possibilities.index(kinds[0])
+      assert_not_nil ix, "Couldn't find #{kinds[0]} in hand (#{possibilities.inspect})"
+      @test_game.add_journal(event: ctrl[:journals][ix], player: player)
     else
       params[key] = []
       kinds.each do |kind|
@@ -55,7 +56,7 @@ When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in (?:his|my) hand$/) do |name,
     end
   end
 
-  player.resolve(params)
+  @test_game.process_journals
 
   # Probably chosen the card for a reason
   @skip_card_checking = 1 if @skip_card_checking == 0
@@ -335,8 +336,7 @@ When(/^(\w*?) chooses? (?:the )?(.*?) (?:for )?piles?$/) do |name, choice|
   flunk "Unimplemented multi-piles controls in testbed" unless controls.length == 1
 
   ctrl = controls[0]
-  params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
-  params[:pa_id] = ctrl[:pa_id]
+  params = {}
 
   if Array(ctrl[:nil_action]).include? choice
     params[:nil_action] = choice
@@ -344,8 +344,9 @@ When(/^(\w*?) chooses? (?:the )?(.*?) (?:for )?piles?$/) do |name, choice|
     possibilities = @test_game.piles.map{|p| p.card_class.readable_name}
     kinds = choice.split(/,\s*/)
     if kinds.length == 1
-      if possibilities.index(kinds[0])
-        params[:pile_index] = possibilities.index(kinds[0])
+      ix = possibilities.index(kinds[0])
+      if ix
+        @test_game.add_journal(event: ctrl[:journals][ix], player: player)
       else
         flunk "Chose a pile that doesn't exist"
       end
@@ -354,7 +355,7 @@ When(/^(\w*?) chooses? (?:the )?(.*?) (?:for )?piles?$/) do |name, choice|
     end
   end
 
-  player.resolve(params)
+  @test_game.process_journals
 
   # Probably chosen the card for a reason
   @skip_card_checking = 1 if @skip_card_checking == 0

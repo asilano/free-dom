@@ -11,7 +11,7 @@ When(/^(\w*?) plays? #{SingleCard}$/) do |name, kind|
   else
     @play_contents[name] << kind
   end
-  assert(player.questions.any? { |q| q.text == 'Play an action' })
+  assert(player.questions.any? { |q| q.text == 'Play an action.' })
 
   card_ix = player.cards.hand.index { |c| c.class == card.class }
   @test_game.add_journal(event: "#{name} played #{kind} (#{card_ix}).", player: player)

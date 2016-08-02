@@ -89,14 +89,14 @@ h1 Buy Piles
           - when :button
             - spacer_count += 1
             - nil_act = control[:nil_action]
-            = button_tag(nil_act[:text],
+            = button_tag(nil_act.andand[:text],
                           type: 'submit',
                           name: "journal[event]",
-                          value: nil_act[:journal],
+                          value: nil_act.andand[:journal],
                           form: "form_#{control.object_id}",
                           class: (nil_act ? '' : ' placeholder') + (control[:css_class] || ''),
-                          data: {disable_with: nil_act[:text],
-                                  confirm: nil_act[:confirm] ? 'Are you sure?' : nil},
+                          data: {disable_with: nil_act.andand[:text],
+                                  confirm: nil_act.andand[:confirm] ? 'Are you sure?' : nil},
                           disabled: !nil_act)
     - spacer_count.times do |_|
       .button-spacer

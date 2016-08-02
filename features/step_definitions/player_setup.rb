@@ -1,4 +1,4 @@
-Given /I am a player in a (?:([2-6])-player )?standard game(?: with (.*))?/ do |player_count, card_list|
+Given(/I am a player in a (?:([2-6])-player )?(standard|Platinum-Colony) game(?: with (.*))?/) do |player_count, type, card_list|
   unless @test_players
     [
       {name: 'Alan', password: 'a', password_confirmation: 'a', email: 'a@example.com'},
@@ -22,6 +22,10 @@ Given /I am a player in a (?:([2-6])-player )?standard game(?: with (.*))?/ do |
     reqd_cards.each.with_index do |type, ix|
       @test_game.send("pile_#{ix+1}=", CARD_TYPES[type].name)
     end
+  end
+
+  if type == 'Platinum-Colony'
+    @test_game.plat_colony = 'yes'
   end
 
   @test_game.save!
