@@ -256,7 +256,6 @@ class Card
   # Raise if the card doesn't have a player
   def discard
     raise "Card not owned" unless player
-    player.cards.in_discard << self
     self.location = 'discard'
     self.position = -1
   end

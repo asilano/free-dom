@@ -766,7 +766,6 @@ class Player < ActiveRecord::Base
     # at the end of the deck array.
     renum(:deck)
     cards.in_discard.shuffle.each do |card|
-      cards.deck << card
       card.location = "deck"
       card.position = cards.deck.count
     end

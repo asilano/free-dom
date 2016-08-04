@@ -66,7 +66,6 @@ Given(/^(\w*?)(?:'s)?? deck contains (?:(#{NamedRandCardsNoMatch}|#{CardListNoCa
   name = 'Alan' if name == 'my'
   player = @test_players[name]
 
-  player.cards.deck.destroy_all
   @deck_contents[name] = []
   rand_top = rand_mid = fixed_bottom = false
 
@@ -80,7 +79,8 @@ Given(/^(\w*?)(?:'s)?? deck contains (?:(#{NamedRandCardsNoMatch}|#{CardListNoCa
   num_rand_bottom = $1
   name_rand_bottom = $2
 
-  position = 0
+  hack_journal = "Hack: #{name} deck = "
+  hack_cards = []
 
   @named_cards[name_rand_top] = [] if name_rand_top
   if rand_top
@@ -88,11 +88,7 @@ Given(/^(\w*?)(?:'s)?? deck contains (?:(#{NamedRandCardsNoMatch}|#{CardListNoCa
       type = CARD_TYPES.keys[rand(CARD_TYPES.length)]
       @deck_contents[name] << type
       @named_cards[name_rand_top].andand << type
-      CARD_TYPES[type].create(:location => 'deck',
-                              :player => player,
-                              :position => position,
-                              :game => player.game)
-      position += 1
+      hack_cards << CARD_TYPES[type].name
     end
   elsif top
     top.split(/,\s*/).each do |type|
@@ -105,11 +101,7 @@ Given(/^(\w*?)(?:'s)?? deck contains (?:(#{NamedRandCardsNoMatch}|#{CardListNoCa
 
       num.times do
         @deck_contents[name] << card_name
-        CARD_TYPES[card_name].create(:location => 'deck',
-                                :player => player,
-                                :position => position,
-                                :game => player.game)
-        position += 1
+        hack_cards << CARD_TYPES[card_name].name
       end
     end
   end
@@ -120,11 +112,7 @@ Given(/^(\w*?)(?:'s)?? deck contains (?:(#{NamedRandCardsNoMatch}|#{CardListNoCa
       type = CARD_TYPES.keys[rand(CARD_TYPES.length)]
       @deck_contents[name] << type
       @named_cards[name_rand_mid].andand << type
-      CARD_TYPES[type].create(:location => 'deck',
-                              :player => player,
-                              :position => position,
-                              :game => player.game)
-      position += 1
+      hack_cards << CARD_TYPES[type].name
     end
   elsif middle
     middle.split(/,\s*/).each do |type|
@@ -137,11 +125,7 @@ Given(/^(\w*?)(?:'s)?? deck contains (?:(#{NamedRandCardsNoMatch}|#{CardListNoCa
 
       num.times do
         @deck_contents[name] << card_name
-        CARD_TYPES[card_name].create(:location => 'deck',
-                                :player => player,
-                                :position => position,
-                                :game => player.game)
-        position += 1
+        hack_cards << CARD_TYPES[card_name].name
       end
     end
   end
@@ -152,11 +136,7 @@ Given(/^(\w*?)(?:'s)?? deck contains (?:(#{NamedRandCardsNoMatch}|#{CardListNoCa
       type = CARD_TYPES.keys[rand(CARD_TYPES.length)]
       @deck_contents[name] << type
       @named_cards[name_rand_bottom].andand << type
-      CARD_TYPES[type].create(:location => 'deck',
-                              :player => player,
-                              :position => position,
-                              :game => player.game)
-      position += 1
+      hack_cards << CARD_TYPES[type].name
     end
   elsif bottom
     bottom_types = bottom.split(/,\s*/).each do |type|
@@ -169,16 +149,14 @@ Given(/^(\w*?)(?:'s)?? deck contains (?:(#{NamedRandCardsNoMatch}|#{CardListNoCa
 
       num.times do
         @deck_contents[name] << card_name
-        CARD_TYPES[card_name].create(:location => 'deck',
-                                :player => player,
-                                :position => position,
-                                :game => player.game)
-        position += 1
+        hack_cards << CARD_TYPES[card_name].name
       end
     end
   end
 
-  player.renum(:deck)
+  hack_journal << hack_cards.join(", ")
+  @test_game.add_journal(event: hack_journal)
+  @test_game.process_journals
 end
 
 # Matches:
@@ -186,8 +164,9 @@ end
 #   Bob has nothing in play
 Given /^(\w*) ha(?:ve|s) nothing in play/ do |name|
   name = 'Alan' if name == 'I'
-  @test_players[name].cards.in_play.destroy_all
   @play_contents[name] = []
+  @test_game.add_journal(event: "Hack: #{name} play =")
+  @test_game.process_journals
 end
 
 # Matches:
@@ -232,8 +211,9 @@ end
 #   Bob has nothing in his discard
 Given /^(\w*) ha(?:ve|s) nothing in (?:my |his )?discard/ do |name|
   name = "Alan" if name == "I"
-  @test_players[name].cards.in_discard.destroy_all
   @discard_contents[name] = []
+  @test_game.add_journal(event: "Hack: #{name} discard =")
+  @test_game.process_journals
 end
 
 # Matches:
@@ -244,7 +224,10 @@ end
 Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? in (?:my |his )?discard/) do |name, fixed_list, num_rand, rand_name|
   name = 'Alan' if name == 'I'
   player = @test_players[name]
-  player.cards.in_discard.destroy_all
+
+
+  hack_journal = "Hack: #{name} discard = "
+  hack_cards = []
 
   fixed_list ||= ""
   fixed_list.split(/,\s*/).each do |kind|
@@ -257,7 +240,7 @@ Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? in (?:my |his )
 
     num.times do
       @discard_contents[name] << card_name
-      CARD_TYPES[card_name].create(:location => 'discard', :player => player, :game => player.game)
+      hack_cards << CARD_TYPES[card_name].name
     end
   end
 
@@ -266,10 +249,12 @@ Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? in (?:my |his )
     type = CARD_TYPES.keys[rand(CARD_TYPES.length)]
     @discard_contents[name] << type
     @named_cards[rand_name].andand << type
-    CARD_TYPES[type].create(:location => 'discard', :player => player, :game => player.game)
+    hack_cars << CARD_TYPES[type].name
   end
 
-  player.renum(:discard)
+  hack_journal << hack_cards.join(", ")
+  @test_game.add_journal(event: hack_journal)
+  @test_game.process_journals
 end
 
 # Matches:

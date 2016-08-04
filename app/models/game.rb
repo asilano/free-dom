@@ -542,7 +542,7 @@ private
     end
 
     case journal.event
-    when /^Hack: (.*) (hand) (\+|=) ((?:[a-zA-Z]*::[a-zA-Z]*(?:,\ )?)*)$/
+    when /^Hack: (.*) (hand|deck|play|discard) (\+|=) *((?:[a-zA-Z]*::[a-zA-Z]*(?:,\ )?)*)$/
       player = players.joins { user }.where { user.name == $1 }.first
       location = $2
 

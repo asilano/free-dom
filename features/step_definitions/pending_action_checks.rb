@@ -6,7 +6,7 @@ Then(/it should be (.*?)(?:'s)? (.*) phase/) do |name, phase|
     when "Play Action"
       'Play an action.'
     when "Play Treasure"
-      /(play_treasure|player_play_treasures;player=#{@test_players[name].id})/
+      'Play treasures.'
     when "Buy"
       'Buy.'
     end
