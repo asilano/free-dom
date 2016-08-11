@@ -141,8 +141,25 @@ module CardDecorators
       end
     end
 
+    def attack
+      # Attack each (other) player in turn
+      player.other_players.each do |victim|
+        if victim.cards.enduring.of_type('Seaside::Lighthouse').present?
+          # Victim has a Lighthouse in play
+          game.add_history(:event => "Placeholder: #{victim.name} has a Lighthouse in play, negating the attack.",
+                            :css_class => "player#{victim.seat} play_reaction")
+        elsif victim.settings.automoat && victim.cards.hand.of_type('BaseGame::Moat').present?
+          # Victim is holding a Moat and has Automoat on
+          game.add_history(event: "Placeholder: #{victim.name} reacted with a Moat, negating the attack.",
+                            :css_class => "player#{victim.seat} play_reaction")
+        else
+          attackeffect(target: victim)
+        end
+      end
+    end
+
     # Queue up a single action to be later exploded into everything needed for the attack
-    def attack(parent_act, params = {})
+    def old_attack(parent_act, params = {})
       action = "resolve_#{self.class}#{id}_startattack"
       action += ";" + params.map {|k,v| "#{k}=#{v}"}.join(';') unless params.empty?
       parent_act.queue(:expected_action => action,
@@ -152,7 +169,7 @@ module CardDecorators
     end
 
     # Set up the "Play" stuff relating to the attack, including PendingActions
-    def startattack(params)
+    def old_startattack(params)
       # Find the parent action, and the attacker
       parent_act = params.delete :parent_act
       pre_attack = params.delete :pre_attack
@@ -205,7 +222,7 @@ module CardDecorators
     # This is the action resolution of the placeholder created for an attack with a pre-attack action
     # We need to explode it here into actions for each individual attackee, taking account of any state
     # stored on it.
-    def doattacks(params)
+    def old_doattacks(params)
       parent_act = params.delete :parent_act
       state = params.delete :state
       params.delete :this_act_id
@@ -217,7 +234,7 @@ module CardDecorators
       add_attack_acts(params, param_string, parent_act, nil, state, :attacks)
     end
 
-    def add_attack_acts(params, param_string, parent_act, attack_act, attack_state, *steps_to_add)
+    def old_add_attack_acts(params, param_string, parent_act, attack_act, attack_state, *steps_to_add)
       add_attack = steps_to_add.include? :attacks
       add_react = steps_to_add.include? :reactions
 

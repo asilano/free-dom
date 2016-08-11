@@ -420,7 +420,6 @@ class Player < ActiveRecord::Base
 
   # Called by the game when it has nothing left to ask about, to see if the player needs to act or buy
   def prompt_for_questions
-    Rails.logger.info("Prompting with #{num_actions} actions")
     if num_actions > 0
       # Ask the question - play action
       game.turn_phase = Game::TurnPhases::ACTION

@@ -35,7 +35,7 @@ class Journal < ActiveRecord::Base
           field = field.join(', ')
         end
 
-        field
+        field || "{{#{$1}}}"
       end
     end
 

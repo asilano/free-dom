@@ -56,8 +56,9 @@ end
 #   Bob's deck is empty
 Given(/^(\w*?)(?:'s)? deck is empty/) do |name|
   name = 'Alan' if name == 'my'
-  @test_players[name].cards.deck.destroy_all
   @deck_contents[name] = []
+  @test_game.add_journal(event: "Hack: #{name} deck =")
+  @test_game.process_journals
 end
 
 # Matches "my deck contains <top> then <middle> then <bottom>". Either of the middle and bottom sections may be missing
@@ -225,7 +226,6 @@ Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? in (?:my |his )
   name = 'Alan' if name == 'I'
   player = @test_players[name]
 
-
   hack_journal = "Hack: #{name} discard = "
   hack_cards = []
 
@@ -249,7 +249,7 @@ Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? in (?:my |his )
     type = CARD_TYPES.keys[rand(CARD_TYPES.length)]
     @discard_contents[name] << type
     @named_cards[rand_name].andand << type
-    hack_cars << CARD_TYPES[type].name
+    hack_cards << CARD_TYPES[type].name
   end
 
   hack_journal << hack_cards.join(", ")
@@ -265,7 +265,9 @@ end
 Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? as (?:a )?durations?/) do |name, fixed_list, num_rand, rand_name|
   name = 'Alan' if name == 'I'
   player = @test_players[name]
-  player.cards.enduring.destroy_all
+
+  hack_journal = "Hack: #{name} enduring = "
+  hack_cards = []
 
   fixed_list ||= ""
   fixed_list.split(/,\s*/).each do |kind|
@@ -278,7 +280,7 @@ Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? as (?:a )?durat
 
     num.times do
       @enduring_contents[name] << card_name
-      CARD_TYPES[card_name].create(:location => 'enduring', :player => player, :game => player.game)
+      hack_cards << CARD_TYPES[card_name].name
     end
   end
 
@@ -288,10 +290,12 @@ Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? as (?:a )?durat
     redo unless CARD_TYPES[type].is_duration?
     @enduring_contents[name] << type
     @named_cards[rand_name].andand << type
-    CARD_TYPES[type].create(:location => 'enduring', :player => player, :game => player.game)
+    hack_cards << CARD_TYPES[type].name
   end
 
-  player.renum(:enduring)
+  hack_journal << hack_cards.join(", ")
+  @test_game.add_journal(event: hack_journal)
+  @test_game.process_journals
 end
 
 Given(/the (.*) piles? (?:is|are) empty/) do |kinds|

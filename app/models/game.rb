@@ -25,6 +25,7 @@ class Game < ActiveRecord::Base
   attr_accessor *(Card.expansions.map {|set| "num_#{set.name.underscore}_cards".to_sym})
   attr_accessor *(Card.expansions.map {|set| "#{set.name.underscore}_present".to_sym})
   attr_accessor(*(1..10).map{|n| "pile_#{n}".to_sym})
+  attr_reader :current_journal
 
   validates :name, :presence => true
   validates :max_players, :presence => true, :numericality => true, :inclusion => { :in => 2..6, :message => 'must be between 2 and 6 inclusive' }
@@ -542,12 +543,12 @@ private
     end
 
     case journal.event
-    when /^Hack: (.*) (hand|deck|play|discard) (\+|=) *((?:[a-zA-Z]*::[a-zA-Z]*(?:,\ )?)*)$/
+    when /^Hack: (.*) (hand|deck|play|discard|enduring) (\+|=) *((?:[a-zA-Z]*::[a-zA-Z]*(?:,\ )?)*)$/
       player = players.joins { user }.where { user.name == $1 }.first
       location = $2
 
       if $3 == '='
-        # Setting hand completely. So throw away existing cards
+        # Setting location completely. So throw away existing cards
         cards.delete_if { |card| card.player == player && card.location == location }
       end
 
@@ -563,7 +564,7 @@ private
         self.cards << card_class.new(game: self,
                                       player: player,
                                       location: location,
-                                      position: player.cards.hand.length)
+                                      position: player.cards.in_location(location).length)
       end
     when /^Hack: ([a-zA-Z]*::[a-zA-Z]*) in (.*) remove (\d*|all)$/
       card_type = $1

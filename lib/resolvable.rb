@@ -8,6 +8,7 @@ module Resolvable
     if m && self.class.resolutions.present?
       name = m[1]
       resolution = self.class.resolutions.detect { |r| r.name == name.to_sym }
+      Rails.logger.info("args: #{args}")
       return resolution.resolve(self, *args) if resolution
     end
 
@@ -108,7 +109,7 @@ class Resolution
     self
   end
 
-  def resolve(card, actor, journal)
+  def resolve(card, journal, actor, check: false)
     # Give card access to the necessary resolve arguments
     card.instance_variable_set(:@res_actor, actor)
     card.instance_variable_set(:@res_journal, journal)
@@ -121,8 +122,12 @@ class Resolution
 
     # Run the special Journal Match validation, and deny ownership if it fails
     if !@journal_valdn.validate(card, journal)
-      @journal.errors.add(:base, :no_question)
+      journal.errors.add(:base, :no_question)
       return false
+    end
+
+    if check
+      return true
     end
 
     # Run the validations
@@ -164,6 +169,8 @@ class Resolution
     end
 
     def validate(card, journal)
+      Rails.logger.info("Expecting: #{@template}; got: #{journal.event}")
+      Rails.logger.info("Journal: #{journal.inspect}")
       journal =~ @template
     end
   end

@@ -31,7 +31,7 @@ class BaseGame::Mine < Card
     end
 
     if journal
-      resolve_trash(player, journal)
+      resolve_trash(journal, player)
     end
   end
 
@@ -78,7 +78,7 @@ class BaseGame::Mine < Card
                                                         })
 
     take_journal.params = {trashed_cost: trashed_cost}
-    resolve_take(actor, take_journal)
+    resolve_take(take_journal, actor)
   end
 
   resolves(:take).using(TakeEventTempl).

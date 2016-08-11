@@ -40,7 +40,7 @@ class Pile
   end
 
   def empty?
-    cards(true).count == 0
+    cards.count == 0
   end
 
   def card_class
