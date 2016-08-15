@@ -14,11 +14,11 @@ Feature: Cellar
       And I have <discardsize> cards in discard
       And it is my Play Action phase
     When I play Cellar
-    Then I should need to Discard any number of cards, with Cellar
+    Then I should need to Discard any number of cards with Cellar
     When I choose <choice> in my hand
-      Then I should have discarded <choice>
-    When the game checks actions
-      Then I should have drawn <drawnsize> cards
+      Then the following 2 steps should happen at once
+        Then I should have discarded <choice>
+        And I should have drawn <drawnsize> cards
       And it should be my Play Action phase
       And I should have 1 action available
 

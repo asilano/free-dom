@@ -578,14 +578,10 @@ class Player < ActiveRecord::Base
       shuffle_discard_under_deck(:log => shuffle_point == 0)
     end
 
+    deck_cards = cards.deck
     (0..[num, cards.deck.size].min - 1).each do |n|
-      card = cards.deck.shift
-      if cards.hand.empty?
-        card.position = 0
-      else
-        card.position = cards.hand[-1].position + 1
-      end
-      cards.hand << card
+      card = deck_cards[n]
+      card.position = cards.hand.length
       card.location = "hand"
       cards_drawn << card
     end

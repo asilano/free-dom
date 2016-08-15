@@ -2,12 +2,12 @@ module Collections
   class CardsCollection < Array
     %w<deck hand enduring pile>.each do |loc|
       define_method(loc) do
-        CardsCollection.new(select { |c| c.location == loc })
+        CardsCollection.new(select { |c| c.location == loc }.sort_by(&:position))
       end
     end
     %w<play discard trash>.each do |loc|
       define_method("in_#{loc}") do
-        CardsCollection.new(select { |c| c.location == loc })
+        CardsCollection.new(select { |c| c.location == loc }.sort_by(&:position))
       end
     end
     %i<revealed peeked>.each do |qual|
@@ -21,15 +21,15 @@ module Collections
     end
 
     def in_location(*locs)
-      CardsCollection.new(select { |c| locs.include? c.location })
+      CardsCollection.new(select { |c| locs.include? c.location }.sort_by{ |c| [c.location, c.position] })
     end
 
     def in_pile(pile)
-      CardsCollection.new(select { |c| c.pile == pile })
+      CardsCollection.new(select { |c| c.pile == pile }.sort_by(&:position))
     end
 
     def belonging_to_player(player)
-      CardsCollection.new(select { |c| c.player && c.player.id == player.id })
+      CardsCollection.new(select { |c| c.player && c.player.id == player.id }.sort_by{ |c| [c.location, c.position] })
     end
 
     def not

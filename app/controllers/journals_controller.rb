@@ -26,6 +26,11 @@ class JournalsController < ApplicationController
     event = params[:journal].andand[:event]
     if event.blank? && params[:journal].andand[:template]
       template = Journal::Template.new(params[:journal][:template])
+      params[:journal][:if_empty].each do |key, val|
+        if !params[:journal].has_key?(key)
+          params[:journal][key] = val
+        end
+      end
       event = template.fill(params[:journal])
     end
 

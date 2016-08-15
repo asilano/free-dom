@@ -4,68 +4,59 @@ class BaseGame::Cellar < Card
   card_text "Action (cost: 2) - +1 Action. Discard any number of cards. Draw 1 card " +
                        "per card discarded."
 
-  def play(parent_act)
+  DiscardEventTempl = Journal::Template.new("{{player}} discarded {{cards}} with #{readable_name}.")
+
+  def play
     super
 
-    # Grant the player another action, and take note of it
-    parent_act = player.add_actions(1, parent_act)
+    # Grant the player another action
+    player.add_actions(1)
 
-    # Now add an action to discard any number of cards
-    act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_discard",
-                                     :text => "Discard any number of cards, with Cellar")
-    act.player = player
-    act.game = game
-    act.save!
+    # And ask for a set of discards
+    journal = game.find_journal(DiscardEventTempl)
 
-    return "OK"
+    if journal.nil?
+      if player.cards.hand.empty?
+        # Holding no cards. Just log
+        game.add_history(:event => "#{player.name} discarded no cards to #{readable_name}.",
+                          :css_class => "player#{player.seat} card_discard")
+      else
+        # Ask the required question, and escape this processing stack
+        game.ask_question(object: self, actor: player, method: :resolve_discard, text: "Discard any number of cards with #{readable_name}.")
+        game.abort_journal
+      end
+    end
+
+    if journal
+      resolve_discard(journal, player)
+    end
   end
 
-  def determine_controls(player, controls, substep, params)
-    case substep
-    when "discard"
+  def determine_controls(actor, controls, question)
+    case question.method
+    when :resolve_discard
       controls[:hand] += [{:type => :checkboxes,
-                           :action => :resolve,
                            :name => "discard",
                            :choice_text => "Discard",
                            :button_text => "Discard selected",
-                           :params => {:card => "#{self.class}#{id}",
-                                       :substep => "discard"},
-                           :cards => [true] * player.cards.hand.size
+                           journal_template: DiscardEventTempl.fill(player: actor.name),
+                           journals: actor.cards.hand.each_with_index.map { |c, ix| {k: :cards, v: "#{c.readable_name} (#{ix})"} },
+                           if_empty: {cards: 'nothing'}
                           }]
     end
   end
 
-  resolves(:discard).validating_param_is_card_array(:discard, scope: :hand).with do
+  resolves(:discard).using(DiscardEventTempl).
+                      validating_param_is_card_array(:cards, scope: :hand, allow_blank_with: 'nothing').with do
     # Looks good.
-    if !params.include? :discard
-      # Nothing to do but create a log
-      game.histories.create!(:event => "#{actor.name} discarded no cards to Cellar.",
-                            :css_class => "player#{actor.seat} card_discard")
-    else
-      # Queue up the draw action in case discarding causes anything to trigger
-      # (I'm looking at you, Hinterlands::Tunnel)
-      Game.parent_act = parent_act.children.create!(
-              :expected_action => "resolve_#{self.class}#{id}_draw_n;num=#{params[:discard].length}",
-              :game => game)
-
-      # Discard each selected card, taking note of its class for logging purposes
-      cards_discarded = []
-      cards_chosen = params[:discard].map { |ix| actor.cards.hand[ix.to_i] }
-      cards_chosen.each do |card|
+    if !journal.cards.empty?
+      # Discard each selected card
+      journal.cards.each do |card|
         card.discard
-        cards_discarded << card.class.readable_name
       end
 
-      # Log the discards
-      game.histories.create!(:event => "#{actor.name} discarded #{cards_discarded.join(', ')} with Cellar.",
-                            :css_class => "player#{actor.seat} card_discard")
+      # Draw the same number of replacement cards
+      actor.draw_cards(journal.cards.count)
     end
-
-    return "OK"
-  end
-
-  def draw_n(params)
-    # Draw the same number of replacement cards
-    player.draw_cards(params[:num].to_i)
   end
 end

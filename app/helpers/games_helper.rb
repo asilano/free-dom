@@ -237,9 +237,9 @@ EOS
 
   def control_form(control)
     str = ''
-    if control[:params]
-      control[:params].each do |key, value|
-        str << raw(hidden_field_tag(key, value, :id => "#{key}_#{control[:name]}_#{control.object_id}"))
+    if control[:if_empty]
+      control[:if_empty].each do |key, value|
+        str << raw(hidden_field_tag("journal[if_empty][#{key}]", value, :id => "#{key}_#{control[:name]}_#{control.object_id}"))
       end
     end
 

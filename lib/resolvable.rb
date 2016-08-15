@@ -8,7 +8,6 @@ module Resolvable
     if m && self.class.resolutions.present?
       name = m[1]
       resolution = self.class.resolutions.detect { |r| r.name == name.to_sym }
-      Rails.logger.info("args: #{args}")
       return resolution.resolve(self, *args) if resolution
     end
 
@@ -54,7 +53,7 @@ class Resolution
   end
 
   def using(template)
-    @template = template.to_re
+    @template = template
     @journal_valdn = JournalMatchValidator.new(@template)
     self
   end
@@ -80,7 +79,7 @@ class Resolution
   end
 
   def validating_param_is_card_array(*args, &block)
-    @validations << ParamCardArrayValidator.new(*args, &block)
+    @validations << ParamCardArrayValidator.new(@template, *args, &block)
     self
   end
 
@@ -134,8 +133,8 @@ class Resolution
     failures = @validations.map do |validation|
       !validation.validate(card, journal)
     end
-    return true if failures.any?
 
+    return true if failures.any?
     card.send("resolution_#{@name}_occurs")
   end
 
@@ -169,9 +168,9 @@ class Resolution
     end
 
     def validate(card, journal)
-      Rails.logger.info("Expecting: #{@template}; got: #{journal.event}")
-      Rails.logger.info("Journal: #{journal.inspect}")
-      journal =~ @template
+      ok = journal =~ @template.to_re
+      Rails.logger.info("Expecting: /#{@template.to_re}/; got: '#{journal.event}.' Match: #{!ok.nil?}")
+      ok
     end
   end
 
@@ -247,23 +246,47 @@ class Resolution
   end
 
   class ParamCardArrayValidator < Validator
-    def initialize(key, options, &condition)
+    def initialize(template, key, options, &condition)
       raise "Must supply :scope parameter to validating_param_is_card" unless options.has_key? :scope
+      @template = template
       @key = key
       @options = options
       @condition = condition
     end
 
-    def validate(card)
+    def validate(card, journal)
       # We can coerce ParamCardValidator into doing the dirty work for us here.
-      return true if !card.params.has_key? @key
-      card.params[@key].map.with_index do |value, index|
-        card.params["#{@key}_value_##{index}"] = value
-        validator = ParamCardValidator.new("#{@key}_value_##{index}", @options, &@condition)
-        valid = validator.validate(card)
-        @failure_msg = validator.failure_msg unless valid
-        valid
-      end.all?
+      match = @template.match(journal.event)
+      return true if !match.names.include? @key.to_s
+
+      if @options[:allow_blank_with].andand == match[@key]
+        all_valid = true
+        card_array = []
+      else
+        value_hash = {}
+        match.names.each { |n| value_hash[n] = match[n] }
+        name_array = match[@key].split(',').map(&:strip)
+        card_array = []
+        all_valid = name_array.all? do |value|
+          # Fill with all fields except @key, then fill @key with just one card. Then call through
+          value_hash[@key] = value
+          fake_journal = Journal.new(event: @template.fill(value_hash))
+          validator = ParamCardValidator.new(@template, "#{@key}", @options, &@condition)
+          valid = validator.validate(card, fake_journal)
+
+          @failure_msg = validator.failure_msg unless valid
+          card_array << fake_journal.send(@key) if valid
+          valid
+        end
+      end
+
+      if all_valid
+        sym = "@#{@key}".to_sym
+        journal.instance_variable_set(sym, card_array)
+        journal.define_singleton_method(@key) { instance_variable_get(sym) }
+      end
+
+      all_valid
     end
   end
 

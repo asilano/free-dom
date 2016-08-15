@@ -84,7 +84,6 @@ class BaseGame::Bureaucrat < Card
                    validating_param_is_card(:card, scope: :hand, &:is_victory?).
                    with do
     # Place the specified card on top of the player's deck, and "reveal" it by creating a history.
-    Rails.logger.info("Bcat place")
     card = journal.card
     card.location = "deck"
     card.position = -1

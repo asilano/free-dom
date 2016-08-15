@@ -16,14 +16,6 @@ When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in (?:his|my) hand$/) do |name,
   flunk "Unimplemented multi-hand controls in testbed" unless controls.length == 1
 
   ctrl = controls[0]
-  #params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
-  #params[:pa_id] = ctrl[:pa_id]
-
-  #key = if ctrl[:type] == :button
-  #  :card_index
-  #else
-  #  ctrl[:name].to_sym
-  #end
 
   if Array(ctrl[:nil_action]).include? choices
     params[:nil_action] = choices
@@ -37,7 +29,7 @@ When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in (?:his|my) hand$/) do |name,
       assert_not_nil ix, "Couldn't find #{kinds[0]} in hand (#{possibilities.inspect})"
       @test_game.add_journal(event: ctrl[:journals][ix], player: player)
     else
-      params[key] = []
+      picked_cards = []
       kinds.each do |kind|
         num = 1
         card_name = kind
@@ -50,9 +42,13 @@ When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in (?:his|my) hand$/) do |name,
           ix = possibilities.index(card_name)
           possibilities[ix] = nil
 
-          params[key] << ix
+          picked_cards << [card_name, ix]
         end
       end
+
+      template = Journal::Template.new(ctrl[:journal_template])
+      event = template.fill(ctrl[:journals][0][:k] => picked_cards.map { |pair| "#{pair[0]} (#{pair[1]})" }.join(', '))
+      @test_game.add_journal(event: event, player: player)
     end
   end
 
