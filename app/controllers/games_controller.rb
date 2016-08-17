@@ -191,8 +191,11 @@ class GamesController < ApplicationController
     since_time = Time.httpdate(params[:since])
 
     if @game.last_modified >= since_time
-      # Game state has changed. Call process_result to update the game state
-      process_result("OK", false)
+      # Game state has changed. Redirect to the play action to update the state
+      respond_to do |format|
+        format.js { redirect_to :action => 'play' }
+        format.html { render action: :show }
+      end
     else
       # No change. Render nothing, but do ensure the Last-Modified header is set
       @last_mod = @game.last_modified
