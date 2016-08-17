@@ -69,7 +69,7 @@ class Resolution
   end
 
   def validating_params_has(arg)
-    @validations << ParamPresenceValidator.new(arg)
+    @validations << ParamPresenceValidator.new(@template, arg)
     self
   end
 
@@ -99,7 +99,7 @@ class Resolution
   end
 
   def validating_param_value_in(*args, &block)
-    @validations << ParamValueInArrayValidator.new(*args, &block)
+    @validations << ParamValueInArrayValidator.new(@template, *args, &block)
     self
   end
 
@@ -175,7 +175,8 @@ class Resolution
   end
 
   class ParamPresenceValidator < Validator
-    def initialize(*keys)
+    def initialize(template, *keys)
+      @template = template
       if keys.last.kind_of? Hash
         @failure_msg = keys.pop[:failure_msg]
       end
@@ -183,12 +184,19 @@ class Resolution
       @keys = keys
     end
 
-    def validate(card)
+    def validate(card, journal)
+      match = @template.match(journal.event)
+      @keys.flatten.each do |k|
+        sym = "@#{k}".to_sym
+        journal.instance_variable_set(sym, match[k.to_s])
+        journal.define_singleton_method(k) { instance_variable_get(sym) }
+      end
+
       @keys.any? do |k|
         if k.kind_of? Array
-          k.all? { |kk| card.params.has_key? kk }
+          k.all? { |kk| match.names.include? kk.to_s }
         else
-          card.params.has_key? k
+          match.names.include? k.to_s
         end
       end
     end
@@ -354,7 +362,8 @@ class Resolution
   end
 
   class ParamValueInArrayValidator < Validator
-    def initialize(key, *args)
+    def initialize(template, key, *args)
+      @template = template
       if args.last.kind_of? Hash
         @failure_message = args.pop[:failure_msg]
       end
@@ -363,9 +372,11 @@ class Resolution
       @values = args
     end
 
-    def validate(card)
-      return true unless card.params.has_key? @key
-      @values.include?(card.params[@key])
+    def validate(card, journal)
+      match = @template.match(journal.event)
+      return true if !match.names.include? @key.to_s
+
+      @values.include?(match[@key])
     end
   end
 

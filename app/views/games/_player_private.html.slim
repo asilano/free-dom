@@ -80,7 +80,7 @@
       tr
         th Cash:
         td= player_private.cash
-  - if !controls[:player].empty?
+  - if controls[:player].present?
     tr
       td[colspan="2"]
         table
@@ -92,10 +92,9 @@
                   td= control[:label]
                   - control[:options].each do |opt|
                     td
-                      - key = opt.keys.detect{|k| k != :text}
                       = button_tag opt[:text], type: 'submit',
-                                                name: key,
-                                                value:  opt[key],
+                                                name: 'journal[event]',
+                                                value: opt[:journal],
                                                 form: "form_#{control.object_id}",
                                                 disable_with: opt[:text],
                                                 class: control[:css_class]

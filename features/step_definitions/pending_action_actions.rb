@@ -203,14 +203,11 @@ When(/^(\w*?) chooses? the option (.*)/) do |name, choice|
   # Look for an option of the chosen name anywhere in the controls
   found = false
   controls.each do |ctrl|
-    params = ctrl[:params].inject({}) {|h,kv| h[kv[0]] = kv[1].to_s; h}
-    params[:pa_id] = ctrl[:pa_id]
-
     matching_controls = ctrl[:options].detect {|opt| opt[:text] =~ /^#{Regexp.escape(choice)}$/i}
     if matching_controls
-      params[:choice] = matching_controls[:choice]
+      @test_game.add_journal(event: matching_controls[:journal], player: player)
+      @test_game.process_journals
       found = true
-      player.resolve(params)
       break
     end
   end

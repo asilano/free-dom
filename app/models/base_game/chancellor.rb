@@ -4,55 +4,47 @@ class BaseGame::Chancellor < Card
   card_text "Action (cost: 3) - +2 Cash. You may immediately put your deck into your " +
                         "discard pile."
 
-  def play(parent_act)
+  ChooseEventTempl = Journal::Template.new("{{player}} chose to {{choice}} their deck with #{readable_name}.")
+
+  def play
     super
 
     # Easy bit first. Add two cash
-    player.add_cash(2)
+    player.cash += 2
 
-    # Now, the "discard your deck" step is actually optional, so create a
-    # PendingAction to ask.
-    act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_choose",
-                                     :text => "Choose whether to discard your deck, with Chancellor")
-    act.player = player
-    act.game = game
-    act.save!
+    journal = game.find_journal(ChooseEventTempl)
 
-    return "OK"
+    if journal.nil?
+      # Ask the required question, and escape this processing stack
+      game.ask_question(object: self, actor: player, method: :resolve_trash, text: "Choose whether to discard your deck, with #{readable_name}.")
+      game.abort_journal
+    end
+
+    if journal
+      resolve_choose(journal, player)
+    end
   end
 
-  def determine_controls(player, controls, substep, params)
-    controls[:player] += [{:type => :buttons,
-                           :action => :resolve,
-                           :label => "#{readable_name}:",
-                           :params => {:card => "#{self.class}#{id}",
-                                        :substep => 'choose'},
-                           :options => [{:text => "Discard deck",
-                                         :choice => "discard"},
-                                        {:text => "Don't discard",
-                                         :choice => "keep"}]
+  def determine_controls(actor, controls, question)
+    controls[:player] += [{type: :buttons,
+                           label: "#{readable_name}:",
+                           options: [{text: "Discard deck", journal: ChooseEventTempl.fill(player: actor.name, choice: 'discard')},
+                                      {text: "Don't discard", journal: ChooseEventTempl.fill(player: actor.name, choice: 'keep')}]
                            }]
   end
 
-  resolves(:choose).validating_params_has(:choice).
+  resolves(:choose).using(ChooseEventTempl).
+                    validating_params_has(:choice).
                     validating_param_value_in(:choice, 'discard', 'keep').
                     with do
     # Everything looks fine. Carry out the requested choice
-    if params[:choice] == "keep"
-      # Chose not to discard the deck, so a no-op. Just create a history
-      game.histories.create!(:event => "#{actor.name} chose not to discard their deck.",
-                            :css_class => "player#{actor.seat}")
-    else
-      actor.cards(true).deck.each do |card|
+      Rails.logger.info("Discarding? #{journal.choice}")
+    if journal.choice == "discard"
+      actor.cards.deck.each do |card|
         # Move card to discard _without tripping callbacks_
-        card.update_column(:location, 'discard')
+        Rails.logger.info("Discarding #{card}")
+        card.location = 'discard'
       end
-
-      # And create a history
-      game.histories.create!(:event => "#{actor.name} put their deck onto their discard pile.",
-                            :css_class => "player#{actor.seat}")
     end
-
-    "OK"
   end
 end
