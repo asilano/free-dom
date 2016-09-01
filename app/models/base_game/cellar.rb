@@ -51,9 +51,7 @@ class BaseGame::Cellar < Card
     # Looks good.
     if !journal.cards.empty?
       # Discard each selected card
-      journal.cards.each do |card|
-        card.discard
-      end
+      journal.cards.each(&:discard)
 
       # Draw the same number of replacement cards
       actor.draw_cards(journal.cards.count)

@@ -131,7 +131,9 @@ class Resolution
 
     # Run the validations
     failures = @validations.map do |validation|
-      !validation.validate(card, journal)
+      failed = !validation.validate(card, journal)
+      journal.errors.add(:base, validation.failure_msg) if failed && validation.failure_msg
+      failed
     end
 
     return true if failures.any?
@@ -275,6 +277,12 @@ class Resolution
         match.names.each { |n| value_hash[n] = match[n] }
         name_array = match[@key].split(',').map(&:strip)
         card_array = []
+
+        if @options[:max_count].andand < name_array.length
+          @failure_msg = "Too many cards specified (more than #{@options[:max_count]})"
+          return false
+        end
+
         all_valid = name_array.all? do |value|
           # Fill with all fields except @key, then fill @key with just one card. Then call through
           value_hash[@key] = value
@@ -283,6 +291,7 @@ class Resolution
           valid = validator.validate(card, fake_journal)
 
           @failure_msg = validator.failure_msg unless valid
+          fake_journal.errors.each { |attrib, err| journal.errors.add(attrib, err) }
           card_array << fake_journal.send(@key) if valid
           valid
         end
