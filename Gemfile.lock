@@ -24,7 +24,6 @@ PATH
       thor (>= 0.14, < 2.0)
 
 GEM
-  remote: http://rubygems.org/
   remote: http://gems.github.com/
   specs:
     actionmailer (4.0.13)
@@ -288,3 +287,6 @@ DEPENDENCIES
   turn
   uglifier
   unicorn
+
+BUNDLED WITH
+   1.10.6

@@ -515,6 +515,14 @@ class Player < ActiveRecord::Base
     self.num_actions += num
   end
 
+  # Grants the player the specified number of Buys
+  def add_buys(num)
+    # First, check that it's the player's turn
+    raise RuntimeError.new("Not Player #{id}'s turn") unless cash
+
+    self.num_buys += num
+  end
+
   # Grants the player the specified number of Buys, and returns an action suitable
   # for hanging more things off.
   def add_buysold(num, parent_act)
