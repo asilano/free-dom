@@ -130,7 +130,10 @@ protected
   rescue ActiveRecord::RecordNotFound
     Rails.logger.error("Attempt to access non-existant game #{params[:id]}" )
     flash[:warning] = "That Game doesn't exist"
-    redirect_to :action => 'index'
+    respond_to do |format|
+      format.html { redirect_to games_path, status: :not_found }
+      format.js { redirect_to games_path, status: :not_found }
+    end
   end
 
   def find_user

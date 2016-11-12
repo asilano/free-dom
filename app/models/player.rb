@@ -127,7 +127,7 @@ class Player < ActiveRecord::Base
                                   pa_id: action.id
                                 }]
         end
-      else
+      elsif action.method != :start_game
         tmp_ctrls = Hash.new([])
         action.object.determine_controls(self, tmp_ctrls, action)
         tmp_ctrls.each do |key, ctrl_array|

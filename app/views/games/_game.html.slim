@@ -53,7 +53,7 @@
     - if (@game.players.length >= 2 && player == @game.players[0] && @game.state == 'waiting')
       #start_button
         = form_for(Journal.new, html: { remote: true, id: 'start_form'}) do |f|
-          = f.hidden_field :game_id, value: @game.id
+          = hidden_field_tag :game_id, @game.id
           = f.hidden_field :event, value: "#{player.name} started the game"
           = f.submit 'Start Game', id: 'start_game_btn', class: 'play'
         javascript:
