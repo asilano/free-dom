@@ -3,13 +3,11 @@ class BaseGame::Festival < Card
   action
   card_text "Action (cost: 5) - +2 Actions, +1 Buy, +2 Cash."
 
-  def play(parent_act)
+  def play
     super
 
-    player.add_actions(2, parent_act)
-    player.add_buys(1, parent_act)
-    player.add_cash(2)
-
-    "OK"
+    player.add_actions(2)
+    player.add_buys(1)
+    player.cash += 2
   end
 end
