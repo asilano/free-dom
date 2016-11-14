@@ -6,6 +6,7 @@ module CardsHelper
 
     return :multi_position, nil if position.length > 1
     position = position[0]
+    cards.compact!
 
     # Identify card by position
     if position

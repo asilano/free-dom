@@ -3,51 +3,57 @@ class BaseGame::Feast < Card
   action
   card_text "Action (cost: 4) - Trash this card. Gain a card costing up to 5."
 
-  def play(parent_act)
+  TakeEventTempl = Journal::Template.new("{{player}} took {{card}} with #{readable_name}.")
+
+  def play
     super
 
-    # First create a PendingAction to take a replacement.
-    # We do this first, since we still have a Player here
-    #
-    # Note that Feast doesn't care whether the trash succeeded when gaining
-    # the replacement.
-    parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_take",
-                               :text => "Take a card with Feast",
-                               :player => player,
-                               :game => game)
-
-    # Now move this card to Trash
+    # Store off the current owner, and trash this card
+    owner = player
     trash
 
-    return "OK"
+    # Ask for which card to gain
+    journal = game.find_journal(TakeEventTempl)
+
+    if journal.nil?
+      if game.piles.all? { |pile| pile.empty? || pile.cost > 5 }
+        # No cards cheap enough to take. Just log
+        game.add_history(event: "#{owner.name} took nothing with #{readable_name}.",
+                          css_class: "player#{owner.seat} card_gain")
+      else
+        # Ask the required question, and escape this processing stack
+        game.ask_question(object: self, actor: owner, method: :resolve_take, text: "Take a card with #{readable_name}.")
+        game.abort_journal
+      end
+    end
+
+    if journal
+      resolve_take(journal, owner)
+    end
   end
 
-  def determine_controls(player, controls, substep, params)
-    case substep
-    when "take"
+  def determine_controls(actor, controls, question)
+    case question.method
+    when :resolve_take
+      journals = game.piles.map do |pile|
+        if pile.cost <= 5 && !pile.empty?
+          TakeEventTempl.fill(player: actor.name, card: pile.cards[0].readable_name)
+        else
+          nil
+        end
+      end
       controls[:piles] += [{:type => :button,
-                            :action => :resolve,
                             :text => "Take",
                             :nil_action => nil,
-                            :params => {:card => "#{self.class}#{id}",
-                                        :substep => "take"},
-                            :piles => game.piles.map do |pile|
-                              pile.cost <= 5 && !pile.empty?
-                            end
+                            journals: journals
                           }]
     end
   end
 
-  resolves(:take).validating_params_has(:pile_index).
-                 validating_param_is_pile(:pile_index) { cost <= 5 }.
+  resolves(:take).using(TakeEventTempl).
+                 validating_param_is_card(:card, scope: :supply) { cost <= 5 }.
                  with do
     # Process the take.
-    game.histories.create!(:event => "#{actor.name} took " +
-           "#{game.piles[params[:pile_index].to_i].card_class.readable_name} with Feast.",
-                          :css_class => "player#{actor.seat} card_gain")
-
-    actor.gain(parent_act, :pile => game.piles[params[:pile_index].to_i])
-
-    return "OK"
+    actor.gain(:card => journal.card, journal: journal)
   end
 end
