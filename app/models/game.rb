@@ -351,43 +351,33 @@ class Game < ActiveRecord::Base
   # Handle the end of the game. This consists of scoring each player, and
   # marking the game as ended
   def end_game
-    pending_actions.destroy_all
     players.each {|p| p.calc_score}
     self.state = 'ended'
-    self.end_time = Time.now
-    save!
+
+    first_end = self.end_time.present?
     winner = players.sort_by {|p| p.score}[-1]
-    histories.create!(:event => "Game ended. #{winner.name} is the winner, with #{winner.score} points!",
+    add_history(:event => "Game ended. #{winner.name} is the winner, with #{winner.score} points!",
                      :css_class => "meta player#{winner.seat} game_end")
 
-    # Call the Ranking model to handle updating the players' rankings
-    Ranking.update_rankings(players)
+    if first_end
+      self.end_time = Time.now
+      save!
+      # Call the Ranking model to handle updating the players' rankings
+      Ranking.update_rankings(players)
 
-    players.each do |ply|
-      # Write the game into the Old Games record, for stats
-      OldScore.create!(:game_id => id,
-                       :user_id => ply.user.id,
-                       :score => ply.score,
-                       :result_elo => ply.user.ranking.result_elo,
-                       :score_elo => ply.user.ranking.score_elo)
+      players.each do |ply|
+        # Write the game into the Old Games record, for stats
+        OldScore.create!(:game_id => id,
+                         :user_id => ply.user.id,
+                         :score => ply.score,
+                         :result_elo => ply.user.ranking.result_elo,
+                         :score_elo => ply.user.ranking.score_elo)
 
-      # Update the last-ended timestamp of the players
-      ply.user.last_completed = end_time
-      ply.user.save!
-    end
-
-    players.each do |ply|
-      if ply.user.pbem?
-        Player.to_email ||= {}
-        Player.to_email[ply.id] ||= {}
-        Player.to_email[ply.id][:game_state] = [nil,
-                                                "free-dom: Game '#{name}' over",
-                                                "Game '#{name}' has ended.",
-                                                nil]
+        # Update the last-ended timestamp of the players
+        ply.user.last_completed = end_time
+        ply.user.save!
       end
     end
-
-    return "OK"
   end
 
   def last_modified

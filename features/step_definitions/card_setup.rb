@@ -178,8 +178,9 @@ end
 Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? in play/) do |name, fixed_list, num_rand, rand_name|
   name = 'Alan' if name == 'I'
   player = @test_players[name]
-  player.cards.in_play.destroy_all
 
+  hack_journal = "Hack: #{name} play = "
+  hack_cards = []
   fixed_list ||= ""
   fixed_list.split(/,\s*/).each do |kind|
     num = 1
@@ -191,7 +192,7 @@ Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? in play/) do |n
 
     num.times do
       @play_contents[name] << card_name
-      CARD_TYPES[card_name].create(:location => 'play', :player => player, :game => player.game)
+      hack_cards << CARD_TYPES[card_name].name
     end
   end
 
@@ -201,10 +202,12 @@ Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? in play/) do |n
     redo if %w<Royal\ Seal Talisman>.include?(type) # Royal Seal and Talisman in play mess up gaining cards
     @play_contents[name] << type
     @named_cards[rand_name].andand << type
-    CARD_TYPES[type].create(:location => 'play', :player => player, :game => player.game)
+    hack_cards << CARD_TYPES[card_name].name
   end
 
-  player.renum(:play)
+  hack_journal << hack_cards.join(", ")
+  @test_game.add_journal(event: hack_journal)
+  @test_game.process_journals
 end
 
 # Matches:

@@ -781,7 +781,7 @@ class Player < ActiveRecord::Base
 
   def calc_score
     self.score ||= vp_chips || 0
-    self.score += self.cards(true).inject(0) {|sum, card| sum + card.points}
+    self.score += self.cards.inject(0) {|sum, card| sum + card.points}
     save!
   end
 

@@ -6,7 +6,7 @@ class BaseGame::Gardens < Card
                             when 3..6
                               12
                             end }
-  victory { player.cards(true).count / 10 }
+  victory { player.cards.count / 10 }
   card_text "Victory (cost: 4) - Worth 1 point for every 10 cards in your deck (rounded down)."
 end
 
