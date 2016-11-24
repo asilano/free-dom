@@ -17,8 +17,9 @@ When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in (?:his|my) hand$/) do |name,
 
   ctrl = controls[0]
 
-  if Array(ctrl[:nil_action]).include? choices
-    params[:nil_action] = choices
+  nact = ctrl[:nil_action].detect{ |na| na[:text] == choices }
+  if nact
+    @test_game.add_journal(event: nact[:journal], player: player)
   else
     possibilities = player.cards.hand.map(&:readable_name)
     assert_not_empty possibilities

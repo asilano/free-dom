@@ -1,6 +1,6 @@
 ul
   - @game.journals.each do |journal|
-    -if !journal.hidden || journal.modified
+    -if !journal.hidden || journal.modified || journal.player == @player
       li.journal class=classes_for_journal(journal, @player)
         - if journal.modified
           span.bold>[] (Edited)

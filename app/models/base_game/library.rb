@@ -6,20 +6,22 @@ class BaseGame::Library < Card
                        "draw them; discard the set-aside cards after you " +
                        "finish drawing."
 
-  def play(parent_act)
+  SetAsideJournalTempl = Journal::Template.new("{{player}} chose '{{choice}}' for {{card}} with #{readable_name}.")
+
+  def play
     super
 
     # Library is heavily re-entrant, so we'll put its processing in a "clean"
     # subfunction
-    process(parent_act)
+    process
   end
 
   # Function to handle the actions dictated by Library. Expected to be called
   # by both play() and resolve_choice()
-  def process(parent_act)
+  def process
     # Assume we're just going to draw up to 7 cards; we'll break out of the loop
     # if we hit an action
-    num_to_draw = 7 - player.cards(true).hand.size
+    num_to_draw = 7 - player.cards.hand.size
     clear_up = true
 
     1.upto(num_to_draw) do |n|
@@ -30,16 +32,12 @@ class BaseGame::Library < Card
       break if drawn.length == 0
 
       if drawn[0].is_action?
-        # Drawn an action. Set up a PendingAction to ask whether we should set
-        # this card aside.
-        act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_choose",
-                                         :text => "Set aside or keep a card.")
-        act.player = player
-        act.game = game
-        act.save!
-
-        # Drop out and wait for choice
-        clear_up = false
+        # Drawn an action. Ask whether we should set this card aside.
+        set_aside_journal = game.find_journal_or_ask(template: Journal::Template.new(SetAsideJournalTempl.fill(player: player.name, card: drawn[0].readable_name)),
+                                                      qn_params: {object: self, actor: player,
+                                                                  method: :resolve_choose,
+                                                                  text: "Set aside or keep a card with #{readable_name}."
+                                                                  })
         break
       end
     end
@@ -47,54 +45,47 @@ class BaseGame::Library < Card
     if clear_up
       discard_set_aside
     end
-
-    return "OK"
   end
 
-  def determine_controls(player, controls, substep, params)
-    case substep
-    when "choose"
+  def determine_controls(actor, controls, question)
+    case question.method
+    when :resolve_choose
       # Player deciding whether to keep or set aside a drawn action.
       # Technically, this would make sense as a Radio Button control - but that
       # needs two clicks, and is likely to get irritating.
+      last_card = actor.cards.hand.last
+      last_ix = actor.cards.hand.length - 1
       controls[:hand] += [{:type => :button,
-                          :action => :resolve,
                           :text => "Set aside",
-                          :nil_action => "Keep",
-                          :params => {:card => "#{self.class}#{id}",
-                                      :substep => "choose"},
-                          :cards => ([false] * (player.cards.hand.size - 1)) + [true]
+                          :nil_action => [{text: "Keep",
+                                           journal: "#{actor.name} chose 'keep' for #{last_card.readable_name} (#{last_ix}) with #{readable_name}.",
+                                           hidden: true}],
+                          :journals => ([nil] * (player.cards.hand.size - 1)) +
+                                       ["#{actor.name} chose 'set aside' for #{last_card.readable_name} (#{last_ix}) with #{readable_name}."]
                          }]
     end
   end
 
-  resolves(:choose).validating_params_has_any_of(:card_index, :nil_action).
-                    validating_param_is_card(:card_index, scope: :hand).
-                    validating_param_satisfies(:card_index) { |value, context| value.to_i == context.actor.cards.hand.count - 1 }.
+  resolves(:choose).using(SetAsideJournalTempl).
+                    validating_param_is_card(:card, scope: :hand) { |card| card.class == card.player.cards.hand.last.class }.
+                    validating_params_has(:choice).
+                    validating_param_value_in(:choice, 'set aside', 'keep').
                     with do
-    if params.include? :nil_action
-      # Player chose not to set aside. That's hidden information, but anyone manically
-      # refreshing would have seen the pending action - so write a history.
-      game.histories.create!(:event => "#{actor.name} chose not to set a card aside.",
-                            :css_class => "player#{actor.seat}")
-    else
-      card = actor.cards.hand[-1]
+    if journal.choice == 'set aside'
+      card = actor.cards.hand.last
       actor.cards.revealed << card
       card.location = "library"
       card.revealed = true
-      card.save!
-      game.histories.create!(:event => "#{actor.name} set aside #{card.class.readable_name}.",
-                            :css_class => "player#{actor.seat}")
     end
 
     # Carry on processing
-    process(parent_act)
+    process
   end
 
   def discard_set_aside
     # Move all revealed cards to Discard, and unreveal them
     # Force a reload of all affected areas
-    player.cards(true).revealed.each do |card|
+    player.cards.revealed.each do |card|
       card.discard
     end
   end

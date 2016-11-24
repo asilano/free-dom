@@ -32,6 +32,8 @@
                                        class: control[:css_class],
                                        data: {disable_with: nil_act[:text],
                                               confirm: nil_act[:confirm] ? 'Are you sure?' : nil})
+                - if nil_act[:hidden]
+                  = hidden_field_tag("journal[hidden][#{nil_act[:journal]}]", 1, form: "form_#{control.object_id}")
             - if control[:on_update]
               span id="#{control.object_id}_js"
               javascript:

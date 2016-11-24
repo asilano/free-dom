@@ -34,6 +34,8 @@ class JournalsController < ApplicationController
       event = template.fill(params[:journal])
     end
 
+    hidden = params[:journal].andand[:hidden].andand[event]
+
     if event && @game
       new_order = params[:journal][:order].andand.to_i
       if new_order && @game.journals.any? { |j| j.order == new_order }
@@ -46,6 +48,7 @@ class JournalsController < ApplicationController
 
       create_params = journal_params
       create_params[:event] = event
+      create_params[:hidden] = hidden
       @journal = @game.journals.build(create_params)
       @journal.player = @player
       if !@journal.order

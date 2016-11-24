@@ -38,11 +38,9 @@ class BaseGame::Chancellor < Card
                     validating_param_value_in(:choice, 'discard', 'keep').
                     with do
     # Everything looks fine. Carry out the requested choice
-      Rails.logger.info("Discarding? #{journal.choice}")
     if journal.choice == "discard"
       actor.cards.deck.each do |card|
         # Move card to discard _without tripping callbacks_
-        Rails.logger.info("Discarding #{card}")
         card.location = 'discard'
       end
     end

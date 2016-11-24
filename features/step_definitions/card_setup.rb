@@ -35,7 +35,16 @@ Given(/^(\w*?)(?:'s)? hand contains #{CardList}(?: and )?#{NamedRandCards}?/) do
   end
 
   @named_cards[rand_name] = [] if rand_name
-  num_rand.to_i.times do |i|
+  nrand = num_rand.to_i
+  if nrand > 0
+    # Force a treasure into hand for consistency with phase ends
+    @hand_contents[name] << 'Copper'
+    @named_cards[rand_name].andand << 'Copper'
+    nrand -= 1
+    hack_cards << 'BasicCards::Copper'
+  end
+
+  nrand.times do |i|
     type = CARD_TYPES.keys[rand(CARD_TYPES.length)]
     # Watchtower in hand messes up any test that wants to gain a card
     redo if type == "Watchtower"

@@ -10,6 +10,8 @@
                                     data: { disable_with: control[:text] },
                                     class: control[:css_class],
                                     disabled: !journal)
+      - if control[:hidden]
+        = hidden_field_tag("journal[hidden][#{journal}]", 1, form: "form_#{control.object_id}")
     - when :checkboxes
       - if journal
         = check_box_tag("journal[#{journal[:k]}][]", journal[:v], false,
