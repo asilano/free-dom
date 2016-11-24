@@ -33,12 +33,12 @@ class BaseGame::Library < Card
 
       if drawn[0].is_action?
         # Drawn an action. Ask whether we should set this card aside.
-        set_aside_journal = game.find_journal_or_ask(template: Journal::Template.new(SetAsideJournalTempl.fill(player: player.name, card: drawn[0].readable_name)),
+        set_aside_journal = game.find_journal_or_ask(template: Journal::Template.new(SetAsideJournalTempl.fill(player: player.name)),
                                                       qn_params: {object: self, actor: player,
                                                                   method: :resolve_choose,
                                                                   text: "Set aside or keep a card with #{readable_name}."
                                                                   })
-        break
+        resolve_choose(set_aside_journal, player)
       end
     end
 
