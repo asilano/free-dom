@@ -14,7 +14,7 @@
         = hidden_field_tag("journal[hidden][#{journal}]", 1, form: "form_#{control.object_id}")
     - when :checkboxes
       - if journal
-        = check_box_tag("journal[#{journal[:k]}][]", journal[:v], false,
+        = check_box_tag("journal[#{control[:field_name]}][]", journal, false,
                                 id: "#{control.object_id}_#{card_ix}",
                                 onclick: ("changed_#{control.object_id}()" if control[:on_update]),
                                 data: { js: (control[:data][card_ix] if control[:data]) },

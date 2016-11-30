@@ -284,4 +284,33 @@ EOS
     end
     classes
   end
+
+  def control_validation(control)
+    str = ''
+    control[:validate].andand.each do |condition, value|
+      case control[:type]
+      when :checkboxes
+        case condition
+        when :max_count
+          str << javascript_tag(<<JS
+function vald_#{control.object_id}_max_count() {
+  var count = $('input:checkbox[name="journal[#{control[:field_name]}][]"][form="form_#{control.object_id}"]:checked').length;
+  if (count > #{value}) {
+    $('button[name="journal[template]"][type="submit"][form="form_#{control.object_id}"]').prop('disabled', true);
+  }
+  else {
+    $('button[name="journal[template]"][type="submit"][form="form_#{control.object_id}"]').prop('disabled', false);
+  }
+}
+
+$('input:checkbox[name="journal[#{control[:field_name]}][]"][form="form_#{control.object_id}"]').bind('click', vald_#{control.object_id}_max_count);
+vald_#{control.object_id}_max_count();
+JS
+)
+        end
+      end
+    end
+
+    raw str
+  end
 end

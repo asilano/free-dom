@@ -36,8 +36,10 @@ class BaseGame::Chapel < Card
                            :choice_text => "Trash",
                            :button_text => "Trash selected",
                            journal_template: TrashEventTempl.fill(player: actor.name),
-                           journals: actor.cards.hand.each_with_index.map { |c, ix| {k: :cards, v: "#{c.readable_name} (#{ix})"} },
-                           if_empty: {cards: 'nothing'}
+                           journals: actor.cards.hand.each_with_index.map { |c, ix| "#{c.readable_name} (#{ix})" },
+                           field_name: :cards,
+                           if_empty: {cards: 'nothing'},
+                           validate: {max_count: 4}
                           }]
     end
   end

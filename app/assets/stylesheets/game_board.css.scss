@@ -468,9 +468,6 @@
     .container, .ctrl {
       position: relative;
       padding: 1px;
-      &:not(:last-child) {
-        border-bottom: thin dotted;
-      }
     }
     .ctrl {
       padding: 2px;
@@ -482,6 +479,12 @@
       label {
         margin-left: 2px;
       }
+    }
+  }
+
+  .card_with_ctrls {
+    .container:not(:last-child), .ctrl:not(:last-child) {
+      border-bottom: thin dotted;
     }
   }
 

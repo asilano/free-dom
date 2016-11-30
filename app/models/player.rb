@@ -96,7 +96,9 @@ class Player < ActiveRecord::Base
                                button_text: 'Play selected',
                                nil_action: nil_actions,
                                journal_template: "#{name} played {{cards}} as treasures.",
-                               journals: cards.hand.each_with_index.map { |c, ix| {k: :cards, v: "#{c.readable_name} (#{ix})"} if c.is_treasure?},
+                               journals: cards.hand.each_with_index.map { |c, ix| "#{c.readable_name} (#{ix})" if c.is_treasure?},
+                               if_empty: {cards: 'no cards'},
+                               field_name: :cards,
                                css_class: 'play-treasure'
                               }]
         when :buy
@@ -198,8 +200,13 @@ class Player < ActiveRecord::Base
       return ok
     end
 
-    # Check for playing nothing
+    # Check for not playing anything (empty checkboxes)
     card_req = match.captures[0]
+    if card_req == 'no cards as'
+      return true
+    end
+
+    # Check for playing nothing
     if card_req == 'no further'
       game.treasure_step = false
       return true

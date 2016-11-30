@@ -40,7 +40,8 @@ class BaseGame::Cellar < Card
                            :choice_text => "Discard",
                            :button_text => "Discard selected",
                            journal_template: DiscardEventTempl.fill(player: actor.name),
-                           journals: actor.cards.hand.each_with_index.map { |c, ix| {k: :cards, v: "#{c.readable_name} (#{ix})"} },
+                           journals: actor.cards.hand.each_with_index.map { |c, ix| "#{c.readable_name} (#{ix})" },
+                           field_name: :cards,
                            if_empty: {cards: 'nothing'}
                           }]
     end

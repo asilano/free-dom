@@ -17,7 +17,7 @@ When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in (?:his|my) hand$/) do |name,
 
   ctrl = controls[0]
 
-  nact = ctrl[:nil_action].detect{ |na| na[:text] == choices }
+  nact = ctrl[:nil_action].andand.detect{ |na| na[:text] == choices }
   if nact
     @test_game.add_journal(event: nact[:journal], player: player)
   else
@@ -48,7 +48,7 @@ When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in (?:his|my) hand$/) do |name,
       end
 
       template = Journal::Template.new(ctrl[:journal_template])
-      event = template.fill(ctrl[:journals][0][:k] => picked_cards.map { |pair| "#{pair[0]} (#{pair[1]})" }.join(', '))
+      event = template.fill(ctrl[:field_name] => picked_cards.map { |pair| "#{pair[0]} (#{pair[1]})" }.join(', '))
       @test_game.add_journal(event: event, player: player)
     end
   end
