@@ -22,14 +22,16 @@ class BaseGame::Library < Card
     # Assume we're just going to draw up to 7 cards; we'll break out of the loop
     # if we hit an action
     num_to_draw = 7 - player.cards.hand.size
-    clear_up = true
 
-    1.upto(num_to_draw) do |n|
+    if num_to_draw >= 1
       drawn = player.draw_cards(1)
 
       # If we didn't actually draw a card - so deck and discard are empty - give
       # up (or we'd just loop a bit more than we want).
-      break if drawn.length == 0
+      if drawn.length == 0
+        discard_set_aside
+        return
+      end
 
       if drawn[0].is_action?
         # Drawn an action. Ask whether we should set this card aside.
@@ -38,11 +40,16 @@ class BaseGame::Library < Card
                                                                   method: :resolve_choose,
                                                                   text: "Set aside or keep a card with #{readable_name}."
                                                                   })
+        if !set_aside_journal
+          game.abort_journal
+        end
+
         resolve_choose(set_aside_journal, player)
       end
-    end
 
-    if clear_up
+      # And repeat
+      process
+    else
       discard_set_aside
     end
   end
@@ -84,7 +91,6 @@ class BaseGame::Library < Card
 
   def discard_set_aside
     # Move all revealed cards to Discard, and unreveal them
-    # Force a reload of all affected areas
     player.cards.revealed.each do |card|
       card.discard
     end
