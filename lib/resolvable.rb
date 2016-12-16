@@ -220,11 +220,9 @@ class Resolution
       match = @template.match(journal.event)
       return true if !match.names.include? @key.to_s
       valid = true
-
       player = @player_key ? Player.find(match[@player_key]) : card.actor
       candidates = (@scope == :supply) ? player.game.supply_cards : player.cards.send(@scope)
       find_type, test_card = find_card_for_journal(candidates, match[@key])
-
       if find_type != :ok
         journal.card_error find_type
         valid = false
@@ -278,9 +276,30 @@ class Resolution
         name_array = match[@key].split(',').map(&:strip)
         card_array = []
 
-        if @options[:max_count].andand < name_array.length
-          @failure_msg = "Too many cards specified (more than #{@options[:max_count]})"
-          return false
+        if @options[:max_count].is_a? Integer
+          if @options[:max_count] < name_array.length
+            @failure_msg = "Too many cards specified (more than #{@options[:max_count]})"
+            return false
+          end
+        elsif @options[:max_count].respond_to? :call
+          max_count = @options[:max_count].call(card)
+          if max_count < name_array.length
+            @failure_msg = "Too many cards specified (more than #{@options[:max_count]})"
+            return false
+          end
+        end
+
+        if @options[:count].is_a? Integer
+          if @options[:count] != name_array.length
+            @failure_msg = "Wrong number of cards specified (should be #{@options[:count]})"
+            return false
+          end
+        elsif @options[:count].respond_to? :call
+          count = @options[:count].call(card)
+          if count != name_array.length
+            @failure_msg = "Wrong number of cards specified (should be #{@options[:count]})"
+            return false
+          end
         end
 
         all_valid = name_array.all? do |value|

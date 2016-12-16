@@ -4,31 +4,33 @@ class BaseGame::Militia < Card
   card_text "Action (Attack; cost: 4) - +2 Cash. Each other player discards down " +
                                         "to 3 cards."
 
-  def play(parent_act)
+  DiscardEventTempl = Journal::Template.new("{{player}} discarded {{cards}} with #{readable_name}.")
+
+  def play
     super
 
     # Grant the player 2 cash
-    player.add_cash(2)
+    player.cash += 2
 
     # Then conduct the attack
-    attack(parent_act)
-
-    "OK"
+    attack
   end
 
-  def determine_controls(player, controls, substep, params)
-    determine_react_controls(player, controls, substep, params)
+  def determine_controls(actor, controls, question)
+    #determine_react_controls(player, controls, substep, params)
 
-    case substep
-    when "discard"
-      # This is the target choosing one card to discard
-      controls[:hand] += [{:type => :button,
-                           :action => :resolve,
-                           :text => "Discard",
-                           :nil_action => nil,
-                           :params => {:card => "#{self.class}#{id}",
-                                       :substep => "discard"},
-                           :cards => [true] * player.cards.hand.size
+    case question.method
+    when :resolve_discard
+      # This is the target choosing all cards to discard
+      controls[:hand] += [{:type => :checkboxes,
+                           :name => "discard",
+                           :choice_text => "Discard",
+                           :button_text => "Discard selected",
+                           journal_template: DiscardEventTempl.fill(player: actor.name),
+                           journals: actor.cards.hand.each_with_index.map { |c, ix| "#{c.readable_name} (#{ix})" },
+                           field_name: :cards,
+                           if_empty: {cards: 'nothing'},
+                           validate: {count: actor.cards.hand.length - 3}
                           }]
     end
   end
@@ -37,33 +39,32 @@ class BaseGame::Militia < Card
     # Effect of the attack succeeding - that is, ask the target to discard
     # enough cards to reduce their hand to 3.
     target = Player.find(params[:target])
-    # source = Player.find(params[:source])
-    parent_act = params[:parent_act]
 
     # Determine how many cards to discard - never negative
-    num_discards = [0, target.cards(true).hand.size - 3].max
-
-    # Hang that many actions off the parent to ask the target to discard a card
-    1.upto(num_discards) do |num|
-      parent_act = parent_act.children.create!(:expected_action => "resolve_#{self.class}#{id}_discard",
-                                              :text => "Discard #{num} card#{num > 1 ? 's' : ''}")
-      parent_act.player = target
-      parent_act.game = game
-      parent_act.save!
+    num_discards = [0, target.cards.hand.size - 3].max
+    if num_discards == 0
+      return
     end
 
-    "OK"
+    target_journal_templ = Journal::Template.new(DiscardEventTempl.fill(player: target.name))
+    journal = game.find_journal_or_ask(template: target_journal_templ,
+                                        qn_params: {object: self, actor: target,
+                                                    method: :resolve_discard,
+                                                    text: "Discard #{num_discards} #{'card'.pluralize(num_discards)} with #{readable_name}."
+                                                    })
+
+    if journal
+      resolve_discard(journal, target)
+    end
   end
 
-  resolves(:discard).validating_params_has(:card_index).
-                     validating_param_is_card(:card_index, scope: :hand).
-                     with do
-    # All checks out. Discard the selected card.
-    card = actor.cards.hand[params[:card_index].to_i]
-    card.discard
-    game.histories.create!(:event => "#{actor.name} discarded #{card.class.readable_name}.",
-                            :css_class => "player#{actor.seat} card_discard")
-
-    "OK"
+  resolves(:discard).using(DiscardEventTempl).
+                      validating_param_is_card_array(:cards, scope: :hand,
+                                                      count: -> journal { journal.actor.cards.hand.length - 3 } ).with do
+    # Looks good.
+    if !journal.cards.empty?
+      # Discard each selected card
+      journal.cards.each(&:discard)
+    end
   end
 end
