@@ -3,7 +3,7 @@ Feature: Bureaucrat
     Each other player reveals a Victory card from his or her hand and puts it on top of their deck, or reveals a hand with no Victory cards.
 
   Background:
-    Given I am a player in a standard game with Bureaucrat
+    Given I am a player in a 4-player standard game with Bureaucrat
 
   Scenario: Bureaucrat should be set up at game start
     Then there should be 10 Bureaucrat cards in piles
@@ -13,18 +13,24 @@ Feature: Bureaucrat
     Given my hand contains Bureaucrat
       And Bob's hand contains Estate, Copper, Copper
       And Charlie's hand contains Gold, Village, Curse
+      And Dave's hand contains Duchy, Estate, Province, Copper
       And Bob has setting autocrat off
       And Charlie has setting autocrat off
+      And Dave has setting autocrat off
       And my deck contains 3 cards
       And Bob's deck contains 4 cards
       And Charlie's deck is empty
+      And Dave's deck contains 1 card
       And it is my Play Action phase
     When I play Bureaucrat
       Then I should have put Silver on top of my deck
       And Bob should need to place a Victory card onto deck
       And Charlie should not need to act
+      And Dave should need to place a Victory card onto deck
     When Bob chooses Estate in his hand
       Then Bob should have put Estate from his hand on top of his deck
+    When Dave chooses Duchy in his hand
+      Then Dave should have put Duchy from his hand on top of his deck
       And it should be my Buy phase
 
   Scenario: Playing Bureaucrat - Autocrat on

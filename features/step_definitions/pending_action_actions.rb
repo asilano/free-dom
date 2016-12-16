@@ -25,7 +25,7 @@ When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in (?:his|my) hand$/) do |name,
     assert_not_empty possibilities
 
     kinds = choices.split(/,\s*/)
-    if kinds.length == 1 && kinds[0] !~ /.* ?x ?\d*/
+    if kinds.length == 1 && kinds[0] !~ /.* ?x ?\d*/ && !ctrl[:journal_template]
       ix = possibilities.index(kinds[0])
       assert_not_nil ix, "Couldn't find #{kinds[0]} in hand (#{possibilities.inspect})"
       @test_game.add_journal(event: ctrl[:journals][ix], player: player)

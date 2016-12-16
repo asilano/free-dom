@@ -24,6 +24,7 @@ class Journal < ActiveRecord::Base
   end
 
   class Template
+    attr_reader :template
     def initialize(templ)
       @template = templ
     end

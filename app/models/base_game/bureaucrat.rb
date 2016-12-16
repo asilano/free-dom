@@ -69,7 +69,6 @@ class BaseGame::Bureaucrat < Card
         # Autocrat doesn't apply.
         # Ask the required question, and escape this processing stack
         game.ask_question(object: self, actor: target, method: :resolve_victory, text: "Place a Victory card onto deck.")
-        game.abort_journal
       end
     end
 

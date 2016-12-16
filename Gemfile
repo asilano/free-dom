@@ -19,6 +19,7 @@ group :development, :test do
   gem "better_errors", '~> 1.0'
   gem "binding_of_caller"
   gem 'pry'
+  gem 'byebug'
 
   gem 'thin'
 end

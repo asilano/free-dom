@@ -144,7 +144,7 @@ class Game < ActiveRecord::Base
       return desired_journal
     else
       ask_question qn_params
-      abort_journal
+      return nil
     end
   end
 
