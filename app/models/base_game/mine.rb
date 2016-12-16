@@ -70,15 +70,41 @@ class BaseGame::Mine < Card
     journal.add_history(:event => "#{actor.name} trashed a #{journal.card.readable_name} from hand (cost: #{trashed_cost}).",
                         :css_class => "player#{actor.seat} card_trash")
 
-    take_journal = game.find_journal_or_ask(template: TakeEventTempl,
-                                            qn_params: {object: self, actor: actor,
-                                                        method: :resolve_take,
-                                                        text: "Take a replacement card with #{readable_name}.",
-                                                        params: {trashed_cost: trashed_cost}
-                                                        })
+    take_journal = game.find_journal(TakeEventTempl)
 
-    take_journal.params = {trashed_cost: trashed_cost}
-    resolve_take(take_journal, actor)
+    if !take_journal
+      candidates = game.piles.map.with_index do |pile, ix|
+        if (pile.cost <= (trashed_cost + 3) &&
+                          pile.card_class.is_treasure? &&
+                          !pile.cards.empty?)
+          [pile, ix]
+        else
+          nil
+        end
+      end.compact
+
+      if candidates.length == 0
+        # Can't take a replacement. Just log.
+        game.add_history(:event => "#{player.name} couldn't take a card with #{readable_name}.",
+                          :css_class => "player#{player.seat} card_take")
+      elsif candidates.length == 1
+        # Only one option. Fabricate the journal.
+        take_journal = game.add_journal(player_id: player.id,
+                                    event: TakeEventTempl.fill(player: player.name,
+                                     supply_card: "#{candidates[0][0].readable_name} (#{candidates[0][1]})"))
+      else
+        game.ask_question(object: self, actor: actor,
+                          method: :resolve_take,
+                          text: "Take a replacement card with #{readable_name}.",
+                          params: {trashed_cost: trashed_cost})
+        game.abort_journal
+      end
+    end
+
+    if take_journal
+      take_journal.params = {trashed_cost: trashed_cost}
+      resolve_take(take_journal, actor)
+    end
   end
 
   resolves(:take).using(TakeEventTempl).

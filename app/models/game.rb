@@ -411,7 +411,7 @@ class Game < ActiveRecord::Base
   end
 
   def supply_cards
-    piles.map { |p| p.cards[0] }
+    piles.map { |p| p.cards[0] || Card.new }
   end
 
   def expand_random_choices
