@@ -23,7 +23,7 @@ class BaseGame::Library < Card
     # if we hit an action
     num_to_draw = 7 - player.cards.hand.size
 
-    if num_to_draw >= 1
+    1.upto(num_to_draw) do
       drawn = player.draw_cards(1)
 
       # If we didn't actually draw a card - so deck and discard are empty - give
@@ -35,23 +35,14 @@ class BaseGame::Library < Card
 
       if drawn[0].is_action?
         # Drawn an action. Ask whether we should set this card aside.
-        set_aside_journal = game.find_journal_or_ask(template: Journal::Template.new(SetAsideJournalTempl.fill(player: player.name)),
-                                                      qn_params: {object: self, actor: player,
-                                                                  method: :resolve_choose,
-                                                                  text: "Set aside or keep a card with #{readable_name}."
-                                                                  })
-        if !set_aside_journal
-          game.abort_journal
-        end
-
-        resolve_choose(set_aside_journal, player)
+        game.ask_question(object: self, actor: player,
+                          method: :resolve_choose,
+                          text: "Set aside or keep a card with #{readable_name}.")
+        return
       end
-
-      # And repeat
-      process
-    else
-      discard_set_aside
     end
+
+    discard_set_aside
   end
 
   def determine_controls(actor, controls, question)

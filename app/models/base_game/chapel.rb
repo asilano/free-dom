@@ -8,24 +8,15 @@ class BaseGame::Chapel < Card
   def play
     super
 
+    if player.cards.hand.empty?
+      # Holding no cards. Just log
+      game.add_history(:event => "#{player.name} trashed no cards with #{readable_name}.",
+                        :css_class => "player#{player.seat} card_trash")
+      return
+    end
+
     # Ask for a set of trashes
-    journal = game.find_journal(TrashEventTempl)
-
-    if journal.nil?
-      if player.cards.hand.empty?
-        # Holding no cards. Just log
-        game.add_history(:event => "#{player.name} trashed no cards with #{readable_name}.",
-                          :css_class => "player#{player.seat} card_trash")
-      else
-        # Ask the required question, and escape this processing stack
-        game.ask_question(object: self, actor: player, method: :resolve_trash, text: "Trash up to 4 cards with #{readable_name}.")
-        game.abort_journal
-      end
-    end
-
-    if journal
-      resolve_trash(journal, player)
-    end
+    game.ask_question(object: self, actor: player, method: :resolve_trash, text: "Trash up to 4 cards with #{readable_name}.")
   end
 
   def determine_controls(actor, controls, question)

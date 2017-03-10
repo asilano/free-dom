@@ -12,17 +12,8 @@ class BaseGame::Chancellor < Card
     # Easy bit first. Add two cash
     player.cash += 2
 
-    journal = game.find_journal(ChooseEventTempl)
-
-    if journal.nil?
-      # Ask the required question, and escape this processing stack
-      game.ask_question(object: self, actor: player, method: :resolve_trash, text: "Choose whether to discard your deck, with #{readable_name}.")
-      game.abort_journal
-    end
-
-    if journal
-      resolve_choose(journal, player)
-    end
+    # Ask the required question
+    game.ask_question(object: self, actor: player, method: :resolve_choose, text: "Choose whether to discard your deck, with #{readable_name}.")
   end
 
   def determine_controls(actor, controls, question)

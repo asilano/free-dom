@@ -12,24 +12,15 @@ class BaseGame::Feast < Card
     owner = player
     trash
 
+    if game.piles.all? { |pile| pile.empty? || pile.cost > 5 }
+      # No cards cheap enough to take. Just log
+      game.add_history(event: "#{owner.name} took nothing with #{readable_name}.",
+                        css_class: "player#{owner.seat} card_gain")
+      return
+    end
+
     # Ask for which card to gain
-    journal = game.find_journal(TakeEventTempl)
-
-    if journal.nil?
-      if game.piles.all? { |pile| pile.empty? || pile.cost > 5 }
-        # No cards cheap enough to take. Just log
-        game.add_history(event: "#{owner.name} took nothing with #{readable_name}.",
-                          css_class: "player#{owner.seat} card_gain")
-      else
-        # Ask the required question, and escape this processing stack
-        game.ask_question(object: self, actor: owner, method: :resolve_take, text: "Take a card with #{readable_name}.")
-        game.abort_journal
-      end
-    end
-
-    if journal
-      resolve_take(journal, owner)
-    end
+    game.ask_question(object: self, actor: owner, method: :resolve_take, text: "Take a card with #{readable_name}.")
   end
 
   def determine_controls(actor, controls, question)

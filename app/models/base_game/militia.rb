@@ -46,16 +46,9 @@ class BaseGame::Militia < Card
       return
     end
 
-    target_journal_templ = Journal::Template.new(DiscardEventTempl.fill(player: target.name))
-    journal = game.find_journal_or_ask(template: target_journal_templ,
-                                        qn_params: {object: self, actor: target,
-                                                    method: :resolve_discard,
-                                                    text: "Discard #{num_discards} #{'card'.pluralize(num_discards)} with #{readable_name}."
-                                                    })
-
-    if journal
-      resolve_discard(journal, target)
-    end
+    game.ask_question(object: self, actor: target,
+                      method: :resolve_discard,
+                      text: "Discard #{num_discards} #{'card'.pluralize(num_discards)} with #{readable_name}.")
   end
 
   resolves(:discard).using(DiscardEventTempl).

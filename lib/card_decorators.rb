@@ -142,19 +142,25 @@ module CardDecorators
     end
 
     def attack
-      # Attack each (other) player in turn
+      # Attack each (other) player in turn. Ignore reactions - they'll get triggered.
+      parent_strand = game.current_strand
       player.other_players.each do |victim|
-        if victim.cards.enduring.of_type('Seaside::Lighthouse').present?
-          # Victim has a Lighthouse in play
-          game.add_history(:event => "Placeholder: #{victim.name} has a Lighthouse in play, negating the attack.",
-                            :css_class => "player#{victim.seat} play_reaction")
-        elsif victim.settings.automoat && victim.cards.hand.of_type('BaseGame::Moat').present?
-          # Victim is holding a Moat and has Automoat on
-          game.add_history(event: "Placeholder: #{victim.name} reacted with a Moat, negating the attack.",
-                            :css_class => "player#{victim.seat} play_reaction")
-        else
-          attackeffect(target: victim)
-        end
+        # if victim.cards.enduring.of_type('Seaside::Lighthouse').present?
+        #   # Victim has a Lighthouse in play
+        #   game.add_history(:event => "Placeholder: #{victim.name} has a Lighthouse in play, negating the attack.",
+        #                     :css_class => "player#{victim.seat} play_reaction")
+        # elsif victim.settings.automoat && victim.cards.hand.of_type('BaseGame::Moat').present?
+        #   # Victim is holding a Moat and has Automoat on
+        #   game.add_history(event: "Placeholder: #{victim.name} reacted with a Moat, negating the attack.",
+        #                     :css_class => "player#{victim.seat} play_reaction")
+        # else
+        #   attackeffect(target: victim)
+        # end
+
+        # Create a new strand for this attack, so the parent strand gets blocked
+        strand = game.add_strand(parent_strand)
+        game.current_strand = strand
+        attackeffect(target: victim)
       end
     end
 

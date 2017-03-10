@@ -171,7 +171,7 @@ class Resolution
 
     def validate(card, journal)
       ok = journal =~ @template.to_re
-      Rails.logger.info("Expecting: /#{@template.to_re}/; got: '#{journal.event}.' Match: #{!ok.nil?}")
+      Rails.logger.info("Expecting: /#{@template.to_re}/; got: '#{journal.event}' Match: #{!ok.nil?}")
       ok
     end
   end

@@ -44,37 +44,33 @@ class BaseGame::Bureaucrat < Card
     # card on top of their deck.
     target = params[:target]
 
+    # Check for the hand having no Victory cards. Then there is no question to ask.
+    target_victories = target.cards.hand.select { |c| c.is_victory? }
+    if target_victories.empty?
+      # Target is holding no victories. Just log the "revealing" of the hand
+      game.add_history(:event => "#{target.name} revealed their hand to the Bureaucrat:",
+                        :css_class => "player#{target.seat} card_reveal")
+      game.add_history(:event => "#{target.name} revealed #{target.cards.hand.map(&:readable_name).join(', ')}.",
+                        :css_class => "player#{target.seat} card_reveal")
+      return
+    end
+
     target_journal_templ = Journal::Template.new(PlaceEventTempl.fill(player: target.name))
-    journal = game.find_journal(target_journal_templ)
-
-    if journal.nil?
-      target_victories = target.cards.hand.select { |c| c.is_victory? }
-
+    if game.find_journal(target_journal_templ).nil?
+      # See if autocrat lets us pre-create the journal.
       if (target.settings.autocrat_victory &&
           target_victories.map(&:class).uniq.length == 1)
         # Target is autocratting victories, and holding exactly one type of
         # victory card. Find the index of that card, and pre-create the journal
         vic = target_victories[0]
         index = target.cards.hand.index(vic)
-
-        journal = game.add_journal(player_id: target.id,
-                                    event: target_journal_templ.fill(card: "#{vic.readable_name} (#{index})"))
-      elsif target_victories.empty?
-        # Target is holding no victories. Just log the "revealing" of the hand
-        game.add_history(:event => "#{target.name} revealed their hand to the Bureaucrat:",
-                          :css_class => "player#{target.seat} card_reveal")
-        game.add_history(:event => "#{target.name} revealed #{target.cards.hand.map(&:readable_name).join(', ')}.",
-                          :css_class => "player#{target.seat} card_reveal")
-      else
-        # Autocrat doesn't apply.
-        # Ask the required question, and escape this processing stack
-        game.ask_question(object: self, actor: target, method: :resolve_victory, text: "Place a Victory card onto deck.")
+        game.add_journal(player_id: target.id,
+                          event: target_journal_templ.fill(card: "#{vic.readable_name} (#{index})"))
       end
     end
 
-    if journal
-      resolve_victory(journal, target)
-    end
+    # Ask the required question
+    game.ask_question(object: self, actor: target, method: :resolve_victory, text: "Place a Victory card onto deck.")
   end
 
   # This is at the attack target either putting a card back on their deck,

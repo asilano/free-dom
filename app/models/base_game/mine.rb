@@ -11,28 +11,24 @@ class BaseGame::Mine < Card
   def play
     super
 
-    journal = game.find_journal(TrashEventTempl)
+    if !(player.cards.hand.any? {|c| c.is_treasure?})
+      # Holding no treasure cards. Just log
+      game.add_history(:event => "#{player.name} trashed nothing.",
+                        :css_class => "player#{player.seat} card_trash")
+      return
+    end
 
-    if journal.nil?
+    if game.find_journal(TrashEventTempl).nil?
       if player.cards.hand.select(&:is_treasure?).map(&:class).uniq.length == 1
         # Only holding one type of treasure card. Pre-create the journal
         ix = player.cards.hand.index(&:is_treasure?)
-        journal = game.add_journal(player_id: player.id,
-                                    event: TrashEventTempl.fill(player: player.name, card: "#{player.cards.hand[ix].readable_name} (#{ix})"))
-      elsif !(player.cards.hand.any? {|c| c.is_treasure?})
-        # Holding no treasure cards. Just log
-        game.add_history(:event => "#{player.name} trashed nothing.",
-                          :css_class => "player#{player.seat} card_trash")
-      else
-        # Ask the required question, and escape this processing stack
-        game.ask_question(object: self, actor: player, method: :resolve_trash, text: "Trash a card with #{readable_name}.")
-        game.abort_journal
+        game.add_journal(player_id: player.id,
+                          event: TrashEventTempl.fill(player: player.name, card: "#{player.cards.hand[ix].readable_name} (#{ix})"))
       end
     end
 
-    if journal
-      resolve_trash(journal, player)
-    end
+    # Ask the required question.
+    game.ask_question(object: self, actor: player, method: :resolve_trash, text: "Trash a card with #{readable_name}.")
   end
 
   def determine_controls(actor, controls, question)
@@ -70,41 +66,36 @@ class BaseGame::Mine < Card
     journal.add_history(:event => "#{actor.name} trashed a #{journal.card.readable_name} from hand (cost: #{trashed_cost}).",
                         :css_class => "player#{actor.seat} card_trash")
 
-    take_journal = game.find_journal(TakeEventTempl)
+    candidates = game.piles.map.with_index do |pile, ix|
+      if (pile.cost <= (trashed_cost + 3) &&
+                        pile.card_class.is_treasure? &&
+                        !pile.cards.empty?)
+        [pile, ix]
+      else
+        nil
+      end
+    end.compact
 
-    if !take_journal
-      candidates = game.piles.map.with_index do |pile, ix|
-        if (pile.cost <= (trashed_cost + 3) &&
-                          pile.card_class.is_treasure? &&
-                          !pile.cards.empty?)
-          [pile, ix]
-        else
-          nil
-        end
-      end.compact
+    if candidates.length == 0
+      # Can't take a replacement. Just log.
+      game.add_history(:event => "#{player.name} couldn't take a card with #{readable_name}.",
+                        :css_class => "player#{player.seat} card_take")
+      return
+    end
 
-      if candidates.length == 0
-        # Can't take a replacement. Just log.
-        game.add_history(:event => "#{player.name} couldn't take a card with #{readable_name}.",
-                          :css_class => "player#{player.seat} card_take")
-      elsif candidates.length == 1
+    if game.find_journal(TakeEventTempl).nil?
+      if candidates.length == 1
         # Only one option. Fabricate the journal.
         take_journal = game.add_journal(player_id: player.id,
                                     event: TakeEventTempl.fill(player: player.name,
                                      supply_card: "#{candidates[0][0].readable_name} (#{candidates[0][1]})"))
-      else
-        game.ask_question(object: self, actor: actor,
-                          method: :resolve_take,
-                          text: "Take a replacement card with #{readable_name}.",
-                          params: {trashed_cost: trashed_cost})
-        game.abort_journal
       end
     end
 
-    if take_journal
-      take_journal.params = {trashed_cost: trashed_cost}
-      resolve_take(take_journal, actor)
-    end
+    game.ask_question(object: self, actor: actor,
+                      method: :resolve_take,
+                      text: "Take a replacement card with #{readable_name}.",
+                      params: {trashed_cost: trashed_cost})
   end
 
   resolves(:take).using(TakeEventTempl).

@@ -1,6 +1,5 @@
 class Game < ActiveRecord::Base
   class_attribute :current
-  class_attribute :current_act_parent
 
   extend FauxField
 
@@ -18,7 +17,7 @@ class Game < ActiveRecord::Base
   has_many :chats, -> { order :created_at }, :dependent => :delete_all
 
   # Things that used to be database fields and relations
-  faux_field [:questions, []], [:state, {}], [:facts, {}], :turn_count, [:piles, []], [:cards, Collections::CardsCollection.new],
+  faux_field :main_strand, [:strands, []], :current_strand, [:state, {}], [:facts, {}], :turn_count, [:piles, []], [:cards, Collections::CardsCollection.new],
               :current_turn_player, :turn_phase, :treasure_step, :last_blocked_journal
 
   attr_accessor :random_select, :specify_distr, :plat_colony
@@ -59,13 +58,15 @@ class Game < ActiveRecord::Base
     self.cards = Collections::CardsCollection.new
     self.current_turn_player = nil
     self.last_blocked_journal = 0
-    self.questions = []
+    self.main_strand = Strand.new
+    self.current_strand = main_strand
+    self.strands = [main_strand]
 
     # Initial questions: What is the platinum-colony rule, and what piles do we have?
-    ask_question(object: self, method: :set_plat_col)
-    ask_question(object: self, method: :set_piles)
+    main_strand.ask_question(object: self, method: :set_plat_col)
+    main_strand.ask_question(object: self, method: :set_piles)
     if players.count >= 2
-      ask_question(object: self, method: :start_game, actor: players.unscoped[0], text: 'Start game')
+      main_strand.ask_question(object: self, method: :start_game, actor: players.unscoped[0], text: 'Start game')
     end
 
     # Main loop. For each journal in turn, look for an extant question which wants it as an answer.
@@ -78,20 +79,15 @@ class Game < ActiveRecord::Base
       @current_journal.histories = []
 
       Rails.logger.info("Processing journal: #{@current_journal.inspect}")
+      Rails.logger.info("Remaining journals: #{@journal_arr.map(&:event)}")
       callcc do |cont|
         @cont = cont
-        apply_to, index = questions.each_with_index.detect do |q, ix|
-          if (q.actor != @current_journal.player)
-            false
-          else
-            q.object.send(q.method, @current_journal, q.actor, check: true)
-          end
-        end
+        matching_strand = strands.detect { |strand| strand.expects_journal(@current_journal) }
 
-        if apply_to
-          # Found a question that wants it
-          questions.delete_at(index) unless index.nil?
-          apply_to.object.send(apply_to.method, @current_journal, apply_to.actor)
+        if matching_strand
+          # Found a strand that wants it
+          current_strand = matching_strand
+          matching_strand.apply_journal(@current_journal)
         elsif hack_game_state(@current_journal, check: true)
           # If nothing else wants it, try the debug hook for adjusting game state
           hack_game_state(@current_journal)
@@ -104,11 +100,13 @@ class Game < ActiveRecord::Base
         end
 
         # Check to see if we need to ask for an Action or Buy
-        if questions.empty? && current_turn_player
+        if strands.all? { |strand| strand.questions.empty? } && current_turn_player
+          current_strand = main_strand
           current_turn_player.prompt_for_questions
         end
       end
 
+      Rails.logger.info("Remaining journals again: #{@journal_arr.map(&:event)}")
       # Strategy - apply a Continuation around sending the journal to the receiver.
       #
       # Triggers can then tell Game about any Questions they have; Game must check all its remaining
@@ -125,16 +123,11 @@ class Game < ActiveRecord::Base
   end
 
   # Called to see if the game-log already has a journal satisfying a question that needs to be
-  # asked. If so, removes it from processing and returns it.
+  # asked. If so, returns it.
   #
   # Expects a template which will be checked against journals to see if they match.
   def find_journal(template)
-    desired_journal = @journal_arr.detect { |j| template.match(j.event) }
-    if desired_journal
-      @journal_arr.delete desired_journal
-    end
-
-    desired_journal
+    @journal_arr.detect { |j| template.match(j.event) }
   end
 
   def find_journal_or_ask(template: nil, qn_params: {})
@@ -148,10 +141,11 @@ class Game < ActiveRecord::Base
     end
   end
 
-  # Add a journal to the game's journals association - but _not_ to its @journal_arr. This means the
-  # caller is free to process the journal immediately.
+  # Add a journal to the game's journals association, and to its @journal_arr. This means the
+  # game will process the journal in the normal course of things.
   def add_journal(journal_params)
-    journals.create!(journal_params.merge(order: journals.map(&:order).max + 1))
+    journal = journals.create!(journal_params.merge(order: journals.map(&:order).max + 1))
+    @journal_arr.andand << journal
   end
 
   # Add a history to the current journal - a record of something that happened as a result of a
@@ -170,9 +164,17 @@ class Game < ActiveRecord::Base
   end
 
   def ask_question(q_params)
-    q = Question.new(q_params)
-    self.questions << q
-    q
+    (current_strand || main_strand).ask_question(q_params)
+  end
+
+  def questions
+    strands.map(&:questions).flatten
+  end
+
+  def add_strand(parent)
+    strand = Strand.new(parent)
+    strands << strand
+    strand
   end
 
   # Read the "Use Platinum & Colony" setting from its journal

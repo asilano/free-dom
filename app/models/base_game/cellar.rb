@@ -12,24 +12,17 @@ class BaseGame::Cellar < Card
     # Grant the player another action
     player.add_actions(1)
 
-    # And ask for a set of discards
-    journal = game.find_journal(DiscardEventTempl)
-
-    if journal.nil?
-      if player.cards.hand.empty?
-        # Holding no cards. Just log
-        game.add_history(:event => "#{player.name} discarded no cards to #{readable_name}.",
-                          :css_class => "player#{player.seat} card_discard")
-      else
-        # Ask the required question, and escape this processing stack
-        game.ask_question(object: self, actor: player, method: :resolve_discard, text: "Discard any number of cards with #{readable_name}.")
-        game.abort_journal
-      end
+    # Check for the player holding no cards. If so, there's no question to ask
+    if player.cards.hand.empty?
+      # Holding no cards. Just log
+      game.add_history(:event => "#{player.name} discarded no cards to #{readable_name}.",
+                        :css_class => "player#{player.seat} card_discard")
+      return
     end
 
-    if journal
-      resolve_discard(journal, player)
-    end
+
+    # Ask the required question
+    game.ask_question(object: self, actor: player, method: :resolve_discard, text: "Discard any number of cards with #{readable_name}.")
   end
 
   def determine_controls(actor, controls, question)
