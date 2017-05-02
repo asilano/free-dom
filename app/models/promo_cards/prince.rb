@@ -1,7 +1,7 @@
 class PromoCards::Prince < Card
   action
   costs 8
-  card_text "You may set this aside. If you do, set aside an Action card from your hand costing up to 4. " +
+  card_text "Action (cost: 8) - You may set this aside. If you do, set aside an Action card from your hand costing up to 4. " +
             "At the start of each of your turns, play that Action, setting it aside again when you discard it from play. " +
             "(Stop playing it if you fail to set it aside on a turn you play it.)"
 
