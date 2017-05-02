@@ -1,9 +1,8 @@
 Given(/it is (.*?)(?:'s)? (.*) phase/) do |name, phase|
   name = 'Alan' if name == 'my'
-  player = @test_players[name]
-  @test_game.strands = [@test_game.main_strand]
-  @test_game.main_strand = Strand.new
-  player.start_turn
+  hack_journal = "Hack: #{name} start turn"
+  @test_game.add_journal(event: hack_journal)
+  @test_game.process_journals
 
   case phase
   when "Play Action"

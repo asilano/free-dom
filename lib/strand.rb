@@ -13,12 +13,13 @@ class Strand
   end
 
   def ask_question(params)
-    q = Question.new(params)
+    q = Question.new(params.merge(strand: self))
     @questions << q
     q
   end
 
   def expects_journal(journal)
+    return false if !unblocked?
     @questions.any? do |q|
       if (q.actor != journal.player)
         false
@@ -43,5 +44,25 @@ class Strand
       journal.params = apply_to.params
       apply_to.object.send(apply_to.method, journal, apply_to.actor)
     end
+
+    check_finished
+  end
+
+  def unblocked?
+    @children.empty? || children.all? { |child| child.questions.empty? && child.unblocked? }
+  end
+
+  def check_finished
+    @children.each(&:check_finished)
+    if @children.empty? && @questions.empty? && @parent
+      Rails.logger.info("Finished")
+      @parent.children.delete(self)
+      @parent.check_finished
+    end
+  end
+
+  def log(indent = 0)
+    Rails.logger.info(" " * indent + "- Strand: Qs = #{@questions.map(&:text)} ")
+    @children.each {|c| c.log(indent + 2)}
   end
 end

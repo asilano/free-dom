@@ -7,6 +7,12 @@ class Card
 
   # Attributes that used to be in the database
   attr_accessor :game, :player, :pile, :location, :position, :revealed, :peeked, :state
+  attr_accessor :can_react_to
+
+  def initialize(*args, &block)
+    super
+    @can_react_to = []
+  end
 
   def to_s
     readable_name

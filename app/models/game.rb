@@ -18,7 +18,7 @@ class Game < ActiveRecord::Base
 
   # Things that used to be database fields and relations
   faux_field :main_strand, [:strands, []], :current_strand, [:state, {}], [:facts, {}], :turn_count, [:piles, []], [:cards, Collections::CardsCollection.new],
-              :current_turn_player, :turn_phase, :treasure_step, :last_blocked_journal
+              :current_turn_player, :turn_phase, :treasure_step, :last_blocked_journal, [:triggers, {}]
 
   attr_accessor :random_select, :specify_distr, :plat_colony
   attr_accessor *(Card.expansions.map {|set| "num_#{set.name.underscore}_cards".to_sym})
@@ -52,15 +52,7 @@ class Game < ActiveRecord::Base
     # timestamp should do
     srand(created_at.nsec)
 
-    self.state = 'waiting'
-    self.facts = {}
-    self.piles = []
-    self.cards = Collections::CardsCollection.new
-    self.current_turn_player = nil
-    self.last_blocked_journal = 0
-    self.main_strand = Strand.new
-    self.current_strand = main_strand
-    self.strands = [main_strand]
+    init_game
 
     # Initial questions: What is the platinum-colony rule, and what piles do we have?
     main_strand.ask_question(object: self, method: :set_plat_col)
@@ -80,6 +72,8 @@ class Game < ActiveRecord::Base
 
       Rails.logger.info("Processing journal: #{@current_journal.inspect}")
       Rails.logger.info("Remaining journals: #{@journal_arr.map(&:event)}")
+      #Rails.logger.info("Questions: #{questions.map(&:insp)}")
+      #Rails.logger.info(main_strand.log)
       callcc do |cont|
         @cont = cont
         matching_strand = strands.detect { |strand| strand.expects_journal(@current_journal) }
@@ -91,13 +85,23 @@ class Game < ActiveRecord::Base
         elsif hack_game_state(@current_journal, check: true)
           # If nothing else wants it, try the debug hook for adjusting game state
           hack_game_state(@current_journal)
-        else
+        elsif !@current_journal.allow_defer ||
+              strands.all? { |strand| strand.questions.empty? }
           @current_journal.errors.add(:base, :no_question)
+          Rails.logger.info("No question!")
+        elsif !@journal_arr.all?(&:deferred) || !@current_journal.deferred
+          @current_journal.deferred = true
+          @journal_arr << @current_journal
+          next
+        else
+          return
         end
 
         if @current_journal.errors.any?
           return
         end
+
+        @journal_arr.each { |j| j.deferred = false }
 
         # Check to see if we need to ask for an Action or Buy
         if strands.all? { |strand| strand.questions.empty? } && current_turn_player
@@ -106,7 +110,6 @@ class Game < ActiveRecord::Base
         end
       end
 
-      Rails.logger.info("Remaining journals again: #{@journal_arr.map(&:event)}")
       # Strategy - apply a Continuation around sending the journal to the receiver.
       #
       # Triggers can then tell Game about any Questions they have; Game must check all its remaining
@@ -146,6 +149,7 @@ class Game < ActiveRecord::Base
   def add_journal(journal_params)
     journal = journals.create!(journal_params.merge(order: journals.map(&:order).max + 1))
     @journal_arr.andand << journal
+    journal
   end
 
   # Add a history to the current journal - a record of something that happened as a result of a
@@ -167,8 +171,12 @@ class Game < ActiveRecord::Base
     (current_strand || main_strand).ask_question(q_params)
   end
 
-  def questions
+  def all_questions
     strands.map(&:questions).flatten
+  end
+
+  def questions
+    strands.select { |st| st.unblocked? }.map(&:questions).flatten
   end
 
   def add_strand(parent)
@@ -529,6 +537,19 @@ protected
   end
 
 private
+  def init_game
+    self.state = 'waiting'
+    self.facts = {}
+    self.piles = []
+    self.cards = Collections::CardsCollection.new
+    self.current_turn_player = nil
+    self.last_blocked_journal = 0
+    self.main_strand = Strand.new
+    self.current_strand = main_strand
+    self.strands = [main_strand]
+    self.triggers = {attack: Triggers::OnAttack.new(self)}
+  end
+
   def hack_game_state(journal, check: false)
     if check || journal.event !~ /^Hack: /
       return journal.event =~ /^Hack: /
@@ -571,6 +592,13 @@ private
           cards.delete_at(ix)
         end
       end
+    when /^Hack: (.*) start turn$/
+      player = players.joins { user }.where { user.name == $1 }.first
+      self.main_strand = Strand.new
+      self.current_strand = main_strand
+      self.strands = [main_strand]
+
+      player.start_turn
     else
       journal.errors.add(:event, "Hack of unknown type")
     end

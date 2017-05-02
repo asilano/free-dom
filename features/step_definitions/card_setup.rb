@@ -3,8 +3,10 @@
 #   Bob's hand is empty
 Given(/^(\w*?)(?:'s)? hand is empty/) do |name|
   name = 'Alan' if name == 'my'
-  @test_players[name].cards.hand.destroy_all
   @hand_contents[name] = []
+  hack_journal = "Hack: #{name} hand = "
+  @test_game.add_journal(event: hack_journal)
+  @test_game.process_journals
 end
 
 # Matches:

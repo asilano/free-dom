@@ -48,8 +48,6 @@ module CardDecorators
     def self.is_reaction?
       true
     end
-    class_attribute :react_trigger
-    self.react_trigger = opts[:to] || :attack
   end
 
   # Define starting pile sizes
@@ -90,28 +88,30 @@ module CardDecorators
       class_attribute :order_relevant, :affects_attacker
       self.order_relevant = opts[:order_relevant]
       self.affects_attacker = opts[:affects_attacker]
+
+      const_set("AttackTempl", Journal::Template.new("Conduct attack on {{victim}}."))
       include AttackMethods
     end
   end
 
   def trigger(meth, opts)
-    raise "No condition provided" unless opts.include?(:on)
-    unless opts[:on].is_a?(Hash)
-      raise "Options not a hash"
-    end
-    opts[:on].each {|key, val| raise "#{key.inspect} not a field" unless self.new.respond_to?("#{key}_was")}
+    raise "No trigger provided" unless opts.include?(:on)
+    #raise "Trigger isn't a trigger type" unless game.triggers[opts[:on]].kind_of? Triggers::Trigger
+    raise "No condition provided" unless opts.include?(:when)
+    raise "Condition not a Hash" unless opts[:when].is_a? Hash
 
-    condition = lambda do |object|
-      opts[:on].all? do |field, change|
-        changed = method("#{field}_changed?").call
-        if (change[0] != :any)
-          changed &&= method("#{field}_was").call == change[0]
+    # Alias the setter for the attribute mentioned in the :when option, to
+    # watch for the condition.
+    opts[:when].each do |attr, val|
+      define_method("#{attr}_with_check_#{val}=") do |new_val|
+        if new_val == val
+          game.triggers[opts[:on]].observe(self, meth)
+        else
+          game.triggers[opts[:on]].ignore(self, meth)
         end
-        if (change[1] != :any)
-          changed &&= method(field).call == change[1]
-        end
-        changed
+        send("#{attr}_without_check_#{val}=", new_val)
       end
+      alias_method_chain "#{attr}=", "check_#{val}"
     end
   end
 
@@ -158,9 +158,25 @@ module CardDecorators
         # end
 
         # Create a new strand for this attack, so the parent strand gets blocked
-        strand = game.add_strand(parent_strand)
-        game.current_strand = strand
-        attackeffect(target: victim)
+        game.current_strand = game.add_strand(parent_strand)
+
+        # In order that attacking gets held up by any triggers, ask and answer a question here that will
+        # kick off the attack.
+        q = game.ask_question(object: self, #actor: player,
+                              method: :resolve_attack,
+                              params: {victim: victim},
+                              text: "Conduct attack on #{victim.name}.")
+
+        j = game.find_journal("Conduct attack on #{victim.name}.")
+        if j.nil?
+          j = game.add_journal(#player_id: player.id,
+                            event: "Conduct attack on #{victim.name}.",
+                            hidden: true,
+                            allow_defer: true)
+        end
+
+        # Trigger any effects that are watching for attack
+        game.triggers[:attack].trigger(victim: victim, attacker: player, trigger_card: self, att_q: q, att_j: j)
       end
     end
 

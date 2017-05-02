@@ -1,4 +1,3 @@
-
 class Journal < ActiveRecord::Base
   extend FauxField
 
@@ -6,7 +5,7 @@ class Journal < ActiveRecord::Base
   belongs_to :player
 
   faux_field [:histories, []], :css_class
-  attr_accessor :params
+  attr_accessor :params, :deferred
 
   after_initialize :blank_histories
   before_save :set_order

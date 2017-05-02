@@ -17,8 +17,6 @@ class BaseGame::Militia < Card
   end
 
   def determine_controls(actor, controls, question)
-    #determine_react_controls(player, controls, substep, params)
-
     case question.method
     when :resolve_discard
       # This is the target choosing all cards to discard
@@ -35,10 +33,10 @@ class BaseGame::Militia < Card
     end
   end
 
-  def attackeffect(params)
+  resolves(:attack).using(AttackTempl).with do
     # Effect of the attack succeeding - that is, ask the target to discard
     # enough cards to reduce their hand to 3.
-    target = Player.find(params[:target])
+    target = Player.find(journal.params[:victim])
 
     # Determine how many cards to discard - never negative
     num_discards = [0, target.cards.hand.size - 3].max

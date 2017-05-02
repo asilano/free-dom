@@ -23,8 +23,6 @@ class BaseGame::Bureaucrat < Card
   end
 
   def determine_controls(actor, controls, question)
-    #determine_react_controls(player, controls, substep, params)
-
     case question.method
     when :resolve_victory
       # Ask the attack target for a Victory card, or to reveal a hand devoid of
@@ -39,10 +37,10 @@ class BaseGame::Bureaucrat < Card
     end
   end
 
-  def attackeffect(params)
+  resolves(:attack).using(AttackTempl).with do
     # Effect of the attack succeeding - that is, ask the target to put a Victory
     # card on top of their deck.
-    target = params[:target]
+    target = Player.find(journal.params[:victim])
 
     # Check for the hand having no Victory cards. Then there is no question to ask.
     target_victories = target.cards.hand.select { |c| c.is_victory? }

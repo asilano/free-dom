@@ -32,6 +32,10 @@ module Collections
       CardsCollection.new(select { |c| c.player && c.player.id == player.id }.sort_by{ |c| [c.location, c.position] })
     end
 
+    def where(&block)
+      CardsCollection.new(select(&block).sort_by{ |c| [c.location, c.position] })
+    end
+
     def not
       Negation.new(self)
     end

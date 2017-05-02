@@ -17,7 +17,8 @@ class Player < ActiveRecord::Base
 
   # Things that used to be database fields and relations
   faux_field :cash, :vp_chips, [:state, PlayerState.new]
-  faux_field :num_actions, :num_buys
+
+  faux_field :num_actions, :num_buys, [:react_questions, {}]
   validates :user_id, :uniqueness => {:scope => 'game_id'}
   validates :seat, :uniqueness => {:scope => 'game_id', :allow_nil => true}
   after_create :init_player
@@ -27,6 +28,7 @@ class Player < ActiveRecord::Base
     @cards = Collections::CardsCollection.new
     @state = PlayerState.new
     @state.init_fields
+    self.react_questions = {}
   end
 
   def name
@@ -119,6 +121,18 @@ class Player < ActiveRecord::Base
                                                 journal: "#{name} bought no more cards"},
                                 journals: piles
                               }]
+        when :play_reaction
+          event = action.params[:event]
+          hand_card_journals = cards.hand.each_with_index.map { |c, ix| "#{name} reacted to #{event} with #{c.readable_name} (#{ix})." if c.can_react_to.include? event }
+          if hand_card_journals.any?
+            controls[:hand] += [{type: :button,
+                               text: "React",
+                               nil_action: [{text: "Don't react",
+                                            journal: "#{name} didn't react to #{event}."}],
+                               journals: hand_card_journals,
+                               params: action.params
+                              }]
+          end
         when 'choose_sot_card'
           # We've peeked at the cards we can choose between
           controls[:peeked] += [{type: :button,
@@ -299,6 +313,55 @@ class Player < ActiveRecord::Base
     true
   end
 
+  def play_reaction(journal, actor, check: false)
+    no_react = /#{name} didn't react to (?<event>.*)/.match(journal.event)
+    match = /#{name} (?<am>auto-)?reacted to (?<event>.*) with (?<card>.*)/.match(journal.event)
+    ok = actor == self && (match || no_react)
+    if !ok || check
+      return ok
+    end
+
+    react_event = (match || no_react)[:event].to_sym
+
+    # Check for not reacting, and drop all available reactions
+    if no_react
+      cards.each { |c| c.can_react_to.delete(react_event) }
+      return true
+    end
+
+    card_req = match[:card].sub(/\.*$/, '')
+
+    # Check we have the specified card in hand
+    ret, card = find_card_for_journal(cards.hand, card_req)
+    if ret != :ok
+      journal.card_error ret
+      return true
+    end
+
+    # Check the specified card is a reaction
+    if !card.is_reaction?
+      journal.card_error :wrong
+      journal.errors.add(:base, 'Specified card is not an action')
+      return true
+    end
+
+    # React with the card
+    begin
+      card.react(journal)
+    rescue ArgumentError
+      raise
+      journal.errors.add(:base, 'Error reacting')
+    end
+
+    # If there are still reactions available for this event, re-ask the question
+    if cards.hand.any? { |c| c.can_react_to.include? react_event }
+      react_questions[react_event] = game.ask_question(object: self, actor: self, method: :play_reaction,
+                                                       text: "React to #{journal.params[:trigger_card] || react_event}.", params: journal.params)
+    end
+
+    true
+  end
+
   def end_turn
     game.add_history(:event => "#{name} ended their turn.",
                      :css_class => "player#{seat} end_turn")
@@ -448,6 +511,17 @@ class Player < ActiveRecord::Base
       game.turn_phase = Game::TurnPhases::CLEAN_UP
       end_turn
     end
+  end
+
+  # Called by a reaction card to tell the player it's available to react to an event
+  def register_reaction(card, event, state)
+    game.main_strand.log
+    if self.react_questions[event].nil?
+      self.react_questions[event] = game.ask_question(object: self, actor: self, method: :play_reaction, text: "React to #{state[:trigger_card] || event}.",
+                                                      params: {event: event}.merge(state))
+    end
+
+    card.can_react_to << event
   end
 
   # Handle the user choosing a card to play at the start of turn.
