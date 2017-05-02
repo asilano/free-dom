@@ -450,6 +450,7 @@
 }
 
 .player {
+  tr:nth-child(odd) { background-color: $bg-grey; }
   th { text-align: right; }
   td {
     padding-left: 10px;
