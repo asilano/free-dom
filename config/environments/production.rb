@@ -70,7 +70,7 @@ Dominion::Application.configure do
   config.action_mailer.raise_delivery_errors = false
   config.action_mailer.smtp_settings = {
     :address              => ENV['MAIL_SERV'],
-    :port                 => ENV['MAIL_PORT'],
+    :port                 => ENV['MAIL_PORT'].to_i,
     :domain               => ENV['MAIL_DOM'],
     :user_name            => ENV['MAIL_USER'],
     :password             => ENV['MAIL_PASS'],
