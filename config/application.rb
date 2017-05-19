@@ -27,16 +27,6 @@ module Dominion
   end
 end
 
-ActionMailer::Base.smtp_settings = {
-  :address              => ENV['MAIL_SERV'],
-  :port                 => ENV['MAIL_PORT'],
-  :domain               => ENV['MAIL_DOM'],
-  :user_name            => ENV['MAIL_USER'],
-  :password             => ENV['MAIL_PASS'],
-  :authentication       => "plain",
-  :enable_starttls_auto => true
-}
-
 ThemesForRails.config do |config|
   # themes_dir is used to allow ThemesForRails to list available themes. It is not used to resolve any paths or routes.
   config.themes_dir = ":root/app/assets/themes"
