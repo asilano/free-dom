@@ -29,4 +29,6 @@ Dominion::Application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
+
+  config.secret_key_base = 'd819de5d039512f7e22e343ec664a556cf0f84be0b1038f6d5374b745beea1db5fefc0b7943a32cb39c970c0cac4290af152eea05d1987832abdbe689931408f'
 end

@@ -44,11 +44,11 @@ ActiveRecord::Schema.define(version: 20170429202823) do
 
   create_table "players", force: true do |t|
     t.integer  "game_id"
+    t.integer  "seat"
     t.integer  "score"
     t.integer  "user_id"
     t.boolean  "lock"
     t.datetime "last_emailed", default: '2011-01-01 00:00:00'
-    t.integer  "seat"
   end
 
   create_table "rankings", force: true do |t|

@@ -138,7 +138,7 @@ protected
 
   def find_user
     #raise
-    @user = User.find_by_id(session[:user_id])
+    @user = User.find_by_id(session[:user_id]) if session
     @player = @user.players.find_by_game_id(@game.id) if (@game && @user)
   end
 

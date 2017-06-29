@@ -9,4 +9,4 @@
 
 # Make sure your secret_key_base is kept private
 # if you're sharing your code publicly.
-Dominion::Application.config.secret_key_base = ENV['secret_token']
+Dominion::Application.config.secret_key_base = ENV['secret_token'] if Rails.env.production?

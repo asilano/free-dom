@@ -1,7 +1,7 @@
-#source 'http://rubygems.org'
+source 'http://rubygems.org'
 source 'http://gems.github.com'
 
-ruby '2.0.0'
+ruby '2.3.3'
 gem 'rails', '~> 4.0.0'
 gem 'i18n'
 
@@ -60,8 +60,8 @@ gem 'themes_for_rails'
 
 group :test do
   # Pretty printed test output
-  gem 'turn', :require => false
-  gem 'minitest'
+  #gem 'turn', :require => false
+  #gem 'minitest'
   gem 'shoulda'
   gem 'factory_girl_rails'
   gem 'capybara'
