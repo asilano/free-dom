@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170429202823) do
+ActiveRecord::Schema.define(version: 20170707200131) do
 
   create_table "chats", force: true do |t|
     t.integer  "game_id"
@@ -31,8 +31,18 @@ ActiveRecord::Schema.define(version: 20170429202823) do
     t.datetime "created_at"
   end
 
-# Could not dump table "journals" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  create_table "journals", force: true do |t|
+    t.integer  "game_id"
+    t.integer  "player_id"
+    t.text     "event"
+    t.datetime "created_at"
+    t.integer  "order"
+    t.boolean  "modified",    default: false
+    t.boolean  "hidden"
+    t.boolean  "allow_defer", default: false
+    t.string   "type"
+    t.text     "parameters"
+  end
 
   create_table "old_scores", force: true do |t|
     t.integer "game_id"

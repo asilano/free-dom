@@ -11,6 +11,36 @@ class Game < ActiveRecord::Base
     AllPhases = [ACTION, BUY, CLEAN_UP]
   end
 
+  module Journals
+    class PlatinumColonyJournal < Journal
+      causes :set_plat_col
+
+      private
+
+      def parameters_ok?
+        super && parameters.key?(:choice) &&
+          %w[yes no rules].include?(parameters[:choice])
+      end
+    end
+
+    class SetupPilesJournal < Journal
+      causes :set_piles
+
+      private
+
+      def parameters_ok?
+        super && parameters.key?(:piles) &&
+          parameters[:piles].all? do |pile_s|
+            begin
+              pile_s.constantize.superclass == Card
+            rescue
+              false
+            end
+          end
+      end
+    end
+  end
+
   has_many :journals, -> { order :order }
   has_many :players, -> { order :seat, :id }, :dependent => :destroy, inverse_of: :game
   has_many :users, :through => :players
@@ -55,8 +85,10 @@ class Game < ActiveRecord::Base
     init_game
 
     # Initial questions: What is the platinum-colony rule, and what piles do we have?
-    main_strand.ask_question(object: self, method: :set_plat_col)
-    main_strand.ask_question(object: self, method: :set_piles)
+    main_strand.ask_question(object: self,
+                             journal: Journals::PlatinumColonyJournal)
+    main_strand.ask_question(object: self,
+                             journal: Journals::SetupPilesJournal)
     if players.count >= 2
       main_strand.ask_question(object: self, method: :start_game, actor: players.unscoped[0], text: 'Start game')
     end
@@ -186,26 +218,13 @@ class Game < ActiveRecord::Base
   end
 
   # Read the "Use Platinum & Colony" setting from its journal
-  def set_plat_col(journal, actor, check: false)
-    match = /Setup Platinum\/Colony option: (yes|no|rules)/.match(journal.event)
-    ok = actor.nil? && match
-    if !ok || check
-      return ok
-    end
-
-    @plat_colony = match[1]
+  def set_plat_col(journal)
+    @plat_colony = journal.parameters[:choice]
   end
 
   # Read the piles to use from its journal
-  def set_piles(journal, actor, check: false)
-    match = /Setup piles: ((\w+::\w+,? ?){10})/.match(journal.event)
-    ok = actor.nil? && match
-    if !ok || check
-      return ok
-    end
-
-    piles_array = match[1].split(', ')
-    piles_array.each do |p|
+  def set_piles(journal)
+    journal.parameters[:piles].each do |p|
       begin
         p.constantize
       rescue
@@ -215,7 +234,7 @@ class Game < ActiveRecord::Base
     end
 
     # Prepare to add Platinum and Colony cards if the user (or the rules) say we should
-    test_pile = piles_array[rand(10)]
+    test_pile = journal.parameters[:piles].sample
     using_plat_col = false
     if @plat_colony == "yes" ||
         (@plat_colony == "rules" && test_pile.match(/(.*)::/)[1] == "Prosperity")
@@ -244,7 +263,7 @@ class Game < ActiveRecord::Base
     piles << Pile.new(card_type: "BasicCards::Curse", position: posn)
     posn += 1
 
-    sorted_piles = piles_array.sort do |a_str,b_str|
+    sorted_piles = journal.parameters[:piles].sort do |a_str,b_str|
       a = a_str.constantize
       b = b_str.constantize
       (a.cost == b.cost) ? a.name <=> b.name : a.cost <=> b.cost
@@ -511,13 +530,9 @@ protected
   end
 
   def journal_setup
-    journals.create!(event: "Setup Platinum/Colony option: #{plat_colony}")
-
-    sorted_piles = piles_array.sort_by do |str|
-      type = str.constantize
-      [type.cost, type.name]
-    end
-    journals.create!(event: "Setup piles: #{sorted_piles.join(', ')}")
+    journals << Journals::PlatinumColonyJournal.new(parameters: { choice: plat_colony })
+    journals << Journals::SetupPilesJournal.new(parameters: { piles: piles_array })
+    save
   end
 
   def welcome_chat

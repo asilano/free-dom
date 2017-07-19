@@ -13,36 +13,28 @@ class Strand
   end
 
   def ask_question(params)
-    q = Question.new(params.merge(strand: self))
-    @questions << q
+    q = params[:journal]::Question.new
+    object = params[:object]
+    actor = params[:actor]
+    templ = params[:journal]::Template.new(actor, params[:expect])
+    @questions << { question: q, object: object, template: templ }
     q
   end
 
   def expects_journal(journal)
     return false if !unblocked?
-    @questions.any? do |q|
-      if (q.actor != journal.player)
-        false
-      else
-        q.object.send(q.method, journal, q.actor, check: true)
-      end
-    end
+    @questions.any? { |q| q[:template].matches?(journal) }
   end
 
   def apply_journal(journal)
     apply_to, index = @questions.each_with_index.detect do |q, ix|
-      if (q.actor != journal.player)
-        false
-      else
-        q.object.send(q.method, journal, q.actor, check: true)
-      end
+      q[:template].matches?(journal)
     end
 
     if apply_to
       # Found a question that wants it
       questions.delete_at(index) unless index.nil?
-      journal.params = apply_to.params
-      apply_to.object.send(apply_to.method, journal, apply_to.actor)
+      journal.invoke(apply_to[:object])
     end
 
     check_finished
