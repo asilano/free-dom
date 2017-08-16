@@ -7,13 +7,13 @@
     - if player_private.questions.present?
       tr
         th Waiting for you to:
-        td= player_private.questions.reject{|a| a.text.nil? || a.text.empty?}.map {|a| a.text}.join(', ')
+        td= player_private.questions.reject { |a| a[:question].text.blank? }.map { |a| a[:question].text }.join(', ')
     tr
       th Deck:
       td= "#{player_private.cards.deck.length} cards"
     tr
       th Hand:
-      - if !player_private.cards.hand.empty? || !controls[:hand].empty?
+      - if !player_private.cards.hand.blank? || !controls[:hand].blank?
         td
           .full_cards
             = render partial: 'control_preamble', collection: controls[:hand]
@@ -22,7 +22,7 @@
 
       - else
         td None
-    - if !player_private.cards.in_play.empty?
+    - if !player_private.cards.in_play.blank?
       tr
         th In Play:
         td
@@ -32,18 +32,18 @@
             = render partial: 'controls_postamble', object: controls[:play]
     tr
       th Discard:
-      - if !player_private.cards.in_discard.empty?
+      - if !player_private.cards.in_discard.blank?
         td
           .full_cards.ghosted
             = render partial: 'card_with_ctrls', collection: zip_cards_no_ctrls(player_private.cards.in_discard)
       - else
         td None
-    - if (!player_private.cards.enduring.empty?) || (!controls[:durations].empty?)
+    - if (!player_private.cards.enduring.blank?) || (!controls[:durations].blank?)
       tr
         th Durations:
         td
           .full_cards= render partial: 'card_with_ctrls', collection: zip_cards_no_ctrls(player_private.cards.enduring)
-    - if (!player_private.cards.revealed.empty?) || (!controls[:revealed].select { |c| c[:player_id] == player_private.id }.empty?)
+    - if (!player_private.cards.revealed.blank?) || (!controls[:revealed]&.select { |c| c[:player_id] == player_private.id }.blank?)
       tr
         th Revealed:
         td
@@ -52,7 +52,7 @@
             = render partial: 'control_preamble', collection: revealed_controls
             = render partial: 'card_with_ctrls', collection: zip_cards_and_ctrls(player_private.cards.revealed, revealed_controls)
             = render partial: 'controls_postamble', object: revealed_controls
-    - if (!player_private.cards.peeked.empty?) || (!controls[:peeked].empty?)
+    - if (!player_private.cards.peeked.blank?) || (!controls[:peeked].blank?)
       tr
         th= controls[:peeked].andand[0].andand[:label] || "Looked at:"
         td
@@ -61,7 +61,7 @@
             = render partial: 'card_with_ctrls', collection: zip_cards_and_ctrls(player_private.cards.peeked, controls[:peeked])
             = render partial: 'controls_postamble', object: controls[:peeked]
 
-    - if !player_private.cards.of_type("Seaside::PirateShip").empty?
+    - if !player_private.cards.of_type("Seaside::PirateShip").blank?
       tr
         th Pirate Coins:
         td= player_private.state.pirate_coins
@@ -81,49 +81,47 @@
         th Cash:
         td= player_private.cash
   - if controls[:player].present?
-    tr
-      td[colspan="2"]
-        table
-          - controls[:player].each do |control|
-            - control_form(control)
-            tr
-              - case control[:type]
-                - when :buttons
-                  td= control[:label]
-                  - control[:options].each do |opt|
+    table.player_ctrls
+      - controls[:player].each do |control|
+        - control_form(control)
+        tr
+          - case control[:type]
+            - when :buttons
+              td= control[:label]
+              - control[:options].each do |opt|
+                td
+                  = button_tag opt[:text], type: 'submit',
+                                            name: 'journal[event]',
+                                            value: opt[:journal],
+                                            form: "form_#{control.object_id}",
+                                            disable_with: opt[:text],
+                                            class: control[:css_class]
+            - when :checkboxes
+              td: table.choices
+                tr: th[colspan=control[:choices].length]= control[:label]
+                tr
+                  - control[:choices].each_with_index do |choice, ix|
                     td
-                      = button_tag opt[:text], type: 'submit',
-                                                name: 'journal[event]',
-                                                value: opt[:journal],
-                                                form: "form_#{control.object_id}",
-                                                disable_with: opt[:text],
-                                                class: control[:css_class]
-                - when :checkboxes
-                  td: table.choices
-                    tr: th[colspan=control[:choices].length]= control[:label]
-                    tr
-                      - control[:choices].each_with_index do |choice, ix|
-                        td
-                          = check_box_tag(control[:name] + "[]", ix, false,
-                                           id: "#{control.object_id}_#{ix}",
-                                           form: "form_#{control.object_id}",
-                                           class: control[:css_class])
-                          = label_tag("#{control.object_id}_#{ix}", choice, class: control[:css_class])
-                      td= submit_tag(control[:button_text],
-                                      form: "form_#{control.object_id}",
-                                      disable_with: control[:button_text],
-                                      class: control[:css_class])
-                - when :dropdown
-                  td
-                    = control[:label]
-                    = select_tag(control[:name], options_for_select(control[:choices], control[:selected]),
-                                  id: "#{control.object_id}_#{control[:name]}",
-                                  form: "form_#{control.object_id}",
-                                  class: control[:css_class])
-                    = submit_tag(control[:button_text],
+                      = check_box_tag(control[:name] + "[]", ix, false,
+                                       id: "#{control.object_id}_#{ix}",
+                                       form: "form_#{control.object_id}",
+                                       class: control[:css_class])
+                      = label_tag("#{control.object_id}_#{ix}", choice, class: control[:css_class])
+                  td= submit_tag(control[:button_text],
                                   form: "form_#{control.object_id}",
                                   disable_with: control[:button_text],
                                   class: control[:css_class])
+            - when :dropdown
+              td
+                = control[:label]
+                = select_tag(control[:name], options_for_select(control[:choices], control[:selected]),
+                              id: "#{control.object_id}_#{control[:name]}",
+                              form: "form_#{control.object_id}",
+                              class: control[:css_class])
+                = submit_tag(control[:button_text],
+                              form: "form_#{control.object_id}",
+                              disable_with: control[:button_text],
+                              class: control[:css_class])
 - set_aside = set_aside_area(player_private, false)
 - if set_aside != ""
  .setAside: table.player= raw set_aside

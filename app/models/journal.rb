@@ -28,6 +28,8 @@ class Journal < ActiveRecord::Base
     end)
 
     subclass.const_set('Template', Class.new do
+      attr_reader :actor
+
       def initialize(actor, args)
         @actor = actor
         @required_args = args || []
@@ -54,7 +56,11 @@ class Journal < ActiveRecord::Base
       define_method(:text) { opts[:text] || '' }
 
       determine ||= ->(actor, controls) {}
-      define_method(:determine_controls, &determine)
+      define_method(:determine_controls) do
+        ret = determine.call
+        ret.values.each { |v| v[:journal_type] = self.class.to_s.deconstantize }
+        ret
+      end
     end)
 
     self::Question
@@ -67,6 +73,14 @@ class Journal < ActiveRecord::Base
 
   def invoke(object)
     object.public_send(self.class.cause_method, self)
+  end
+
+  def self.text(string = nil, &block)
+    if string
+      define_method(:text) { string }
+    else
+      define_method(:text, &block)
+    end
   end
 
   # def =~(ptn)
@@ -113,7 +127,8 @@ class Journal < ActiveRecord::Base
     end
   end
 
-private
+  private
+
   def blank_histories
     self.histories = []
   end

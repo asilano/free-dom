@@ -2,12 +2,7 @@ ul
   - @game.journals.each do |journal|
     -if !journal.hidden || journal.modified || journal.player == @player
       li.journal class=classes_for_journal(journal, @player)
-        - if journal.modified
-          span.bold>[] (Edited)
-        - if (journal.player == @player && journal.order > @game.last_blocked_journal) || Rails.env == 'development'
-          = best_in_place journal, :event, class: 'change_journal', other_fields: {game_id: @game.id}, html_attrs: {style: 'width: 100%', autocomplete: 'off'}
-        - else
-          span.immutable= journal.event
+        = journal.text
         -if journal.errors.any?
           ul.journal_errors.error
             - journal.errors.full_messages.each do |msg|

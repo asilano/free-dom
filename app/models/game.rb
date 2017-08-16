@@ -14,6 +14,7 @@ class Game < ActiveRecord::Base
   module Journals
     class PlatinumColonyJournal < Journal
       causes :set_plat_col
+      text { "Using Platinum & Colony: #{parameters[:choice].titleize}" }
 
       private
 
@@ -26,6 +27,10 @@ class Game < ActiveRecord::Base
     class SetupPilesJournal < Journal
       causes :set_piles
 
+      def text
+        "Using piles: #{parameters[:piles].map{ |p| p.sub(/.*::/, '').titleize }.join(', ')}"
+      end
+
       private
 
       def parameters_ok?
@@ -37,6 +42,21 @@ class Game < ActiveRecord::Base
               false
             end
           end
+      end
+    end
+
+    class StartGameJournal < Journal
+      causes :start_game
+      text { "#{player.name} started the game" }
+      question(text: 'Start the game') do
+        {
+          player: {
+            type: :buttons,
+            label: '',
+            options: [{ text: 'Start Game' }],
+            css_class: 'play massive'
+          }
+        }
       end
     end
   end
@@ -90,7 +110,7 @@ class Game < ActiveRecord::Base
     main_strand.ask_question(object: self,
                              journal: Journals::SetupPilesJournal)
     if players.count >= 2
-      main_strand.ask_question(object: self, method: :start_game, actor: players.unscoped[0], text: 'Start game')
+      main_strand.ask_question(object: self, actor: players.unscoped[0], journal: Journals::StartGameJournal)
     end
 
     # Main loop. For each journal in turn, look for an extant question which wants it as an answer.
@@ -138,7 +158,7 @@ class Game < ActiveRecord::Base
         # Check to see if we need to ask for an Action or Buy
         if strands.all? { |strand| strand.questions.empty? } && current_turn_player
           current_strand = main_strand
-          current_turn_player.prompt_for_questions
+          #current_turn_player.prompt_for_questions
         end
       end
 
@@ -284,12 +304,7 @@ class Game < ActiveRecord::Base
     end
   end
 
-  def start_game(journal, actor, check: false)
-    ok = (actor == players.unscoped[0] && journal.event == "#{players.unscoped[0].name} started the game")
-    if !ok || check
-      return ok
-    end
-
+  def start_game(journal)
     if state == "running"
       # Game is already running. Odd. Error, and consume the event
       journal.errors.add(:event, ': Game already running')
@@ -339,8 +354,6 @@ class Game < ActiveRecord::Base
 
     save!
     seat_order[0].start_turn
-
-    return
   end
 
   def check_game_end

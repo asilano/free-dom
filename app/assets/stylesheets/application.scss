@@ -65,6 +65,11 @@ button, input[type=button], input[type=submit], a.button {
   @include when-smaller-than(medium) {
     min-height: 40px;
   }
+
+  &.massive {
+    min-height: 40px;
+    font-size: 2em;
+  }
 }
 
 a.button {

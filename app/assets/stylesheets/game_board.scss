@@ -206,7 +206,7 @@
     }
   }
 
-  th, td {
+  th:not(:empty), td:not(:empty) {
     margin: 0 5px;
     padding: 0 5px;
   }
@@ -455,6 +455,10 @@
   td {
     padding-left: 10px;
   }
+}
+
+.player_ctrls {
+  margin-top: 5px;
 }
 
 .full_cards {

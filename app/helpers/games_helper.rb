@@ -249,7 +249,9 @@ EOS
                       :id => "form_#{control.object_id}",
                       :class => 'ajaxSpinSmall'
                     }) do |f|
-      hidden_field_tag(:game_id, @game.id) + raw(str)
+      f.hidden_field(:game_id, value: @game.id) +
+        f.hidden_field(:type, value: control[:journal_type]) +
+        raw(str)
     end
 
     content_for(:control_forms, raw(form))

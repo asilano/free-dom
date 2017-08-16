@@ -36,7 +36,7 @@ class Player < ActiveRecord::Base
   end
 
   def questions
-    game.questions.select { |q| q.actor == self }
+    game.questions.select { |q| q[:template].actor == self }
   end
 
   def cards
@@ -71,86 +71,91 @@ class Player < ActiveRecord::Base
     return Hash.new([]) if questions.blank?
 
     self.reload
-    controls = Hash.new([])
-    questions.each do |action|
-      if action.object == self
-        case action.method
-        when :play_action
-          controls[:hand] += [{type: :button,
-                               text: "Play",
-                               nil_action: {text: "Leave Action Phase",
-                                            journal: "#{name} played no further actions."},
-                               journals: cards.hand.each_with_index.map { |c, ix| "#{name} played #{c.readable_name} (#{ix})." if c.is_action? },
-                               css_class: 'play'
-                              }]
-        when :play_treasure
-          nil_actions = []
-          if cards.hand.any? { |card| card.is_treasure? && !card.is_special? }
-            card_list = cards.hand.each_with_index.map { |c, ix| "#{c.readable_name} (#{ix})" if c.is_treasure? && !c.is_special? }
-            nil_actions << {text: 'Play Simple Treasures',
-                            journal: "#{name} played #{card_list.compact.join(', ')} as treasures."}
-          end
-          nil_actions << {text: 'Stop Playing Treasures',
-                          journal: "#{name} played no further treasures.",
-                          confirm: true}
-          controls[:hand] += [{type: :checkboxes,
-                               choice_text: "Play",
-                               button_text: 'Play selected',
-                               nil_action: nil_actions,
-                               journal_template: "#{name} played {{cards}} as treasures.",
-                               journals: cards.hand.each_with_index.map { |c, ix| "#{c.readable_name} (#{ix})" if c.is_treasure?},
-                               if_empty: {cards: 'no cards'},
-                               field_name: :cards,
-                               css_class: 'play-treasure'
-                              }]
-        when :buy
-          piles = game.piles.each_with_index.map do |pile, ix|
-            if game.facts[:contraband] && game.facts[:contraband].include?(pile.card_type)
-              nil
-            elsif pile.card_type == "Prosperity::GrandMarket" && !cards.in_play.of_type("BasicCards::Copper").empty?
-              nil
-            elsif pile.cost > cash || pile.cards.empty?
-              nil
-            else
-              "#{name} bought #{pile.cards[0].readable_name} (#{ix})."
-            end
-          end
-          controls[:piles] += [{:type => :button,
-                                :text => "Buy",
-                                :nil_action => {text: 'Buy no more',
-                                                journal: "#{name} bought no more cards"},
-                                journals: piles
-                              }]
-        when :play_reaction
-          event = action.params[:event]
-          hand_card_journals = cards.hand.each_with_index.map { |c, ix| "#{name} reacted to #{event} with #{c.readable_name} (#{ix})." if c.can_react_to.include? event }
-          if hand_card_journals.any?
-            controls[:hand] += [{type: :button,
-                               text: "React",
-                               nil_action: [{text: "Don't react",
-                                            journal: "#{name} didn't react to #{event}."}],
-                               journals: hand_card_journals,
-                               params: action.params
-                              }]
-          end
-        when 'choose_sot_card'
-          # We've peeked at the cards we can choose between
-          controls[:peeked] += [{type: :button,
-                                  action: :choose_sot_card,
-                                  text: 'Choose',
-                                  params: {},
-                                  cards: [true] * cards.peeked.count,
-                                  pa_id: action.id
-                                }]
-        end
-      elsif action.method != :start_game
-        tmp_ctrls = Hash.new([])
-        action.object.determine_controls(self, tmp_ctrls, action)
-        tmp_ctrls.each do |key, ctrl_array|
-          controls[key] ||= []
-          controls[key] += ctrl_array
-        end
+    controls = questions.each_with_object({}) do |q, ctrls|
+      added = q[:question].determine_controls
+      added.each do |k, v|
+        ctrls[k] ||= []
+        ctrls[k] << v
       end
+      ctrls
+      # if action.object == self
+      #   case action.method
+      #   when :play_action
+      #     controls[:hand] += [{type: :button,
+      #                          text: "Play",
+      #                          nil_action: {text: "Leave Action Phase",
+      #                                       journal: "#{name} played no further actions."},
+      #                          journals: cards.hand.each_with_index.map { |c, ix| "#{name} played #{c.readable_name} (#{ix})." if c.is_action? },
+      #                          css_class: 'play'
+      #                         }]
+      #   when :play_treasure
+      #     nil_actions = []
+      #     if cards.hand.any? { |card| card.is_treasure? && !card.is_special? }
+      #       card_list = cards.hand.each_with_index.map { |c, ix| "#{c.readable_name} (#{ix})" if c.is_treasure? && !c.is_special? }
+      #       nil_actions << {text: 'Play Simple Treasures',
+      #                       journal: "#{name} played #{card_list.compact.join(', ')} as treasures."}
+      #     end
+      #     nil_actions << {text: 'Stop Playing Treasures',
+      #                     journal: "#{name} played no further treasures.",
+      #                     confirm: true}
+      #     controls[:hand] += [{type: :checkboxes,
+      #                          choice_text: "Play",
+      #                          button_text: 'Play selected',
+      #                          nil_action: nil_actions,
+      #                          journal_template: "#{name} played {{cards}} as treasures.",
+      #                          journals: cards.hand.each_with_index.map { |c, ix| "#{c.readable_name} (#{ix})" if c.is_treasure?},
+      #                          if_empty: {cards: 'no cards'},
+      #                          field_name: :cards,
+      #                          css_class: 'play-treasure'
+      #                         }]
+      #   when :buy
+      #     piles = game.piles.each_with_index.map do |pile, ix|
+      #       if game.facts[:contraband] && game.facts[:contraband].include?(pile.card_type)
+      #         nil
+      #       elsif pile.card_type == "Prosperity::GrandMarket" && !cards.in_play.of_type("BasicCards::Copper").empty?
+      #         nil
+      #       elsif pile.cost > cash || pile.cards.empty?
+      #         nil
+      #       else
+      #         "#{name} bought #{pile.cards[0].readable_name} (#{ix})."
+      #       end
+      #     end
+      #     controls[:piles] += [{:type => :button,
+      #                           :text => "Buy",
+      #                           :nil_action => {text: 'Buy no more',
+      #                                           journal: "#{name} bought no more cards"},
+      #                           journals: piles
+      #                         }]
+      #   when :play_reaction
+      #     event = action.params[:event]
+      #     hand_card_journals = cards.hand.each_with_index.map { |c, ix| "#{name} reacted to #{event} with #{c.readable_name} (#{ix})." if c.can_react_to.include? event }
+      #     if hand_card_journals.any?
+      #       controls[:hand] += [{type: :button,
+      #                          text: "React",
+      #                          nil_action: [{text: "Don't react",
+      #                                       journal: "#{name} didn't react to #{event}."}],
+      #                          journals: hand_card_journals,
+      #                          params: action.params
+      #                         }]
+      #     end
+      #   when 'choose_sot_card'
+      #     # We've peeked at the cards we can choose between
+      #     controls[:peeked] += [{type: :button,
+      #                             action: :choose_sot_card,
+      #                             text: 'Choose',
+      #                             params: {},
+      #                             cards: [true] * cards.peeked.count,
+      #                             pa_id: action.id
+      #                           }]
+      #   end
+      # elsif action.method != :start_game
+      #   tmp_ctrls = Hash.new([])
+      #   action.object.determine_controls(self, tmp_ctrls, action)
+      #   tmp_ctrls.each do |key, ctrl_array|
+      #     controls[key] ||= []
+      #     controls[key] += ctrl_array
+      #   end
+      # end
     end
 
     return controls
@@ -485,7 +490,7 @@ class Player < ActiveRecord::Base
       end
     end
 
-    prompt_for_questions
+    #prompt_for_questions
   end
 
   # Called by the game when it has nothing left to ask about, to see if the player needs to act or buy

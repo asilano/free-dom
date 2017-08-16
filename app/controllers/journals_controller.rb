@@ -1,6 +1,6 @@
 class JournalsController < ApplicationController
   before_action :set_journal, only: [:show, :edit, :update, :destroy]
-  before_action :find_game, only: [:create, :update]
+  #before_action :find_game, only: [:create, :update]
   before_action :find_user, only: [:create, :update]
 
   # GET /journals
@@ -23,44 +23,50 @@ class JournalsController < ApplicationController
 
   # POST /journals
   def create
-    event = params[:journal].andand[:event]
-    if event.blank? && params[:journal].andand[:template]
-      template = Journal::Template.new(params[:journal][:template])
-      params[:journal][:if_empty].andand.each do |key, val|
-        if !params[:journal].has_key?(key)
-          params[:journal][key] = val
-        end
-      end
-      event = template.fill(params[:journal])
-    end
+    @journal = Journal.new(journal_params)
+    @journal.player = @journal.game.players.where(user_id: @user.id).first
+    # event = params[:journal].andand[:event]
+    # if event.blank? && params[:journal].andand[:template]
+    #   template = Journal::Template.new(params[:journal][:template])
+    #   params[:journal][:if_empty].andand.each do |key, val|
+    #     if !params[:journal].has_key?(key)
+    #       params[:journal][key] = val
+    #     end
+    #   end
+    #   event = template.fill(params[:journal])
+    # end
 
-    hidden = params[:journal].andand[:hidden].andand[event]
+    # hidden = params[:journal].andand[:hidden].andand[event]
 
-    if event && @game
-      new_order = params[:journal][:order].andand.to_i
-      if new_order && @game.journals.any? { |j| j.order == new_order }
-        # Inserting a journal. Renumber all following journals
-        @game.journals.where { order >= new_order }.each do |j|
-          j.order += 1
-          j.save!
-        end
-      end
+    # if event && @game
+    #   new_order = params[:journal][:order].andand.to_i
+    #   if new_order && @game.journals.any? { |j| j.order == new_order }
+    #     # Inserting a journal. Renumber all following journals
+    #     @game.journals.where { order >= new_order }.each do |j|
+    #       j.order += 1
+    #       j.save!
+    #     end
+    #   end
 
-      create_params = journal_params
-      create_params[:event] = event
-      create_params[:hidden] = hidden
-      @journal = @game.journals.build(create_params)
-      @journal.player = @player
-      if !@journal.order
-        @journal.order = @journal.game.journals.map(&:order).max + 1
-      end
+    #   create_params = journal_params
+    #   create_params[:event] = event
+    #   create_params[:hidden] = hidden
+    #   @journal = @game.journals.build(create_params)
+    #   @journal.player = @player
+    #   if !@journal.order
+    #     @journal.order = @journal.game.journals.map(&:order).max + 1
+    #   end
 
-      @journal.save
-    end
+    #   @journal.save
+    # end
     respond_to do |format|
-        format.html { redirect_to play_game_path(@game), status: :see_other }
+      if @journal.save
+        format.html { redirect_to play_game_path(@journal.game), status: :see_other }
         format.json { respond_with_bip(@journal) }
-        format.js { redirect_to play_game_path(@game), status: :see_other }
+        format.js { redirect_to play_game_path(@journal.game), status: :see_other }
+      else
+        respond_with 567
+      end
     end
   end
 
@@ -92,6 +98,6 @@ private
 
     # Only allow a trusted parameter "white list" through.
     def journal_params
-      params[:journal].permit :game_id, :event, :order, :modified
+      params.require(:journal).permit(:game_id, :type, :order)
     end
 end

@@ -11,23 +11,23 @@ div[class=['player', ('curr_turn' if player.game.current_turn_player == player)]
   tr
     th Play:
     td
-      - if (!player.cards.in_play.empty?)
+      - if (!player.cards.in_play.blank?)
         .full_cards
           = render partial: 'card_with_ctrls', collection: zip_cards_no_ctrls(player.cards.in_play)
-  - if (!player.cards.enduring.empty?)
+  - if (!player.cards.enduring.blank?)
     tr
       th Durations:
       td: .full_cards
         = render partial: 'card_with_ctrls', collection: zip_cards_no_ctrls(player.cards.enduring)
   tr
     th Discard:
-    - if !player.cards.in_discard.empty?
+    - if !player.cards.in_discard.blank?
       td: .full_cards
         = render partial:'card_with_ctrls', collection: [[player.cards.in_discard[0], nil]]
         div and #{player.cards.in_discard.count - 1} others
     - else
       td None
-  - if !player.cards.revealed.empty? || !controls[:revealed].select { |c| c[:player_id] == player.id }.empty?
+  - if !player.cards.revealed.blank? || !controls[:revealed]&.select { |c| c[:player_id] == player.id }.blank?
     tr
       th Revealed:
       td: .full_cards
@@ -35,7 +35,7 @@ div[class=['player', ('curr_turn' if player.game.current_turn_player == player)]
         = render partial: 'control_preamble', collection: ctrls
         = render partial: 'card_with_ctrls', collection: zip_cards_and_ctrls(player.cards.revealed, ctrls)
         = render partial: 'controls_postamble', object: ctrls
-  - if !player.cards.of_type("Seaside::PirateShip").empty?
+  - if !player.cards.of_type("Seaside::PirateShip").blank?
     tr
       th Pirate Coins:
       td= player.state.pirate_coins
@@ -44,7 +44,7 @@ div[class=['player', ('curr_turn' if player.game.current_turn_player == player)]
     tr.scoreRow
       th Score:
       td= player.score
-  - if !controls[:other_players].select { |c| c[:player_id].to_i == player.id }.empty?
+  - if !controls[:other_players]&.select { |c| c[:player_id].to_i == player.id }.blank?
     tr
       td[colspan="2"]
         table

@@ -38,12 +38,12 @@
 #status
   #ended.hidden= game.state == 'ended'
   #locked.hidden false
-  - if game.questions.any? { |q| q.actor }
+  - if game.questions.any? { |q| q[:template].actor }
     #waiting_for
       span Waiting for:
       ul
-        - game.questions.select { |q| q.actor }.each do |q|
-          li= q.actor.name + " to " + q.text
+        - game.questions.select { |q| q[:template].actor }.each do |q|
+          li= q[:template].actor.name + " to " + q[:question].text
 - if player
   #player_private
     = render partial: 'player_private', object: player,
@@ -84,7 +84,7 @@ h1 Buy Piles
   - spacer_count = 0
   .pile.non-pile
     .buttons
-      - controls[:piles].each do |control|
+      - controls[:piles]&.each do |control|
         - case control[:type]
           - when :button
             - spacer_count += 1
