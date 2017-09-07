@@ -40,7 +40,9 @@ html
     main
       #flash= render 'flash_area'
       #siteAnnounce
-        h1 Important - please read
-        p The service on which FreeDom is hosted is being discontinued in September. Consequently, I am looking into options for migrating FreeDom to another host. I will post further announcements here (and hopefully by email) when I have more information.
+        h1 Update on migration
+        p I have found replacement hosting for FreeDom, and will be migrating to the new server soon.
+        p I currently plan to take this site down for maintenance on Monday at 12 noon. I will then take a snapshot of the database, and upload it into the new server. Once that is complete, I will update this site to provide a link to the new server.
+        p I hope that the process will take less than an hour; however, if there are unforeseen problems, FreeDom will remain offline until I have resolved them. Thank you for your patience.
       #mainContent= yield
     footer== [link_to("Home", games_path), link_to("About", about_path), link_to("Feedback", contact_path)].join(' | ')

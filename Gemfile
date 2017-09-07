@@ -46,6 +46,8 @@ gem 'acts_as_tree'
 
 gem 'themes_for_rails'
 
+gem 'turnout'
+
 # Use unicorn as the web server
 # gem 'unicorn'
 
