@@ -10,7 +10,8 @@ gem 'activerecord-session_store'
 group :production do
   gem 'pg'
   gem 'newrelic_rpm'
-  gem 'unicorn'
+  #gem 'unicorn'
+  gem 'puma'
   gem 'rails_12factor'
 end
 group :development, :test do
