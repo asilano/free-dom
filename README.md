@@ -10,7 +10,7 @@ Notes
 
 `master` is the main branch. Development work will be performed here (if small), or merged here when complete. It is intended that `master` is always building and passing; however, mistakes happen.
 
-The `release` branch is the codebase as it exists on heroku.
+The `release` branch is the codebase as it exists live.
 
 Other branches may be created for significant items of development (such as new sets, or UI rewrites).
 

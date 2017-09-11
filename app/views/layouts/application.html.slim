@@ -39,8 +39,5 @@ html
         = content_for :game_prefs
     main
       #flash= render 'flash_area'
-      #siteAnnounce
-        h1 Important - please read
-        p The service on which FreeDom is hosted is being discontinued in September. Consequently, I am looking into options for migrating FreeDom to another host. I will post further announcements here (and hopefully by email) when I have more information.
       #mainContent= yield
     footer== [link_to("Home", games_path), link_to("About", about_path), link_to("Feedback", contact_path)].join(' | ')
