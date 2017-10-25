@@ -1,8 +1,54 @@
 class Player < ActiveRecord::Base
-
   include GamesHelper
   include CardsHelper
   extend FauxField
+
+  module Journals
+    class PlayActionJournal < Journal
+      causes :play_action
+      text do
+        card = find_card(game, parameters[:card_id])
+        card ? "#{player.name} played #{card.readable_name}." : "#{player.name} stopped playing actions."
+      end
+      question(text: 'Play an action') do
+        {
+          hand: {
+            type: :button,
+            text: 'Play',
+            nil_action: { text: 'Leave Action Phase' },
+            parameters: cards.hand.map { |c| c.id if c.is_action? },
+            css_class: 'play'
+          }
+        }
+      end
+
+      private
+
+      def parameters_ok?
+        c = find_card(game, parameters[:card_id])
+        super && (parameters[:card_id].blank? ||
+          (c.player == player &&
+            c.location == 'hand' &&
+            c.is_action?))
+      end
+    end
+
+    class PlayTreasuresJournal < Journal
+      causes :play_treasures
+      text { "" }
+      question(text: 'Play treasures') do
+        {
+          hand: {
+            type: :checkbox,
+            choice_text: 'Play',
+            button_text: 'Play selected',
+            parameters: cards.hand.map { |c| c.id if c.is_treasure? },
+            css_class: 'play-treasure'
+          }
+        }
+      end
+    end
+  end
 
   @@to_email = {}
   cattr_accessor :to_email
@@ -161,39 +207,33 @@ class Player < ActiveRecord::Base
     return controls
   end
 
-  def play_action(journal, actor, check: false)
-    match = /#{name} played (.*)/.match(journal.event)
-    ok = actor == self && match
-    if !ok || check
-      return ok
-    end
-
+  def play_action(journal)
     # Check we still have an action available
     if num_actions < 1
       journal.errors.add(:base, 'No available actions remaining')
-      return true
+      return
     end
 
     # Check for playing nothing
-    card_req = match.captures[0].sub(/\.*$/, '')
-    if card_req == 'no further actions'
+    if journal.parameters[:card].blank?
       self.num_actions = 0
       game.treasure_step = true
-      return true
+      return
     end
 
     # Check we have the specified card in hand
-    ret, card = find_card_for_journal(cards.hand, card_req)
-    if ret != :ok
-      journal.card_error ret
-      return true
+    card = find_card(game, parameters[:card])
+    if card.player != self
+      journal.card_error :wrong
+      journal.errors.add(:base, 'Specified card in not owned by the right player')
+      return
     end
 
     # Check the specified card is an action
     if !card.is_action?
       journal.card_error :wrong
       journal.errors.add(:base, 'Specified card is not an action')
-      return true
+      return
     end
 
     # Play the card
@@ -490,7 +530,7 @@ class Player < ActiveRecord::Base
       end
     end
 
-    #prompt_for_questions
+    prompt_for_questions
   end
 
   # Called by the game when it has nothing left to ask about, to see if the player needs to act or buy
@@ -498,12 +538,12 @@ class Player < ActiveRecord::Base
     if num_actions > 0
       # Ask the question - play action
       game.turn_phase = Game::TurnPhases::ACTION
-      game.ask_question(object: self, actor: self, method: :play_action, text: 'Play an action.')
+      game.ask_question(object: self, actor: self, journal: Journals::PlayActionJournal)
     elsif game.treasure_step && cards.hand.any?(&:is_treasure?)
       game.turn_phase = Game::TurnPhases::BUY
 
       # Ask the question - play treasures
-      game.ask_question(object: self, actor: self, method: :play_treasure, text: 'Play treasures.')
+      game.ask_question(object: self, actor: self, journal: Journals::PlayTreasuresJournal)
     elsif num_buys > 0
       # Just to be sure, force us out of treasure step
       game.turn_phase = Game::TurnPhases::BUY

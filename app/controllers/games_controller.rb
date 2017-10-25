@@ -264,7 +264,7 @@ private
     @full_title = ""
 
     if @game.state == 'running'
-      waiting_players = @game.questions.map(&:actor).compact
+      waiting_players = @game.questions.map { |q| q[:actor] }.compact
 
       # Ensure the current player is on the front of the list.
       if waiting_players.delete(@player)

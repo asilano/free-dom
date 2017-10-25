@@ -1,4 +1,6 @@
 class Journal < ActiveRecord::Base
+  include CardsHelper
+
   extend FauxField
 
   belongs_to :game
@@ -19,11 +21,14 @@ class Journal < ActiveRecord::Base
     super
 
     subclass.const_set('Question', Class.new do
+      def initialize(actor)
+      end
+
       def text
         ''
       end
 
-      def determine_controls(actor, controls)
+      def determine_controls
       end
     end)
 
@@ -53,11 +58,15 @@ class Journal < ActiveRecord::Base
     self.question_defined = true
     remove_const(:Question)
     const_set('Question', Class.new do
+      def initialize(actor)
+        @actor = actor
+      end
+
       define_method(:text) { opts[:text] || '' }
 
-      determine ||= ->(actor, controls) {}
+      determine ||= -> {}
       define_method(:determine_controls) do
-        ret = determine.call
+        ret = @actor.instance_exec(&determine)
         ret.values.each { |v| v[:journal_type] = self.class.to_s.deconstantize }
         ret
       end

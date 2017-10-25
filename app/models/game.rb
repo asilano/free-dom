@@ -47,7 +47,7 @@ class Game < ActiveRecord::Base
 
     class StartGameJournal < Journal
       causes :start_game
-      text { "#{player.name} started the game" }
+      text { "#{player.name} started the game." }
       question(text: 'Start the game') do
         {
           player: {
@@ -68,7 +68,7 @@ class Game < ActiveRecord::Base
 
   # Things that used to be database fields and relations
   faux_field :main_strand, [:strands, []], :current_strand, [:state, {}], [:facts, {}], :turn_count, [:piles, []], [:cards, Collections::CardsCollection.new],
-              :current_turn_player, :turn_phase, :treasure_step, :last_blocked_journal, [:triggers, {}]
+              :current_turn_player, :turn_phase, :treasure_step, :last_blocked_journal, [:triggers, {}], :last_card_id
 
   attr_accessor :random_select, :specify_distr, :plat_colony
   attr_accessor *(Card.expansions.map {|set| "num_#{set.name.underscore}_cards".to_sym})
@@ -158,7 +158,7 @@ class Game < ActiveRecord::Base
         # Check to see if we need to ask for an Action or Buy
         if strands.all? { |strand| strand.questions.empty? } && current_turn_player
           current_strand = main_strand
-          #current_turn_player.prompt_for_questions
+          current_turn_player.prompt_for_questions
         end
       end
 
@@ -456,6 +456,10 @@ class Game < ActiveRecord::Base
     piles.map { |p| p.cards[0] || Card.new }
   end
 
+  def next_card_id
+    self.last_card_id += 1
+  end
+
   def expand_random_choices
     if random_select.to_i == 1
       if specify_distr.to_i == 1
@@ -576,6 +580,7 @@ private
     self.current_strand = main_strand
     self.strands = [main_strand]
     self.triggers = {attack: Triggers::OnAttack.new(self)}
+    self.last_card_id = 0
   end
 
   def hack_game_state(journal, check: false)

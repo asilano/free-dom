@@ -1,15 +1,15 @@
-- journal, control = single_control
-.ctrl[class=(journal ? '' : 'placeholder')]
+- param, control = single_control
+.ctrl[class=(param ? '' : 'placeholder')]
   - control[:css_class] ||= ''
   - case control[:type]
     - when :button
       = button_tag(control[:text], type: 'submit',
-                                    name: 'journal[event]',
-                                    value: journal,
+                                    name: 'journal[parameters][card_id]',
+                                    value: param,
                                     form: "form_#{control.object_id}",
                                     data: { disable_with: control[:text] },
                                     class: control[:css_class],
-                                    disabled: !journal)
+                                    disabled: !param)
       - if control[:hidden]
         = hidden_field_tag("journal[hidden][#{journal}]", 1, form: "form_#{control.object_id}")
     - when :checkboxes

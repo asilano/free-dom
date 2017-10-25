@@ -23,7 +23,9 @@ class JournalsController < ApplicationController
 
   # POST /journals
   def create
+    Rails.logger.info(journal_params)
     @journal = Journal.new(journal_params)
+    Rails.logger.info(@journal)
     @journal.player = @journal.game.players.where(user_id: @user.id).first
     # event = params[:journal].andand[:event]
     # if event.blank? && params[:journal].andand[:template]
@@ -98,6 +100,8 @@ private
 
     # Only allow a trusted parameter "white list" through.
     def journal_params
-      params.require(:journal).permit(:game_id, :type, :order)
+      params.require(:journal).permit(:game_id, :type, :order).tap do |whitelist|
+        whitelist[:parameters] = params[:journal][:parameters]
+      end
     end
 end

@@ -6,12 +6,13 @@ class Card
   include Resolvable
 
   # Attributes that used to be in the database
-  attr_accessor :game, :player, :pile, :location, :position, :revealed, :peeked, :state
+  attr_accessor :game, :id, :player, :pile, :location, :position, :revealed, :peeked, :state
   attr_accessor :can_react_to
 
   def initialize(*args, &block)
     super
     @can_react_to = []
+    @id = game.andand.next_card_id
   end
 
   def to_s

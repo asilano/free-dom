@@ -261,11 +261,11 @@ EOS
   # each being a card and an array of the control-hashes affecting that card.
   def zip_cards_and_ctrls(cards, controls)
     # Create a template return array
-    rtn = cards.zip(Array.new(cards.length) { [] } )
+    rtn = cards.zip(Array.new(cards.length) { [] })
     controls.each do |ctrl|
-      journals = ctrl.delete(:journals)
-      rtn.zip(journals) do |pair, journal|
-        pair[1] << [journal, ctrl]
+      parameters = ctrl.delete(:parameters)
+      rtn.zip(parameters) do |pair, param|
+        pair[1] << [param, ctrl]
       end
     end
 

@@ -13,9 +13,9 @@ class Strand
   end
 
   def ask_question(params)
-    q = params[:journal]::Question.new
     object = params[:object]
     actor = params[:actor]
+    q = params[:journal]::Question.new(actor)
     templ = params[:journal]::Template.new(actor, params[:expect])
     @questions << { question: q, object: object, template: templ }
     q
