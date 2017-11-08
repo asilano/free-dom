@@ -33,24 +33,6 @@ h2= @game.name
           = submit_tag "Say", class: 'input-hack'
   - content_for :js_in_head do
     javascript:
-      // Best-in-place handling
-      $(function()
-      {
-        $(".best_in_place").best_in_place();
-        $('#journals').on("ajax:success", '.change_journal', function ()
-        {
-          $.getScript('#{play_game_path(@game)}');
-        })
-        .on("click", '.journal .insert', function ()
-        {
-          var newLi = $('<li class="journal">').insertAfter($(this).parent()); //'
-          var bipField = $("#{escape_javascript best_in_place(Journal.new, :event, class: 'change_journal', method: 'post', html_attrs: {style: 'width: 100%', autocomplete: 'off'})}");
-          bipField.attr('data-bip-other-fields', $.param({game_id: #{@game.id}, journal: {modified: true, order: $(this).data('order')}}));
-          bipField.insertAfter(newLi);
-          bipField.best_in_place().click();
-        });
-      });
-
       // Scroll to bottom of history & chat, and enable controls, every update
       function onLoadFunc() {
         $('#journals').scrollTop($('#journals')[0].scrollHeight);

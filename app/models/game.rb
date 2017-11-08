@@ -61,7 +61,7 @@ class Game < ActiveRecord::Base
     end
   end
 
-  has_many :journals, -> { order :order }
+  has_many :journals, -> { order :order }, dependent: :destroy
   has_many :players, -> { order :seat, :id }, :dependent => :destroy, inverse_of: :game
   has_many :users, :through => :players
   has_many :chats, -> { order :created_at }, :dependent => :delete_all

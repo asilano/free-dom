@@ -57,7 +57,7 @@ class Journal < ActiveRecord::Base
     raise 'Double question definition' if question_defined
     self.question_defined = true
     remove_const(:Question)
-    const_set('Question', Class.new do
+    const_set('Question', Class.new(Question) do
       def initialize(actor)
         @actor = actor
       end

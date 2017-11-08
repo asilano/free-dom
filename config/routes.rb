@@ -32,7 +32,7 @@ Dominion::Application.routes.draw do
       post :perform
     end
   end
-  resources :journals
+  resources(:journals) { delete 'undo', on: :member }
 
   get 'about', :controller => 'users', :action => 'about', :as => 'about'
   get 'contact', :controller => 'users', :action => 'contact', :as => 'contact'

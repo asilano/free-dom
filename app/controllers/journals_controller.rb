@@ -1,5 +1,5 @@
 class JournalsController < ApplicationController
-  before_action :set_journal, only: [:show, :edit, :update, :destroy]
+  before_action :set_journal, only: [:show, :edit, :update, :destroy, :undo]
   #before_action :find_game, only: [:create, :update]
   before_action :find_user, only: [:create, :update]
 
@@ -89,7 +89,21 @@ class JournalsController < ApplicationController
   # DELETE /journals/1
   def destroy
     @journal.destroy
-    redirect_to journals_url, notice: 'Journal was successfully destroyed.'
+    respond_to do |format|
+      format.html { redirect_to play_game_path(@journal.game), status: :see_other }
+      format.js { redirect_to play_game_path(@journal.game), status: :see_other }
+    end
+  end
+
+  # DELETE /journals/1/undo
+  def undo
+    to_undo = @journal.game.journals.where{ order >= my{@journal.order} }
+    to_undo.destroy_all
+
+    respond_to do |format|
+      format.html { redirect_to play_game_path(@journal.game), status: :see_other }
+      format.js { redirect_to play_game_path(@journal.game), status: :see_other }
+    end
   end
 
 private
