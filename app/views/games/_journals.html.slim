@@ -14,6 +14,6 @@ ul
               - if @player && history.css_class =~ /\bplayer#{@player.seat}\b/
                 - classes += ' self'
               li class=classes = format_history(history, @player)
-        - if journal.order >= @game.last_blocked_journal && journal.player == @player && journal.order > (@game.journals.where.not(player: @player).pluck(:order).max || 0)
+        - if journal.order > @game.last_blocked_journal && journal.player == @player && journal.order > (@game.journals.where.not(player: @player).pluck(:order).max || 0)
           = link_to undo_journal_path(journal), method: :delete, remote: true
             span.undo

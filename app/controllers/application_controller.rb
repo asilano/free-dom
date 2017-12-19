@@ -123,10 +123,12 @@ protected
   end
 
   def find_game
-    @game = Game.find(params[:game_id] || params[:id])
+    @game ||= Game.find(session[:game_id])
     Game.current = @game
     @omit_onload = false
     @just_checking = false
+
+    @game.process_journals
   rescue ActiveRecord::RecordNotFound
     Rails.logger.error("Attempt to access non-existant game #{params[:id]}" )
     flash[:warning] = "That Game doesn't exist"
@@ -137,7 +139,6 @@ protected
   end
 
   def find_user
-    #raise
     @user = User.find_by_id(session[:user_id]) if session
     @player = @user.players.find_by_game_id(@game.id) if (@game && @user)
   end

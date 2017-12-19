@@ -49,6 +49,8 @@ gem 'acts_as_tree'
 
 gem 'themes_for_rails'
 
+gem 'validates_serialized', git: 'https://github.com/asilano/validates_serialized'
+
 # Use unicorn as the web server
 # gem 'unicorn'
 

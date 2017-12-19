@@ -14,34 +14,22 @@ class Game < ActiveRecord::Base
   module Journals
     class PlatinumColonyJournal < Journal
       causes :set_plat_col
-      text { "Using Platinum & Colony: #{parameters[:choice].titleize}" }
-
-      private
-
-      def parameters_ok?
-        super && parameters.key?(:choice) &&
-          %w[yes no rules].include?(parameters[:choice])
+      validates_hash_keys :parameters do
+        validates :choice, presence: true, inclusion: { in: %w[yes no rules] }
       end
+      text { "Using Platinum & Colony: #{parameters[:choice].titleize}" }
     end
 
     class SetupPilesJournal < Journal
       causes :set_piles
+      validates_hash_keys :parameters do
+        validates_each_in_array :piles do
+          validates :value, card_type: true
+        end
+      end
 
       def text
         "Using piles: #{parameters[:piles].map{ |p| p.sub(/.*::/, '').titleize }.join(', ')}"
-      end
-
-      private
-
-      def parameters_ok?
-        super && parameters.key?(:piles) &&
-          parameters[:piles].all? do |pile_s|
-            begin
-              pile_s.constantize.superclass == Card
-            rescue
-              false
-            end
-          end
       end
     end
 
@@ -490,6 +478,10 @@ class Game < ActiveRecord::Base
 
   def piles_array
     (1..10).map {|ix| self.send("pile_#{ix}")}
+  end
+
+  def find_card(card_id)
+    cards.where { |c| c.id == card_id.to_i }.first
   end
 
 protected

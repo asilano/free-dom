@@ -249,9 +249,7 @@ EOS
                       :id => "form_#{control.object_id}",
                       :class => 'ajaxSpinSmall'
                     }) do |f|
-      f.hidden_field(:game_id, value: @game.id) +
-        f.hidden_field(:type, value: control[:journal_type]) +
-        raw(str)
+      f.hidden_field(:type, value: control[:journal_type]) + raw(str)
     end
 
     content_for(:control_forms, raw(form))
@@ -263,6 +261,7 @@ EOS
     # Create a template return array
     rtn = cards.zip(Array.new(cards.length) { [] })
     controls.each do |ctrl|
+      Rails.logger.info(ctrl.inspect)
       parameters = ctrl.delete(:parameters)
       rtn.zip(parameters) do |pair, param|
         pair[1] << [param, ctrl]

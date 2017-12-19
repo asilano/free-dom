@@ -74,8 +74,8 @@ h1 Buy Piles
             - nil_act = control[:nil_action]
             = button_tag(nil_act.andand[:text],
                           type: 'submit',
-                          name: "journal[event]",
-                          value: nil_act.andand[:journal],
+                          name: "journal[parameters][nil_action]",
+                          value: nil_act.andand[:text],
                           form: "form_#{control.object_id}",
                           class: (nil_act ? '' : ' placeholder') + (control[:css_class] || ''),
                           data: {disable_with: nil_act.andand[:text],

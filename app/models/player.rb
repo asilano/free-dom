@@ -6,9 +6,14 @@ class Player < ActiveRecord::Base
   module Journals
     class PlayActionJournal < Journal
       causes :play_action
+      validates_hash_keys :parameters do
+        validates :nil_action, presence: { if: ->(p) { p[:card_id].blank? } }
+        validates :nil_action, absence: { unless: ->(p) { p[:card_id].blank? } }
+        validates :card_id, card: { owner: :actor, location: :hand, satisfies: :is_action?, allow_nil: true }
+      end
       text do
-        card = find_card(game, parameters[:card_id])
-        card ? "#{player.name} played #{card.readable_name}." : "#{player.name} stopped playing actions."
+        card = game.find_card(parameters[:card_id])
+        parameters[:nil_action] ? "#{player.name} stopped playing actions." : "#{player.name} played #{card.readable_name}."
       end
       question(text: 'Play an action') do
         {
@@ -21,29 +26,60 @@ class Player < ActiveRecord::Base
           }
         }
       end
-
-      private
-
-      def parameters_ok?
-        c = find_card(game, parameters[:card_id])
-        super && (parameters[:card_id].blank? ||
-          (c.player == player &&
-            c.location == 'hand' &&
-            c.is_action?))
-      end
     end
 
     class PlayTreasuresJournal < Journal
       causes :play_treasures
-      text { "" }
+      validates_hash_keys :parameters do
+        validates :nil_action, presence: { if: ->(p) { p[:card_id].blank? } }
+        validates :nil_action, absence: { unless: ->(p) { p[:card_id].blank? } }
+        validates_each_in_array :card_id do
+          validates :value, card: { owner: :actor, location: :hand, satisfies: :is_treasure? }
+        end
+      end
+      text do
+        if parameters[:nil_action]
+          "#{player.name} stopped playing treasures."
+        else
+          cards = parameters[:card_id].map { |cid| game.find_card(cid).readable_name }
+          "#{player.name} played #{cards.join(', ')} as treasures."
+        end
+      end
       question(text: 'Play treasures') do
         {
           hand: {
-            type: :checkbox,
+            type: :checkboxes,
             choice_text: 'Play',
             button_text: 'Play selected',
+            nil_action: { text: 'Stop playing treasures' },
             parameters: cards.hand.map { |c| c.id if c.is_treasure? },
             css_class: 'play-treasure'
+          }
+        }
+      end
+    end
+
+    class BuyJournal < Journal
+      causes :buy_card
+      validates_hash_keys :parameters do
+        validates :nil_action, presence: { if: ->(p) { p[:card_id].blank? } }
+        validates :nil_action, absence: { unless: ->(p) { p[:card_id].blank? } }
+        validates :card_id, card: { location: :pile, allow_nil: true,
+                                    satisfies: ->(card, journal){ card.position == 0 && card.cost <= journal.player.cash },
+                                    satisfy_msg: 'is not an affordable card on top of a pile.' }
+      end
+      text do
+        card = game.find_card(parameters[:card_id])
+        parameters[:nil_action] ? "#{player.name} stopped buying cards." : "#{player.name} bought #{card.readable_name}."
+      end
+      question(text: 'Buy a card') do
+        {
+          piles: {
+            type: :button,
+            text: 'Buy',
+            nil_action: { text: 'Leave Buy Phase' },
+            parameters: game.piles.map { |p| c = p.cards.first; c.id if c.cost <= cash },
+            css_class: 'buy'
           }
         }
       end
@@ -117,7 +153,7 @@ class Player < ActiveRecord::Base
     return Hash.new([]) if questions.blank?
 
     self.reload
-    controls = questions.each_with_object({}) do |q, ctrls|
+    controls = questions.each_with_object(Hash.new { |h,k| h[k] = [] }) do |q, ctrls|
       added = q[:question].determine_controls
       added.each do |k, v|
         ctrls[k] ||= []
@@ -215,26 +251,14 @@ class Player < ActiveRecord::Base
     end
 
     # Check for playing nothing
-    if journal.parameters[:card].blank?
+    if journal.parameters[:nil_action]
       self.num_actions = 0
       game.treasure_step = true
       return
     end
 
-    # Check we have the specified card in hand
-    card = find_card(game, parameters[:card])
-    if card.player != self
-      journal.card_error :wrong
-      journal.errors.add(:base, 'Specified card in not owned by the right player')
-      return
-    end
-
-    # Check the specified card is an action
-    if !card.is_action?
-      journal.card_error :wrong
-      journal.errors.add(:base, 'Specified card is not an action')
-      return
-    end
+    # Find the specified card in hand
+    card = game.find_card(journal.parameters[:card_id])
 
     # Play the card
     self.num_actions -= 1
@@ -252,47 +276,20 @@ class Player < ActiveRecord::Base
     true
   end
 
-  def play_treasure(journal, actor, check: false)
-    match = /#{name} played (.*) treasures/.match(journal.event)
-    ok = actor == self && match
-    if !ok || check
-      return ok
+  def play_treasures(journal)
+    # Check for stopping playing
+    if journal.parameters[:nil_action].present?
+      game.treasure_step = false
+      return
     end
 
     # Check for not playing anything (empty checkboxes)
-    card_req = match.captures[0]
-    if card_req == 'no cards as'
-      return true
-    end
-
-    # Check for playing nothing
-    if card_req == 'no further'
-      game.treasure_step = false
-      return true
-    end
-
-    # Split out the card strings requested
-    card_req.sub!(/\s* as/, '')
-    card_strings = card_req.split(',').map(&:strip)
-
-    # Check we have the specified cards in hand
-    card_arr = card_strings.map do |card_s|
-      ret, card = find_card_for_journal(cards.hand, card_s)
-      if ret != :ok
-        journal.card_error ret
-        return true
-      end
-      card
-    end
-
-    # Check the specified cards are all treasures
-    if !card_arr.all?(&:is_treasure?)
-      journal.card_error :wrong
-      journal.errors.add(:base, 'Specified card is not a treasure')
-      return true
+    if journal.parameters[:card_id].blank?
+      return
     end
 
     # Play the cards
+    card_arr = journal.parameters[:card_id].map { |cid| game.find_card(cid) }
     ok = true
     cash_added = 0
     card_arr.each do |card|
@@ -305,46 +302,28 @@ class Player < ActiveRecord::Base
     end
 
     if ok
-      journal.add_history(event: "Cash added: #{cash_added}. Total cash: #{cash}.",
-                          css_class: "player#{seat}")
+      game.add_history(event: "Cash added: #{cash_added}. Total cash: #{cash}.",
+                       css_class: "player#{seat}")
     end
 
     ok
   end
 
-  def buy(journal, actor, check: false)
-    match = /#{name} bought (.*)/.match(journal.event)
-    ok = actor == self && match
-    if !ok || check
-      return ok
-    end
-
+  def buy_card(journal)
     # Check we still have a buy available
     if num_buys < 1
       journal.errors.add(:base, 'No buys remaining')
-      return true
+      return
     end
 
     # Check for buying nothing
-    card_req = match.captures[0].sub(/\.*$/, '')
-    if card_req == 'no more cards'
+    if journal.parameters[:nil_action]
       self.num_buys = 0
-      return true
+      return
     end
 
-    # Check we can find the specified card in piles
-    ret, card = find_card_for_journal(game.supply_cards, card_req)
-    if ret != :ok
-      journal.card_error ret
-      return true
-    end
-
-    # Check the specified card costs no more than our current cash
-    if card.cost > cash
-      journal.card_error :wrong
-      journal.errors.add(:base, 'Specified card is too expensive')
-      return true
-    end
+    # Find the specified card
+    card = game.find_card(journal.parameters[:card_id])
 
     # Buy the card.
     # TODO: Trigger "on-buy" here
@@ -354,8 +333,7 @@ class Player < ActiveRecord::Base
     self.num_buys -= 1
 
     # Gain the card
-    actor.gain(card: card, journal: journal)
-    true
+    gain(card, journal)
   end
 
   def play_reaction(journal, actor, check: false)
@@ -550,7 +528,7 @@ class Player < ActiveRecord::Base
       game.treasure_step = false
 
       # Ask the question - buy card
-      game.ask_question(object: self, actor: self, method: :buy, text: 'Buy.')
+      game.ask_question(object: self, actor: self, journal: Journals::BuyJournal)
     else
       # Next turn
       game.turn_phase = Game::TurnPhases::CLEAN_UP
@@ -980,49 +958,25 @@ class Player < ActiveRecord::Base
     return vps + list
   end
 
-  # This needs to handle gaining both from a pile, and of a specific card (as in Thief).
-  # opts must contain either
-  # :pile => <Pile object> or :card => <Card object>
-  def gain(opts = {})
-    raise "No :card or :pile to gain" unless (opts.include?(:card) || opts.include?(:pile))
-    raise "Both :card and :pile given to gain" if (opts.include?(:card) && opts.include?(:pile))
-    raise ":card supplied but not a Card" if (opts[:card] && !opts[:card].is_a?(Card))
-    raise ":pile supplied but not a Pile" if (opts[:pile] && !opts[:pile].is_a?(Pile))
-    raise "Object to be gained not in this game" if ((opts[:pile] && opts[:pile].game != game) ||
-                                                      (opts[:card] && opts[:card].game != game))
-
+  # opts must contain :card => <Card object>
+  def gain(card, journal, location: 'discard', position: -1)
     # Trip any cards that need to trigger before the gain to change the details of the gain
     # (as for, say, Nomad Camp)
     card_types = game.cards.map(&:class).uniq
-    gain_params = {:gainer => self,
-                   :card => opts[:card], # Can be nil
-                   :pile => opts[:pile], # Can be nil
-                   journal: opts[:journal],
-                   :location => opts[:location] || 'discard',
-                   :position => opts[:position] || 0}
+    gain_params = {gainer: self,
+                   card: card,
+                   journal: journal,
+                   location: location,
+                   position: position}
 
     # TODO: Publish pre-gain event here
 
-    pile = gain_params[:pile]
-    card = gain_params[:card] || pile.cards[0]
-    journal = gain_params[:journal]
-
-    if pile.andand.empty?
-      # Can't gain this card
-      journal.add_history(:event => "#{name} couldn't gain a #{pile.card_class.readable_name}, as the pile was empty.",
-                          :css_class => "player#{seat}")
-      return
-    end
-
-    raise "Couldn't determine card to gain" if card.nil?
-    raise "Card not in this game" if card.game != game
-
-    journal.add_history(event: "#{name} gained #{card.readable_name}.",
-                        css_class: "player#{seat} card_gain")
+    game.add_history(event: "#{name} gained #{card.readable_name}.",
+                     css_class: "player#{seat} card_gain")
     # Move the chosen card to the chosen position.
     # Card#gain defaults to discard, -1
     #
-    # Get the card to do it, so that we mint a fresh instance of infinite cards
+    # Get the card to do it, in case of callbacks
     card.gain(self, journal, locn: gain_params[:location], posn: gain_params[:position])
 
   end

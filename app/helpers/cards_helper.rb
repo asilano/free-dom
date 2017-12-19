@@ -1,8 +1,4 @@
 module CardsHelper
-  def find_card(game, id)
-    game.cards.where { |c| c.id == id }.first
-  end
-
   def find_card_for_journal(cards, journal_string)
     name = /([^()]*)/.match(journal_string).captures[0].strip
     modifiers = journal_string.scan(/\(([^)]*)\)/).flatten

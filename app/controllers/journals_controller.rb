@@ -1,7 +1,10 @@
 class JournalsController < ApplicationController
+  respond_to :html, :js
+
   before_action :set_journal, only: [:show, :edit, :update, :destroy, :undo]
   #before_action :find_game, only: [:create, :update]
-  before_action :find_user, only: [:create, :update]
+  before_action :find_game
+  before_action :find_user
 
   # GET /journals
   def index
@@ -23,9 +26,8 @@ class JournalsController < ApplicationController
 
   # POST /journals
   def create
-    Rails.logger.info(journal_params)
     @journal = Journal.new(journal_params)
-    Rails.logger.info(@journal)
+    @journal.game = Game.current
     @journal.player = @journal.game.players.where(user_id: @user.id).first
     # event = params[:journal].andand[:event]
     # if event.blank? && params[:journal].andand[:template]
@@ -61,14 +63,15 @@ class JournalsController < ApplicationController
 
     #   @journal.save
     # end
+
+    flash.alert = @journal.errors.full_messages unless @journal.save
     respond_to do |format|
-      if @journal.save
+      #if @journal.save
         format.html { redirect_to play_game_path(@journal.game), status: :see_other }
-        format.json { respond_with_bip(@journal) }
         format.js { redirect_to play_game_path(@journal.game), status: :see_other }
-      else
-        respond_with 567
-      end
+      #else
+      #  respond_with 567, location: play_game_path(@journal.game)
+      #end
     end
   end
 

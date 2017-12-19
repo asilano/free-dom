@@ -252,3 +252,31 @@ footer {
   text-align: center;
 }
 .gapAbove {padding-top: 5px;}
+
+#flash
+{
+  margin-top: 2em;
+  padding-left: 2px;
+  padding-right: 2px;
+
+  div { padding: 2px 5px; }
+
+  .notice
+  {
+    color: green;
+    border: 1px solid #008800;
+    background-color: #AAFFAA;
+  }
+  .alert
+  {
+    color: black;
+    border: 1px solid red;
+    background-color: #87CEFA;
+  }
+  .error
+  {
+    color: #880000;
+    border: 1px solid red;
+    background-color: #FFCCCC;
+  }
+}

@@ -10,8 +10,6 @@ class Journal < ActiveRecord::Base
   faux_field [:histories, []], :css_class
   attr_accessor :deferred
 
-  validate :parameters_ok?
-
   after_initialize :blank_histories
   before_save :set_order
 
@@ -146,9 +144,5 @@ class Journal < ActiveRecord::Base
     if !self.order
       self.order = game.journals.any? ? game.journals.map(&:order).max + 1 : 1
     end
-  end
-
-  def parameters_ok?
-    true
   end
 end

@@ -26,8 +26,8 @@
             - Array.wrap(control[:nil_action]).each.with_index do |nil_act, ix|
               - if nil_act
                 = button_tag(nil_act[:text], type: 'submit',
-                                       name: 'journal[parameters][card_id]',
-                                       value: nil,
+                                       name: 'journal[parameters][nil_action]',
+                                       value: nil_act[:value] || nil_act[:text],
                                        form: "form_#{control.object_id}",
                                        class: control[:css_class],
                                        data: {disable_with: nil_act[:text],

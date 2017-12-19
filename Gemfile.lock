@@ -16,6 +16,13 @@ GIT
       actionpack (>= 3.2)
       railties (>= 3.2)
 
+GIT
+  remote: https://github.com/asilano/validates_serialized
+  revision: 7e51257f670293f015be1bf2bdd19dbed915b195
+  specs:
+    validates_serialized (0.0.8)
+      activemodel (>= 3.0)
+
 PATH
   remote: vendor/gems/jquery-rails-3.1.4
   specs:
@@ -287,6 +294,7 @@ DEPENDENCIES
   thin
   uglifier
   unicorn
+  validates_serialized!
 
 RUBY VERSION
    ruby 2.3.3p222

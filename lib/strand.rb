@@ -12,11 +12,11 @@ class Strand
     end
   end
 
-  def ask_question(params)
-    object = params[:object]
-    actor = params[:actor]
-    q = params[:journal]::Question.new(actor)
-    templ = params[:journal]::Template.new(actor, params[:expect])
+  def ask_question(qn_params)
+    object = qn_params[:object]
+    actor = qn_params[:actor]
+    q = qn_params[:journal]::Question.new(actor)
+    templ = qn_params[:journal]::Template.new(actor, qn_params[:expect])
     @questions << { question: q, object: object, template: templ }
     q
   end

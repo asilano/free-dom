@@ -1,4 +1,7 @@
-- [:notice, :warning, :error].each do |type|
-  - if flash[type]
-    p class="flash #{type}" id="flash#{type}"
-      == flash[type]
+- flash.each do |type, msg|
+  - if msg.is_a? String
+    div(class=type)= msg
+  - else
+    div(class=type)
+      - msg.each do |a_msg|
+        p=a_msg

@@ -7,11 +7,12 @@ class GamesController < ApplicationController
   # * For every action which may make use of a user, pick up the user
   # * For every action requiring login, authorise the user
   # * In all cases, set up the HTML title string.
-  before_filter :find_game, :except => [:index, :new, :create, :card_text]
-  before_filter :find_user, :except => [:card_text]
+  before_filter :set_game_session, only: [:watch, :play]
+  before_filter :find_game, except: [:index, :new, :create, :card_text]
+  before_filter :find_user, except: :card_text
   before_filter :legacy
-  before_filter :authorise, :except => [:index, :watch, :speak, :check_change, :card_text]
-  before_filter :setup_title, :except => [:card_text]
+  before_filter :authorise, except: [:index, :watch, :speak, :check_change, :card_text]
+  before_filter :setup_title, except: :card_text
 
   around_filter :lock_player, :only => [:buy, :play_action, :resolve]
 
@@ -310,6 +311,11 @@ private
         @player.save!
       end
     end
+  end
+
+  def set_game_session
+    @game = Game.find(params[:id])
+    session[:game_id] = @game.id if @game
   end
 
 end
