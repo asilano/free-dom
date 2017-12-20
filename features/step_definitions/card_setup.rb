@@ -3,9 +3,10 @@
 #   Bob's hand is empty
 Given(/^(\w*?)(?:'s)? hand is empty/) do |name|
   name = 'Alan' if name == 'my'
+  player = @test_players[name]
   @hand_contents[name] = []
-  hack_journal = "Hack: #{name} hand = "
-  @test_game.add_journal(event: hack_journal)
+
+  @test_game.add_journal(type: 'HackJournals::HackPlayerCardsJournal', parameters: { player_id: player.id, location: 'hand', mod_type: 'set', card_types: [] })
   @test_game.process_journals
 end
 
@@ -20,7 +21,6 @@ Given(/^(\w*?)(?:'s)? hand contains #{CardList}(?: and )?#{NamedRandCards}?/) do
 
   fixed_list ||= ""
   @hand_contents[name] = []
-  hack_journal = "Hack: #{name} hand = "
   hack_cards = []
   fixed_list.split(/,\s*/).each do |kind|
     num = 1
@@ -56,8 +56,7 @@ Given(/^(\w*?)(?:'s)? hand contains #{CardList}(?: and )?#{NamedRandCards}?/) do
     hack_cards << CARD_TYPES[type].name
   end
 
-  hack_journal << hack_cards.join(", ")
-  @test_game.add_journal(event: hack_journal)
+  @test_game.add_journal(type: 'HackJournals::HackPlayerCardsJournal', parameters: { player_id: player.id, location: 'hand', mod_type: 'set', card_types: hack_cards })
   @test_game.process_journals
 
 end
@@ -67,8 +66,9 @@ end
 #   Bob's deck is empty
 Given(/^(\w*?)(?:'s)? deck is empty/) do |name|
   name = 'Alan' if name == 'my'
+  player = @test_players[name]
   @deck_contents[name] = []
-  @test_game.add_journal(event: "Hack: #{name} deck =")
+  @test_game.add_journal(type: 'HackJournals::HackPlayerCardsJournal', parameters: { player_id: player.id, location: 'deck', mod_type: 'set', card_types: [] })
   @test_game.process_journals
 end
 
@@ -91,7 +91,6 @@ Given(/^(\w*?)(?:'s)?? deck contains (?:(#{NamedRandCardsNoMatch}|#{CardListNoCa
   num_rand_bottom = $1
   name_rand_bottom = $2
 
-  hack_journal = "Hack: #{name} deck = "
   hack_cards = []
 
   @named_cards[name_rand_top] = [] if name_rand_top
@@ -166,8 +165,7 @@ Given(/^(\w*?)(?:'s)?? deck contains (?:(#{NamedRandCardsNoMatch}|#{CardListNoCa
     end
   end
 
-  hack_journal << hack_cards.join(", ")
-  @test_game.add_journal(event: hack_journal)
+  @test_game.add_journal(type: 'HackJournals::HackPlayerCardsJournal', parameters: { player_id: player.id, location: 'deck', mod_type: 'set', card_types: hack_cards })
   @test_game.process_journals
 end
 
@@ -176,8 +174,9 @@ end
 #   Bob has nothing in play
 Given /^(\w*) ha(?:ve|s) nothing in play/ do |name|
   name = 'Alan' if name == 'I'
+  player = @test_players[name]
   @play_contents[name] = []
-  @test_game.add_journal(event: "Hack: #{name} play =")
+  @test_game.add_journal(type: 'HackJournals::HackPlayerCardsJournal', parameters: { player_id: player.id, location: 'play', mod_type: 'set', card_types: [] })
   @test_game.process_journals
 end
 
@@ -190,7 +189,6 @@ Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? in play/) do |n
   name = 'Alan' if name == 'I'
   player = @test_players[name]
 
-  hack_journal = "Hack: #{name} play = "
   hack_cards = []
   fixed_list ||= ""
   fixed_list.split(/,\s*/).each do |kind|
@@ -216,8 +214,7 @@ Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? in play/) do |n
     hack_cards << CARD_TYPES[card_name].name
   end
 
-  hack_journal << hack_cards.join(", ")
-  @test_game.add_journal(event: hack_journal)
+  @test_game.add_journal(type: 'HackJournals::HackPlayerCardsJournal', parameters: { player_id: player.id, location: 'play', mod_type: 'set', card_types: hack_cards })
   @test_game.process_journals
 end
 
@@ -227,7 +224,8 @@ end
 Given /^(\w*) ha(?:ve|s) nothing in (?:my |his )?discard/ do |name|
   name = "Alan" if name == "I"
   @discard_contents[name] = []
-  @test_game.add_journal(event: "Hack: #{name} discard =")
+  player = @test_players[name]
+  @test_game.add_journal(type: 'HackJournals::HackPlayerCardsJournal', parameters: { player_id: player.id, location: 'discard', mod_type: 'set', card_types: [] })
   @test_game.process_journals
 end
 
@@ -240,7 +238,6 @@ Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? in (?:my |his )
   name = 'Alan' if name == 'I'
   player = @test_players[name]
 
-  hack_journal = "Hack: #{name} discard = "
   hack_cards = []
 
   fixed_list ||= ""
@@ -266,8 +263,7 @@ Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? in (?:my |his )
     hack_cards << CARD_TYPES[type].name
   end
 
-  hack_journal << hack_cards.join(", ")
-  @test_game.add_journal(event: hack_journal)
+  @test_game.add_journal(type: 'HackJournals::HackPlayerCardsJournal', parameters: { player_id: player.id, location: 'discard', mod_type: 'set', card_types: hack_cards })
   @test_game.process_journals
 end
 
@@ -280,7 +276,6 @@ Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? as (?:a )?durat
   name = 'Alan' if name == 'I'
   player = @test_players[name]
 
-  hack_journal = "Hack: #{name} enduring = "
   hack_cards = []
 
   fixed_list ||= ""
@@ -307,8 +302,7 @@ Given(/^(\w*) ha(?:ve|s) #{CardList}(?: and )?#{NamedRandCards}? as (?:a )?durat
     hack_cards << CARD_TYPES[type].name
   end
 
-  hack_journal << hack_cards.join(", ")
-  @test_game.add_journal(event: hack_journal)
+  @test_game.add_journal(type: 'HackJournals::HackPlayerCardsJournal', parameters: { player_id: player.id, location: 'enduring', mod_type: 'set', card_types: hack_cards })
   @test_game.process_journals
 end
 

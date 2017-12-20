@@ -122,9 +122,9 @@ class Game < ActiveRecord::Base
           # Found a strand that wants it
           current_strand = matching_strand
           matching_strand.apply_journal(@current_journal)
-        elsif hack_game_state(@current_journal, check: true)
+        elsif @current_journal.hack_journal?
           # If nothing else wants it, try the debug hook for adjusting game state
-          hack_game_state(@current_journal)
+          @current_journal.invoke(self)
         elsif !@current_journal.allow_defer ||
               strands.all? { |strand| strand.questions.empty? }
           @current_journal.errors.add(:base, :no_question)
@@ -484,6 +484,53 @@ class Game < ActiveRecord::Base
     cards.where { |c| c.id == card_id.to_i }.first
   end
 
+  def hack_player_cards(journal)
+    # when /^Hack: (.*) (hand|deck|play|discard|enduring) (\+|=) *((?:[a-zA-Z]*::[a-zA-Z]*(?:,\ )?)*)$/
+    player = players.where(id: journal.parameters[:player_id]).first
+    location = journal.parameters[:location]
+
+    if journal.parameters[:mod_type] == 'set'
+      # Setting location completely. So throw away existing cards
+      cards.delete_if { |card| card.player == player && card.location == location }
+    end
+
+    card_list = journal.parameters[:card_types]
+    card_list.each do |card|
+      card_class =  card.constantize
+      self.cards << card_class.new(game: self,
+                                   player: player,
+                                   location: location,
+                                   position: player.cards.in_location(location).length)
+    end
+  end
+
+  def hack_other_things
+    case 1
+    when /^Hack: ([a-zA-Z]*::[a-zA-Z]*) in (.*) remove (\d*|all)$/
+      card_type = $1
+      location = $2
+      quantity = $3
+      if quantity == 'all'
+        cards.delete_if { |card| card.class.to_s == card_type && card.location == location }
+      else
+        $3.to_i.times do |_|
+          ix = cards.index { |card| card.class.to_s == card_type && card.location == location }
+          break unless ix
+          cards.delete_at(ix)
+        end
+      end
+    when /^Hack: (.*) start turn$/
+      player = players.joins { user }.where { user.name == $1 }.first
+      self.main_strand = Strand.new
+      self.current_strand = main_strand
+      self.strands = [main_strand]
+
+      player.start_turn
+    else
+      journal.errors.add(:event, "Hack of unknown type")
+    end
+  end
+
 protected
   def unique_valid_piles
     if random_select.to_i != 1
@@ -574,59 +621,4 @@ private
     self.triggers = {attack: Triggers::OnAttack.new(self)}
     self.last_card_id = 0
   end
-
-  def hack_game_state(journal, check: false)
-    if check || journal.event !~ /^Hack: /
-      return journal.event =~ /^Hack: /
-    end
-
-    case journal.event
-    when /^Hack: (.*) (hand|deck|play|discard|enduring) (\+|=) *((?:[a-zA-Z]*::[a-zA-Z]*(?:,\ )?)*)$/
-      player = players.joins { user }.where { user.name == $1 }.first
-      location = $2
-
-      if $3 == '='
-        # Setting location completely. So throw away existing cards
-        cards.delete_if { |card| card.player == player && card.location == location }
-      end
-
-      card_list = $4.split(/,\s*/)
-      card_list.each do |card|
-        card_class = nil
-        begin
-          card_class = card.constantize
-        rescue
-          journal.errors.add(:event, "Hack mentions bad card type #{card}")
-        end
-
-        self.cards << card_class.new(game: self,
-                                      player: player,
-                                      location: location,
-                                      position: player.cards.in_location(location).length)
-      end
-    when /^Hack: ([a-zA-Z]*::[a-zA-Z]*) in (.*) remove (\d*|all)$/
-      card_type = $1
-      location = $2
-      quantity = $3
-      if quantity == 'all'
-        cards.delete_if { |card| card.class.to_s == card_type && card.location == location }
-      else
-        $3.to_i.times do |_|
-          ix = cards.index { |card| card.class.to_s == card_type && card.location == location }
-          break unless ix
-          cards.delete_at(ix)
-        end
-      end
-    when /^Hack: (.*) start turn$/
-      player = players.joins { user }.where { user.name == $1 }.first
-      self.main_strand = Strand.new
-      self.current_strand = main_strand
-      self.strands = [main_strand]
-
-      player.start_turn
-    else
-      journal.errors.add(:event, "Hack of unknown type")
-    end
-  end
-
 end

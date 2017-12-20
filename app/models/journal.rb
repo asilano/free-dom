@@ -90,44 +90,9 @@ class Journal < ActiveRecord::Base
     end
   end
 
-  # def =~(ptn)
-  #   event =~ ptn
-  # end
-
-  # def card_error(error)
-  #   errors.add(:base, "card_#{error}".to_sym)
-  # end
-
-  # def add_history(params)
-  #   self.histories << History.new(params)
-  # end
-
-  # class Template
-  #   attr_reader :template
-  #   def initialize(templ)
-  #     @template = templ
-  #   end
-
-  #   def fill(fields)
-  #     @template.gsub(/{{(.*?)}}/) do |m|
-  #       field = fields[$1.to_sym]
-  #       if field.kind_of? Array
-  #         field = field.join(', ')
-  #       end
-
-  #       field || "{{#{$1}}}"
-  #     end
-  #   end
-
-  #   def match(*args)
-  #     to_re.match(*args)
-  #   end
-
-  #   def to_re
-  #     pattern = @template.gsub(/{{(.*?)}}/) { |m| "(?<#{$1}>.*)" }
-  #     Regexp.new pattern
-  #   end
-  # end
+  def hack_journal?
+    false
+  end
 
   class Template
     def initialize(args)

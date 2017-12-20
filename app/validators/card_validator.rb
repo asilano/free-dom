@@ -3,7 +3,6 @@ class CardValidator < ActiveModel::EachValidator
 
   def validate_each(record, attribute, value)
     record.errors[attribute] << (options[:message] || :blank) if value.blank? && !options[:allow_nil]
-# Haven't processed journals yet
     card = Game.current.find_card(value)
 
     unless card
