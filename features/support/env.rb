@@ -4,19 +4,12 @@
 # instead of editing this one. Cucumber will automatically load all features/**/*.rb
 # files.
 
-ENV["RAILS_ENV"] = "test"
-
 require 'cucumber/rails'
-require 'factory_girl_rails'
-require 'test/unit/assertions'
 
-World(Test::Unit::Assertions)
-
-# Capybara defaults to XPath selectors rather than Webrat's default of CSS3. In
-# order to ease the transition to Capybara we set the default here. If you'd
-# prefer to use XPath just remove this line and adjust any selectors in your
-# steps to use the XPath syntax.
-Capybara.default_selector = :css
+# Capybara defaults to CSS3 selectors rather than XPath.
+# If you'd prefer to use XPath, just uncomment this line and adjust any
+# selectors in your step definitions to use the XPath syntax.
+# Capybara.default_selector = :xpath
 
 # By default, any exception happening in your Rails application will bubble up
 # to Cucumber so that your scenario will fail. This is a different from how
@@ -47,7 +40,10 @@ end
 # See the DatabaseCleaner documentation for details. Example:
 #
 #   Before('@no-txn,@selenium,@culerity,@celerity,@javascript') do
-#     DatabaseCleaner.strategy = :truncation, {:except => %w[widgets]}
+#     # { :except => [:widgets] } may not do what you expect here
+#     # as Cucumber::Rails::Database.javascript_strategy overrides
+#     # this setting.
+#     DatabaseCleaner.strategy = :truncation
 #   end
 #
 #   Before('~@no-txn', '~@selenium', '~@culerity', '~@celerity', '~@javascript') do
@@ -59,3 +55,4 @@ end
 # The :transaction strategy is faster, but might give you threading problems.
 # See https://github.com/cucumber/cucumber-rails/blob/master/features/choose_javascript_database_strategy.feature
 Cucumber::Rails::Database.javascript_strategy = :truncation
+

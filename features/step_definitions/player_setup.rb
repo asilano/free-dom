@@ -41,7 +41,7 @@ Given(/I am a player in a (?:([2-6])-player )?(standard|Platinum-Colony) game(?:
   @test_players = Hash[arr]
   assert_not_nil @test_players["Alan"]
 
-  @test_game.add_journal(event: "Alan started the game", player: @test_players["Alan"])
+  @test_game.add_journal(type: 'Game::Journals::StartGameJournal', player: @test_players["Alan"])
   @test_game.reload.process_journals
 
   Game.current = @test_game

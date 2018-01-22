@@ -29,19 +29,24 @@ When(/^(\w*?) stops? playing actions$/) do |name|
   @test_players[name].play_action(:nil_action => "Leave Action Phase", :pa_id => parent_act.id)
 end
 
-When(/^(\w*?) plays? #{SingleCard} as treasure$/) do |name, kind|
+When(/^(\w*?) plays? #{CardList} as treasure$/) do |name, card_list|
   name = 'Alan' if name == 'I'
-  assert_contains @hand_contents[name], kind
-  card = @test_players[name].cards.hand.of_type(CARD_TYPES[kind].name).first
-  assert_not_nil card
+  player = @test_players[name]
+  card_list = split_card_list(card_list)
+  assert_subset card_list, @hand_contents[name]
 
-  @hand_contents[name].delete_first(kind)
-  @play_contents[name] << kind
-  parent_act = @test_players[name].pending_actions.active.first
-  assert_match /play_treasure/, parent_act.expected_action
+  card_ids = []
+  card_list.each do |kind|
+    card = @test_players[name].cards.hand.of_type(CARD_TYPES[kind].name).first
+    assert_not_nil card
 
-  card_ix = @test_players[name].cards.hand.index {|c| c.type == card.type}
-  @test_players[name].play_treasure(:card_index => card_ix, :pa_id => parent_act.id)
+    @hand_contents[name].delete_first(kind)
+    @play_contents[name] << kind
+    card_ids << card.id
+  end
+
+  @test_game.add_journal(type: 'Player::Journals::PlayTreasuresJournal', player: player, parameters: { card_id: card_ids })
+  @test_game.process_journals
 
   # Playing the card is likely to do something. Skip checking this step
   @skip_card_checking = 1 if @skip_card_checking == 0
@@ -66,26 +71,6 @@ When(/^(\w*?) plays? simple treasures$/) do |name|
 
   # Skip checking this step, so the feature can move the cards
   @skip_card_checking = 1 if @skip_card_checking == 0
-end
-
-When(/(.*) moves? (.*) from (.*) to (.*)/) do |name, kind, from, to|
-  assert_not_equal "deck", from
-  assert_not_equal "deck", to
-
-  name = "Alan" if name == "I"
-  card = @test_players[name].cards.where(:location => from, :type => CARD_TYPES[kind].to_s)[0]
-  card.location = to
-  card.save!
-
-  if (%w<hand play discard enduring>.include? from)
-    conts = instance_variable_get("@#{from}_contents")
-    conts[name].delete_first(kind)
-  end
-
-  if (%w<hand play discard enduring>.include? to)
-    conts = instance_variable_get("@#{to}_contents")
-    conts[name] << kind
-  end
 end
 
 When(/^(\w*?) buys? #{SingleCard} expecting side-effects$/) do |name, kind|

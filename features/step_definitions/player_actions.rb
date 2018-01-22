@@ -3,16 +3,12 @@
 #   Bob gains Copper, Silver
 When(/^(\w*?) gain(?:s)? (.*)/) do |name, kinds|
   name = "Alan" if name == "I"
+  player = @test_players[name]
 
   kinds.split(/,\s+/).each do |kind|
-    params = {}
-    params[:pile_id] = @test_game.piles.where(:card_type => CARD_TYPES[kind].to_s)[0].id
-    pa = @test_game.pending_actions.where(:parent_id => nil)[0]
-    params[:parent_act] = pa.id
-    @test_players[name].do_gain(params)
+    card = @test_game.cards.select { |c| c.kind_of?(CARD_TYPES[kind]) && c.location == 'pile' }[0]
+    @test_game.add_journal(type: 'HackJournals::HackGainJournal', parameters: { player_id: player.id, location: 'discard', position: 0, card_id: card.id })
   end
-
-  @test_game.process_actions
 
   # Need the test to tell us what card movements are expected; especially since Watchtower etc can step in.
   @skip_card_checking = 1 if @skip_card_checking == 0

@@ -1,19 +1,19 @@
-# Check the pending action is correct for a given ("stack-empty") phase of the game.
+# Check the game-state is correct for a given ("stack-empty") phase of the game.
 # Checks for Play Action, Play Treasure and Buy phases
 Then(/it should be (.*?)(?:'s)? (.*) phase/) do |name, phase|
   name = 'Alan' if name == 'my'
   exp_text = case phase
     when "Play Action"
-      'Play an action.'
+      'Play an action'
     when "Play Treasure"
-      'Play treasures.'
+      'Play treasures'
     when "Buy"
-      'Buy.'
+      'Buy a card'
     end
 
   assert_not_nil exp_text, "Unknown phase '#{phase}'"
 
-  assert_contains(@test_players[name].questions.map(&:text), exp_text, "Questions didn't contain #{exp_text}")
+  assert_contains(@test_players[name].questions.map { |q| q[:question].text }, exp_text, "Questions didn't contain #{exp_text}")
 end
 
 # Check for the readable text of a pending action

@@ -1,4 +1,6 @@
 AfterStep do |scenario|
+  @test_game.process_journals
+
   # Make sure we have a correct record of each player's attribs
   @test_players.values.each(&:reload)
 
@@ -6,7 +8,8 @@ AfterStep do |scenario|
   @skip_card_checking ||= 0
 
   if @skip_card_checking == 0
-    @test_players.each do |name, player|
+    @test_players.each do |name, test_player|
+      player = @test_game.players.where(id: test_player.id).first
       player.renum(:deck)
       assert_same_elements @hand_contents[name], player.cards.hand.map(&:readable_name), "#{name}'s hand didn't match"
       assert_same_elements @discard_contents[name], player.cards.in_discard.map(&:readable_name), "#{name}'s discard didn't match"
@@ -98,4 +101,22 @@ def assert_disjoint(left, right, extra_msg = "")
   end
 
   assert(!failed, msg)
+end
+
+def split_card_list(card_list)
+  rtn_array =[]
+  card_list.split(/,\s*/).each do |kind|
+    num = 1
+    card_name = kind
+    if /(.*) ?x ?(\d+)/ =~ kind
+      card_name = $1.rstrip
+      num = $2.to_i
+    end
+
+    num.times do
+      rtn_array << card_name
+    end
+  end
+
+  rtn_array
 end

@@ -111,7 +111,7 @@ class Game < ActiveRecord::Base
       @current_journal.histories = []
 
       Rails.logger.info("Processing journal: #{@current_journal.inspect}")
-      Rails.logger.info("Remaining journals: #{@journal_arr.map(&:event)}")
+      Rails.logger.info("Remaining journals: #{@journal_arr.map(&:type)}")
       #Rails.logger.info("Questions: #{questions.map(&:insp)}")
       #Rails.logger.info(main_strand.log)
       callcc do |cont|
@@ -502,6 +502,23 @@ class Game < ActiveRecord::Base
                                    location: location,
                                    position: player.cards.in_location(location).length)
     end
+  end
+
+  def hack_gain(journal)
+    player = players.where(id: journal.parameters[:player_id]).first
+    location = journal.parameters[:location]
+    position = journal.parameters[:position]
+    card = find_card(journal.parameters[:card_id])
+    player.gain(card, journal, location: location, position: position)
+  end
+
+  def hack_start_turn(journal)
+    player = players.where(id: journal.parameters[:player_id]).first
+    self.main_strand = Strand.new
+    self.current_strand = main_strand
+    self.strands = [main_strand]
+
+    player.start_turn
   end
 
   def hack_other_things

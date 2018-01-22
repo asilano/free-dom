@@ -10,7 +10,7 @@ end
 
 Then /(.*) should have (\d+) cash/ do |name, cash|
   name = "Alan" if name == "I"
-  assert_equal cash.to_i, @test_players[name].cash
+  assert_equal cash.to_i, @test_players[name].reload.cash
 end
 
 Then /(.*) should have (\d+) cards in hand/ do |name, cards|

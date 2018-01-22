@@ -20,21 +20,8 @@ Given(/^(\w*?)(?:'s)? hand contains #{CardList}(?: and )?#{NamedRandCards}?/) do
   player = @test_players[name]
 
   fixed_list ||= ""
-  @hand_contents[name] = []
-  hack_cards = []
-  fixed_list.split(/,\s*/).each do |kind|
-    num = 1
-    card_name = kind
-    if /(.*) ?x ?(\d+)/ =~ kind
-      card_name = $1.rstrip
-      num = $2.to_i
-    end
-
-    num.times do
-      @hand_contents[name] << card_name
-      hack_cards << CARD_TYPES[card_name].name
-    end
-  end
+  @hand_contents[name] = split_card_list(fixed_list)
+  hack_cards = @hand_contents[name].map { |c| CARD_TYPES[c].name }
 
   @named_cards[rand_name] = [] if rand_name
   nrand = num_rand.to_i
