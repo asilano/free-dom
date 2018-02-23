@@ -15,7 +15,7 @@ Feature: Chancellor
       And it is my Play Action phase
     When I play Chancellor
       Then I should have 2 cash
-      And I should need to Choose whether to discard your deck, with Chancellor
+      And I should need to Choose whether to discard your deck with Chancellor
     When I choose the option Don't discard
     Then it should be my Play Treasure phase
 
@@ -26,7 +26,7 @@ Feature: Chancellor
       And it is my Play Action phase
     When I play Chancellor
       Then I should have 2 cash
-      And I should need to Choose whether to discard your deck, with Chancellor
+      And I should need to Choose whether to discard your deck with Chancellor
     When I choose the option Discard deck
       Then I should have moved the cards named "deck" from deck to discard
       And it should be my Play Treasure phase
@@ -38,6 +38,6 @@ Feature: Chancellor
       And it is my Play Action phase
     When I play Chancellor
       Then I should have 2 cash
-      And I should need to Choose whether to discard your deck, with Chancellor
+      And I should need to Choose whether to discard your deck with Chancellor
     When I choose the option Discard deck
       Then it should be my Play Treasure phase

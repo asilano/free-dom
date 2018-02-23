@@ -3,6 +3,27 @@ class BaseGame::Feast < Card
   action
   card_text "Action (cost: 4) - Trash this card. Gain a card costing up to 5."
 
+  module Journals
+    class TakeJournal < Journal
+      causes :take_card
+      validates_hash_keys :parameters do
+        validates :card_id, card: { location: :pile, allow_nil: false,
+                                    satisfies: ->(card, journal){ card.position == 0 && card.cost <= 5 },
+                                    satisfy_msg: 'is not an affordable card on top of a pile.' }
+      end
+      text { "#{player.name} bought #{card.readable_name}." }
+      question(text: 'Take a card with Feast') do
+        {
+          piles: {
+            type: :button,
+            text: 'Take',
+            parameters: game.piles.map { |p| c = p.cards.first; c.id if c && c.cost <= 5 }
+          }
+        }
+      end
+    end
+  end
+
   TakeEventTempl = Journal::Template.new("{{player}} took {{card}} with #{readable_name}.")
 
   def play
@@ -20,31 +41,11 @@ class BaseGame::Feast < Card
     end
 
     # Ask for which card to gain
-    game.ask_question(object: self, actor: owner, method: :resolve_take, text: "Take a card with #{readable_name}.")
+    game.ask_question(object: self, actor: owner, journal: Journals::TakeJournal)
   end
 
-  def determine_controls(actor, controls, question)
-    case question.method
-    when :resolve_take
-      journals = game.piles.map do |pile|
-        if pile.cost <= 5 && !pile.empty?
-          TakeEventTempl.fill(player: actor.name, card: pile.cards[0].readable_name)
-        else
-          nil
-        end
-      end
-      controls[:piles] += [{:type => :button,
-                            :text => "Take",
-                            :nil_action => nil,
-                            journals: journals
-                          }]
-    end
-  end
-
-  resolves(:take).using(TakeEventTempl).
-                 validating_param_is_card(:card, scope: :supply) { cost <= 5 }.
-                 with do
+  def take_card(journal)
     # Process the take.
-    actor.gain(:card => journal.card, journal: journal)
+    journal.player.gain(journal.card, journal)
   end
 end

@@ -1,6 +1,6 @@
 ul
   - @game.journals.each do |journal|
-    -if !journal.hidden || journal.modified || journal.player == @player
+    -if !journal.hidden || journal.player == @player
       li.journal class=classes_for_journal(journal, @player)
         = journal.text
         -if journal.errors.any?

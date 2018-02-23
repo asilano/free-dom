@@ -32,8 +32,28 @@ module HackJournals
     text do
       name = Player.find(parameters[:player_id]).name
       card = game.find_card(parameters[:card_id])
-      "HACK: #{name} gained #{card} to #{parameters[:location]} position #{parameters[:position]}"
+      "HACK: #{name} gained #{card.readable_name} to #{parameters[:location]} position #{parameters[:position]}"
     end
+
+    def hack_journal?
+      true
+    end
+  end
+
+  class HackEmptyPileJournal < Journal
+    causes :hack_empty_pile
+    validates_hash_keys :parameters do
+      validates :card_type, card_type: true
+      validate :card_type_is_pile
+
+      def card_type_is_pile
+        unless record.game.piles.detect { |p| p.card_type == card_type }
+          errors.add(:card_type, 'is not in a pile')
+        end
+      end
+    end
+
+    text { "HACK: Emptied the #{parameters[:card_type]} pile" }
 
     def hack_journal?
       true

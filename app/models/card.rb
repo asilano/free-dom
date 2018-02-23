@@ -265,6 +265,7 @@ class Card
     raise "Card not owned" unless player
     self.location = 'discard'
     self.position = -1
+    self.revealed = false
   end
 
   # Peek at a card - mark it as peeked, so its owner can see it.

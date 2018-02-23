@@ -78,7 +78,7 @@ class Player < ActiveRecord::Base
             type: :button,
             text: 'Buy',
             nil_action: { text: 'Leave Buy Phase' },
-            parameters: game.piles.map { |p| c = p.cards.first; c.id if c.cost <= cash },
+            parameters: game.piles.map { |p| c = p.cards.first; c.id if c && c.cost <= cash },
             css_class: 'buy'
           }
         }
@@ -678,7 +678,7 @@ class Player < ActiveRecord::Base
   # pile under the deck if needed.
   #
   # Return the array of cards actually drawn
-  def draw_cards(num, reason = nil)
+  def draw_cards(num, reason: nil, journal: nil)
     cards_drawn = []
 
     if nil==reason
@@ -701,8 +701,9 @@ class Player < ActiveRecord::Base
     renum(:deck)
 
     if cards_drawn.empty?
-      game.add_history(:event => "#{name} drew no cards#{reason}.",
-                            :css_class => "player#{seat} card_draw")
+      game.add_history({ event: "#{name} drew no cards#{reason}.",
+                         css_class: "player#{seat} card_draw" },
+                       journal)
     else
       # Some number of cards drawn, revealing information and therefore blocking journal editing before it
       game.apply_journal_block
@@ -718,14 +719,16 @@ class Player < ActiveRecord::Base
         drawn_string << "#{cards_drawn.join(', ')}|#{cards_drawn.length} card#{cards_drawn.length == 1 ? '' : 's'}]"
       end
 
-      game.add_history(:event => "#{name} drew #{drawn_string}#{reason}.",
-                            :css_class => "player#{seat} card_draw #{'shuffle' if (shuffle_point > 0 && shuffle_point < cards_drawn.length)}")
+      game.add_history({ event: "#{name} drew #{drawn_string}#{reason}.",
+                         css_class: "player#{seat} card_draw #{'shuffle' if (shuffle_point > 0 && shuffle_point < cards_drawn.length)}" },
+                       journal)
     end
 
     if cards_drawn.length < num
       excess = num - cards_drawn.length
-      game.add_history(:event => "#{name} tried to draw #{excess} more card#{'s' unless excess == 1}#{reason}, but their deck was empty.",
-                            :css_class => "player#{seat} card_draw")
+      game.add_history({ event: "#{name} tried to draw #{excess} more card#{'s' unless excess == 1}#{reason}, but their deck was empty.",
+                         css_class: "player#{seat} card_draw"},
+                       journal)
     end
 
     return cards_drawn
@@ -978,7 +981,6 @@ class Player < ActiveRecord::Base
     #
     # Get the card to do it, in case of callbacks
     card.gain(self, journal, locn: gain_params[:location], posn: gain_params[:position])
-
   end
 
 private

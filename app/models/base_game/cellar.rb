@@ -4,7 +4,34 @@ class BaseGame::Cellar < Card
   card_text "Action (cost: 2) - +1 Action. Discard any number of cards. Draw 1 card " +
                        "per card discarded."
 
-  DiscardEventTempl = Journal::Template.new("{{player}} discarded {{cards}} with #{readable_name}.")
+  module Journals
+    class DiscardJournal < Journal
+      causes :discard_for_draw
+      validates_hash_keys :parameters do
+        validates_each_in_array :card_id do
+          validates :value, card: { owner: :actor, location: :hand, allow_nil: true }
+        end
+      end
+      text do
+        if parameters[:card_id].empty?
+          "#{player.name} discarded no cards to Cellar."
+        else
+          cards = parameters[:card_id].map { |cid| game.find_card(cid).readable_name }
+          "#{player.name} discarded #{cards.join(', ')} to Cellar."
+        end
+      end
+      question(text: 'Discard any number of cards with Cellar') do
+        {
+          hand: {
+            type: :checkboxes,
+            choice_text: 'Discard',
+            button_text: 'Discard selected',
+            parameters: cards.hand.map(&:id)
+          }
+        }
+      end
+    end
+  end
 
   def play
     super
@@ -22,33 +49,16 @@ class BaseGame::Cellar < Card
 
 
     # Ask the required question
-    game.ask_question(object: self, actor: player, method: :resolve_discard, text: "Discard any number of cards with #{readable_name}.")
+    game.ask_question(object: self, actor: player, journal: Journals::DiscardJournal)
   end
 
-  def determine_controls(actor, controls, question)
-    case question.method
-    when :resolve_discard
-      controls[:hand] += [{:type => :checkboxes,
-                           :name => "discard",
-                           :choice_text => "Discard",
-                           :button_text => "Discard selected",
-                           journal_template: DiscardEventTempl.fill(player: actor.name),
-                           journals: actor.cards.hand.each_with_index.map { |c, ix| "#{c.readable_name} (#{ix})" },
-                           field_name: :cards,
-                           if_empty: {cards: 'nothing'}
-                          }]
-    end
-  end
-
-  resolves(:discard).using(DiscardEventTempl).
-                      validating_param_is_card_array(:cards, scope: :hand, allow_blank_with: 'nothing').with do
-    # Looks good.
+  def discard_for_draw(journal)
     if !journal.cards.empty?
       # Discard each selected card
       journal.cards.each(&:discard)
 
       # Draw the same number of replacement cards
-      actor.draw_cards(journal.cards.count)
+      journal.player.draw_cards(journal.cards.count)
     end
   end
 end

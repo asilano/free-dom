@@ -295,7 +295,7 @@ end
 
 Given(/the (.*) piles? (?:is|are) empty/) do |kinds|
   kinds.split(/,\s*/).each do |kind|
-    @test_game.add_journal(event: "Hack: #{CARD_TYPES[kind].name} in pile remove all")
+    @test_game.add_journal(type: 'HackJournals::HackEmptyPileJournal', parameters: { card_type: CARD_TYPES[kind].name })
     @test_game.process_journals
   end
 end

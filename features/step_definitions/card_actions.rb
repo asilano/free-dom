@@ -11,10 +11,9 @@ When(/^(\w*?) plays? #{SingleCard}$/) do |name, kind|
   else
     @play_contents[name] << kind
   end
-  assert(player.questions.any? { |q| q.text == 'Play an action.' })
+  assert(player.questions.any? { |q| q[:question].text == 'Play an action' })
 
-  card_ix = player.cards.hand.index { |c| c.class == card.class }
-  @test_game.add_journal(event: "#{name} played #{kind} (#{card_ix}).", player: player)
+  @test_game.add_journal(type: 'Player::Journals::PlayActionJournal', player: player, parameters: { card_id: card.id })
   @test_game.process_journals
 
   # Playing the card is likely to do something. Skip checking this step

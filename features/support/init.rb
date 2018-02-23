@@ -1,3 +1,4 @@
+require 'pp'
 CARD_NAMES = CARD_TYPES.keys
 SingleCardNoCapture = /#{CARD_NAMES.join('|')}/
 SingleCard = /(#{SingleCardNoCapture})/

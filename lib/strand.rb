@@ -17,8 +17,9 @@ class Strand
     actor = qn_params[:actor]
     q = qn_params[:journal]::Question.new(actor)
     templ = qn_params[:journal]::Template.new(actor, qn_params[:expect])
-    @questions << { question: q, object: object, template: templ }
-    q
+    qn_hash = { question: q, object: object, template: templ }
+    @questions << qn_hash
+    qn_hash
   end
 
   def expects_journal(journal)

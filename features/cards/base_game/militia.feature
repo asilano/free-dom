@@ -20,8 +20,12 @@ Feature: Militia
       And Charlie should need to Discard 1 card with Militia
       And Dave should not need to act
       And I should not need to act
-    When Bob chooses Copper, Copper in his hand
-      Then Bob should have discarded Copper, Copper
+    When Bob chooses Copper in his hand
+      Then Bob should have discarded Copper
+      And Bob should need to Discard 1 card with Militia
+    When Bob chooses Copper in his hand
+      Then Bob should have discarded Copper
+      And Bob should not need to act
     When Charlie chooses Curse in his hand
       Then Charlie should have discarded Curse
       And it should be my Play Treasure phase

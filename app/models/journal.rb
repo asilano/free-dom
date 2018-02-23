@@ -60,7 +60,14 @@ class Journal < ActiveRecord::Base
         @actor = actor
       end
 
-      define_method(:text) { opts[:text] || '' }
+      define_method(:text) do
+        case opts[:text]
+        when String
+          opts[:text]
+        when Proc
+          instance_exec(&opts[:text])
+        end
+      end
 
       determine ||= -> {}
       define_method(:determine_controls) do
@@ -92,6 +99,14 @@ class Journal < ActiveRecord::Base
 
   def hack_journal?
     false
+  end
+
+  def card
+    game.find_card(parameters[:card_id]) if parameters[:card_id]
+  end
+
+  def cards
+    parameters[:card_id].map { |cid| game.find_card(cid) } if parameters[:card_id]
   end
 
   class Template

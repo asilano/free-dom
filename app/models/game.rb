@@ -49,20 +49,19 @@ class Game < ActiveRecord::Base
     end
   end
 
-  has_many :journals, -> { order :order }, dependent: :destroy
+  has_many :journals, -> { order :order }, dependent: :destroy, inverse_of: :game
   has_many :players, -> { order :seat, :id }, :dependent => :destroy, inverse_of: :game
   has_many :users, :through => :players
   has_many :chats, -> { order :created_at }, :dependent => :delete_all
 
   # Things that used to be database fields and relations
-  faux_field :main_strand, [:strands, []], :current_strand, [:state, {}], [:facts, {}], :turn_count, [:piles, []], [:cards, Collections::CardsCollection.new],
+  faux_field :main_strand, [:strands, []], :current_strand, :current_journal, [:state, {}], [:facts, {}], :turn_count, [:piles, []], [:cards, Collections::CardsCollection.new],
               :current_turn_player, :turn_phase, :treasure_step, :last_blocked_journal, [:triggers, {}], :last_card_id
 
   attr_accessor :random_select, :specify_distr, :plat_colony
   attr_accessor *(Card.expansions.map {|set| "num_#{set.name.underscore}_cards".to_sym})
   attr_accessor *(Card.expansions.map {|set| "#{set.name.underscore}_present".to_sym})
   attr_accessor(*(1..10).map{|n| "pile_#{n}".to_sym})
-  attr_reader :current_journal
 
   validates :name, :presence => true
   validates :max_players, :presence => true, :numericality => true, :inclusion => { :in => 2..6, :message => 'must be between 2 and 6 inclusive' }
@@ -106,38 +105,37 @@ class Game < ActiveRecord::Base
     # a journal, then we need to render controls for that question.
     @journal_arr = journals.to_a
     until @journal_arr.empty?
+      self.current_journal = @journal_arr.shift
+      current_journal.histories = []
 
-      @current_journal = @journal_arr.shift
-      @current_journal.histories = []
-
-      Rails.logger.info("Processing journal: #{@current_journal.inspect}")
+      Rails.logger.info("Processing journal: #{current_journal.inspect}")
       Rails.logger.info("Remaining journals: #{@journal_arr.map(&:type)}")
       #Rails.logger.info("Questions: #{questions.map(&:insp)}")
       #Rails.logger.info(main_strand.log)
       callcc do |cont|
         @cont = cont
-        matching_strand = strands.detect { |strand| strand.expects_journal(@current_journal) }
+        matching_strand = strands.detect { |strand| strand.expects_journal(current_journal) }
 
         if matching_strand
           # Found a strand that wants it
-          current_strand = matching_strand
-          matching_strand.apply_journal(@current_journal)
-        elsif @current_journal.hack_journal?
+          self.current_strand = matching_strand
+          matching_strand.apply_journal(current_journal)
+        elsif current_journal.hack_journal?
           # If nothing else wants it, try the debug hook for adjusting game state
-          @current_journal.invoke(self)
-        elsif !@current_journal.allow_defer ||
+          current_journal.invoke(self)
+        elsif !current_journal.allow_defer ||
               strands.all? { |strand| strand.questions.empty? }
-          @current_journal.errors.add(:base, :no_question)
+          current_journal.errors.add(:base, :no_question)
           Rails.logger.info("No question!")
-        elsif !@journal_arr.all?(&:deferred) || !@current_journal.deferred
-          @current_journal.deferred = true
-          @journal_arr << @current_journal
+        elsif !@journal_arr.all?(&:deferred) || !current_journal.deferred
+          current_journal.deferred = true
+          @journal_arr << current_journal
           next
         else
           return
         end
 
-        if @current_journal.errors.any?
+        if current_journal.errors.any?
           return
         end
 
@@ -145,7 +143,7 @@ class Game < ActiveRecord::Base
 
         # Check to see if we need to ask for an Action or Buy
         if strands.all? { |strand| strand.questions.empty? } && current_turn_player
-          current_strand = main_strand
+          self.current_strand = main_strand
           current_turn_player.prompt_for_questions
         end
       end
@@ -170,7 +168,7 @@ class Game < ActiveRecord::Base
   #
   # Expects a template which will be checked against journals to see if they match.
   def find_journal(template)
-    @journal_arr.detect { |j| template.match(j.event) }
+    @journal_arr.detect { |j| template.matches?(j) }
   end
 
   def find_journal_or_ask(template: nil, qn_params: {})
@@ -187,6 +185,7 @@ class Game < ActiveRecord::Base
   # Add a journal to the game's journals association, and to its @journal_arr. This means the
   # game will process the journal in the normal course of things.
   def add_journal(journal_params)
+    raise ArgumentError, "Old-style journal event present" if journal_params.key?(:event)
     journal = journals.create!(journal_params.merge(order: journals.map(&:order).max + 1))
     @journal_arr.andand << journal
     journal
@@ -195,7 +194,7 @@ class Game < ActiveRecord::Base
   # Add a history to the current journal - a record of something that happened as a result of a
   # player choice.
   def add_history(history_params, to_journal = nil)
-    to_journal ||= @current_journal
+    to_journal ||= current_journal
     if to_journal
       to_journal.histories << History.new(history_params)
     end
@@ -204,7 +203,7 @@ class Game < ActiveRecord::Base
   # Set that this journal, and all journals before it, are not free for edit (because hidden
   # information was revealed).
   def apply_journal_block
-    self.last_blocked_journal = @current_journal.order
+    self.last_blocked_journal = current_journal.order
   end
 
   def ask_question(q_params)
@@ -510,6 +509,11 @@ class Game < ActiveRecord::Base
     position = journal.parameters[:position]
     card = find_card(journal.parameters[:card_id])
     player.gain(card, journal, location: location, position: position)
+  end
+
+  def hack_empty_pile(journal)
+    pile = piles.detect { |p| p.card_type == journal.parameters[:card_type] }
+    cards.delete_if { |card| card.pile == pile && card.location == 'pile' }
   end
 
   def hack_start_turn(journal)

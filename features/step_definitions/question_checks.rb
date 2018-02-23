@@ -19,7 +19,7 @@ end
 # Check for the readable text of a pending action
 Then(/(.*) should (not )?need to (?!act)(.*)/) do |name, negate, action|
   name = "Alan" if name == "I"
-  questions = @test_players[name].questions.map(&:text)
+  questions = @test_players[name].questions.map{ |q| q[:question].text }
 
   if negate
     assert_not_contains(questions, /^#{action}\.?$/i)
@@ -166,7 +166,7 @@ Then(/(.*) should (not )?be able to choose the (.*) piles?$/) do |name, negate, 
   flunk "Unimplemented multi-pile controls in testbed" unless controls.length == 1
 
   ctrl = controls[0]
-  acceptable = ctrl[:journals].map.with_index {|valid, ix| @test_game.piles[ix].card_class.readable_name if valid}.compact
+  acceptable = ctrl[:parameters].compact.map.with_index { |card_id| @test_game.find_card(card_id).readable_name }
 
   unless negate
     assert_subset kinds.split(/,\s*/), acceptable

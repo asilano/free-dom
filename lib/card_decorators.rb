@@ -89,7 +89,6 @@ module CardDecorators
       self.order_relevant = opts[:order_relevant]
       self.affects_attacker = opts[:affects_attacker]
 
-      const_set("AttackTempl", Journal::Template.new("Conduct attack on {{victim}}."))
       include AttackMethods
     end
   end
@@ -141,6 +140,16 @@ module CardDecorators
       end
     end
 
+    module Journals
+      class ConductAttackJournal < Journal
+        causes :attackeffect
+        validates_hash_keys :parameters do
+          validates :victim_id, presence: true, player: true
+        end
+        text { "Conducting attack on #{game.players.where(id: parameters[:victim_id]).first.name}" }
+      end
+    end
+
     def attack
       # Attack each (other) player in turn. Ignore reactions - they'll get triggered.
       parent_strand = game.current_strand
@@ -162,21 +171,20 @@ module CardDecorators
 
         # In order that attacking gets held up by any triggers, ask and answer a question here that will
         # kick off the attack.
-        q = game.ask_question(object: self, #actor: player,
-                              method: :resolve_attack,
-                              params: {victim: victim},
-                              text: "Conduct attack on #{victim.name}.")
+        q = game.ask_question(object: self,
+                              actor: nil,
+                              journal: Journals::ConductAttackJournal,
+                              expect: { victim_id: victim.id })
 
-        j = game.find_journal("Conduct attack on #{victim.name}.")
+        j = game.find_journal(q[:template])
         if j.nil?
-          j = game.add_journal(#player_id: player.id,
-                            event: "Conduct attack on #{victim.name}.",
-                            hidden: true,
-                            allow_defer: true)
+          j = game.add_journal(type: Journals::ConductAttackJournal.to_s,
+                               parameters: { victim_id: victim.id },
+                               allow_defer: true)
         end
 
         # Trigger any effects that are watching for attack
-        game.triggers[:attack].trigger(victim: victim, attacker: player, trigger_card: self, att_q: q, att_j: j)
+        # game.triggers[:attack].trigger(victim: victim, attacker: player, trigger_card: self, att_q: q, att_j: j)
       end
     end
 

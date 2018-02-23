@@ -92,8 +92,8 @@
               - control[:options].each do |opt|
                 td
                   = button_tag opt[:text], type: 'submit',
-                                            name: 'journal[event]',
-                                            value: opt[:journal],
+                                            name: 'journal[parameters][choice]',
+                                            value: opt[:choice],
                                             form: "form_#{control.object_id}",
                                             disable_with: opt[:text],
                                             class: control[:css_class]

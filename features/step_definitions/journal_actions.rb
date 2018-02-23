@@ -16,19 +16,18 @@ When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in (?:his|my) hand$/) do |name,
   flunk "Unimplemented multi-hand controls in testbed" unless controls.length == 1
 
   ctrl = controls[0]
-
-  nact = ctrl[:nil_action].andand.detect{ |na| na[:text] == choices }
-  if nact
-    @test_game.add_journal(event: nact[:journal], player: player)
+  if ctrl[:nil_action] && ctrl[:nil_action][:text] == choices
+    @test_game.add_journal(type: ctrl[:journal_type], player: player, parameters: { nil_action: true })
   else
     possibilities = player.cards.hand.map(&:readable_name)
     assert_not_empty possibilities
 
     kinds = choices.split(/,\s*/)
-    if kinds.length == 1 && kinds[0] !~ /.* ?x ?\d*/ && !ctrl[:journal_template]
+    if kinds.length == 1 && kinds[0] !~ /.* ?x ?\d*/
       ix = possibilities.index(kinds[0])
       assert_not_nil ix, "Couldn't find #{kinds[0]} in hand (#{possibilities.inspect})"
-      @test_game.add_journal(event: ctrl[:journals][ix], player: player)
+      assert_not_nil ctrl[:parameters][ix], "#{kinds[0]} not choosable in control"
+      @test_game.add_journal(type: ctrl[:journal_type], player: player, parameters: { card_id: ctrl[:parameters][ix] })
     else
       picked_cards = []
       kinds.each do |kind|
@@ -43,13 +42,11 @@ When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in (?:his|my) hand$/) do |name,
           ix = possibilities.index(card_name)
           possibilities[ix] = nil
 
-          picked_cards << [card_name, ix]
+          picked_cards << ix
         end
       end
 
-      template = Journal::Template.new(ctrl[:journal_template])
-      event = template.fill(ctrl[:field_name] => picked_cards.map { |pair| "#{pair[0]} (#{pair[1]})" }.join(', '))
-      @test_game.add_journal(event: event, player: player)
+      @test_game.add_journal(type: ctrl[:journal_type], player: player, parameters: { card_id: picked_cards.map { |ix| ctrl[:parameters][ix] } })
     end
   end
 
@@ -206,7 +203,7 @@ When(/^(\w*?) chooses? the option (.*)/) do |name, choice|
   controls.each do |ctrl|
     matching_controls = ctrl[:options].detect {|opt| opt[:text] =~ /^#{Regexp.escape(choice)}$/i}
     if matching_controls
-      @test_game.add_journal(event: matching_controls[:journal], player: player)
+      @test_game.add_journal(type: ctrl[:journal_type], player: player, parameters: { choice: matching_controls[:choice] })
       @test_game.process_journals
       found = true
       break
@@ -319,7 +316,7 @@ end
 #   I choose the Estate pile
 #   Bob chooses the Estate, Copper piles
 #   I choose Take nothing for piles  // (Where "Take nothing" is the nil-action text)
-When(/^(\w*?) chooses? (?:the )?(.*?) (?:for )?piles?$/) do |name, choice|
+When(/^(\w*?) chooses? (?:the )?(.*?) (?:for )?piles?$/) do |name, choices|
   name = "Alan" if name == "I"
   player = @test_players[name]
 
@@ -330,22 +327,30 @@ When(/^(\w*?) chooses? (?:the )?(.*?) (?:for )?piles?$/) do |name, choice|
   flunk "Unimplemented multi-piles controls in testbed" unless controls.length == 1
 
   ctrl = controls[0]
-  params = {}
-
-  if Array(ctrl[:nil_action]).include? choice
-    params[:nil_action] = choice
+  if ctrl[:nil_action] && ctrl[:nil_action][:text] == choices
+    @test_game.add_journal(type: ctrl[:journal_type], player: player, parameters: { nil_action: true })
   else
-    possibilities = @test_game.piles.map{|p| p.card_class.readable_name}
-    kinds = choice.split(/,\s*/)
+    possibilities = @test_game.piles.map { |p| p.card_class.readable_name }
+    assert_not_empty possibilities
+
+    kinds = choices.split(/,\s*/)
     if kinds.length == 1
       ix = possibilities.index(kinds[0])
-      if ix
-        @test_game.add_journal(event: ctrl[:journals][ix], player: player)
-      else
-        flunk "Chose a pile that doesn't exist"
-      end
+      assert_not_nil ix, "Couldn't find #{kinds[0]} in pile-tops (#{possibilities.inspect})"
+      assert_not_nil ctrl[:parameters][ix], "#{kinds[0]} not choosable in control"
+      @test_game.add_journal(type: ctrl[:journal_type], player: player, parameters: { card_id: ctrl[:parameters][ix] })
     else
       flunk "Can't think of any multiple-pile cards at the mo..."
+      # picked_cards = []
+      # kinds.each do |kind|
+      #   num = 1
+      #   ix = possibilities.index(kind)
+      #   possibilities[ix] = nil
+
+      #   picked_cards << ix
+      # end
+
+      # @test_game.add_journal(type: ctrl[:journal_type], player: player, parameters: { card_id: picked_cards.map { |ix| ctrl[:parameters][ix] } })
     end
   end
 

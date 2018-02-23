@@ -31,17 +31,17 @@ Feature: Library
       And it is my Play Action phase
     When I play Library
     Then I should have drawn 3 cards
-      And I should need to Set aside or keep a card with Library.
+      And I should need to Set aside or keep a card with Library
     When I choose Smithy in my hand
     Then the following 2 steps should happen at once
       Then I should have removed Smithy from my hand
       And I should have drawn 2 cards
-    And I should need to Set aside or keep a card with Library.
+    And I should need to Set aside or keep a card with Library
     When I choose Witch in my hand
     Then the following 2 steps should happen at once
       Then I should have removed Witch from my hand
       And I should have drawn 1 card
-    And I should need to Set aside or keep a card with Library.
+    And I should need to Set aside or keep a card with Library
     When I choose Keep in my hand
     Then the following 2 steps should happen at once
       Then I should have drawn 1 card
