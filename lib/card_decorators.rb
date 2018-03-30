@@ -112,6 +112,21 @@ module CardDecorators
       end
       alias_method_chain "#{attr}=", "check_#{val}"
     end
+
+    # Called by a reaction card to tell the player it's available to react to an event
+    define_method(:register_reaction) do |event, state|
+      game.main_strand.log
+      if state[:trigger_card].react_questions[event].nil?
+        q = state[:trigger_card].react_questions[event] = game.ask_question(object: state[:trigger_card],
+                                                                            actor: self.player,
+                                                                            journal: state[:trigger_card].class::Journals::ReactJournal,
+                                                                            expect: { state: state.to_yaml })
+        q[:question].trigger_card = state[:trigger_card]
+      end
+
+      @can_react_to << event
+      state[:trigger_card].react_questions[event]
+    end
   end
 
   module AttackMethods
@@ -132,6 +147,7 @@ module CardDecorators
     # You still have to define attackeffect, and any choice actions, manually.
     def self.included(base)
       base.extend(ClassMethods)
+      base::Journals.include(Journals)
     end
 
     module ClassMethods
@@ -147,6 +163,41 @@ module CardDecorators
           validates :victim_id, presence: true, player: true
         end
         text { "Conducting attack on #{game.players.where(id: parameters[:victim_id]).first.name}" }
+        question(attribs: :victim_id)
+      end
+
+      class ReactJournal < Journal
+        causes :doreact
+        validates_hash_keys :parameters do
+          validates :nil_action, presence: { if: ->(p) { p[:card_id].blank? } }
+          validates :nil_action, absence: { unless: ->(p) { p[:card_id].blank? } }
+          validates :card_id, card: { owner: :actor, satisfies: :is_reaction?, allow_nil: true }
+        end
+        before_save :make_hidden
+
+        text do
+          if card
+            "#{player.name} reacted with #{card.readable_name}."
+          else
+            "#{player.name} chose not to react to #{self.readable_name}"
+          end
+        end
+
+        question(attribs: [:state, :trigger_card], text: -> { "React to #{@trigger_card.readable_name}" }) do |q|
+          {
+            hand: {
+              type: :button,
+              text:  "React",
+              nil_action: { text: "Don't react" },
+              parameters: cards.hand.map { |c| c.id if c.can_react_to?(:attack) },
+              expect: { state: q.state }
+            }
+          }
+        end
+
+        def make_hidden
+          self.hidden = true if parameters[:nil_action]
+        end
       end
     end
 
@@ -177,14 +228,14 @@ module CardDecorators
                               expect: { victim_id: victim.id })
 
         j = game.find_journal(q[:template])
-        if j.nil?
+        unless j
           j = game.add_journal(type: Journals::ConductAttackJournal.to_s,
                                parameters: { victim_id: victim.id },
                                allow_defer: true)
         end
 
         # Trigger any effects that are watching for attack
-        # game.triggers[:attack].trigger(victim: victim, attacker: player, trigger_card: self, att_q: q, att_j: j)
+        game.triggers[:attack].trigger(victim: victim, attacker: player, trigger_card: self, att_q: q, att_j: j)
       end
     end
 
@@ -355,72 +406,12 @@ module CardDecorators
       return "OK"
     end
 
-    # Set up controls for reactions, and handling for the reaction actions
-    def determine_react_controls(player, controls, substep, params)
-      if substep == "react"
-        controls[:hand] += [{:type => :button,
-                             :action => :resolve,
-                             :text => "React",
-                             :nil_action => "Don\'t react",
-                             :params => {:card => "#{self.class}#{id}",
-                                         :substep => "react"}.merge(params),
-                             :cards => player.cards.hand.map do |card|
-                               card.is_reaction?
-                             end
-                            }]
-      end
-    end
-
-    def resolve_react(ply, params, parent_act)
+    def doreact(journal)
       # This is at the scope of the attackees - and is registering a Reaction
       # We expect to have been passed either :nil_action or a :card_index
-      if (not params.include? :nil_action) and (not params.include? :card_index)
-        return "Invalid parameters"
-      end
+      return unless journal.card
 
-      # Processing is pretty much the same as a Play; code shamelessly yoinked from
-      # Player.play_action.
-      if ((params.include? :card_index) and
-          (params[:card_index].to_i < 0 or
-           params[:card_index].to_i > ply.cards.hand.length - 1))
-        # Asked to play an invalid card (out of range)
-        return "Invalid request - card index #{params[:card_index]} is out of range"
-      elsif params.include? :card_index and not ply.cards.hand[params[:card_index].to_i].is_reaction?
-        # Asked to play an invalid card (not an reaction)
-        return "Invalid request - card index #{params[:card_index]} is not an reaction"
-      end
-
-      # Now process the reaction played
-      if params[:nil_action]
-        # Player has chosen to play no reaction. If we stop now, the Game will do
-        # the right thing
-        unless params.include? :nolog and params[:nolog] == "true"
-          game.histories.create(:event => "#{ply.name} played no reaction.",
-                                :css_class => "player#{ply.seat} no_react")
-        end
-        rc = "OK"
-      else
-        # Player played a reaction. Check that the parent action is a Game-level
-        # action to make the attack effect happen, and add a child to ask for
-        # further reactions.
-        attack_act = parent_act
-        if (attack_act.expected_action !~ /_doattack/)
-          attack_act = attack_act.parent until attack_act.expected_action =~ /_doattacks/
-        end
-
-        react_act = parent_act.children.create(:expected_action => "resolve_#{self.class}#{id}_react;nolog=true",
-                                                 :text => "React to #{readable_name}",
-                                                 :player => ply,
-                                                 :game => game)
-
-        # Pass the reaction action in to the reaction handler as parent action.
-        rc = ply.cards.hand[params[:card_index].to_i].react(attack_act, react_act)
-
-      end
-
-      save!
-
-      return rc
+      journal.card.react(journal)
     end
 
     # Simple wrapper to call through to attackeffect, as modified by any

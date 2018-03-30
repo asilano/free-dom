@@ -22,7 +22,6 @@ class BaseGame::Library < Card
       before_save :make_hidden
 
       text do
-        card = game.find_card(parameters[:card_id])
         if card
           "#{player.name} set #{card.readable_name} aside."
         else

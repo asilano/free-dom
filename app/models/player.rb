@@ -536,17 +536,6 @@ class Player < ActiveRecord::Base
     end
   end
 
-  # Called by a reaction card to tell the player it's available to react to an event
-  def register_reaction(card, event, state)
-    game.main_strand.log
-    if self.react_questions[event].nil?
-      self.react_questions[event] = game.ask_question(object: self, actor: self, method: :play_reaction, text: "React to #{state[:trigger_card] || event}.",
-                                                      params: {event: event}.merge(state))
-    end
-
-    card.can_react_to << event
-  end
-
   # Handle the user choosing a card to play at the start of turn.
   def choose_sot_card(params)
     # Checks, including retrieving the action.

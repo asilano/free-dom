@@ -7,12 +7,17 @@ class Card
 
   # Attributes that used to be in the database
   attr_accessor :game, :id, :player, :pile, :location, :position, :revealed, :peeked, :state
-  attr_accessor :can_react_to
+  attr_accessor :can_react_to, :react_questions
 
   def initialize(*args, &block)
     super
     @can_react_to = []
+    @react_questions = {}
     @id = game.andand.next_card_id
+  end
+
+  def self.inherited(child)
+    child.const_set(:Journals, Module.new)
   end
 
   def to_s
@@ -29,6 +34,10 @@ class Card
 
   def modifiers
     []
+  end
+
+  def can_react_to?(event)
+    @can_react_to.include? event
   end
 
   def self.expansions

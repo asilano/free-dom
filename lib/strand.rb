@@ -17,6 +17,7 @@ class Strand
     actor = qn_params[:actor]
     q = qn_params[:journal]::Question.new(actor)
     templ = qn_params[:journal]::Template.new(actor, qn_params[:expect])
+    qn_params[:expect].each { |k,v| q.send("#{k}=", v) } if qn_params.key?(:expect)
     qn_hash = { question: q, object: object, template: templ }
     @questions << qn_hash
     qn_hash
@@ -55,7 +56,7 @@ class Strand
   end
 
   def log(indent = 0)
-    Rails.logger.info(" " * indent + "- Strand: Qs = #{@questions.map(&:text)} ")
+    Rails.logger.info(" " * indent + "- Strand: Qs = #{@questions.map { |q| q[:question].text }} ")
     @children.each {|c| c.log(indent + 2)}
   end
 end

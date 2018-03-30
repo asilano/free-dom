@@ -41,9 +41,9 @@ class Journal < ActiveRecord::Base
       def matches?(journal)
         return false unless self.class == journal.class::Template
         return false unless @actor == journal.player
+        check_parms = HashWithIndifferentAccess.new(journal.parameters)
         return false unless @required_args.all? do |key, val|
-          journal.parameters.key?(key) &&
-            journal.parameters[key] == val
+          check_parms.key?(key) && check_parms[key].to_s == val.to_s
         end
 
         true
@@ -57,6 +57,7 @@ class Journal < ActiveRecord::Base
     remove_const(:Question)
     const_set('Question', Class.new(Question) do
       def initialize(actor)
+        super
         @actor = actor
       end
 
@@ -71,10 +72,12 @@ class Journal < ActiveRecord::Base
 
       determine ||= -> {}
       define_method(:determine_controls) do
-        ret = @actor.instance_exec(&determine)
+        ret = @actor.instance_exec(self, &determine)
         ret.values.each { |v| v[:journal_type] = self.class.to_s.deconstantize }
         ret
       end
+
+      attr_accessor(*Array(opts[:attribs])) if opts[:attribs]
     end)
 
     self::Question

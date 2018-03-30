@@ -39,8 +39,6 @@ Feature: Moat
       Then Bob should have put Silver on top of his deck
       And I should need to React to Bureaucrat
     When I choose Moat in my hand
-      Then I should need to React to Bureaucrat
-    When I choose Don't react in my hand
       Then I should not need to act
       And it should be Bob's Buy phase
 

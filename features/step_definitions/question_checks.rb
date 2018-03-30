@@ -51,7 +51,7 @@ Then(/(.*) should (not )?be able to choose #{CardListNoRep} in (?:my|his) hand/)
   flunk "Too many controls in #{name}'s hand" unless controls.length == 1
 
   ctrl = controls[0]
-  acceptable = ctrl[:journals].map.with_index {|valid, ix| player.cards.hand[ix].readable_name if valid}.compact
+  acceptable = ctrl[:parameters].compact.map { |card_id| @test_game.find_card(card_id).readable_name }
 
   unless negate
     assert_subset kinds.split(/,\s*/), acceptable
@@ -166,7 +166,7 @@ Then(/(.*) should (not )?be able to choose the (.*) piles?$/) do |name, negate, 
   flunk "Unimplemented multi-pile controls in testbed" unless controls.length == 1
 
   ctrl = controls[0]
-  acceptable = ctrl[:parameters].compact.map.with_index { |card_id| @test_game.find_card(card_id).readable_name }
+  acceptable = ctrl[:parameters].compact.map { |card_id| @test_game.find_card(card_id).readable_name }
 
   unless negate
     assert_subset kinds.split(/,\s*/), acceptable

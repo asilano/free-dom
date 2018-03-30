@@ -20,7 +20,7 @@ Given(/I am a player in a (?:([2-6])-player )?(standard|Platinum-Colony) game(?:
     assert_operator reqd_cards.length, :<=, 10
 
     reqd_cards.each.with_index do |type, ix|
-      if !(1..10).any? { |jx| @test_game.send("pile_#{jx}") == CARD_TYPES[type].name }
+      unless ((reqd_cards.length + 1)..10).any? { |jx| @test_game.send("pile_#{jx}") == CARD_TYPES[type].name }
         @test_game.send("pile_#{ix+1}=", CARD_TYPES[type].name)
       end
     end

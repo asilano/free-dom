@@ -14,7 +14,7 @@ class BaseGame::Militia < Card
         card = game.find_card(parameters[:card_id])
         "#{player.name} discarded #{card.readable_name}."
       end
-      question(text: -> { "Discard #{@count} #{'card'.pluralize @count} with Militia" }) do
+      question(attribs: :count, text: -> { "Discard #{@count} #{'card'.pluralize @count} with Militia" }) do
         {
           hand: {
             type: :button,
@@ -22,10 +22,6 @@ class BaseGame::Militia < Card
             parameters: cards.hand.map(&:id)
           }
         }
-      end.class_eval do
-        def set_count(count)
-          @count = count
-        end
       end
     end
   end
@@ -65,6 +61,6 @@ class BaseGame::Militia < Card
     end
 
     q = game.ask_question(object: self, actor: target, journal: Journals::DiscardJournal)
-    q[:question].set_count(num_discards)
+    q[:question].count = num_discards
   end
 end

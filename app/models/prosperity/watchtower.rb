@@ -1,3 +1,4 @@
+# Note! Watchtower moves the card _after_ it's gained!
 # Watchtower (Action - Reaction - $3) - Draw until you have 6 cards in hand. / When you gain a card, you may reveal this from your hand. If you do, either trash that card, or put it on top of your deck.
 
 class Prosperity::Watchtower < Card

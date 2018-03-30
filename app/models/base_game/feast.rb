@@ -11,7 +11,7 @@ class BaseGame::Feast < Card
                                     satisfies: ->(card, journal){ card.position == 0 && card.cost <= 5 },
                                     satisfy_msg: 'is not an affordable card on top of a pile.' }
       end
-      text { "#{player.name} bought #{card.readable_name}." }
+      text { "#{player.name} took #{card.readable_name} with Feast." }
       question(text: 'Take a card with Feast') do
         {
           piles: {
@@ -23,8 +23,6 @@ class BaseGame::Feast < Card
       end
     end
   end
-
-  TakeEventTempl = Journal::Template.new("{{player}} took {{card}} with #{readable_name}.")
 
   def play
     super

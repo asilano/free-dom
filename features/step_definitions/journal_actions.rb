@@ -17,7 +17,7 @@ When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in (?:his|my) hand$/) do |name,
 
   ctrl = controls[0]
   if ctrl[:nil_action] && ctrl[:nil_action][:text] == choices
-    @test_game.add_journal(type: ctrl[:journal_type], player: player, parameters: { nil_action: true })
+    @test_game.add_journal(type: ctrl[:journal_type], player: player, parameters: { nil_action: true }.merge(ctrl[:expect] || {}))
   else
     possibilities = player.cards.hand.map(&:readable_name)
     assert_not_empty possibilities
@@ -27,7 +27,7 @@ When(/^(\w*?) chooses? (#{CardListNoCapture}|.*) in (?:his|my) hand$/) do |name,
       ix = possibilities.index(kinds[0])
       assert_not_nil ix, "Couldn't find #{kinds[0]} in hand (#{possibilities.inspect})"
       assert_not_nil ctrl[:parameters][ix], "#{kinds[0]} not choosable in control"
-      @test_game.add_journal(type: ctrl[:journal_type], player: player, parameters: { card_id: ctrl[:parameters][ix] })
+      @test_game.add_journal(type: ctrl[:journal_type], player: player, parameters: { card_id: ctrl[:parameters][ix] }.merge(ctrl[:expect] || {}))
     else
       picked_cards = []
       kinds.each do |kind|
@@ -328,7 +328,7 @@ When(/^(\w*?) chooses? (?:the )?(.*?) (?:for )?piles?$/) do |name, choices|
 
   ctrl = controls[0]
   if ctrl[:nil_action] && ctrl[:nil_action][:text] == choices
-    @test_game.add_journal(type: ctrl[:journal_type], player: player, parameters: { nil_action: true })
+    @test_game.add_journal(type: ctrl[:journal_type], player: player, parameters: { nil_action: true }.merge(ctrl[:expect] || {}))
   else
     possibilities = @test_game.piles.map { |p| p.card_class.readable_name }
     assert_not_empty possibilities
@@ -338,7 +338,7 @@ When(/^(\w*?) chooses? (?:the )?(.*?) (?:for )?piles?$/) do |name, choices|
       ix = possibilities.index(kinds[0])
       assert_not_nil ix, "Couldn't find #{kinds[0]} in pile-tops (#{possibilities.inspect})"
       assert_not_nil ctrl[:parameters][ix], "#{kinds[0]} not choosable in control"
-      @test_game.add_journal(type: ctrl[:journal_type], player: player, parameters: { card_id: ctrl[:parameters][ix] })
+      @test_game.add_journal(type: ctrl[:journal_type], player: player, parameters: { card_id: ctrl[:parameters][ix] }.merge(ctrl[:expect] || {}))
     else
       flunk "Can't think of any multiple-pile cards at the mo..."
       # picked_cards = []

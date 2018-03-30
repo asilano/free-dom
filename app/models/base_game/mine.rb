@@ -5,104 +5,101 @@ class BaseGame::Mine < Card
                        "Gain a Treasure card costing up to 3 more, and put " +
                        "it into your hand."
 
-  TrashEventTempl = Journal::Template.new("{{player}} chose {{card}} to trash with #{readable_name}.")
-  TakeEventTempl = Journal::Template.new("{{player}} took {{supply_card}} with #{readable_name}.")
+  module Journals
+    class TrashJournal < Journal
+      causes :trash_treasure
+      validates_hash_keys :parameters do
+        validates :card_id, card: { owner: :actor, location: :hand, satisfies: :is_treasure? }
+      end
+      text do
+        "#{player.name} chose #{card.readable_name} to trash with Mine."
+      end
+      question(text: 'Trash a card with Mine') do
+        {
+          hand: {
+            type: :button,
+            text: 'Trash',
+            parameters: cards.hand.map { |c| c.id if c.is_treasure? }
+          }
+        }
+      end
+    end
+
+    class TakeJournal < Journal
+      causes :take_treasure
+      validates_hash_keys :parameters do
+        validates :card_id, card: { location: :pile, allow_nil: false,
+                                    satisfies: ->(card, journal){ card.position == 0 && card.cost <= journal.parameters[:max_cost].to_i },
+                                    satisfy_msg: 'is not an affordable card on top of a pile.' }
+      end
+      text { "#{player.name} took #{card.readable_name} with Mine." }
+      question(attribs: :max_cost, text: 'Take a replacement card with Mine') do |q|
+        {
+          piles: {
+            type: :button,
+            text: 'Take',
+            expect: { max_cost: q.max_cost },
+            parameters: game.piles.map { |p| c = p.cards.first; c.id if c && c.is_treasure? && c.cost <= q.max_cost }
+          }
+        }
+      end
+    end
+  end
 
   def play
     super
 
-    if !(player.cards.hand.any? {|c| c.is_treasure?})
+    if player.cards.hand.none?(&:is_treasure?)
       # Holding no treasure cards. Just log
-      game.add_history(:event => "#{player.name} trashed nothing.",
-                        :css_class => "player#{player.seat} card_trash")
+      game.add_history(event: "#{player.name} trashed nothing.",
+                       css_class: "player#{player.seat} card_trash")
       return
     end
 
-    if game.find_journal(TrashEventTempl).nil?
-      if player.cards.hand.select(&:is_treasure?).map(&:class).uniq.length == 1
-        # Only holding one type of treasure card. Pre-create the journal
-        ix = player.cards.hand.index(&:is_treasure?)
-        game.add_journal(player_id: player.id,
-                          event: TrashEventTempl.fill(player: player.name, card: "#{player.cards.hand[ix].readable_name} (#{ix})"))
-      end
-    end
+    # Ask the required question
+    q = game.ask_question(object: self, actor: player, journal: Journals::TrashJournal)
 
-    # Ask the required question.
-    game.ask_question(object: self, actor: player, method: :resolve_trash, text: "Trash a card with #{readable_name}.")
+    return if game.find_journal(q[:template])
+    return unless player.cards.hand.select(&:is_treasure?).map(&:class).uniq.length == 1
+
+    # Only holding one type of treasure card. Pre-create the journal
+    treasure = player.cards.hand.detect(&:is_treasure?)
+    game.add_journal(type: Journals::TrashJournal.to_s,
+                     player: player,
+                     parameters: { card_id: treasure.id })
   end
 
-  def determine_controls(actor, controls, question)
-    case question.method
-    when :resolve_trash
-      controls[:hand] += [{:type => :button,
-                          :text => "Trash",
-                          :nil_action => nil,
-                          journals: actor.cards.hand.each_with_index.map do |c, ix|
-                            TrashEventTempl.fill(player: actor.name, card: "#{c.readable_name} (#{ix})") if c.is_treasure?
-                          end
-                         }]
-    when :resolve_take
-      controls[:piles] += [{:type => :button,
-                            :text => "Take",
-                            :nil_action => nil,
-                            journals: game.piles.each_with_index.map do |pile, ix|
-                              if (pile.cost <= (question.params[:trashed_cost].to_i + 3) &&
-                                   pile.card_class.is_treasure? &&
-                                   !pile.cards.empty?)
-                                TakeEventTempl.fill(player: actor.name, supply_card: "#{pile.cards[0].readable_name} (#{ix})")
-                              end
-                            end
-                          }]
-    end
-  end
-
-  resolves(:trash).using(TrashEventTempl).
-                   validating_param_is_card(:card, scope: :hand, &:is_treasure?).
-                   with do
+  def trash_treasure(journal)
     # Trash the selected card, and create a new question for picking up
     # the Mined card.
     journal.card.trash
     trashed_cost = journal.card.cost
-    journal.add_history(:event => "#{actor.name} trashed a #{journal.card.readable_name} from hand (cost: #{trashed_cost}).",
-                        :css_class => "player#{actor.seat} card_trash")
+    game.add_history(event: "#{journal.player.name} trashed a #{journal.card.readable_name} from hand (cost: #{trashed_cost}).",
+                     css_class: "player#{journal.player.seat} card_trash")
 
-    candidates = game.piles.map.with_index do |pile, ix|
-      if (pile.cost <= (trashed_cost + 3) &&
-                        pile.card_class.is_treasure? &&
-                        !pile.cards.empty?)
-        [pile, ix]
-      else
-        nil
-      end
-    end.compact
+    candidates = game.piles.select do |pile|
+      pile.cost <= (trashed_cost + 3) && pile.card_class.is_treasure? && !pile.cards.empty?
+    end
 
-    if candidates.length == 0
+    if candidates.empty?
       # Can't take a replacement. Just log.
-      game.add_history(:event => "#{player.name} couldn't take a card with #{readable_name}.",
-                        :css_class => "player#{player.seat} card_take")
+      game.add_history(event: "#{journal.player.name} couldn't take a card with #{readable_name}.",
+                       css_class: "player#{journal.player.seat} card_take")
       return
     end
 
-    if game.find_journal(TakeEventTempl).nil?
-      if candidates.length == 1
-        # Only one option. Fabricate the journal.
-        take_journal = game.add_journal(player_id: player.id,
-                                    event: TakeEventTempl.fill(player: player.name,
-                                     supply_card: "#{candidates[0][0].readable_name} (#{candidates[0][1]})"))
-      end
-    end
+    q = game.ask_question(object: self, actor: journal.player, journal: Journals::TakeJournal, expect: { max_cost: trashed_cost + 3 })
 
-    game.ask_question(object: self, actor: actor,
-                      method: :resolve_take,
-                      text: "Take a replacement card with #{readable_name}.",
-                      params: {trashed_cost: trashed_cost})
+    if !game.find_journal(q[:template]) && candidates.length == 1
+      # Only one option. Fabricate the journal.
+      game.add_journal(type: Journals::TakeJournal,
+                       player: player,
+                       parameters: { card_id: pile.cards.first.id })
+    end
   end
 
-  resolves(:take).using(TakeEventTempl).
-                  validating_param_is_card(:supply_card, scope: :supply) { is_treasure? &&
-                                                                            cost <= my{journal.params}[:trashed_cost].to_i + 3 }.
-                  with do
+  def take_treasure(journal)
     # Process the take.
-    actor.gain(:card => journal.supply_card, :location => "hand", journal: journal)
+    journal.player.gain(journal.card, journal, location: 'hand')
   end
 end
