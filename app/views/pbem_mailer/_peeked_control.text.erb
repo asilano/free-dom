@@ -1,8 +1,0 @@
-<% control = peeked_control -%>
-(PA <%= control[:pa_id] -%>) <%= PendingAction.find(control[:pa_id]).text.html_safe -%>: <% -%>
-<% case control[:type]
-   when :button -%>
-Choose one from your Looked At cards. Valid choices: <%= opts_for_buttons_from_valid(control, :cards, "Card") %>
-<% when :latin_radio -%>
-Choose separate actions to apply to each of your Looked At cards. Reply using 'Choose', then a Ruby-style Hash of '<Card>=><Option>', where Card is one of <%= control[:cards].each_with_index.map {|valid, ix| ix.to_s if valid}.compact.join(', ') -%> and Option is one of <%= control[:options].each_with_index.map {|opt, ix| "#{ix} for '#{opt}'"}.join(', ') -%>
-<% end %>
