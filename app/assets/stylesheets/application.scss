@@ -10,6 +10,36 @@
  * files in this directory. Styles in this file should be added after the last require_* statement.
  * It is generally better to create a new file per style scope.
  *
+ *= require foundation_and_overrides
  *= require_tree .
  *= require_self
+require foundation_and_overrides
+
+
  */
+
+@import 'foundation_and_overrides';
+@import 'settings';
+@import 'fonts';
+
+.hero-section {
+  background: url('https://c.pxhere.com/images/8c/09/9f796baf03e899b6c873596464d0-1418873.jpg!d') 50% no-repeat;
+  background-size: cover;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .hero-section-text {
+    h1 {
+      font-size: 5rem;
+      font-family: CloisterBlackLight;
+      color: darkblue;
+      text-shadow: 2px 2px 1px $white;
+    }
+    h2 {
+      font-family: $serif-stack;
+      color: $white;
+    }
+  }
+}
