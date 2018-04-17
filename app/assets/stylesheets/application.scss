@@ -22,6 +22,10 @@ require foundation_and_overrides
 @import 'settings';
 @import 'fonts';
 
+#staging-banner {
+  background-color: orange;
+}
+
 .hero-section {
   background: url('old-map.jpg') 50% no-repeat;
   background-size: cover;
