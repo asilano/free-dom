@@ -11,6 +11,6 @@ html lang="en"
     = csrf_meta_tag
 
   body
-    - if true || Rails.env.staging?
+    - if ENV['STAGING_SERVER']
       .row.column#staging-banner This is the staging environment
     == yield
