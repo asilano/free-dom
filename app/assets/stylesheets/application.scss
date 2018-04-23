@@ -10,17 +10,12 @@
  * files in this directory. Styles in this file should be added after the last require_* statement.
  * It is generally better to create a new file per style scope.
  *
- *= require foundation_and_overrides
- *= require_tree .
- *= require_self
-require foundation_and_overrides
-
-
  */
 
 @import 'foundation_and_overrides';
 @import 'settings';
 @import 'fonts';
+@import 'flash';
 
 #staging-banner {
   background-color: orange;

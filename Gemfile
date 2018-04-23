@@ -34,6 +34,8 @@ gem 'slim-rails'
 gem 'foundation-rails', '~> 6.0'
 gem 'autoprefixer-rails'
 
+gem 'devise'
+
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 

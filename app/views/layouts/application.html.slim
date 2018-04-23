@@ -13,4 +13,16 @@ html lang="en"
   body
     - if ENV['STAGING_SERVER']
       .row.column#staging-banner This is the staging environment
-    == yield
+    .grid-y.grid-frame.grid-padding-y
+      .hero-section.cell.small-2.medium-4.padding-collapse
+        .hero-section-text.grid-y
+          .small-12.medium-8: h1 FreeDom
+          .show-for-medium.medium-4: h2 Free Dominion Server
+      - if notice.present?
+        .cell.small-1.grid-padding-x.notice
+          .cell = notice
+      - if alert.present?
+        .cell.small-1.grid-padding-x.alert
+          .cell = alert
+      .cell.auto.grid-x.grid-frame.grid-padding-x
+        == yield
