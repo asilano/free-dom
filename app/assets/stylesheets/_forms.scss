@@ -1,0 +1,4 @@
+// Override hr top margin when following a checkbox (which has bottom margin built in)
+input[type=checkbox] ~ hr {
+  margin-top: 0;
+}

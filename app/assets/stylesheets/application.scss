@@ -16,7 +16,23 @@
 @import 'settings';
 @import 'fonts';
 @import 'flash';
+@import 'forms';
 
+body {
+  min-height: 100vh;
+}
+
+.hero-section {
+  &.small-20vh {
+    height: 20vh;
+  }
+
+  &.medium-40vh {
+    @media print, screen and (min-width: 40em) {
+      height: 40vh;
+    }
+  }
+}
 #staging-banner {
   background-color: orange;
 }
@@ -29,16 +45,23 @@
   align-items: center;
   justify-content: center;
 
-  .hero-section-text {
-    h1 {
-      font-size: 5rem;
-      font-family: CloisterBlackLight;
-      color: darkblue;
-      text-shadow: 2px 2px 1px $white;
-    }
-    h2 {
-      font-family: $serif-stack;
-      color: $white;
-    }
+  h1 a {
+    font-size: 5rem;
+    font-family: CloisterBlackLight;
+    color: darkblue;
+    text-shadow: 2px 2px 1px $white;
+  }
+  h2 {
+    font-family: $serif-stack;
+    color: $white;
+  }
+}
+
+footer {
+  background-color: darkblue;
+  a {
+    height: 2em;
+    line-height: 2em;
+    color: $white;
   }
 }

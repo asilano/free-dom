@@ -10,19 +10,28 @@ html lang="en"
     = javascript_include_tag "application", "data-turbolinks-track" => true
     = csrf_meta_tag
 
-  body
-    - if ENV['STAGING_SERVER']
-      .row.column#staging-banner This is the staging environment
-    .grid-y.grid-frame.grid-padding-y
-      .hero-section.cell.small-2.medium-4.padding-collapse
+  body.flex-container.flex-dir-column
+    header
+      - if ENV['STAGING_SERVER']
+        .row.column#staging-banner This is the staging environment
+      .hero-section class=header_class
         .hero-section-text.grid-y
-          .small-12.medium-8: h1 FreeDom
-          .show-for-medium.medium-4: h2 Free Dominion Server
+          .small-12.medium-8: h1 = link_to 'FreeDom', root_path
+          - if current_page?(root_path)
+            .show-for-medium.medium-4: h2 Free Dominion Server
       - if notice.present?
-        .cell.small-1.grid-padding-x.notice
+        .grid-padding-x.notice
           .cell = notice
       - if alert.present?
-        .cell.small-1.grid-padding-x.alert
+        .grid-padding-x.alert
           .cell = alert
-      .cell.auto.grid-x.grid-frame.grid-padding-x
+    main.flex-child-auto.flex-container.flex-dir-column
+      .flex-child-auto.grid-y.grid-padding-y
         == yield
+    footer.cell.grid-x.grid-padding-x
+      .cell.small-4
+        - if current_user
+          span = "Signed in as #{current_user.name}"
+          = link_to 'Sign out', destroy_user_session_path, method: :delete
+        - else
+          = link_to 'Sign in', new_user_session_path

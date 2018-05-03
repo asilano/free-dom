@@ -1,3 +1,10 @@
+.notice, .alert {
+  div {
+    height: 2em;
+    line-height: 2em;
+  }
+}
+
 .notice {
   background-color: lightgreen;
 }
