@@ -19,6 +19,15 @@
       .field
         = f.label :password_confirmation
         = f.password_field :password_confirmation, autocomplete: "off"
+      .field
+        = f.label :name
+        = f.text_field :name
+      .field
+        .description = t '.contact_me_microcopy'
+        = f.check_box :contact_me
+        = f.label :contact_me
+        - if devise_mapping.rememberable?
+          hr
       - if devise_mapping.rememberable?
         .field
           = f.check_box :remember_me
