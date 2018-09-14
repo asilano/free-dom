@@ -12,7 +12,7 @@
           ' Password
           - if @minimum_password_length
             em
-              ' (
+              | (
               = @minimum_password_length
               |  characters minimum)
         = f.password_field :password, autocomplete: "off"
