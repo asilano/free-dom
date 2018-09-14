@@ -1,24 +1,17 @@
-# README
+FreeDom
+======
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+[![Build Status](https://travis-ci.org/asilano/free-dom.png?branch=restart)](https://travis-ci.org/asilano/free-dom)
 
-Things you may want to cover:
+This is the codebase for my free, online Dominion server. In this branch, I'm rewriting it from the ground up!
 
-* Ruby version
+Notes
+-----
 
-* System dependencies
+`master` is the main branch. Development work will be performed here (if small), or merged here when complete. It is intended that `master` is always building and passing; however, mistakes happen.
 
-* Configuration
+The `release` branch is the codebase as it exists on heroku.
 
-* Database creation
+Other branches may be created for significant items of development (such as new sets, or UI rewrites).
 
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+_**Please fork and contribute where possible!**_
