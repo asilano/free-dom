@@ -29,9 +29,10 @@ html lang="en"
       .flex-child-auto.grid-y.grid-padding-y
         == yield
     footer.cell.grid-x.grid-padding-x
-      .cell.small-4
-        - if current_user
+      - if current_user
+        .cell
           span = "Signed in as #{current_user.name}"
-          = link_to 'Sign out', destroy_user_session_path, method: :delete
-        - else
-          = link_to 'Sign in', new_user_session_path
+        .cell = link_to 'Preferences', edit_user_registration_path
+        .cell = link_to 'Sign out', destroy_user_session_path, method: :delete
+      - else
+        .cell = link_to 'Sign in', new_user_session_path

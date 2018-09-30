@@ -4,6 +4,8 @@ class Users::RegistrationsController < Devise::RegistrationsController
   before_action :configure_sign_up_params, only: [:create]
   before_action :configure_account_update_params, only: [:update]
 
+  after_action :send_sign_up_email, only: [:create]
+
   # GET /resource/sign_up
   # def new
   #   super
@@ -59,4 +61,10 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # def after_inactive_sign_up_path_for(resource)
   #   super(resource)
   # end
+
+  def send_sign_up_email
+    if @user.persisted?
+      SignUpMailer.with(user: @user).welcome.deliver_later
+    end
+  end
 end
