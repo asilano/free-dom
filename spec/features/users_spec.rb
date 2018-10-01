@@ -38,15 +38,22 @@ RSpec.feature "Users", type: :feature do
       expect(user.contact_me).to be true
     end
 
-    it 'should send a registration email on sign-up' do
-      expect { perform_enqueued_jobs { sign_up } }.to change { ActionMailer::Base.deliveries.count }.by(1)
+    it 'should send a registration and new-user emails on sign-up' do
+      ActionMailer::Base.deliveries.clear
+      expect { perform_enqueued_jobs { sign_up } }.to change { ActionMailer::Base.deliveries.count }.by(2)
 
-      mail = ActionMailer::Base.deliveries.last
+      mail = ActionMailer::Base.deliveries[0]
       expect(mail.subject).to eq 'Welcome to FreeDom!'
       expect(mail.to).to eq ['me@example.com']
       expect(mail.from).to eq ['no-reply@example.com']
       expect(mail.parts.map(&:body).map(&:decoded)).to include(match(/\AHi James Smith,$/))
       expect(mail.parts.map(&:body).map(&:decoded)).to include(match(/Welcome to FreeDom!/))
+
+      mail = ActionMailer::Base.deliveries[1]
+      expect(mail.subject).to eq 'New user at FreeDom!'
+      expect(mail.to).to eq ['dominion.app@gmail.com']
+      expect(mail.from).to eq ['no-reply@example.com']
+      expect(mail.body.decoded).to match /A new user, going by the name of James Smith and using the email address me@example.com, just registered on FreeDom./
     end
   end
 end

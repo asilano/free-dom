@@ -41,4 +41,6 @@ Rails.application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
+
+  config.x.admin_email = 'dominion.app@gmail.com'
 end
