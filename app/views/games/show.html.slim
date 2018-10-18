@@ -1,0 +1,12 @@
+p#notice = notice
+
+p
+  strong Name:
+  = @game.name
+p
+  strong End time:
+  = @game.end_time
+
+=> link_to 'Edit', edit_game_path(@game)
+'|
+=< link_to 'Back', games_path

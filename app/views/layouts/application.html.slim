@@ -30,9 +30,11 @@ html lang="en"
         == yield
     footer.cell.grid-x.grid-padding-x
       - if current_user
-        .cell
+        .cell.shrink
           span = "Signed in as #{current_user.name}"
-        .cell = link_to 'Preferences', edit_user_registration_path
-        .cell = link_to 'Sign out', destroy_user_session_path, method: :delete
+        .cell.shrink = link_to 'Preferences', edit_user_registration_path
+        .cell.shrink = link_to 'Sign out', destroy_user_session_path, method: :delete
       - else
-        .cell = link_to 'Sign in', new_user_session_path
+        .cell.grid-x.grid-padding-x
+          .cell.shrink = link_to 'Sign in', new_user_session_path
+          .cell.shrink = link_to 'Sign up', new_user_registration_path

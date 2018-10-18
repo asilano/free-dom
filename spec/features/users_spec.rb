@@ -10,7 +10,7 @@ RSpec.feature "Users", type: :feature do
     fill_in 'Password confirmation', with: 's3cretc0de'
     fill_in 'Name', with: 'James Smith'
     check 'Contact me'
-    click_on 'Sign up'
+    click_button 'Sign up'
   end
 
   describe 'registrations' do
