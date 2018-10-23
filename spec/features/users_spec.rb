@@ -55,5 +55,15 @@ RSpec.feature "Users", type: :feature do
       expect(mail.from).to eq ['no-reply@example.com']
       expect(mail.body.decoded).to match /A new user, going by the name of James Smith and using the email address me@example.com, just registered on FreeDom./
     end
+
+    it 'should reject invalid sign-up' do
+      visit new_user_registration_path
+      expect { click_button 'Sign up' }.not_to change { User.count }
+    end
+
+    it 'should not email on invalid sign-up' do
+      visit new_user_registration_path
+      expect { perform_enqueued_jobs { click_button 'Sign up' } }.not_to change { ActionMailer::Base.deliveries.count }
+    end
   end
 end
