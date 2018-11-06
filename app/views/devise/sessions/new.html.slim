@@ -4,16 +4,12 @@
       | Log in
     = form_for(resource, as: resource_name, url: session_path(resource_name)) do |f|
       .field
-        = f.label :email
         = f.email_field :email, autofocus: true, autocomplete: "email"
       .field
-        = f.label :password
         = f.password_field :password, autocomplete: "off"
       - if devise_mapping.rememberable?
         .field
-          = f.check_box :remember_me
-          = f.label :remember_me
-          em[] (We will use a cookie to remember you)
+          = f.check_box :remember_me, help_text: 'We will use a cookie to remember you'
       .actions
         = f.submit "Sign in", class: 'button'
     = render "devise/shared/links"

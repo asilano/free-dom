@@ -32,6 +32,7 @@ gem 'jbuilder', '~> 2.5'
 # gem 'bcrypt', '~> 3.1.7'
 gem 'slim-rails'
 gem 'foundation-rails', '~> 6.0'
+gem 'foundation_rails_helper', '~> 3.0'
 gem 'autoprefixer-rails'
 
 gem 'devise'

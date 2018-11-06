@@ -3,36 +3,23 @@
     h2
       | Sign up
     = form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f|
-      = devise_error_messages!
       .field
-        = f.label :email
         = f.email_field :email, autofocus: true, autocomplete: "email"
       .field
-        = f.label :password do
-          ' Password
-          - if @minimum_password_length
-            em
-              | (
-              = @minimum_password_length
-              |  characters minimum)
-        = f.password_field :password, autocomplete: "off"
+        - label_text = "Password"
+        - label_text << " (#{@minimum_password_length} characters minimum)" if @minimum_password_length
+        = f.password_field :password, label: label_text, autocomplete: "off"
       .field
-        = f.label :password_confirmation
         = f.password_field :password_confirmation, autocomplete: "off"
       .field
-        = f.label :name
         = f.text_field :name
       .field
-        .description = t '.contact_me_microcopy'
-        = f.check_box :contact_me
-        = f.label :contact_me
+        = f.check_box :contact_me, help_text: t('.contact_me_microcopy')
         - if devise_mapping.rememberable?
           hr
       - if devise_mapping.rememberable?
         .field
-          = f.check_box :remember_me
-          = f.label :remember_me
-          em[] (We will use a cookie to remember you)
+          = f.check_box :remember_me, help_text: 'We will use a cookie to remember you'
       .actions
         = f.submit "Sign up", class: 'button'
     = render "devise/shared/links"

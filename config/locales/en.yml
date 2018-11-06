@@ -33,6 +33,6 @@ en:
   devise:
     registrations:
       new:
-        contact_me_microcopy: 'Check the box below if you would like us to keep you informed about news and updates via email. Note: these emails are extremely low-traffic!'
+        contact_me_microcopy: 'Check this box if you would like us to keep you informed about news and updates via email. Note: these emails are extremely low-traffic!'
       edit:
-        contact_me_microcopy: 'Check the box below if you would like us to keep you informed about news and updates via email. Note: these emails are extremely low-traffic!'
+        contact_me_microcopy: 'Check this box if you would like us to keep you informed about news and updates via email. Note: these emails are extremely low-traffic!'
