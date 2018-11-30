@@ -1,23 +1,24 @@
-h1 Listing games
+.small-2.grid-x.grid-padding-x.align-middle
+  .cell.tagline FreeDom is an online rules-enforcing game engine for playing the card game Dominion. It's open-source, free, and always will be.
 
-table
-  thead
-    tr
-      th Name
-      th End time
-      th
-      th
-      th
+.cell.grid-x.grid-frame.grid-padding-x.align-center
+  - if current_user
+    .cell.small-8
+      table#games-list
+        thead
+          tr
+            th.name-column Name
+            th
 
-  tbody
-    - @games.each do |game|
-      tr
-        td = game.name
-        td = game.end_time
-        td = link_to 'Show', game
-        td = link_to 'Edit', edit_game_path(game)
-        td = link_to 'Destroy', game, data: { confirm: 'Are you sure?' }, method: :delete
+        tbody
+          - @games.each do |game|
+            tr
+              td = link_to game.name, game
+              td = button_to 'Destroy', game, data: { confirm: 'Are you sure?' }, method: :delete, class: 'button no-gap-under alert'
 
-br
+      br
 
-= link_to 'New Game', new_game_path
+      = link_to 'New Game', new_game_path
+  - else
+    .cell.small-2 = link_to 'Register', new_user_registration_path, class: 'button expanded'
+    .cell.small-2 = link_to 'Sign in', new_user_session_path, class: 'button expanded'

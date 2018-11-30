@@ -1,3 +1,22 @@
 // Place all the styles related to the Games controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+#games-list {
+  .name-column {
+    width: 100%;
+  }
+
+  // Allow the game-name link to be as much of the table-cell as possible
+  td {
+    padding: 0;
+
+    > a {
+      display: block;
+    }
+
+    > a, > form {
+      padding: $table-padding;
+    }
+  }
+}

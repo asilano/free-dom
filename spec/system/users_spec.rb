@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.feature "Users", type: :feature do
+RSpec.feature "Users" do
   include ActiveJob::TestHelper
 
   def sign_up

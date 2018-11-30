@@ -1,0 +1,60 @@
+body {
+  min-height: 100vh;
+}
+
+a {
+  color: $black;
+}
+
+.hero-section {
+  &.small-20vh {
+    height: 20vh;
+  }
+
+  &.medium-40vh {
+    @media print, screen and (min-width: 40em) {
+      height: 40vh;
+    }
+  }
+}
+#staging-banner {
+  background-color: orange;
+}
+
+.hero-section {
+  background: image-url('old-map.jpg') 50% no-repeat;
+  background-size: cover;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  h1 a {
+    font-size: 5rem;
+    font-family: CloisterBlackLight;
+    color: darkblue;
+    text-shadow: 2px 2px 1px $white;
+  }
+  h2 {
+    font-family: $serif-stack;
+    color: $white;
+  }
+}
+
+.tagline {
+  background-color: darkblue;
+  color: $white;
+}
+
+.button.no-gap-under {
+  margin-bottom: 0;
+}
+
+footer {
+  background-color: darkblue;
+  a, span {
+    height: 2em;
+    line-height: 2em;
+    color: $white;
+  }
+}
