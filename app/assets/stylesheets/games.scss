@@ -19,4 +19,22 @@
       padding: $table-padding;
     }
   }
+
+  .game-id, .game-name {
+    display: inline-block;
+  }
+  .game-id {
+    width: 4em;
+  }
+}
+
+#new_game {
+  .random-name {
+    font-style: normal;
+    font-weight: bold;
+
+    body.js-active & {
+      cursor: pointer;
+    }
+  }
 }

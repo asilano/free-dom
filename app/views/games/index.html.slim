@@ -4,16 +4,13 @@
 .cell.grid-x.grid-frame.grid-padding-x.align-center
   - if current_user
     .cell.small-8
-      table#games-list
-        thead
-          tr
-            th.name-column Name
-            th
-
+      table#games-list.hover
         tbody
           - @games.each do |game|
             tr
-              td = link_to game.name, game
+              td.name-column = link_to game do
+                .game-id = game.id
+                .game-name = game.name
               td = button_to 'Destroy', game, data: { confirm: 'Are you sure?' }, method: :delete, class: 'button no-gap-under alert'
 
       br

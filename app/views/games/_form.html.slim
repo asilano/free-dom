@@ -1,4 +1,11 @@
 = form_for @game do |f|
   .field
-    = f.text_field :name
+    = f.text_field :name, help_text: 'A name can help make a game memorable, but isn\'t required'
+    p.help-text
+      | Want inspiration for a game name? Here's a suggestion
+      span.js< you can click
+      | :
+      span.random-name =<> random_game_name
+      = link_to random_name_path, class: 'random-regenerate', remote: true do
+        i.fas.fa-sync{ title='Regenerate' }
   .actions = f.submit class: 'button'

@@ -6,9 +6,8 @@ RSpec.describe Game, type: :model do
     expect(game).to be_valid
   end
 
-  it 'should require a name' do
+  it 'should not require a name' do
     game = build(:game, name: nil)
-    expect(game).to_not be_valid
-    expect(game.errors).to be_added(:name, :blank)
+    expect(game).to be_valid
   end
 end

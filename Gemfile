@@ -34,6 +34,7 @@ gem 'slim-rails'
 gem 'foundation-rails', '~> 6.0'
 gem 'foundation_rails_helper', '~> 3.0'
 gem 'autoprefixer-rails'
+gem 'jquery-rails'
 
 gem 'devise'
 

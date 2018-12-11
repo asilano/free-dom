@@ -68,6 +68,7 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
 
   config.include Warden::Test::Helpers
+  config.include Devise::Test::IntegrationHelpers, type: :system
 
   config.before(:each, type: :system) do
     driven_by :rack_test
