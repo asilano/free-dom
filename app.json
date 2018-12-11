@@ -1,0 +1,9 @@
+{
+  "name": "free-dom",
+  "description": "Free, open-source, online Dominion server",
+  "scripts": {
+    "dokku": {
+      "postdeploy": "bin/rails db:migrate"
+    }
+  }
+}
