@@ -4,15 +4,17 @@
 .cell.grid-x.grid-frame.grid-padding-x.align-center
   - if current_user
     .cell.small-8
-      table#games-list.hover
-        tbody
-          - @games.each do |game|
-            tr
-              td.name-column = link_to game do
-                .game-id = game.id
-                .game-name = game.name
-              td = button_to 'Destroy', game, data: { confirm: 'Are you sure?' }, method: :delete, class: 'button no-gap-under alert'
-
+      - if @games.empty?
+        .empty-list There aren't any games at the moment
+      - else
+        table#games-list.hover
+          tbody
+            - @games.each do |game|
+              tr
+                td.name-column = link_to game do
+                  .game-id = game.id
+                  .game-name = game.name
+                td = button_to 'Destroy', game, data: { confirm: 'Are you sure?' }, method: :delete, class: 'button no-gap-under alert'
       br
 
       = link_to 'New Game', new_game_path

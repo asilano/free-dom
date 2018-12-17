@@ -14,10 +14,23 @@
 // require foundation
 //= require turbolinks
 //= require jquery3
+//= require onmount
 //= require_tree .
 
 // $(function(){ $(document).foundation(); });
+$(document).on('ready show.bs closed.bs load page:change turbolinks:load', function () {
+  $.onmount()
+})
+$(document).on('turbolinks:before-cache', function () { $.onmount.teardown() })
+
 $(function() {
-  $('body').addClass('js-active')
-  $('.js').removeClass('js')
+  FontAwesome.dom.watch({observeMutationsRoot: document})
+})
+
+
+$.onmount('body', function() {
+  $(this).addClass('js-active')
+})
+$.onmount('.js', function() {
+  $(this).removeClass('js')
 })

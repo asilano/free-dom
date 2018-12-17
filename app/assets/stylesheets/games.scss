@@ -28,6 +28,14 @@
   }
 }
 
+.empty-list {
+  background-color: lighten($light-gray, 5%);
+  border: 1px solid $medium-gray;
+  text-align: center;
+  padding: 1em;
+  font-size: 1.4rem;
+}
+
 #new_game {
   .random-name {
     font-style: normal;
