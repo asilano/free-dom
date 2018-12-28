@@ -91,6 +91,23 @@ RSpec.describe 'Games' do
         expect(page).to have_css('td.name-column .game-name', text: 'Awful Chimpanzee')
         expect(page).to_not have_css('td.name-column .game-name', text: 'Rambunctious Princess')
       end
+
+      it 'adds me to a game I create' do
+        visit new_game_path
+        click_button 'Create Game'
+
+        game = Game.last
+        expect(game.players.map(&:user)).to eql [user]
+      end
+
+      it 'lets me join a game' do
+        game = FactoryBot.create(:game)
+        expect(game.players).to be_empty
+        visit games_path
+        click_button 'Join'
+        expect(current_path).to eql(game_path(game))
+        expect(game.players.map(&:user)).to eql [user]
+      end
     end
   end
 

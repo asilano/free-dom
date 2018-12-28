@@ -1,9 +1,0 @@
-.small-2.grid-x.grid-padding-x.align-middle
-  .cell FreeDom is an online rules-enforcing game engine for playing the card game Dominion. It's open-source, free, and always will be.
-
-- if current_user
-  .cell Placeholder
-- else
-  .cell.grid-x.grid-frame.grid-padding-x.align-center
-    .cell.small-2 = link_to 'Register', new_user_registration_path, class: 'button expanded'
-    .cell.small-2 = link_to 'Sign in', new_user_session_path, class: 'button expanded'
