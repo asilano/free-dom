@@ -3,19 +3,36 @@
 
 .cell.grid-x.grid-frame.grid-padding-x.align-center
   - if current_user
-    .cell.small-8
+    .cell.small-8#games-list
       - if @games.empty?
         .empty-list There aren't any games at the moment
       - else
-        table#games-list.hover
-          tbody
-            - @games.each do |game|
-              tr
-                td.name-column = link_to game do
-                  .game-id = game.id
-                  .game-name = game.name
-                td = button_to 'Join', players_path(player_params: { game_id: game.id }), method: :post, class: 'button no-gap-under' unless game.users.include?(current_user)
-                td = button_to 'Destroy', game, data: { confirm: 'Are you sure?' }, method: :delete, class: 'button no-gap-under alert'
+        - unless current_user.games.empty?
+          .game-list-section
+            h1 My games
+
+            table.hover
+              tbody
+                - current_user.games.each do |game|
+                  tr
+                    td.name-column = link_to game do
+                      .game-id = game.id
+                      .game-name = game.name
+                    td
+                    td = button_to 'Destroy', game, data: { confirm: 'Are you sure?' }, method: :delete, class: 'button no-gap-under alert'
+        - unless (Game.all - current_user.games).empty?
+          .game-list-section
+            h1 Open games
+
+            table.hover
+              tbody
+                - (Game.all - current_user.games).each do |game|
+                  tr
+                    td.name-column = link_to game do
+                      .game-id = game.id
+                      .game-name = game.name
+                    td = button_to 'Join', players_path(player_params: { game_id: game.id }), method: :post, class: 'button no-gap-under'
+                    td = button_to 'Destroy', game, data: { confirm: 'Are you sure?' }, method: :delete, class: 'button no-gap-under alert'
       br
 
       = link_to 'New Game', new_game_path

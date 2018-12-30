@@ -21,10 +21,10 @@ RSpec.describe 'Games' do
       login_as(user)
 
       visit games_path
-      expect(page).to have_table('games-list')
-      expect(page).to have_css('td.name-column .game-id', text: games[0].id)
-      expect(page).to have_css('td.name-column .game-name', text: games[0].name)
-      expect(page).to have_css('td.name-column .game-id', text: games[1].id)
+      expect(page).to have_css('#games-list')
+      expect(page).to have_css('#games-list table td.name-column .game-id', text: games[0].id)
+      expect(page).to have_css('#games-list table td.name-column .game-name', text: games[0].name)
+      expect(page).to have_css('#games-list table td.name-column .game-id', text: games[1].id)
     end
   end
 
@@ -107,6 +107,31 @@ RSpec.describe 'Games' do
         click_button 'Join'
         expect(current_path).to eql(game_path(game))
         expect(game.players.map(&:user)).to eql [user]
+      end
+
+      it "lists games separately whether I'm in them" do
+        you = FactoryBot.create(:user)
+        mine = FactoryBot.create(:game, name: 'Mine')
+        FactoryBot.create(:player, game: mine, user: user)
+        ours = FactoryBot.create(:game, name: 'Ours')
+        [user, you].each { |u| FactoryBot.create(:player, game: ours, user: u) }
+        yours = FactoryBot.create(:game, name: 'Yours')
+        FactoryBot.create(:player, game: yours, user: you)
+
+        visit games_path
+        expect(page).to have_css('.game-list-section', text: 'My games')
+        expect(page).to have_css('.game-list-section', text: 'Open games')
+
+        within('.game-list-section', text: 'My games') do
+          expect(page).to have_css('td.name-column .game-name', text: 'Mine')
+          expect(page).to have_css('td.name-column .game-name', text: 'Ours')
+          expect(page).to_not have_css('td.name-column .game-name', text: 'Yours')
+        end
+        within('.game-list-section', text: 'Open games') do
+          expect(page).to_not have_css('td.name-column .game-name', text: 'Mine')
+          expect(page).to_not have_css('td.name-column .game-name', text: 'Ours')
+          expect(page).to have_css('td.name-column .game-name', text: 'Yours')
+        end
       end
     end
   end
