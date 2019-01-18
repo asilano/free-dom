@@ -10,7 +10,6 @@ RSpec.describe 'Games' do
     end
 
     it 'lists games if authd' do
-      pending 'referring to Players not as a database table'
       # Create two games
       games = [
         FactoryBot.create(:game),
@@ -42,7 +41,6 @@ RSpec.describe 'Games' do
       end
 
       it 'creates a game with a name' do
-        pending 'referring to Players not as a database table'
         visit new_game_path
         fill_in 'Name', with: 'My game'
         click_button 'Create Game'
@@ -53,7 +51,6 @@ RSpec.describe 'Games' do
       end
 
       it 'creates a game with no name' do
-        pending 'referring to Players not as a database table'
         visit new_game_path
         expect(page).to have_content('A name can help make a game memorable, but isn\'t required')
         click_button 'Create Game'
@@ -65,7 +62,6 @@ RSpec.describe 'Games' do
       end
 
       it 'creates a game with a random name', js: true do
-        pending 'referring to Players not as a database table'
         stub_const('RandomNamer::ADJECTIVES', %w[awful rambunctious])
         expect(RandomNamer::ADJECTIVES).to receive(:sample).and_return 'rambunctious'
         stub_const('RandomNamer::NOUNS', %w[Chimpanzee Princess])
@@ -80,7 +76,6 @@ RSpec.describe 'Games' do
       end
 
       it 'respins the random name', js: true do
-        pending 'referring to Players not as a database table'
         stub_const('RandomNamer::ADJECTIVES', %w[awful rambunctious])
         expect(RandomNamer::ADJECTIVES).to receive(:sample).and_return('rambunctious', 'awful')
         stub_const('RandomNamer::NOUNS', %w[Chimpanzee Princess])
@@ -98,33 +93,30 @@ RSpec.describe 'Games' do
       end
 
       it 'adds me to a game I create' do
-        pending 'referring to Players not as a database table'
         visit new_game_path
         click_button 'Create Game'
 
         game = Game.last
-        expect(game.players.map(&:user)).to eql [user]
+        expect(game.users.to_a).to eql [user]
       end
 
       it 'lets me join a game' do
-        pending 'referring to Players not as a database table'
         game = FactoryBot.create(:game)
-        expect(game.players).to be_empty
+        expect(game.users).to be_empty
         visit games_path
         click_button 'Join'
         expect(current_path).to eql(game_path(game))
-        expect(game.players.map(&:user)).to eql [user]
+        expect(game.users.to_a).to eql [user]
       end
 
       it "lists games separately whether I'm in them" do
-        pending 'referring to Players not as a database table'
         you = FactoryBot.create(:user)
         mine = FactoryBot.create(:game, name: 'Mine')
-        FactoryBot.create(:player, game: mine, user: user)
+        FactoryBot.create(:journal, game: mine, user: user, type: GameEngine::AddPlayerJournal)
         ours = FactoryBot.create(:game, name: 'Ours')
-        [user, you].each { |u| FactoryBot.create(:player, game: ours, user: u) }
+        [user, you].each { |u| FactoryBot.create(:journal, game: ours, user: u, type: GameEngine::AddPlayerJournal) }
         yours = FactoryBot.create(:game, name: 'Yours')
-        FactoryBot.create(:player, game: yours, user: you)
+        FactoryBot.create(:journal, game: yours, user: you, type: GameEngine::AddPlayerJournal)
 
         visit games_path
         expect(page).to have_css('.game-list-section', text: 'My games')
@@ -162,7 +154,6 @@ RSpec.describe 'Games' do
       end
 
       it 'deletes the game' do
-        pending 'referring to Players not as a database table'
         visit games_path
         expect(page).to have_css('td.name-column .game-name', text: game.name)
         click_button 'Destroy'

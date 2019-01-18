@@ -22,10 +22,10 @@ class GamesController < ApplicationController
   # POST /games.json
   def create
     @game = Game.new(game_params)
-    @game.players.build(user: current_user)
 
     respond_to do |format|
       if @game.save
+        @game.journals.create!(type: GameEngine::AddPlayerJournal, user: current_user, order: 0)
         format.html { redirect_to @game, notice: 'Game was successfully created.' }
         format.json { render :show, status: :created, location: @game }
       else

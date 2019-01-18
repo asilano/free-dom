@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :journal do
     game
     user
-    order { 1 }
+    sequence(:order)
     type { Journal }
     params { '' }
   end

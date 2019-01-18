@@ -68,4 +68,7 @@ guard :rspec, cmd: "bundle exec bin/rspec", failed_mode: :keep do
   watch(%r{^spec/acceptance/steps/(.+)_steps\.rb$}) do |m|
     Dir[File.join("**/#{m[1]}.feature")][0] || "spec/acceptance"
   end
+
+  # Game engine changes
+  watch(%r{^app/lib/game_engine/}) { rspec.spec.call('system/games') }
 end

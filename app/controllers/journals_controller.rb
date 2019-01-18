@@ -5,10 +5,11 @@ class JournalsController < ApplicationController
   # POST /journals.json
   def create
     @journal = Journal.new(journal_params)
+    @journal.order ||= (@journal.game.journals.pluck(:order).max || 0) + 1
 
     respond_to do |format|
       if @journal.save
-        format.html { redirect_to @journal, notice: 'Journal was successfully created.' }
+        format.html { redirect_to @journal.game }
         format.json { render :show, status: :created, location: @journal }
       else
         format.html { render :new }
