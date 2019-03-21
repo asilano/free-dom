@@ -280,7 +280,7 @@ DEPENDENCIES
   unicorn
 
 RUBY VERSION
-   ruby 2.0.0p648
+   ruby 2.3.1
 
 BUNDLED WITH
    1.15.4

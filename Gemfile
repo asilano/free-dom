@@ -1,7 +1,6 @@
 source 'http://rubygems.org'
-source 'http://gems.github.com'
 
-ruby '2.0.0'
+ruby '2.3.1'
 gem 'rails', '~> 4.0.0'
 gem 'i18n'
 
@@ -27,7 +26,7 @@ end
 # in production environments by default.
 #group :assets do
   gem 'sass-rails'
-  gem 'compass-rails', git: 'https://github.com/Compass/compass-rails', branch: 'master'
+  gem 'compass-rails'
   gem 'sassy-buttons'
   gem 'sass'
   gem 'coffee-rails'
