@@ -1,13 +1,13 @@
 source 'http://rubygems.org'
 
-ruby '2.3.1'
-gem 'rails', '~> 4.0.0'
+ruby '2.4.5'
+gem 'rails', '~> 4.2.0'
 gem 'i18n'
 
 gem 'activerecord-session_store'
 
 group :production do
-  gem 'pg'
+  gem 'pg', '~> 0.11'
   gem 'newrelic_rpm'
   #gem 'unicorn'
   gem 'puma'
