@@ -1220,8 +1220,14 @@ private
       user.create_settings
     end
 
-    create_settings!(user.settings.attributes.except('id', 'user_id'))
-    create_state!
+    unless settings
+      self.settings = Settings.new(user.settings.attributes.except('id', 'user_id'))
+      self.settings.save!
+    end
+    unless state
+      self.state = PlayerState.new
+      self.state.save!
+    end
 
     self.score = 0
     self.vp_chips = 0
