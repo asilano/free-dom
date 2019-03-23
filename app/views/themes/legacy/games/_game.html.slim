@@ -16,23 +16,8 @@
           = text_field_tag "settings[update_interval]", @player.settings.update_interval, size: 4
           = submit_tag "Set"
       '  seconds.
-      span#change_freq= link_to_function "Change.", "enable_freq_form()"
-      span#cancel_freq.hidden= link_to_function "Cancel.", "disable_freq_form()"
-      javascript:
-        function enable_freq_form() {
-          $('#update_freq').removeClass("lighter");
-          $('#update_freq_value').hide();
-          $('#update_freq_form').show();
-          $('#change_freq').hide();
-          $('#cancel_freq').show();
-        };
-        function disable_freq_form() {
-          $('#update_freq').addClass("lighter");
-          $('#update_freq_value').show();
-          $('#update_freq_form').hide();
-          $('#change_freq').show();
-          $('#cancel_freq').hide();
-        }
+      span#change_freq= link_to 'Change.', 'javascript:void(0)'
+      span#cancel_freq.hidden= link_to 'Cancel.', 'javascript:void(0)'
     - else
       - freq = @user ? @user.settings.update_interval : 60
       |  Updating every #{freq} seconds.

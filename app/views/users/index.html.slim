@@ -3,7 +3,7 @@
 nav#games-rankings
   span User Rankings
   = link_to 'View Games', games_path
-= link_to_function "What's this?", "$('#explain_ranking').slideToggle()", class: 'light'
+= link_to "What's this?", 'javascript:void(0);', class: 'light', id: 'show_ranking_explain'
 #explain_ranking.hidden
   p This table shows the ranking and rating of each registered user by a number of measures.
   p Users who have yet to complete a game are hidden, as are users who haven't completed a game in the last 4 months or so. Users who haven't completed a game in the last two weeks are progressively faded according to how long they've been inactive. You are always shown.
