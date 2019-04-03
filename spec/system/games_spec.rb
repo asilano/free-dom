@@ -101,21 +101,21 @@ RSpec.describe 'Games' do
       end
 
       it 'lets me join a game' do
-        game = FactoryBot.create(:game)
-        expect(game.users).to be_empty
+        game = FactoryBot.create(:game_with_kingdom)
+        expect(game.users).to_not include user
         visit games_path
         click_button 'Join'
         expect(current_path).to eql(game_path(game))
-        expect(game.users.to_a).to eql [user]
+        expect(game.reload.users.to_a).to include user
       end
 
       it "lists games separately whether I'm in them" do
         you = FactoryBot.create(:user)
-        mine = FactoryBot.create(:game, name: 'Mine')
+        mine = FactoryBot.create(:game_with_kingdom, name: 'Mine')
         FactoryBot.create(:journal, game: mine, user: user, type: GameEngine::AddPlayerJournal)
-        ours = FactoryBot.create(:game, name: 'Ours')
+        ours = FactoryBot.create(:game_with_kingdom, name: 'Ours')
         [user, you].each { |u| FactoryBot.create(:journal, game: ours, user: u, type: GameEngine::AddPlayerJournal) }
-        yours = FactoryBot.create(:game, name: 'Yours')
+        yours = FactoryBot.create(:game_with_kingdom, name: 'Yours')
         FactoryBot.create(:journal, game: yours, user: you, type: GameEngine::AddPlayerJournal)
 
         visit games_path
@@ -137,7 +137,7 @@ RSpec.describe 'Games' do
   end
 
   describe 'destroy' do
-    let(:game) { FactoryBot.build(:game, name: 'Game for deletion') }
+    let(:game) { FactoryBot.build(:game_with_kingdom, name: 'Game for deletion') }
     before :each do
       game.save
     end

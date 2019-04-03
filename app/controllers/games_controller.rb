@@ -11,11 +11,15 @@ class GamesController < ApplicationController
   # GET /games/1
   # GET /games/1.json
   def show
+    @game.process
   end
 
   # GET /games/new
   def new
     @game = Game.new
+    @game.journals.build(type: GameEngine::ChooseKingdomJournal,
+                         user: current_user,
+                         order: 0)
   end
 
   # POST /games
@@ -25,7 +29,7 @@ class GamesController < ApplicationController
 
     respond_to do |format|
       if @game.save
-        @game.journals.create!(type: GameEngine::AddPlayerJournal, user: current_user, order: 0)
+        @game.journals.create!(type: GameEngine::AddPlayerJournal, user: current_user, order: @game.journals.maximum(:order) + 1)
         format.html { redirect_to @game, notice: 'Game was successfully created.' }
         format.json { render :show, status: :created, location: @game }
       else
@@ -50,13 +54,20 @@ class GamesController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_game
-      @game = Game.find(params[:id])
-    end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def game_params
-      params.require(:game).permit(:name, :end_time)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_game
+    @game = Game.find(params[:id])
+  end
+
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def game_params
+    params.require(:game).permit(:name,
+                                 journals_attributes: [
+                                   :user_id,
+                                   :type,
+                                   :order,
+                                   cards: []
+                                 ])
+  end
 end

@@ -1,6 +1,10 @@
-= form_for @game do |f|
+= form_with model: @game, id: 'new_game' do |f|
+  - if @game.errors.present?
+    .grid-padding-x.alert
+      - @game.errors.full_messages.each do |err|
+        .cell = err
   .field
-    = f.text_field :name, help_text: 'A name can help make a game memorable, but isn\'t required'
+    = f.text_field :name, help_text: 'A name can help make a game memorable, but isn\'t required', id: 'game_name'
     p.help-text
       | Want inspiration for a game name? Here's a suggestion
       span.js< you can click
@@ -8,4 +12,24 @@
       span.random-name =<> random_game_name
       = link_to random_name_path, class: 'random-regenerate', remote: true do
         i.fas.fa-sync{ title='Regenerate' }
+
+  = f.fields :journals do |j|
+    = j.hidden_field :type
+    = j.hidden_field :user_id
+    = j.hidden_field :order
+    = j.fields :cards do |jc|
+      #card_selects
+        - all_cards = GameEngine::Card.expansions.map(&:kingdom_cards).flatten.shuffle
+        - 10.times do |ix|
+          .card-select-row
+            .pileLabel= label_tag("cards_#{ix}", "Kingdom card #{ix + 1}: ")
+            .pileSelect= jc.select('', option_groups_from_collection_for_select(GameEngine::Card.expansions,
+                                          :kingdom_cards,
+                                          :name,
+                                          :name,
+                                          :readable_name,
+                                          all_cards[ix]),
+                                    {},
+                                    id: "cards_#{ix}")
+
   .actions = f.submit class: 'button'

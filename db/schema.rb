@@ -27,7 +27,7 @@ ActiveRecord::Schema.define(version: 20190103131611) do
     t.bigint "user_id"
     t.integer "order"
     t.string "type"
-    t.text "params"
+    t.json "params"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["game_id"], name: "index_journals_on_game_id"

@@ -5,7 +5,7 @@ class CreateJournals < ActiveRecord::Migration[5.1]
       t.references :user, foreign_key: true
       t.integer :order
       t.string :type
-      t.text :params
+      t.json :params
 
       t.timestamps
     end

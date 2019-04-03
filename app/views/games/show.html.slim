@@ -5,4 +5,14 @@ p
   strong> Players in game:
   = @game.users.map(&:name).join(', ')
 
+p
+  strong> Current question:
+  = @game.question.text(@game.game_state)
+
+p
+  strong> Journal log:
+  ul
+    - @game.game_state.logs.each do |log|
+      li= log
+
 = link_to 'Back', games_path

@@ -5,7 +5,7 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :trackable, :validatable
 
   has_many :journals
-  has_many :games, through: :journals
+  has_many :games, -> { distinct }, through: :journals
 
-  validates :name, presence: :true
+  validates :name, presence: true
 end
