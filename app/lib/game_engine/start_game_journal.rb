@@ -5,6 +5,15 @@ class GameEngine::StartGameJournal < Journal
       qn << ' or Start the game'
     end
     qn
+  end.with_controls do
+    [ButtonControl.new(player: @player,
+                       scope: :player,
+                       values: [['Start the game', 'start']])]
+  end
+
+  def process(game_state)
+    super
+    game_state.state = :running
   end
 
   class Template

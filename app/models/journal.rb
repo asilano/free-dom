@@ -4,14 +4,19 @@ class Journal < ApplicationRecord
 
   # Nested classes let GameEngine request the right journal at the right time
   class Template
-    attr_reader :opts
+    attr_reader :opts, :player
 
-    def initialize(opts)
+    def initialize(player)
+      @player = player
+    end
+
+    def with(opts)
       @opts = opts
+      self
     end
 
     def question
-      self.class::Question.new(@opts)
+      self.class::Question.new(@player, @opts)
     end
 
     def matches?(journal)
@@ -28,19 +33,32 @@ class Journal < ApplicationRecord
     end
 
     class Question
-      attr_reader :opts
-      def initialize(opts)
+      attr_reader :opts, :player
+      def initialize(player, opts)
         @opts = opts
+        @player = player
       end
 
-      def answer(value)
-        self.class::Parent.new(value)
+      def journal_type
+        self.class::Parent
       end
 
-      def controls; end
+      def controls
+        @controls ||= get_controls
+      end
 
-      def with_controls(&controls)
-        self::Template::Question.define_method(:controls, &controls)
+      def controls_for(user)
+        controls.select { |ctrl| ctrl.player.user == user }
+      end
+
+      def self.with_controls(&controls)
+        define_method(:get_controls, &controls)
+      end
+
+      private
+
+      def get_controls
+        []
       end
     end
   end
@@ -62,10 +80,11 @@ class Journal < ApplicationRecord
     else
       self::Template::Question.define_method(:text, &block)
     end
+    self::Template::Question
   end
 
-  def self.with(opts)
-    self::Template.new(opts)
+  def self.from(player)
+    self::Template.new(player)
   end
 
   def self.validation(&block)

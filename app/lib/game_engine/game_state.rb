@@ -7,6 +7,7 @@ class GameEngine::GameState
   end
 
   attr_reader :logs, :players, :piles
+  attr_accessor :state
 
   def initialize(seed)
     @seed = seed
@@ -24,23 +25,29 @@ class GameEngine::GameState
 
     # Ask the game creator what cards are in the Kingdom. We expect this to
     # proceed immediately, with a journal created with the game.
-    get_journal(GameEngine::ChooseKingdomJournal).process(self)
+    get_journal(GameEngine::ChooseKingdomJournal, from: @players[0]).process(self)
 
     # Ask the game creator to start the game. The StartGameJournal template is
     # specially modified to allow the AddPlayerJournal to match it.
-    until @state == :running do
-      get_journal(GameEngine::StartGameJournal).process(self)
+    until @state == :running
+      get_journal(GameEngine::StartGameJournal, from: @players[0]).process(self)
     end
 
     loop do
-      journal = Fiber.yield('Question here')
+      turn_player = @players[0]
+      get_journal(GameEngine::PlayActionJournal, from: turn_player).process(self)
     end
   end
 
-  def get_journal(journal_class, opts = {})
-    journal = Fiber.yield(journal_class.with(opts).question)
-    raise UnexpectedJournalError, "Unexpected journal type: #{journal}" unless journal_class.with(opts).matches? journal
-    raise InvalidJournalError, "Invalid journal: #{journal}" unless journal_class.with(opts).valid? journal
+  def get_journal(journal_class, from:, opts: {})
+    template = journal_class.from(from).with(opts)
+    journal = Fiber.yield(template.question)
+    raise UnexpectedJournalError, "Unexpected journal type: #{journal}" unless template.matches? journal
+    raise InvalidJournalError, "Invalid journal: #{journal}" unless template.valid? journal
     journal
+  end
+
+  def other_players(exclude_user:)
+    @players.reject { |ply| ply.user == exclude_user }
   end
 end

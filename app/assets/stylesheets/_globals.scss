@@ -21,6 +21,15 @@ a {
   background-color: orange;
 }
 
+// Make header tags a bit smaller
+h2 {
+  font-size: 2rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
 .hero-section {
   background: image-url('old-map.jpg') 50% no-repeat;
   background-size: cover;
@@ -48,6 +57,10 @@ a {
 
 .button.no-gap-under {
   margin-bottom: 0;
+}
+
+.border-under {
+  border-bottom: 1px solid $dark-gray;
 }
 
 footer {

@@ -4,4 +4,8 @@ class GameEngine::PlayerState
   def initialize(user)
     @user = user
   end
+
+  def name
+    @user.name
+  end
 end

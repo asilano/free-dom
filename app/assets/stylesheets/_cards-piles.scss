@@ -1,0 +1,11 @@
+.card, .pile {
+  border: 3px solid $black;
+  border-radius: 3px;
+  max-width: 10em;
+  margin: 5px 0;
+
+  .card-name {
+    background-color: $action-cream;
+    text-align: center;
+  }
+}

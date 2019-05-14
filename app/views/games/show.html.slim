@@ -1,18 +1,48 @@
-p
-  strong> Name:
-  = @game.name
-p
-  strong> Players in game:
-  = @game.users.map(&:name).join(', ')
+.cell
+  .grid-container.fluid
+    .grid-x
+      .cell#game-title
+        - game_title = "Game #{@game.id}"
+        - game_title << " — #{@game.name}" if @game.name.present?
+        h2= game_title
+.cell.border-under
+  .grid-container.fluid
+    - if @game.users.include? current_user
+      .grid-x.grid-margin-x
+        .cell.player.border-under#current-player
+          h2= current_user.name
+          / Player-button controls
+          - @game.question.controls_for(current_user).select { |ctrl| ctrl.scope == :player }.each do |ctrl|
+            = form_with model: @game.journals.build do |f|
+              = f.hidden_field :game_id
+              = f.hidden_field :type, value: @game.question.journal_type
+              - ctrl.values.each do |val|
+                = f.button val[0], value: val[1], name: "journal[params][#{ctrl.key}]", class: 'button', data: { disable_with: val[0] }
 
-p
-  strong> Current question:
-  = @game.question.text(@game.game_state)
+    .grid-x.grid-margin-x
+      - @game.game_state.other_players(exclude_user: current_user).each do |player|
+        .cell.auto.player
+          h3= player.user.name
 
-p
-  strong> Journal log:
-  ul
-    - @game.game_state.logs.each do |log|
-      li= log
+.cell
+  .grid-container.fluid
+    .grid-x.grid-margin-x
+      - @game.game_state.piles.each do |pile|
+        .cell.pile
+          .card-name= pile.card_class.readable_name
 
-= link_to 'Back', games_path
+  p
+    strong> Players in game:
+    = @game.users.map(&:name).join(', ')
+
+  p
+    strong> Current question:
+    = @game.question.player.name + ': ' + @game.question.text(@game.game_state)
+
+  p
+    strong> Journal log:
+    ul
+      - @game.game_state.logs.each do |log|
+        li= log
+
+  = link_to 'Back', games_path
