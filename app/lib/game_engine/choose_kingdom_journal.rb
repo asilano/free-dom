@@ -4,16 +4,16 @@ module GameEngine
 
     validate :valid_kingdom_choices
 
-    def cards
-      return [] unless params
-      params['card_list']
-    end
+    # def cards
+    #   return [] unless params
+    #   params['card_list']
+    # end
 
-    def cards=(arr)
-      params_will_change!
-      self.params ||= {}
-      self.params['card_list'] = arr
-    end
+    # def cards=(arr)
+    #   params_will_change!
+    #   self.params ||= {}
+    #   self.params['card_list'] = arr
+    # end
 
     validation do
       journal.kingdom_choice_errors.empty?
@@ -29,7 +29,7 @@ module GameEngine
     end
 
     def kingdom_choice_errors
-      card_list = cards
+      card_list = params['card_list']
       return ['cards_list not an Array'] unless card_list.is_a? Array
       return ["cards_list has #{card_list.uniq.length} members"] unless card_list.uniq.length == 10
       card_list.map do |card|

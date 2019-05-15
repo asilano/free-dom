@@ -67,7 +67,7 @@ class GamesController < ApplicationController
                                    :user_id,
                                    :type,
                                    :order,
-                                   cards: []
+                                   params: {}
                                  ])
   end
 end

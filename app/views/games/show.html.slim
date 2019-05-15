@@ -12,7 +12,7 @@
         .cell.player.border-under#current-player
           h2= current_user.name
           / Player-button controls
-          - @game.question.controls_for(current_user).select { |ctrl| ctrl.scope == :player }.each do |ctrl|
+          - @game.question.controls_for(current_user, @game.game_state).select { |ctrl| ctrl.scope == :player }.each do |ctrl|
             = form_with model: @game.journals.build do |f|
               = f.hidden_field :game_id
               = f.hidden_field :type, value: @game.question.journal_type

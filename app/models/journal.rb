@@ -43,12 +43,12 @@ class Journal < ApplicationRecord
         self.class::Parent
       end
 
-      def controls
-        @controls ||= get_controls
+      def controls(game_state)
+        @controls ||= get_controls(game_state)
       end
 
-      def controls_for(user)
-        controls.select { |ctrl| ctrl.player.user == user }
+      def controls_for(user, game_state)
+        controls(game_state).select { |ctrl| ctrl.player.user == user }
       end
 
       def self.with_controls(&controls)

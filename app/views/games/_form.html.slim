@@ -1,4 +1,4 @@
-= form_with model: @game, id: 'new_game' do |f|
+= form_with model: @game, local: true, id: 'new_game' do |f|
   - if @game.errors.present?
     .grid-padding-x.alert
       - @game.errors.full_messages.each do |err|
@@ -17,19 +17,18 @@
     = j.hidden_field :type
     = j.hidden_field :user_id
     = j.hidden_field :order
-    = j.fields :cards do |jc|
-      #card_selects
-        - all_cards = GameEngine::Card.expansions.map(&:kingdom_cards).flatten.shuffle
-        - 10.times do |ix|
-          .card-select-row
-            .pileLabel= label_tag("cards_#{ix}", "Kingdom card #{ix + 1}: ")
-            .pileSelect= jc.select('', option_groups_from_collection_for_select(GameEngine::Card.expansions,
-                                          :kingdom_cards,
-                                          :name,
-                                          :name,
-                                          :readable_name,
-                                          all_cards[ix]),
-                                    {},
-                                    id: "cards_#{ix}")
+    #card_selects
+      - all_cards = GameEngine::Card.expansions.map(&:kingdom_cards).flatten.shuffle
+      - 10.times do |ix|
+        .card-select-row
+          .pileLabel= label_tag("cards_#{ix}", "Kingdom card #{ix + 1}: ")
+          .pileSelect= select_tag("#{j.object_name}[params][card_list][]",
+                                  option_groups_from_collection_for_select(GameEngine::Card.expansions,
+                                        :kingdom_cards,
+                                        :name,
+                                        :name,
+                                        :readable_name,
+                                        all_cards[ix]),
+                                  id: "cards_#{ix}")
 
   .actions = f.submit class: 'button'

@@ -5,10 +5,14 @@ class GameEngine::StartGameJournal < Journal
       qn << ' or Start the game'
     end
     qn
-  end.with_controls do
-    [ButtonControl.new(player: @player,
-                       scope: :player,
-                       values: [['Start the game', 'start']])]
+  end.with_controls do |game_state|
+    if game_state.players.length > 1
+      [ButtonControl.new(player: @player,
+                         scope: :player,
+                         values: [['Start the game', 'start']])]
+    else
+      []
+    end
   end
 
   def process(game_state)
