@@ -5,6 +5,16 @@
         - game_title = "Game #{@game.id}"
         - game_title << " — #{@game.name}" if @game.name.present?
         h2= game_title
+- unless @game.users.include? current_user
+  .cell.border-under
+    .grid-container.fluid.grid-x
+      .cell
+        p You are not currently in this game
+        = form_with model: @game.journals.build do |f|
+          = f.hidden_field :game_id
+          = f.hidden_field :type, value: GameEngine::AddPlayerJournal
+          = f.submit 'Join game'
+
 .cell.border-under
   .grid-container.fluid
     - if @game.users.include? current_user
