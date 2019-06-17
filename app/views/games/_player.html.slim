@@ -1,0 +1,23 @@
+- player = @game.game_state.player_for(current_user)
+.cell.player#current-player
+  h2= current_user.name
+  / Player-button controls
+  - @game.question.controls_for(current_user, @game.game_state).select { |ctrl| ctrl.scope == :player }.each do |ctrl|
+    = form_with model: @game.journals.build do |f|
+      = f.hidden_field :game_id
+      = f.hidden_field :type, value: @game.question.journal_type
+      - ctrl.values.each do |val|
+        = f.button val[0], value: val[1], name: "journal[params][#{ctrl.key}]", class: 'button', data: { disable_with: val[0] }
+
+  / Cards held in hand
+  h5 Hand
+  .grid-container.fluid
+    .card-grid
+      - player.hand_cards.each do |card|
+        .cell.card-name{class=card.class.types}= card.readable_name
+
+  / Deck representation
+  h5 Deck
+  .grid-container.fluid
+    .grid-x.grid-margin-x
+      .cell.card-back= player.deck_cards.count

@@ -2,6 +2,8 @@ class Journal < ApplicationRecord
   belongs_to :game
   belongs_to :user
 
+  attr_reader :histories
+
   # Nested classes let GameEngine request the right journal at the right time
   class Template
     attr_reader :opts, :player
@@ -57,7 +59,7 @@ class Journal < ApplicationRecord
 
       private
 
-      def get_controls
+      def get_controls(_game_state)
         []
       end
     end
@@ -91,7 +93,7 @@ class Journal < ApplicationRecord
     self::Template.define_method(:do_validate, &block)
   end
 
-  def process(_)
-    Rails.logger.info("Processing a #{'type'}")
+  def process(_state)
+    @histories = []
   end
 end

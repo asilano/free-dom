@@ -1,0 +1,15 @@
+.cell.auto.player
+  h3= other_player.user.name
+  / Cards held in hand representation
+  h5 Hand
+  .grid-container.fluid
+    .grid-x.grid-margin-x
+      .cell.card
+        .card-back= other_player.hand_cards.count
+
+  / Deck representation
+  h5 Deck
+  .grid-container.fluid
+    .grid-x.grid-margin-x
+      .cell.card
+        .card-back= other_player.deck_cards.count

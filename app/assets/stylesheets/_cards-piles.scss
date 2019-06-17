@@ -1,11 +1,91 @@
-.card, .pile {
+.card-grid {
+  @include xy-grid;
+  @include xy-grid-layout(1, '.cell', true, map-get($grid-margin-gutters, small) / 2, 'margin');
+      @include xy-gutters(map-get($grid-margin-gutters, small) / 2, $negative:true);
+
+  @include breakpoint(medium) {
+      @include xy-grid-layout(1, '.cell', true, map-get($grid-margin-gutters, medium) / 2, 'margin');
+      @include xy-gutters(map-get($grid-margin-gutters, medium) / 2, $negative:true);
+  }
+  @include breakpoint(large up) {
+      @include xy-grid-layout(1, '.cell', true, map-get($grid-margin-gutters, medium) / 2, 'margin');
+      @include xy-gutters(map-get($grid-margin-gutters, medium) / 2, $negative:true);
+  }
+}
+
+.card-name {
   border: 3px solid $black;
   border-radius: 3px;
-  max-width: 10em;
+  max-width: 120px;
   margin: 5px 0;
+  position: relative;
+  text-align: center;
+
+  // The following section is order-dependent
+  &.action  {background-color: $action-cream}
+  &.reaction  {background-color: $reaction-blue}
+  &.duration  {background-color: $duration-orange}
+  &.treasure  {background-color: $treasure-yellow}
+  &.victory  {background-color: $victory-green}
+  &.curse  {background-color: $curse-purple}
+  &.attack {color: red; font-weight: bold;}
+}
+
+.pile {
+  display: flex;
+  align-items: center;
 
   .card-name {
-    background-color: $action-cream;
-    text-align: center;
+    width: 120px;
+    height: 80px;
+    line-height: 80px;
   }
+
+  .pile-cost {
+    width: 70px;
+    height: 0px;
+    text-align: center;
+    border: 25px solid $medium-gray;
+    border-left-color: transparent;
+    position: relative;
+
+    .cost-text {
+      position: absolute;
+      top: -15px;
+      left: 8px;
+      height: 30px;
+      width: 30px;
+      line-height: 30px;
+
+      background-color: $treasure-yellow;
+      border-radius: 50%;
+    }
+  }
+
+  .pile-count {
+    width: 70px;
+    height: 50px;
+    line-height: 50px;
+    background-color: $medium-gray;
+    padding: 0 5px;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+  }
+}
+
+.card-back {
+  border: 10px solid $reaction-blue;
+  border-left-width: 15px;
+  border-right-width: 15px;
+  background-color: $action-cream;
+  max-width: 160px;
+  text-align: center;
+}
+
+.card-count {
+  font-size: 0.75em;
+}
+
+.this-player .card-back {
+  font-size: 1.5em;
 }

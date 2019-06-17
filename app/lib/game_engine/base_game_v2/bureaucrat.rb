@@ -1,2 +1,9 @@
-class GameEngine::BaseGameV2::Bureaucrat < GameEngine::Card
+module GameEngine
+  module BaseGameV2
+    class Bureaucrat < GameEngine::Card
+      action
+      attack
+      costs 4
+    end
+  end
 end

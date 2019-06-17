@@ -1,2 +1,8 @@
-class GameEngine::BaseGameV2::Poacher < GameEngine::Card
+module GameEngine
+  module BaseGameV2
+    class Poacher < GameEngine::Card
+      action
+      costs 4
+    end
+  end
 end

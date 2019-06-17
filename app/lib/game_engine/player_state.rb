@@ -1,8 +1,11 @@
 class GameEngine::PlayerState
-  attr_reader :user
+  attr_reader :user, :deck_cards, :hand_cards
+  attr_accessor :seat
 
   def initialize(user)
     @user = user
+    @deck_cards = []
+    @hand_cards = []
   end
 
   def name

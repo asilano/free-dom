@@ -47,6 +47,10 @@ class GameEngine::GameState
     journal
   end
 
+  def player_for(user)
+    @players.detect { |ply| ply.user == user }
+  end
+
   def other_players(exclude_user:)
     @players.reject { |ply| ply.user == exclude_user }
   end

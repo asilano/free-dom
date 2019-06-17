@@ -1,2 +1,8 @@
-class GameEngine::BaseGameV2::Cellar < GameEngine::Card
+module GameEngine
+  module BaseGameV2
+    class Cellar < GameEngine::Card
+      action
+      costs 2
+    end
+  end
 end

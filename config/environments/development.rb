@@ -61,5 +61,7 @@ Rails.application.configure do
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::FileUpdateChecker
 
+  config.web_console.whitelisted_ips = %w[127.0.0.1 10.0.2.2]
+
   config.x.admin_email = 'dominion.app@gmail.com'
 end

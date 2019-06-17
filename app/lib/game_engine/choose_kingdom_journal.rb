@@ -4,28 +4,22 @@ module GameEngine
 
     validate :valid_kingdom_choices
 
-    # def cards
-    #   return [] unless params
-    #   params['card_list']
-    # end
-
-    # def cards=(arr)
-    #   params_will_change!
-    #   self.params ||= {}
-    #   self.params['card_list'] = arr
-    # end
-
     validation do
       journal.kingdom_choice_errors.empty?
     end
 
     def process(game_state)
       super
-      params['card_list'].each do |card|
-        card_class = card.constantize
-        game_state.piles << GameEngine::Pile.new(card_class)
-        game_state.logs << "Added #{card_class.readable_name} to the kingdom"
+      # Add the basic cards
+      basic_piles = %w[Estate Duchy Province Copper Silver Gold Curse].map do |basic_type|
+        "GameEngine::BasicCards::#{basic_type}"
       end
+      supply = basic_piles.map(&:constantize) + params['card_list'].map(&:constantize).sort_by(&:raw_cost)
+      supply.each do |card_class|
+        game_state.piles << GameEngine::Pile.new(card_class)
+      end
+
+      @histories << History.new("#{params['card_list'].map(&:demodulize).map(&:titleize).join(', ')} chosen for the kingdom.")
     end
 
     def kingdom_choice_errors
