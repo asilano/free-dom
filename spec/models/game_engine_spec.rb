@@ -27,4 +27,16 @@ RSpec.describe GameEngine, type: :model do
     expect(game.question).to be_a(GameEngine::StartGameJournal::Template::Question)
     expect(game.question.text game.game_state).to eq 'Wait for more players or Start the game'
   end
+
+  it 'should process game-start' do
+    game = FactoryBot.create(:started_game_with_two_players)
+    game.process
+
+    # Players should have 7 Coppers and 3 Estates, 5 each in deck and hand
+    game.game_state.players.each do |player|
+      expect(player.cards.map(&:readable_name)).to match_array(['Estate'] * 3 + ['Copper'] * 7)
+      expect(player.hand_cards.count).to eq 5
+      expect(player.deck_cards.count).to eq 5
+    end
+  end
 end

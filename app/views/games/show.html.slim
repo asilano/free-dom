@@ -30,17 +30,16 @@
 .cell
   .grid-container.fluid
     .grid-x.grid-margin-x
-      .cell.small-12.medium-6
-        ul
-          - @game.game_state.piles.each do |pile|
-            li
-              .pile
-                .pile-cost
-                  span.cost-text= pile.cards.first.cost
-                .card-name{class=pile.card_class.types}= pile.card_class.readable_name
-                .pile-count= "#{pile.cards.count} of #{pile.card_class.starting_size(@game.users.count)}"
+      - @game.game_state.piles.each_slice((@game.game_state.piles.count / 2.0).round) do |half|
+        .cell.small-12.medium-6.large-4
+          - half.each do |pile|
+            .pile
+              .pile-cost
+                span.cost-text= pile.cards.first&.cost || pile.card_class.raw_cost
+              .card-name{class=pile.card_class.types}= pile.card_class.readable_name
+              .pile-count= "#{pile.cards.count} of #{pile.card_class.starting_size(@game.users.count)}"
 
-      .cell.small-12.medium-6
+      .cell.small-12.medium-6.large-4
         p
           strong> Current question:
           = @game.question.player.name + ': ' + @game.question.text(@game.game_state)

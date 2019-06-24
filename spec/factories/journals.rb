@@ -27,5 +27,9 @@ FactoryBot.define do
     factory :add_player_journal, class: GameEngine::AddPlayerJournal do
       type { GameEngine::AddPlayerJournal }
     end
+
+    factory :start_game_journal, class: GameEngine::StartGameJournal do
+      type { GameEngine::StartGameJournal }
+    end
   end
 end

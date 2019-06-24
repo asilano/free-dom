@@ -11,4 +11,8 @@ class GameEngine::PlayerState
   def name
     @user.name
   end
+
+  def cards
+    @deck_cards + @hand_cards
+  end
 end
