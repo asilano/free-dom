@@ -1,6 +1,5 @@
 # # This module is "extend"ed into Card.
 module CardDecorators
-
 #   ######
 #   # Basic decorators
 #   ######

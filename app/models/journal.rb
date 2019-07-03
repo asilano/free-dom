@@ -27,6 +27,7 @@ class Journal < ApplicationRecord
 
     def valid?(journal)
       define_singleton_method(:journal) { journal }
+      return false unless journal.skip_owner_check || player == journal.player
       do_validate
     end
 
@@ -91,6 +92,17 @@ class Journal < ApplicationRecord
 
   def self.validation(&block)
     self::Template.define_method(:do_validate, &block)
+  end
+
+  def skip_owner_check
+    false
+  end
+  def self.skip_owner_check
+    define_method(:skip_owner_check) { true }
+  end
+
+  def player
+    game.game_state.player_for(user)
   end
 
   def process(_state)

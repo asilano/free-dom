@@ -1,0 +1,2 @@
+- text ||= control.text
+= button_tag text, value: value, name: "journal[params][#{control.key}]", class: 'button' + control.css_class, form: "control_form_#{control.object_id}"

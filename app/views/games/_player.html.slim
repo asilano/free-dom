@@ -11,13 +11,21 @@
 
   / Cards held in hand
   h5 Hand
+  - hand_controls = @game.question.controls_for(current_user, @game.game_state).select { |ctrl| ctrl.scope == :hand }
+  = render partial: 'control_skeleton', collection: hand_controls
   .grid-container.fluid
     .card-grid
-      - player.hand_cards.each do |card|
-        .cell.card-name{class=card.class.types}= card.readable_name
+      = render partial: 'card', collection: player.hand_cards, locals: { controls: hand_controls }
+      - if hand_controls.any?(&:cardless_button)
+        .cell.card.null-card
+          .card-name
+          - hand_controls.each do |ctrl|
+            - if ctrl.cardless_button
+              .card-ctrl= render partial: 'controls/one_card_control', object: ctrl, as: :control, locals: { text: ctrl.cardless_button[:text], value: ctrl.cardless_button[:value] }
 
   / Deck representation
   h5 Deck
   .grid-container.fluid
     .grid-x.grid-margin-x
-      .cell.card-back= player.deck_cards.count
+      .cell.card
+        .card-back= player.deck_cards.count

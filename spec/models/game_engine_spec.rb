@@ -39,4 +39,20 @@ RSpec.describe GameEngine, type: :model do
       expect(player.deck_cards.count).to eq 5
     end
   end
+
+  # it 'should not take too long' do
+  #   game = FactoryBot.create(:started_game_with_two_players)
+
+  #   game.users.cycle(1000) do |u|
+  #     FactoryBot.create(:journal,
+  #                       game: game,
+  #                       user: u,
+  #                       type: GameEngine::PlayActionJournal,
+  #                       params: { 'choice' => 'none' } )
+  #   end
+
+  #   puts Time.current
+  #   game.process
+  #   puts Time.current
+  # end
 end

@@ -1,26 +1,38 @@
-class GameEngine::Card
-  extend CardDecorators
-  attr_reader :player, :pile, :game, :location, :position
-  delegate :readable_name, to: :class
+module GameEngine
+  class Card
+    extend CardDecorators
+    attr_reader :player, :pile, :game, :location, :position
+    delegate :action?, :treasure?, :victory?, :curse?, :reaction?, :attack?, :readable_name, to: :class
 
-  # By default, 10 cards in a pile
-  pile_size 10
+    # By default, 10 cards in a pile
+    pile_size 10
 
-  def self.expansions
-    [GameEngine::BaseGameV2]
+    def self.expansions
+      [GameEngine::BaseGameV2]
+    end
+
+    def self.readable_name
+      name.demodulize.underscore.titleize
+    end
+
+    def self.types
+      %w[action attack curse reaction treasure victory].map do |type|
+        type if send("#{type}?")
+      end.compact
+    end
+
+    def cost
+      self.class.raw_cost
+    end
   end
 
-  def self.readable_name
-    name.demodulize.underscore.titleize
-  end
+  class NullCard < Card
+    def self.readable_name
+      ''
+    end
 
-  def self.types
-    %w[action attack curse reaction treasure victory].map do |type|
-      type if send("#{type}?")
-    end.compact
-  end
-
-  def cost
-    self.class.raw_cost
+    def self.types
+      'null-card'
+    end
   end
 end

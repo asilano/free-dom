@@ -13,29 +13,55 @@
   }
 }
 
-.card-name {
+// The following section is order-dependent
+.action .card-name {background-color: $action-cream}
+.reaction .card-name {background-color: $reaction-blue}
+.duration .card-name {background-color: $duration-orange}
+.treasure .card-name {background-color: $treasure-yellow}
+.victory .card-name {background-color: $victory-green}
+.curse .card-name {background-color: $curse-purple}
+.attack .card-name {color: red; font-weight: bold;}
+
+.cell.card {
+  width: auto;
+  min-width: 120px;
+}
+
+.card {
   border: 3px solid $black;
   border-radius: 3px;
-  max-width: 120px;
   margin: 5px 0;
   position: relative;
   text-align: center;
 
-  // The following section is order-dependent
-  &.action  {background-color: $action-cream}
-  &.reaction  {background-color: $reaction-blue}
-  &.duration  {background-color: $duration-orange}
-  &.treasure  {background-color: $treasure-yellow}
-  &.victory  {background-color: $victory-green}
-  &.curse  {background-color: $curse-purple}
-  &.attack {color: red; font-weight: bold;}
+  // Styling overrides for a fake button-holding card
+  &.null-card {
+    border-color: $light-gray;
+    background-color: $light-gray;
+    max-width: none;
+    width: auto;
+  }
+
+  .card-name {
+    height: 24px;
+  }
+
+  .card-ctrl {
+    height: 48px;
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+
+  .card-name + .card-ctrl {
+    margin-top: 8px;
+  }
 }
 
 .pile {
   display: flex;
   align-items: center;
 
-  .card-name {
+  .card {
     width: 120px;
     height: 64px;
     line-height: 64px;
@@ -79,7 +105,7 @@
   border-right-width: 15px;
   border-radius: 3px;
   background-color: $action-cream;
-  max-width: 160px;
+  width: 160px;
   text-align: center;
 }
 

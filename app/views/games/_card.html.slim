@@ -1,0 +1,6 @@
+.cell.card{class=card.class.types}
+  .card-name= card.readable_name
+  - controls.each do |ctrl|
+    .card-ctrl
+      - if ctrl.filter[card]
+        = render partial: ctrl, as: :control, locals: { value: card_counter }
