@@ -54,3 +54,26 @@
 #game-title {
   text-align: center;
 }
+
+.cost-text {
+  text-align: center;
+  height: 30px;
+  width: 30px;
+  line-height: 30px;
+
+  background-color: $treasure-yellow;
+  border-radius: 50%;
+}
+
+.turn-status {
+  .counts, .cash {
+    display: table-cell;
+    position: relative;
+  }
+
+  .cost-text {
+    position: absolute;
+    top: calc(50% - 15px);
+    left: 15px;
+  }
+}

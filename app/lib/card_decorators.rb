@@ -11,6 +11,7 @@ module CardDecorators
   end
 
   def treasure?; false; end
+  def special?; false; end
   # Define a card as a Treasure with the specified value
   def treasure(opts)
     raise ArgumentError, 'Treasure must specify cash or special' unless opts.key?(:cash) || opts[:special]

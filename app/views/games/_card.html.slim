@@ -3,4 +3,4 @@
   - controls.each do |ctrl|
     .card-ctrl
       - if ctrl.filter[card]
-        = render partial: ctrl, as: :control, locals: { value: card_counter }
+        = render partial: ctrl, as: :control, locals: { value: card_counter, card: card }

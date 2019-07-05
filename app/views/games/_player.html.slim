@@ -21,7 +21,21 @@
           .card-name
           - hand_controls.each do |ctrl|
             - if ctrl.cardless_button
-              .card-ctrl= render partial: 'controls/one_card_control', object: ctrl, as: :control, locals: { text: ctrl.cardless_button[:text], value: ctrl.cardless_button[:value] }
+              .card-ctrl= render partial: 'controls/cardless_button', object: ctrl.cardless_button, as: :button, locals: { control: ctrl }
+
+  / Cards in play
+  h5 In Play
+  - play_controls = @game.question.controls_for(current_user, @game.game_state).select { |ctrl| ctrl.scope == :play }
+  = render partial: 'control_skeleton', collection: play_controls
+  .grid-container.fluid
+    .card-grid
+      = render partial: 'card', collection: player.in_play_cards, locals: { controls: play_controls }
+      - if play_controls.any?(&:cardless_button)
+        .cell.card.null-card
+          .card-name
+          - play_controls.each do |ctrl|
+            - if ctrl.cardless_button
+              .card-ctrl= render partial: 'controls/cardless_button', object: ctrl.cardless_button, as: :button, locals: { control: ctrl }
 
   / Deck representation
   h5 Deck
@@ -29,3 +43,12 @@
     .grid-x.grid-margin-x
       .cell.card
         .card-back= player.deck_cards.count
+
+  / Cash, actions, buys
+  h5 Status
+  .turn-status
+    .counts
+      .count= "#{player.actions} Actions"
+      .count= "#{player.buys} Buys"
+    .cash
+      span.cost-text= player.cash

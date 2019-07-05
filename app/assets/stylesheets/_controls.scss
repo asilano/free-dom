@@ -3,3 +3,13 @@ button.play-action,
   background-color: $action-cream;
   color: $black;
 }
+
+button.play-treasure,
+[type=button].play-treasure {
+  background-color: $treasure-yellow;
+  color: $black;
+}
+
+.card-ctrl input[type=checkbox] {
+  margin-top: 0.85rem;
+}
