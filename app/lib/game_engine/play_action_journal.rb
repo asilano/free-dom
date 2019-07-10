@@ -14,7 +14,8 @@ module GameEngine
 
       if params['choice'] == 'none'
         player.actions = 0
-        @histories << History.new("#{player.name} stopped playing actions.")
+        @histories << History.new("#{player.name} stopped playing actions.",
+                                  player: player)
         return
       end
     end

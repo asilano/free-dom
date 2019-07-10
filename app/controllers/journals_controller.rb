@@ -22,9 +22,10 @@ class JournalsController < ApplicationController
   # DELETE /journals/1
   # DELETE /journals/1.json
   def destroy
-    @journal.destroy
+    to_destroy = @journal.game.journals.where('journals.order >= ?', @journal.order)
+    to_destroy.destroy_all
     respond_to do |format|
-      format.html { redirect_to journals_url, notice: 'Journal was successfully destroyed.' }
+      format.html { redirect_to @journal.game }
       format.json { head :no_content }
     end
   end

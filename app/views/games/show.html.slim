@@ -45,13 +45,21 @@
           = @game.question.player.name + ': ' + @game.question.text(@game.game_state)
 
         ul#journal-log
+          - last_fixed_journal = @game.last_fixed_journal_for(current_user)
           - @game.journals.each do |journal|
             - if journal.histories.present?
-              li
-                span{class=journal.histories.first.css_class}= journal.histories.first.event
+              li{class=journal.histories.first.css_class}
+                - if journal.order > last_fixed_journal.order
+                  = form_with url: journal_path(journal), method: :delete do |f|
+                    = f.button inline_svg('action-undo.svg',
+                                          class: 'undo-arrow',
+                                          title: 'Undo to here',
+                                          desc: 'Click to undo this and all later actions',
+                                          aria: true), class: 'undo-button'
+                span= journal.histories.first.event
                 - if journal.histories.length > 1
                   ul
                     - journal.histories[1..-1].each do |hist|
-                      li: span{class=hist.css_class}= hist.event
+                      li{class=hist.css_class}: span= hist.event
 
   = link_to 'Back', games_path

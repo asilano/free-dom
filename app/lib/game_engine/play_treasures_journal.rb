@@ -21,14 +21,20 @@ module GameEngine
       super
 
       # return :stop if params['choice'].blank?
-
       cards = params['choice'].map { |ch| player.hand_cards[ch.to_i] }
+      texts_for_history = []
       cards.each do |card|
         player.in_play_cards << card
         player.hand_cards.delete card
-        player.cash += card.cash
+        cash_gain = card.cash
+        player.cash += cash_gain
+
+        texts_for_history << "#{card.readable_name} ($#{cash_gain})"
       end
 
+      @histories << History.new("#{player.name} played #{texts_for_history.join(', ')} (total: $#{player.cash})",
+                                player: player,
+                                css_classes: %w[play-treasure])
       :continue
     end
   end

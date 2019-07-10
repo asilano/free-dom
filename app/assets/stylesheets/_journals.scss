@@ -1,5 +1,32 @@
 #journal-log {
+  @each $player, $colour in $player-backgrounds {
+    .#{$player} {
+      background-color: $colour;
+    }
+  }
+
   li {
-    list-style-type: disc;
+    padding-left: 24px;
+    position: relative;
+  }
+}
+
+.undo-button {
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  height: 16px;
+  width: 16px;
+
+  .undo-arrow {
+    height: 16px;
+    width: 16px;
+    transform: rotate(45deg);
+    transition: all 0.1s ease-in;
+
+    &:hover {
+      transform: rotate(45deg) scale(1.2);
+      fill: $dark-blue;
+    }
   }
 }

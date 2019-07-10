@@ -29,7 +29,8 @@ module GameEngine
     def randomise_players(game_state)
       game_state.players.shuffle!.each.with_index do |player, ix|
         player.seat = ix + 1
-        @histories << History.new("#{player.name} will play #{(ix + 1).ordinalize}.", css_class: "player#{ix + 1}")
+        @histories << History.new("#{player.name} will play #{(ix + 1).ordinalize}.",
+                                  player: player)
       end
     end
 

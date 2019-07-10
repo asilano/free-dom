@@ -36,6 +36,8 @@ gem 'foundation_rails_helper', '~> 3.0'
 gem 'autoprefixer-rails'
 gem 'jquery-rails'
 
+gem 'inline_svg'
+
 gem 'devise'
 
 # for railties app_generator_test

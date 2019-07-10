@@ -45,10 +45,11 @@
         .card-back= player.deck_cards.count
 
   / Cash, actions, buys
-  h5 Status
-  .turn-status
-    .counts
-      .count= "#{player.actions} Actions"
-      .count= "#{player.buys} Buys"
-    .cash
-      span.cost-text= player.cash
+  - if player == @game.game_state.turn_player
+    h5 Status
+    .turn-status
+      .counts
+        .count= pluralize(player.actions, 'Action')
+        .count= pluralize(player.buys, 'Buy')
+      .cash
+        span.cost-text= player.cash

@@ -10,6 +10,8 @@ module GameEngine
 
     def process(game_state)
       super
+      prevent_undo
+
       # Add the basic cards
       basic_piles = %w[Estate Duchy Province Copper Silver Gold Curse].map do |basic_type|
         "GameEngine::BasicCards::#{basic_type}"
