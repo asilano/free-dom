@@ -1,0 +1,24 @@
+- pile_controls = @game.question.controls_for(current_user, @game.game_state).select { |ctrl| ctrl.scope == :piles }
+= render partial: 'control_skeleton', collection: pile_controls
+
+- @game.game_state.piles.each_with_index.each_slice((@game.game_state.piles.count / 2.0).round).with_index do |half, half_ix|
+  .cell.small-12.medium-6.large-4
+    - if pile_controls.any?(&:cardless_button)
+      .pile{class=('hidden' if half_ix > 0)}
+        .pile-cost.hidden
+        .card.null-card
+          .card-name
+          - pile_controls.each do |ctrl|
+            - if ctrl.cardless_button
+              .card-ctrl= render partial: 'controls/cardless_button', object: ctrl.cardless_button, as: :button, locals: { control: ctrl }
+    - half.each do |pile, ix|
+      .pile
+        .pile-cost
+          span.cost-text= pile.cards.first&.cost || pile.card_class.raw_cost
+        .card{class=pile.card_class.types}
+          .card-name= pile.card_class.readable_name
+          - pile_controls.each do |ctrl|
+            .card-ctrl
+              - if ctrl.filter[pile.cards.first]
+                = render partial: ctrl, as: :control, locals: { value: ix, card: pile.cards.first }
+        .pile-count= "#{pile.cards.count} of #{pile.card_class.starting_size(@game.users.count)}"

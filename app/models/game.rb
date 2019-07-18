@@ -10,6 +10,7 @@ class Game < ApplicationRecord
   def process
     # Initialise things
     @last_fixed_journal_order = 0
+    @journal_stack = []
 
     # Spawn a GameState object, seeding it with our creating time
     # in nanoseconds
@@ -25,8 +26,17 @@ class Game < ApplicationRecord
     journals.each { |j| @question = fiber.resume(j) }
   end
 
+  def push_journal(journal)
+    @journal_stack.push journal
+  end
+
+  def pop_journal
+    @journal_stack.pop
+  end
+
   # Mark a journal as not able to be undone
-  def fix_journal(journal)
+  def fix_journal(journal: :current)
+    journal = @journal_stack.last if journal == :current
     @last_fixed_journal_order = journal.order
   end
 

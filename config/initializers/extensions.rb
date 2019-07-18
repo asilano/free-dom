@@ -9,3 +9,9 @@ class Module
 
   alias :kingdom_cards :card_classes
 end
+
+class String
+  def integer?(allow_negative: false)
+    self =~ /\A#{'-?' if allow_negative}\d+\z/
+  end
+end

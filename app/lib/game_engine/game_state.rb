@@ -51,9 +51,13 @@ class GameEngine::GameState
       play_treasures = :continue
       until play_treasures == :stop
         play_treasures = get_journal(GameEngine::PlayTreasuresJournal, from: @turn_player).process(self)
+        Rails.logger.info("Continue? #{play_treasures}")
       end
 
       # Buy cards until the player stops our runs out of buys
+      until  @turn_player.buys.zero?
+        get_journal(GameEngine::BuyCardJournal, from: @turn_player).process(self)
+      end
 
       turn_seat = (turn_seat + 1) % @players.length
     end

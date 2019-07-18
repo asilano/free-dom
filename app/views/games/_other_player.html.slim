@@ -4,12 +4,28 @@
   h5 Hand
   .grid-container.fluid
     .grid-x.grid-margin-x
-      .cell.card
+      .cell.card{class=('no-card' if other_player.hand_cards.empty?)}
         .card-back= other_player.hand_cards.count
+
+  / Cards in play - these are visible
+  - if other_player.played_cards.present?
+    h5 In Play
+    .grid-container.fluid
+      .card-grid
+        = render partial: 'card', collection: other_player.played_cards
+
+  / Discarded cards - the top one is visible
+  - if other_player.discarded_cards.present?
+    h5 Discarded
+    .grid-container.fluid
+      .card-grid
+        = render partial: 'card', object: other_player.discarded_cards.first
+        - if other_player.discarded_cards.count > 1
+          .card-back= other_player.discarded_cards.count - 1
 
   / Deck representation
   h5 Deck
   .grid-container.fluid
     .grid-x.grid-margin-x
-      .cell.card
+      .cell.card{class=('no-card' if other_player.deck_cards.empty?)}
         .card-back= other_player.deck_cards.count

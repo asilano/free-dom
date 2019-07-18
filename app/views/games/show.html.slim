@@ -30,14 +30,7 @@
 .cell
   .grid-container.fluid
     .grid-x.grid-margin-x
-      - @game.game_state.piles.each_slice((@game.game_state.piles.count / 2.0).round) do |half|
-        .cell.small-12.medium-6.large-4
-          - half.each do |pile|
-            .pile{class=pile.card_class.types}
-              .pile-cost
-                span.cost-text= pile.cards.first&.cost || pile.card_class.raw_cost
-              .card.card-name= pile.card_class.readable_name
-              .pile-count= "#{pile.cards.count} of #{pile.card_class.starting_size(@game.users.count)}"
+      = render partial: 'pile_section'
 
       .cell.small-12.medium-6.large-4
         p

@@ -9,9 +9,15 @@ module GameEngine
                           css_class: 'play-action')]
     end
 
-    def process(game_state)
-      super
+    validation do
+      return true if journal.params['choice'] == 'none'
+      return false unless journal.params['choice'].integer?
 
+      choice = journal.params['choice'].to_i
+      choice < journal.player.hand_cards.length && journal.player.hand_cards[choice].action?
+    end
+
+    process do |_game_state|
       if params['choice'] == 'none'
         player.actions = 0
         @histories << History.new("#{player.name} stopped playing actions.",

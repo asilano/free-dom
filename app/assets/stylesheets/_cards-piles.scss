@@ -14,13 +14,13 @@
 }
 
 // The following section is order-dependent
-.action .card-name {background-color: $action-cream}
-.reaction .card-name {background-color: $reaction-blue}
-.duration .card-name {background-color: $duration-orange}
-.treasure .card-name {background-color: $treasure-yellow}
-.victory .card-name {background-color: $victory-green}
-.curse .card-name {background-color: $curse-purple}
-.attack .card-name {color: red; font-weight: bold;}
+.action.card .card-name {background-color: $action-cream}
+.reaction.card .card-name {background-color: $reaction-blue}
+.duration.card .card-name {background-color: $duration-orange}
+.treasure.card .card-name {background-color: $treasure-yellow}
+.victory.card .card-name {background-color: $victory-green}
+.curse.card .card-name {background-color: $curse-purple}
+.attack.card .card-name {color: red; font-weight: bold;}
 
 .cell.card {
   width: auto;
@@ -40,6 +40,9 @@
     background-color: $light-gray;
     max-width: none;
     width: auto;
+  }
+  &.no-card {
+    border-style: dashed;
   }
 
   .card-name {
@@ -63,8 +66,18 @@
 
   .card {
     width: 120px;
-    height: 64px;
-    line-height: 64px;
+    min-height: 64px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .card-name {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .pile-cost {

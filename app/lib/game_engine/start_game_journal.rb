@@ -14,8 +14,7 @@ module GameEngine
       end
     end
 
-    def process(game_state)
-      super
+    process do |game_state|
       game_state.state = :running
       @histories << History.new("#{user.name} started the game.")
 

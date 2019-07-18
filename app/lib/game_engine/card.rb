@@ -24,15 +24,15 @@ module GameEngine
     def cost
       self.class.raw_cost
     end
-  end
 
-  class NullCard < Card
-    def self.readable_name
-      ''
+    def player_can_buy?(player:)
+      cost <= player.cash
     end
 
-    def self.types
-      'null-card'
+    # Default effect of a player gaining a card
+    def be_gained_by(player, from:)
+      from.delete(self)
+      player.discarded_cards << self
     end
   end
 end

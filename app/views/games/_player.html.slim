@@ -29,19 +29,33 @@
   = render partial: 'control_skeleton', collection: play_controls
   .grid-container.fluid
     .card-grid
-      = render partial: 'card', collection: player.in_play_cards, locals: { controls: play_controls }
-      - if play_controls.any?(&:cardless_button)
-        .cell.card.null-card
+      - if player.played_cards.blank?
+        .cell.card.no-card
           .card-name
-          - play_controls.each do |ctrl|
-            - if ctrl.cardless_button
-              .card-ctrl= render partial: 'controls/cardless_button', object: ctrl.cardless_button, as: :button, locals: { control: ctrl }
+      - else
+        = render partial: 'card', collection: player.played_cards, locals: { controls: play_controls }
+        - if play_controls.any?(&:cardless_button)
+          .cell.card.null-card
+            .card-name
+            - play_controls.each do |ctrl|
+              - if ctrl.cardless_button
+                .card-ctrl= render partial: 'controls/cardless_button', object: ctrl.cardless_button, as: :button, locals: { control: ctrl }
+
+  / Cards in discard
+  h5 Discarded
+  .grid-container.fluid
+    .card-grid
+      - if player.discarded_cards.blank?
+        .cell.card.no-card
+          .card-name
+      - else
+        = render partial: 'card', collection: player.discarded_cards, locals: { controls: [] }
 
   / Deck representation
   h5 Deck
   .grid-container.fluid
     .grid-x.grid-margin-x
-      .cell.card
+      .cell.card{class=('no-card' if player.deck_cards.empty?)}
         .card-back= player.deck_cards.count
 
   / Cash, actions, buys

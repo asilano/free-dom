@@ -101,6 +101,10 @@ class Journal < ApplicationRecord
     define_method(:skip_owner_check) { true }
   end
 
+  def self.process(&block)
+    define_method(:do_process, &block)
+  end
+
   def game_state
     game.game_state
   end
@@ -109,11 +113,15 @@ class Journal < ApplicationRecord
     game_state.player_for(user)
   end
 
-  def process(_state)
+  def process(state)
     @histories = []
+    game.push_journal(self)
+    result = do_process(state)
+    game.pop_journal
+    result
   end
 
   def prevent_undo
-    game.fix_journal(self)
+    game.fix_journal(journal: self)
   end
 end

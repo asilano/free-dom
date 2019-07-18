@@ -8,8 +8,7 @@ module GameEngine
       journal.kingdom_choice_errors.empty?
     end
 
-    def process(game_state)
-      super
+    process do |game_state|
       prevent_undo
 
       # Add the basic cards
