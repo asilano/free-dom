@@ -59,7 +59,7 @@
 //  54. Tooltip
 //  55. Top Bar
 //  56. Xy Grid
-
+@import 'colours';
 @import 'util/util';
 
 // 1. Global
@@ -833,10 +833,10 @@ $titlebar-icon-spacing: 0.25rem;
 $has-tip-cursor: help;
 $has-tip-font-weight: $global-weight-bold;
 $has-tip-border-bottom: dotted 1px $dark-gray;
-$tooltip-background-color: $black;
+$tooltip-background-color: $dark-blue;
 $tooltip-color: $white;
 $tooltip-padding: 0.75rem;
-$tooltip-max-width: 10rem;
+$tooltip-max-width: 15rem;
 $tooltip-font-size: $small-font-size;
 $tooltip-pip-width: 0.75rem;
 $tooltip-pip-height: $tooltip-pip-width * 0.866;

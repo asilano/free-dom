@@ -9,4 +9,10 @@ class GameEngine::Pile
   def fill_with(cards)
     @cards = cards
   end
+
+  def text
+    @cards.first&.text || card_class.card_text
+  rescue
+    ''
+  end
 end

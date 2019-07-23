@@ -16,7 +16,7 @@
         .pile-cost
           span.cost-text= pile.cards.first&.cost || pile.card_class.raw_cost
         .card{class=pile.card_class.types}
-          .card-name= pile.card_class.readable_name
+          .card-name{data-tooltip title=pile.text}= pile.card_class.readable_name
           - pile_controls.each do |ctrl|
             .card-ctrl
               - if ctrl.filter[pile.cards.first]

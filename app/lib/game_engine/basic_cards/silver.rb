@@ -1,5 +1,10 @@
-class GameEngine::BasicCards::Silver < GameEngine::Card
-  treasure cash: 2
-  pile_size 40
-  costs 3
+module GameEngine
+  module BasicCards
+    class Silver < GameEngine::Card
+      text 'Treasure (cost: 3)', '2 cash'
+      treasure cash: 2
+      pile_size 40
+      costs 3
+    end
+  end
 end

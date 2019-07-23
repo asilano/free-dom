@@ -11,13 +11,14 @@
 // about supported directives.
 //
 //= require rails-ujs
-// require foundation
 //= require turbolinks
 //= require jquery3
+//= require foundation
 //= require onmount
 //= require_tree .
 
-// $(function(){ $(document).foundation(); });
+Foundation.Tooltip.defaults.triggerClass = ''
+
 $(document).on('ready show.bs closed.bs load page:change turbolinks:load', function () {
   $.onmount()
 })
@@ -30,6 +31,7 @@ $(function() {
 
 $.onmount('body', function() {
   $(this).addClass('js-active')
+  $(document).foundation()
 })
 $.onmount('.js', function() {
   $(this).removeClass('js')

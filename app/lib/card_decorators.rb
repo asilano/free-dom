@@ -3,6 +3,12 @@ module CardDecorators
 #   ######
 #   # Basic decorators
 #   ######
+  # Define the text of a card
+  def text(*lines)
+    str = lines.join("\n")
+    define_method(:text) { str }
+    define_singleton_method(:card_text) { str }
+  end
 
   # Define the raw cost of a card, before any modifications like Bridge
   def costs(cost)
