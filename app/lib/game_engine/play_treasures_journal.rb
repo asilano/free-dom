@@ -27,8 +27,7 @@ module GameEngine
       cards = params['choice'].map { |ch| player.hand_cards[ch.to_i] }
       texts_for_history = []
       cards.each do |card|
-        player.played_cards << card
-        player.hand_cards.delete card
+        card.location = :play
         cash_gain = card.cash
         player.cash += cash_gain
 

@@ -50,7 +50,7 @@
   }
 
   .card-ctrl {
-    height: 48px;
+    min-height: 48px;
     margin-left: 16px;
     margin-right: 16px;
   }
@@ -114,6 +114,7 @@
   background-color: $action-cream;
   width: 160px;
   text-align: center;
+  height: 40px;
 }
 
 .card-count {
@@ -122,4 +123,5 @@
 
 .this-player .card-back {
   font-size: 1.5em;
+  height: 55px;
 }

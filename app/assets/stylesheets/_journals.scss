@@ -5,9 +5,17 @@
     }
   }
 
-  li {
+  li.main-journal {
     padding-left: 24px;
     position: relative;
+  }
+
+  ul.sub-histories {
+    margin-left: 8px;
+
+    li {
+      padding-left: 8px;
+    }
   }
 }
 

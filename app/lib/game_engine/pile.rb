@@ -8,6 +8,7 @@ class GameEngine::Pile
 
   def fill_with(cards)
     @cards = cards
+    @cards.each { |c| c.location = :pile }
   end
 
   def text

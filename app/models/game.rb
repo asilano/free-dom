@@ -4,7 +4,7 @@ class Game < ApplicationRecord
 
   accepts_nested_attributes_for :journals
 
-  attr_reader :game_state, :question, :last_fixed_journal_order
+  attr_reader :game_state, :question, :last_fixed_journal_order, :current_journal
 
   # Execute the game's journals in memory.
   def process
@@ -14,7 +14,7 @@ class Game < ApplicationRecord
 
     # Spawn a GameState object, seeding it with our creating time
     # in nanoseconds
-    @game_state = GameEngine::GameState.new(created_at.nsec)
+    @game_state = GameEngine::GameState.new(created_at.nsec, self)
 
     # Prepare a Fiber to run the game state in a coroutiney way
     fiber = Fiber.new { @game_state.run }
@@ -28,10 +28,13 @@ class Game < ApplicationRecord
 
   def push_journal(journal)
     @journal_stack.push journal
+    @current_journal = journal
   end
 
   def pop_journal
-    @journal_stack.pop
+    journal = @journal_stack.pop
+    @current_journal = journal unless journal.nil?
+    journal
   end
 
   # Mark a journal as not able to be undone

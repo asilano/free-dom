@@ -41,7 +41,7 @@
           - last_fixed_journal = @game.last_fixed_journal_for(current_user)
           - @game.journals.each do |journal|
             - if journal.histories.present?
-              li{class=journal.histories.first.css_class}
+              li.main-journal{class=journal.histories.first.css_class}
                 - if journal.order > last_fixed_journal.order
                   = form_with url: journal_path(journal), method: :delete do |f|
                     = f.button inline_svg('action-undo.svg',
@@ -49,10 +49,10 @@
                                           title: 'Undo to here',
                                           desc: 'Click to undo this and all later actions',
                                           aria: true), class: 'undo-button'
-                span= journal.histories.first.event
+                span= display_event_for_user(journal.histories.first.event)
                 - if journal.histories.length > 1
-                  ul
+                  ul.sub-histories
                     - journal.histories[1..-1].each do |hist|
-                      li{class=hist.css_class}: span= hist.event
+                      li{class=hist.css_class}: span= display_event_for_user(hist.event)
 
   = link_to 'Back', games_path

@@ -4,4 +4,15 @@ module ApplicationHelper
     cls << ' medium-40vh' if current_page?(root_path)
     cls
   end
+
+  def display_event_for_user(event)
+    event.gsub(/\{(?<user_id>\d+)\?(?<private>[^|]*)\|(?<public>[^}]*)\}/) do |str|
+      match = Regexp.last_match
+      if current_user && match[:user_id] == current_user.id.to_s
+        match[:private]
+      else
+        match[:public]
+      end
+    end
+  end
 end

@@ -43,13 +43,14 @@ module GameEngine
       copper_pile = game_state.piles.detect { |p| p.card_class == GameEngine::BasicCards::Copper }
       game_state.players.each do |player|
         # Deal 7 Coppers from the supply pile
-        player.deck_cards.concat copper_pile.cards.shift(7)
+        player.cards.concat copper_pile.cards.shift(7)
 
         # Create 3 fresh Estates
-        player.deck_cards.concat Array.new(3) { GameEngine::BasicCards::Estate.new }
+        player.cards.concat Array.new(3) { GameEngine::BasicCards::Estate.new }
 
-        player.deck_cards.shuffle!
-        player.hand_cards.concat player.deck_cards.shift(5)
+        player.cards.shuffle!
+        player.cards[0, 5].each { |c| c.location = :hand }
+        player.cards[5, 5].each { |c| c.location = :deck }
       end
     end
 
