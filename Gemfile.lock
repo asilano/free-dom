@@ -157,7 +157,7 @@ GEM
     multi_json (1.13.1)
     multi_test (0.1.2)
     newrelic_rpm (6.2.0.354)
-    nokogiri (1.10.2)
+    nokogiri (1.10.4)
       mini_portile2 (~> 2.4.0)
     pg (0.21.0)
     polyamorous (1.1.0)
@@ -299,4 +299,4 @@ RUBY VERSION
    ruby 2.4.5p335
 
 BUNDLED WITH
-   1.15.2
+   1.17.3
