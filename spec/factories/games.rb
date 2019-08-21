@@ -1,6 +1,7 @@
 FactoryBot.define do
   factory :game do
     name { "Test game" }
+    created_at { Time.now }
   end
 
   factory :game_with_kingdom, parent: :game do

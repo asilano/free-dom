@@ -1,4 +1,4 @@
-- pile_controls = @game.question.controls_for(current_user, @game.game_state).select { |ctrl| ctrl.scope == :piles }
+- pile_controls = @game.question.controls_for(current_user, @game.game_state).select { |ctrl| ctrl.scope == :supply }
 = render partial: 'control_skeleton', collection: pile_controls
 
 - @game.game_state.piles.each_with_index.each_slice((@game.game_state.piles.count / 2.0).round).with_index do |half, half_ix|

@@ -23,7 +23,11 @@ class Game < ApplicationRecord
     @question = fiber.resume
 
     # Until we run out of answers, post journals in as answers to questions
-    journals.each { |j| @question = fiber.resume(j) }
+    journals.each do|j|
+      # Allow tests to ignore individual journals
+      next if j.ignore
+      @question = fiber.resume(j)
+    end
   end
 
   def push_journal(journal)

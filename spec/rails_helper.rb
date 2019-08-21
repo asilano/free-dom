@@ -14,6 +14,7 @@ require File.expand_path('../../config/environment', __FILE__)
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
+require 'webdrivers'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -38,7 +39,10 @@ rescue ActiveRecord::PendingMigrationError => e
   puts e.to_s.strip
   exit 1
 end
+
 RSpec.configure do |config|
+  config.include FactoryBot::Syntax::Methods
+
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
 
@@ -77,3 +81,10 @@ RSpec.configure do |config|
     driven_by :selenium_chrome_headless
   end
 end
+
+# The game relies on randomisation by shuffling, both in-place and non.
+# For test purposes, override shuffle to be sort (by suitable fields).
+require_relative './monkey_patches'
+Array.prepend MonkeyPatches::Array::Shuffling
+GameEngine::Card.prepend MonkeyPatches::GameEngine::Card::Sorting
+GameEngine::PlayerState.prepend MonkeyPatches::GameEngine::PlayerState::Sorting

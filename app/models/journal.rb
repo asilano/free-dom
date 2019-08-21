@@ -3,6 +3,7 @@ class Journal < ApplicationRecord
   belongs_to :user
 
   attr_reader :histories
+  attr_accessor :ignore  # Used for tests
 
   # Nested classes let GameEngine request the right journal at the right time
   class Template

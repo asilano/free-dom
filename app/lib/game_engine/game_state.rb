@@ -70,7 +70,7 @@ module GameEngine
     def get_journal(journal_class, from:, opts: {})
       template = journal_class.from(from).with(opts)
       journal = Fiber.yield(template.question)
-      raise UnexpectedJournalError, "Unexpected journal type: #{journal}" unless template.matches? journal
+      raise UnexpectedJournalError, "Unexpected journal type: #{journal.class}. Expecting: #{template.class::Parent}" unless template.matches? journal
       raise InvalidJournalError, "Invalid journal: #{journal}" unless template.valid? journal
       journal
     end
