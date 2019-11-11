@@ -35,7 +35,7 @@ module GameEngine
 
     def populate_piles(game_state)
       game_state.piles.each do |pile|
-        pile.fill_with Array.new(pile.card_class.starting_size(game_state.players.count)) { pile.card_class.new }
+        pile.fill_with Array.new(pile.card_class.starting_size(game_state.players.count)) { pile.card_class.new(game_state, pile: pile) }
       end
     end
 
@@ -44,9 +44,13 @@ module GameEngine
       game_state.players.each do |player|
         # Deal 7 Coppers from the supply pile
         player.cards.concat copper_pile.cards.shift(7)
+        player.cards.each do |copper|
+          copper.pile = nil
+          copper.player = player
+        end
 
         # Create 3 fresh Estates
-        player.cards.concat Array.new(3) { GameEngine::BasicCards::Estate.new }
+        player.cards.concat Array.new(3) { GameEngine::BasicCards::Estate.new(game_state, player: player) }
 
         player.cards.shuffle!
         player.cards[0, 5].each { |c| c.location = :hand }

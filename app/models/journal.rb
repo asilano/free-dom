@@ -48,7 +48,7 @@ class Journal < ApplicationRecord
       end
 
       def controls(game_state)
-        @controls ||= get_controls(game_state)
+        @controls = get_controls(game_state)
       end
 
       def controls_for(user, game_state)

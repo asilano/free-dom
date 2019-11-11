@@ -1,0 +1,7 @@
+#!./bin/rails runner
+File.open("#{Rails.root}/spec/support/hashed_card_types.rb", 'w') do |f|
+  f.write('CARD_TYPES = {')
+  str = GameEngine::Card.all_card_types.map { |ty| "'#{ty.readable_name}' => #{ty.name}" }.join(",\n")
+  f.write(str)
+  f.write('}')
+end

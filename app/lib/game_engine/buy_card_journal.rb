@@ -5,7 +5,8 @@ module GameEngine
                           scope: :supply,
                           text: 'Buy',
                           filter: ->(card) { card&.player_can_buy?(player: @player) },
-                          null_choice: { 'Buy nothing' => 'none' },
+                          null_choice: { text: 'Buy nothing',
+                                         value: 'none' },
                           css_class: 'buy-card')]
     end
 
@@ -29,6 +30,7 @@ module GameEngine
       player.buys -= 1
       pile = game_state.piles[params['choice'].to_i]
       card = pile.cards.first
+      player.cash -= card.cost
 
       @histories << History.new("#{player.name} bought #{card.readable_name} for #{card.cost}.",
                                 player: player)

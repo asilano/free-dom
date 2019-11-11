@@ -1,8 +1,8 @@
 module GameEngine
   class Card
     extend CardDecorators
-    attr_reader :player, :pile, :game
-    attr_accessor :location
+    attr_reader :game_state
+    attr_accessor :location, :player, :pile
     delegate :action?, :treasure?, :special?, :victory?, :curse?, :reaction?, :attack?, :readable_name, to: :class
 
     # By default, 10 cards in a pile
@@ -10,6 +10,29 @@ module GameEngine
 
     def self.expansions
       [GameEngine::BaseGameV2]
+    end
+
+    # The ever-present Victory cards
+    BASIC_VICTORY_TYPES = %w[Estate Duchy Province Curse].map { |t| 'GameEngine::BasicCards::' + t }.freeze
+
+    # The ever-present Treasure cards
+    BASIC_TREASURE_TYPES = %w[Copper Silver Gold].map { |t| 'GameEngine::BasicCards::' + t }.freeze
+
+    def self.basic_victory_types
+      BASIC_VICTORY_TYPES.map(&:constantize)
+    end
+
+    def self.basic_treasure_types
+      BASIC_TREASURE_TYPES.map(&:constantize)
+    end
+
+    def self.all_card_types
+      expansions.flat_map(&:card_classes) +
+        basic_victory_types + basic_treasure_types
+    end
+
+    def self.all_kingdom_cards
+      expansions.flat_map(&:kingdom_cards)
     end
 
     def self.readable_name
@@ -22,6 +45,12 @@ module GameEngine
       end.compact
     end
 
+    def initialize(game_state, pile: nil, player: nil)
+      @game_state = game_state
+      @pile = pile
+      @player = player
+    end
+
     def cost
       self.class.raw_cost
     end
@@ -30,11 +59,31 @@ module GameEngine
       cost <= player.cash
     end
 
+    def play_as_action(_)
+      @location = :play
+    end
+
     # Default effect of a player gaining a card
-    def be_gained_by(player, from:)
+    def be_gained_by(player, from:, to: :discard)
       from.delete(self)
-      player.cards << self
-      @location = :discard
+      if to == :deck
+        # Add self onto the front of the player's cards, so it's on top of the deck
+        player.cards.unshift(self)
+      else
+        player.cards << self
+      end
+      @player = player
+      @pile = nil
+      @location = to
+    end
+
+    def put_on_deck(player, from:)
+      from.delete(self)
+
+      # Add self onto the front of the player's cards, so it's on top of the deck
+      player.cards.unshift(self)
+      @player = player
+      @location = :deck
     end
 
     # Default effect of a card being put into discard from wherever it is

@@ -5,7 +5,8 @@ module GameEngine
                           scope: :hand,
                           text: 'Play',
                           filter: ->(card) { card.action? },
-                          null_choice: { 'Leave Action Phase' => 'none' },
+                          null_choice: { text: 'Leave Action Phase',
+                                         value: 'none' },
                           css_class: 'play-action')]
     end
 
@@ -24,6 +25,13 @@ module GameEngine
                                   player: player)
         return
       end
+
+      # Charge the player an Action-play slot
+      player.actions -= 1
+
+      # Retrieve the card and make it play itself
+      card = player.hand_cards[params['choice'].to_i]
+      card.play_as_action(played_by: player)
     end
   end
 end

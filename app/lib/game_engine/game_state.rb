@@ -53,7 +53,6 @@ module GameEngine
         play_treasures = :continue
         until play_treasures == :stop
           play_treasures = get_journal(GameEngine::PlayTreasuresJournal, from: @turn_player).process(self)
-          Rails.logger.info("Continue? #{play_treasures}")
         end
 
         # Buy cards until the player stops our runs out of buys
@@ -70,6 +69,10 @@ module GameEngine
     def get_journal(journal_class, from:, opts: {})
       template = journal_class.from(from).with(opts)
       journal = Fiber.yield(template.question)
+      while journal.is_a? GameEngine::HackJournal
+        journal.process(self)
+        journal = Fiber.yield(template.question)
+      end
       raise UnexpectedJournalError, "Unexpected journal type: #{journal.class}. Expecting: #{template.class::Parent}" unless template.matches? journal
       raise InvalidJournalError, "Invalid journal: #{journal}" unless template.valid? journal
       journal

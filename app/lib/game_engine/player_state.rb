@@ -1,6 +1,6 @@
 module GameEngine
   class PlayerState
-    attr_reader :user, :cards
+    attr_reader :user, :cards, :game_state
     attr_accessor :seat, :actions, :buys, :cash
 
     def initialize(user, game_state)
