@@ -2,7 +2,7 @@
 Feature: Artisan
   Background:
     Given I am in a 3 player game
-    And the kingdom contains Market, Workshop
+    And the kingdom choice contains Market, Workshop
     And my hand contains Artisan, Estate, Copper, Silver
 
   Scenario: Play Artisan normally
@@ -25,7 +25,6 @@ Feature: Artisan
     And I should need to 'Play Treasures, or pass'
 
   Scenario: No cards in hand to place
-    Given the kingdom contains Market, Workshop
     Then I should need to 'Play an Action, or pass'
     When I choose Artisan in my hand
     Then I should need to 'Choose a card to gain into your hand'

@@ -23,7 +23,8 @@ module GameEngine
       if params['choice'] == 'none'
         player.buys = 0
         @histories << History.new("#{player.name} bought nothing.",
-                                  player: player)
+                                  player: player,
+                                  css_classes: %w[buy-card])
         return
       end
 
@@ -33,7 +34,8 @@ module GameEngine
       player.cash -= card.cost
 
       @histories << History.new("#{player.name} bought #{card.readable_name} for #{card.cost}.",
-                                player: player)
+                                player: player,
+                                css_classes: %w[buy-card])
       card.be_gained_by(player, from: pile.cards)
     end
   end

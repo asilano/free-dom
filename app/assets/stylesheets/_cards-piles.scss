@@ -25,6 +25,11 @@
 .cell.card {
   width: auto;
   min-width: 120px;
+
+  &.back-wrapper {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .card {
@@ -34,7 +39,7 @@
   position: relative;
   text-align: center;
 
-  // Styling overrides for a fake button-holding card
+  // Styling overrides for a fake button-holding card etc.
   &.null-card {
     border-color: $light-gray;
     background-color: $light-gray;
@@ -58,6 +63,18 @@
   .card-name + .card-ctrl {
     margin-top: 8px;
   }
+}
+
+.subset-indicator {
+  background: linear-gradient(
+    to right,
+    $light-gray,
+    $white
+  );
+  border-color: 3px solid $white;
+  border-radius: 3px;
+  margin: 5px 0 5px 5px;
+  padding-left: 8px;
 }
 
 .pile {
@@ -112,9 +129,13 @@
   border-right-width: 15px;
   border-radius: 3px;
   background-color: $action-cream;
+  height: 40px;
   width: 160px;
   text-align: center;
-  height: 40px;
+
+  .back-wrapper & {
+    flex: 1 0 auto;
+  }
 }
 
 .card-count {

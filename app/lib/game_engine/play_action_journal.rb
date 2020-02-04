@@ -22,7 +22,8 @@ module GameEngine
       if params['choice'] == 'none'
         player.actions = 0
         @histories << History.new("#{player.name} stopped playing actions.",
-                                  player: player)
+                                  player: player,
+                                  css_classes: %w[play-action])
         return
       end
 

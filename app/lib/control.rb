@@ -15,4 +15,8 @@ class Control
   def to_partial_path
     "controls/#{self.class.name.demodulize.underscore}"
   end
+
+  def single_answer?(_)
+    false
+  end
 end

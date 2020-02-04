@@ -20,25 +20,25 @@ module GameSteps
       FactoryBot.create(:start_game_journal, game: @game, user: @user_alan)
     end
 
-    step 'the kingdom contains :cards' do |cards|
+    step 'the kingdom choice contains :cards' do |cards|
       kingdom_journal = @game.journals.where(type: 'GameEngine::ChooseKingdomJournal').first
       list = cards.map(&:to_s) + kingdom_journal.params['card_list']
       kingdom_journal.params['card_list'] = list.uniq.take 10
       kingdom_journal.save
     end
 
-    step ':name(\'s) hand contains :cards' do |name, cards|
-      player = get_player(name == 'my' ? 'I' : name)
+    step ':player_name :location contains :cards' do |name, location, cards|
+      player = get_player(name)
       make_journal(user: player.user,
                    type: GameEngine::HackJournal,
-                   params: { scope: :hand,
+                   params: { scope: location,
                              action: :set,
                              cards: cards.map(&:to_s) })
     end
   end
 
   module ActionSteps
-    step ':name choose(s) :cards in my/his/her/the :scope' do |name, cards, scope|
+    step ':player_name choose(s) :cards in/on my/his/her/the :scope' do |name, cards, scope|
       user = get_player(name).user
       controls = @question.controls_for(user, @game.game_state)
       scope = scope.to_sym
@@ -47,28 +47,38 @@ module GameSteps
       make_journal(user: user,
                    type: @question.journal_type,
                    params: control.handle_choice(cards))
+
+      # If the question is for a PlayActionJournal, record the chosen card
+      # as the last action played
+      @last_action_played = cards[0] if @question.journal_type == GameEngine::PlayActionJournal
     end
   end
 
   module CheckSteps
-    step ':name should need to :question' do |name, question|
+    step ':player_name should need to :question' do |name, question|
       @game.process
       @question = @game.question
 
-      expect(@question.player).to be get_player(name)
+      expect(@question.player).to be == get_player(name)
       expect(@question.text(@game.game_state)).to be == question
     end
 
-    step ':name(\'s) hand should contain :cards' do |name, cards|
+    step ':player_name hand should contain :cards' do |name, cards|
       @game.process
-      player = get_player(name == 'my' ? 'I' : name)
+      player = get_player(name)
       expect(player.hand_cards.map { |c| c.class.to_s }).to match_array(cards.map(&:to_s))
     end
 
-    step ':name should have :cards in play' do |name, cards|
+    step ':player_name should have :cards in play' do |name, cards|
       @game.process
       player = get_player(name)
       expect(player.played_cards.map { |c| c.class.to_s }).to match_array(cards.map(&:to_s))
+    end
+
+    step ':cards should be revealed on :player_name deck' do |cards, name|
+      @game.process
+      player = get_player(name)
+      expect(player.deck_cards.select(&:revealed).map { |c| c.class.to_s }).to match_array(cards.map(&:to_s))
     end
 
     step 'cards should move as follows:' do
@@ -78,6 +88,12 @@ module GameSteps
 
       # Take a record of the cards in the game at this time.
       @cards_before = extract_game_cards
+
+      # If the last-added journal was a PlayActionJournal, expect the last played action to move
+      if @game.journals.last.is_a? GameEngine::PlayActionJournal
+        action = cards_for_player(@game.journals.last.player.name, location: 'hand').detect { |c| c[:class] == @last_action_played }
+        action[:location] = :play
+      end
 
       # Unignore the last-added journal
       @game.journals.last.ignore = false
@@ -99,19 +115,19 @@ module GameSteps
       send 'these card moves should happen'
     end
 
-    step ':name should discard :cards from/in( my/his/her) :location' do |name, cards, location|
+    step ':player_name should discard :cards from/in( my/his/her) :location' do |name, cards, location|
       players_cards = cards_for_player(name, location: location)
       if cards == 'everything'
         players_cards.each { |c| c[:location] = :discard }
       else
         cards.each do |type|
-          card = players_cards.delete_at(players_cards.index { |c| c.is_a? == type })
+          card = players_cards.delete_at(players_cards.index { |c| c[:class] == type })
           card[:location] = :discard
         end
       end
     end
 
-    step ':name should draw :count card(s)' do |name, count|
+    step ':player_name should draw :count card(s)' do |name, count|
       players_cards = cards_for_player(name, location: :deck)
       if players_cards.count < count
         # Not enough to draw. "Shuffle" the discards
@@ -122,15 +138,15 @@ module GameSteps
       players_cards.take(count).each { |c| c[:location] = :hand }
     end
 
-    step ':name should gain :cards' do |name, cards|
-      send ':name should gain :cards from :source to my/his/her :destination', name, cards, 'supply', 'discard'
+    step ':player_name should gain :cards' do |name, cards|
+      send ':player_name should gain :cards from :source to my/his/her :destination', name, cards, 'supply', 'discard'
     end
 
-    step ':name should gain :cards to my/his/her :destination' do |name, cards, destination|
-      send ':name should gain :cards from :source to my/his/her :destination', name, cards, 'supply', destination
+    step ':player_name should gain :cards to my/his/her :destination' do |name, cards, destination|
+      send ':player_name should gain :cards from :source to my/his/her :destination', name, cards, 'supply', destination
     end
 
-    step ':name should gain :cards from :source to my/his/her :destination' do |name, cards, source, destination|
+    step ':player_name should gain :cards from :source to my/his/her :destination' do |name, cards, source, destination|
       players_cards = cards_for_player(name)
       cards.each do |card|
         if source == 'supply'
@@ -141,7 +157,7 @@ module GameSteps
       end
     end
 
-    step ':name should move :cards from my/his/her :source to my/his/her :destination' do |name, cards, source, destination|
+    step ':player_name should move :cards from my/his/her :source to my/his/her :destination' do |name, cards, source, destination|
       players_cards = cards_for_player(name)
       cards.each do |card|
         instance_ix = players_cards.index { |c| c[:class] == card && c[:location] == source.to_sym }
@@ -154,7 +170,16 @@ module GameSteps
       end
     end
 
-    step ':name :whether_to be able to choose the :cards pile(s)' do |name, should, cards|
+    step ':player_name should trash :cards from my/his/her :source' do |name, cards, source|
+      players_cards = cards_for_player(name)
+      cards.each do |card|
+        instance_ix = players_cards.index { |c| c[:class] == card && c[:location] == source.to_sym }
+        instance = players_cards.delete_at(instance_ix)
+        instance[:location] = :trash
+      end
+    end
+
+    step ':player_name :whether_to be able to choose the :cards pile(s)' do |name, should, cards|
       controls = @question.controls_for(get_player(name).user, @game.game_state)
       control = controls.detect { |c| c.scope == :supply }
       can_pick = cards.map do |card|
@@ -169,6 +194,7 @@ module GameSteps
   def get_player(name)
     name.replace('Alan') if name == 'I'
     @game.process unless @game.game_state
+    puts name unless PLAYER_NAMES.index(name)
     @game.game_state.players[PLAYER_NAMES.index(name)]
   end
 
@@ -216,6 +242,9 @@ OneCardControl.define_method(:handle_choice) do |choice|
   when :supply
     pile_ix = @game_state.piles.index { |pile| pile.cards.first.is_a? choice }
     { @key => pile_ix }
+  when :deck
+    card_ix = @player.deck_cards.index { |c| c.is_a? choice }
+    { @key => card_ix }
   end
 end
 MultiCardControl.define_method(:handle_choice) do |choice|

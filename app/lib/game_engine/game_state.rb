@@ -67,7 +67,7 @@ module GameEngine
     end
 
     def get_journal(journal_class, from:, opts: {})
-      template = journal_class.from(from).with(opts)
+      template = journal_class.from(from).in(@game).with(opts)
       journal = Fiber.yield(template.question)
       while journal.is_a? GameEngine::HackJournal
         journal.process(self)
@@ -84,6 +84,10 @@ module GameEngine
 
     def other_players(exclude_user:)
       @players.reject { |ply| ply.user == exclude_user }
+    end
+
+    def find_pile_by_top_card
+      @piles.detect { |p| p.cards.present? && yield(p.cards.first) }
     end
 
     private

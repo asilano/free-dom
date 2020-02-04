@@ -16,7 +16,7 @@ Feature: Basic turn
     And Belle should need to "Play an Action, or pass"
 
   Scenario: Play nothing, can buy
-    Given the kingdom contains Market, Workshop
+    Given the kingdom choice contains Market, Workshop
       And my hand contains Estate x2, Copper x3
     Then my hand should contain Estate x2, Copper x3
     Then I should need to "Play an Action, or pass"
@@ -37,7 +37,7 @@ Feature: Basic turn
       And these card moves should happen
 
   Scenario: Play some treasures, can buy
-    Given the kingdom contains Market, Workshop, Cellar
+    Given the kingdom choice contains Market, Workshop, Cellar
       And my hand contains Estate x2, Copper x3
     Then my hand should contain Estate x2, Copper x3
     Then I should need to "Play an Action, or pass"

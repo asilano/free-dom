@@ -1,9 +1,11 @@
 module GameEngine
   class Card
-    extend CardDecorators
+    extend CardDecorators::CardDecorators
     attr_reader :game_state
-    attr_accessor :location, :player, :pile
-    delegate :action?, :treasure?, :special?, :victory?, :curse?, :reaction?, :attack?, :readable_name, to: :class
+    attr_accessor :location, :player, :pile, :revealed
+    alias revealed? revealed
+    delegate :game, to: :game_state
+    delegate :action?, :treasure?, :special?, :victory?, :curse?, :reaction?, :attack?, :readable_name, :types, to: :class
 
     # By default, 10 cards in a pile
     pile_size 10
@@ -49,6 +51,7 @@ module GameEngine
       @game_state = game_state
       @pile = pile
       @player = player
+      @revealed = false
     end
 
     def cost
@@ -59,8 +62,11 @@ module GameEngine
       cost <= player.cash
     end
 
-    def play_as_action(_)
+    def play_as_action(played_by:)
       @location = :play
+      game.current_journal.histories << History.new("#{played_by.name} played #{readable_name}.",
+                                                    player: played_by,
+                                                    css_classes: types + %w[play-action])
     end
 
     # Default effect of a player gaining a card
@@ -95,6 +101,25 @@ module GameEngine
     # Default effect of a card being drawn. This is not expected to ever be overridden
     def be_drawn
       @location = :hand
+    end
+
+    # Default effect of a card being trashed.
+    def trash(from:)
+      from.delete(self)
+
+      @player = nil
+      @pile = nil
+      @location = :trash
+    end
+
+    # Default effect of a card being revealed.
+    def be_revealed
+      @revealed = true
+    end
+
+    # Default effect of a card being unrevealed. This is not expected to ever be overridden
+    def be_unrevealed
+      @revealed = false
     end
 
     # Is this card (in play and) currently still doing something, so it cannot

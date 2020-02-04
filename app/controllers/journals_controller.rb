@@ -5,7 +5,7 @@ class JournalsController < ApplicationController
   # POST /journals.json
   def create
     @journal = Journal.new(journal_params)
-    @journal.order ||= (@journal.game.journals.pluck(:order).max || 0) + 1
+    @journal.order ||= (@journal.game.journals.maximum(:order) || 0) + 1
     @journal.user_id ||= current_user.id
 
     respond_to do |format|

@@ -41,7 +41,8 @@ module GameEngine
         process do |game_state|
           if params['choice'] == 'none'
             @histories << History.new("#{player.name} gained nothing.",
-                                      player: player)
+                                      player: player,
+                                      css_classes: %w[gain-card])
             return
           end
 
@@ -49,7 +50,8 @@ module GameEngine
           card = pile.cards.first
 
           @histories << History.new("#{player.name} gained #{card.readable_name} to their hand.",
-                                    player: player)
+                                    player: player,
+                                    css_classes: %w[gain-card])
           card.be_gained_by(player, from: pile.cards, to: :hand)
 
           game_state.get_journal(PlaceCardJournal, from: player).process(game_state)

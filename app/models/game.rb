@@ -23,10 +23,22 @@ class Game < ApplicationRecord
     @question = fiber.resume
 
     # Until we run out of answers, post journals in as answers to questions
-    journals.each do|j|
+    journals.each do |j|
       # Allow tests to ignore individual journals
       next if j.ignore
       @question = fiber.resume(j)
+    end
+
+    # Before going back to the users, see if the question:
+    # * was caused by someone other than the person who needs to answer; and
+    # * has only one valid choice
+    # In that case, we synthesise the journal and carry on.
+    # Buuut, we have to keep a hold of who the last _active_ person is, in case
+    # there's a follow-up no-choice for the same player.
+    spawner = journals.last&.player
+    while @question.can_be_auto_answered?(@game_state, spawner: spawner)
+      auto_journal = @question.auto_answer(@game_state)
+      @question = fiber.resume(auto_journal)
     end
   end
 

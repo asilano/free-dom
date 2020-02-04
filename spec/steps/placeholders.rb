@@ -41,3 +41,9 @@ placeholder :whether_to do
     true
   end
 end
+
+placeholder :player_name do
+  match /([a-zA-Z]+)('s)?/ do |name|
+    name == 'my' ? 'I' : name
+  end
+end

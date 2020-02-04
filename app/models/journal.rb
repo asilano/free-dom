@@ -7,10 +7,11 @@ class Journal < ApplicationRecord
 
   # Nested classes let GameEngine request the right journal at the right time
   class Template
-    attr_reader :opts, :player
+    attr_reader :opts, :player, :game
 
-    def initialize(player)
+    def initialize(player, game)
       @player = player
+      @game = game
     end
 
     def with(opts)
@@ -47,16 +48,31 @@ class Journal < ApplicationRecord
         self.class::Parent
       end
 
-      def controls(game_state)
-        @controls = get_controls(game_state)
-      end
-
       def controls_for(user, game_state)
-        controls(game_state).select { |ctrl| ctrl.player.user == user }
+        get_controls(game_state).select { |ctrl| ctrl.player.user == user }
       end
 
       def self.with_controls(&controls)
         define_method(:get_controls, &controls)
+      end
+
+      def can_be_auto_answered?(game_state, spawner:)
+        # A question can be skipped over with an autoanswer if:
+        # * it's a question for someone other than the "spawner"
+        # * the question has only one possible answer
+        return false if spawner == @player
+        controls = controls_for(@player.user, game_state)
+        controls.length == 1 && controls.first.single_answer?(game_state)
+      end
+
+      def auto_answer(game_state)
+        control = controls_for(@player.user, game_state).first
+        game_state.game.journals.create(
+          type: journal_type,
+          user: @player.user,
+          order: (game_state.game.journals.maximum(:order) || 0) + 1,
+          params: { control.key => control.single_answer }
+        )
       end
 
       private
@@ -87,8 +103,18 @@ class Journal < ApplicationRecord
     self::Template::Question
   end
 
+  class TemplateFactory
+    def initialize(player, template_class)
+      @player = player
+      @template_class = template_class
+    end
+
+    def in(game)
+      @template_class.new(@player, game)
+    end
+  end
   def self.from(player)
-    self::Template.new(player)
+    TemplateFactory.new(player, self::Template)
   end
 
   def self.validation(&block)

@@ -53,10 +53,26 @@
 
   / Deck representation
   h5 Deck
+  - deck_controls = @game.question.controls_for(current_user, @game.game_state).select { |ctrl| ctrl.scope == :deck }
+  = render partial: 'control_skeleton', collection: deck_controls
   .grid-container.fluid
     .grid-x.grid-margin-x
-      .cell.card{class=('no-card' if player.deck_cards.empty?)}
+      .cell.card.back-wrapper{class=('no-card' if player.deck_cards.empty?)}
         .card-back= player.deck_cards.count
+      - if player.deck_cards.any?(&:revealed?)
+        .card-grid
+          .subset-indicator
+            div Revealed:
+            div[] (Top &rarr; Bottom)
+          = render partial: 'card', collection: player.deck_cards.select(&:revealed?), locals: { controls: deck_controls }
+          - if deck_controls.any?(&:cardless_button)
+            .cell.card.null-card
+              .card-name
+              - deck_controls.each do |ctrl|
+                - if ctrl.cardless_button
+                  .card-ctrl= render partial: 'controls/cardless_button', object: ctrl.cardless_button, as: :button, locals: { control: ctrl }
+
+
 
   / Cash, actions, buys
   - if player == @game.game_state.turn_player
