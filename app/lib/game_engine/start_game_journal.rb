@@ -6,7 +6,8 @@ module GameEngine
       qn
     end.with_controls do |game_state|
       if game_state.players.length > 1
-        [ButtonControl.new(player: @player,
+        [ButtonControl.new(journal_type: StartGameJournal,
+                           player: @player,
                            scope: :player,
                            values: [['Start the game', 'start']])]
       else
@@ -26,7 +27,7 @@ module GameEngine
     private
 
     def randomise_players(game_state)
-      game_state.players.shuffle!.each.with_index do |player, ix|
+      game_state.players.shuffle!(random: game_state.rng).each.with_index do |player, ix|
         player.seat = ix + 1
         @histories << History.new("#{player.name} will play #{(ix + 1).ordinalize}.",
                                   player: player)
@@ -52,7 +53,7 @@ module GameEngine
         # Create 3 fresh Estates
         player.cards.concat Array.new(3) { GameEngine::BasicCards::Estate.new(game_state, player: player) }
 
-        player.cards.shuffle!
+        player.cards.shuffle!(random: game_state.rng)
         player.cards[0, 5].each { |c| c.location = :hand }
         player.cards[5, 5].each { |c| c.location = :deck }
       end

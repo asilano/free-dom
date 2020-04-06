@@ -1,7 +1,8 @@
 module GameEngine
   class BuyCardJournal < Journal
     define_question('Buy a card, or pass').with_controls do |_game_state|
-      [OneCardControl.new(player: @player,
+      [OneCardControl.new(journal_type: BuyCardJournal,
+                          player: @player,
                           scope: :supply,
                           text: 'Buy',
                           filter: ->(card) { card&.player_can_buy?(player: @player) },

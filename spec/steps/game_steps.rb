@@ -40,27 +40,30 @@ module GameSteps
   module ActionSteps
     step ':player_name choose(s) :cards in/on my/his/her/the :scope' do |name, cards, scope|
       user = get_player(name).user
-      controls = @question.controls_for(user, @game.game_state)
+      question = @questions.detect { |q| q&.player&.name == user.name }
+      controls = question.controls_for(user, @game.game_state)
       scope = scope.to_sym
       expect(controls).to include(have_attributes(scope: scope))
       control = controls.detect { |c| c.scope == scope }
       make_journal(user: user,
-                   type: @question.journal_type,
+                   type: question.journal_type,
+                   fiber_id: question.fiber_id,
                    params: control.handle_choice(cards))
 
       # If the question is for a PlayActionJournal, record the chosen card
       # as the last action played
-      @last_action_played = cards[0] if @question.journal_type == GameEngine::PlayActionJournal
+      @last_action_played = cards[0] if question.journal_type == GameEngine::PlayActionJournal
     end
   end
 
   module CheckSteps
     step ':player_name should need to :question' do |name, question|
       @game.process
-      @question = @game.question
+      @questions = @game.questions
+      player = get_player(name)
 
-      expect(@question.player).to be == get_player(name)
-      expect(@question.text(@game.game_state)).to be == question
+      expect(@questions.compact.map(&:player)).to include(be == player)
+      expect(@questions.compact.select { |q| q.player == player }.map { |q| q.text(@game.game_state) }).to include(be == question)
     end
 
     step ':player_name hand should contain :cards' do |name, cards|
@@ -180,7 +183,9 @@ module GameSteps
     end
 
     step ':player_name :whether_to be able to choose the :cards pile(s)' do |name, should, cards|
-      controls = @question.controls_for(get_player(name).user, @game.game_state)
+      user = get_player(name).user
+      question = @questions.detect { |q| q.player.name == user.name }
+      controls = question.controls_for(user, @game.game_state)
       control = controls.detect { |c| c.scope == :supply }
       can_pick = cards.map do |card|
         pile = @game.game_state.piles.detect { |p| p.cards.first.is_a? card }

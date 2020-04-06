@@ -4,7 +4,7 @@ module CardDecorators
     # All the attacks should be in parallel (unless there's a reason they can't)
     # ...but we'll ignore that for a moment.
     def launch_attack(victims:)
-      victims.each { |v| attack(victim: v) }
+      game_state.in_parallel(victims) { |v| attack(victim: v) }
     end
   end
 end

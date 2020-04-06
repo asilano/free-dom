@@ -15,7 +15,8 @@ module GameEngine
       class GainCardJournal < Journal
         define_question('Choose a card to gain into your hand').with_controls do |game_state|
           filter = ->(card) { card && card.cost <= 5 }
-          [OneCardControl.new(player: @player,
+          [OneCardControl.new(journal_type: GainCardJournal,
+                              player: @player,
                               scope: :supply,
                               text: 'Gain',
                               filter: filter,
@@ -60,7 +61,8 @@ module GameEngine
 
       class PlaceCardJournal < Journal
         define_question('Choose a card to put onto your deck').with_controls do |_game_state|
-          [OneCardControl.new(player: @player,
+          [OneCardControl.new(journal_type: PlaceCardJournal,
+                              player: @player,
                               scope: :hand,
                               text: 'Put on deck',
                               null_choice: if @player.hand_cards.blank?

@@ -34,12 +34,18 @@
 
       .cell.small-12.medium-6.large-4
         p
-          strong> Current question:
-          = @game.question.player.name + ': ' + @game.question.text(@game.game_state)
+          - if @game.questions.any?
+            strong> Current question:
+            ul.question-list
+              - @game.questions.compact.each do |question|
+                li= question.player.name + ': ' + question.text(@game.game_state)
+          - else
+            strong> No question - check journals!
 
         ul#journal-log
           - last_fixed_journal = @game.last_fixed_journal_for(current_user)
           - @game.journals.each do |journal|
+            - next unless journal.persisted?
             - if journal.histories.present?
               li.main-journal{class=journal.histories.first.css_class}
                 - if journal.order > last_fixed_journal.order
@@ -54,5 +60,14 @@
                   ul.sub-histories
                     - journal.histories[1..-1].each do |hist|
                       li{class=hist.css_class}: span= display_event_for_user(hist.event)
+            - else
+              li.main-journal.error-journal
+                = form_with url: journal_path(journal), method: :delete do |f|
+                  = f.button inline_svg('action-undo.svg',
+                                        class: 'undo-arrow',
+                                        title: 'Undo to here',
+                                        desc: 'Click to undo this and all later actions',
+                                        aria: true), class: 'undo-button'
+                span= "#{journal.user.name}'s choice for '#{journal.class.from(journal.user).in(@game).question.text(@game.game_state)}', which is now invalid"
 
   = link_to 'Back', games_path

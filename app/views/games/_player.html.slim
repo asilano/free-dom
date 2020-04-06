@@ -2,16 +2,16 @@
 .cell.player#current-player
   h2= current_user.name
   / Player-button controls
-  - @game.question.controls_for(current_user, @game.game_state).select { |ctrl| ctrl.scope == :player }.each do |ctrl|
+  - @game.controls_for(current_user).select { |ctrl| ctrl.scope == :player }.each do |ctrl|
     = form_with model: @game.journals.build do |f|
       = f.hidden_field :game_id
-      = f.hidden_field :type, value: @game.question.journal_type
+      = f.hidden_field :type, value: ctrl.journal_type
       - ctrl.values.each do |val|
         = f.button val[0], value: val[1], name: "journal[params][#{ctrl.key}]", class: 'button', data: { disable_with: val[0] }
 
   / Cards held in hand
   h5 Hand
-  - hand_controls = @game.question.controls_for(current_user, @game.game_state).select { |ctrl| ctrl.scope == :hand }
+  - hand_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :hand }
   = render partial: 'control_skeleton', collection: hand_controls
   .grid-container.fluid
     .card-grid
@@ -25,7 +25,7 @@
 
   / Cards in play
   h5 In Play
-  - play_controls = @game.question.controls_for(current_user, @game.game_state).select { |ctrl| ctrl.scope == :play }
+  - play_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :play }
   = render partial: 'control_skeleton', collection: play_controls
   .grid-container.fluid
     .card-grid
@@ -53,7 +53,7 @@
 
   / Deck representation
   h5 Deck
-  - deck_controls = @game.question.controls_for(current_user, @game.game_state).select { |ctrl| ctrl.scope == :deck }
+  - deck_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :deck }
   = render partial: 'control_skeleton', collection: deck_controls
   .grid-container.fluid
     .grid-x.grid-margin-x

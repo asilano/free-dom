@@ -20,7 +20,7 @@
 .treasure.card .card-name {background-color: $treasure-yellow}
 .victory.card .card-name {background-color: $victory-green}
 .curse.card .card-name {background-color: $curse-purple}
-.attack.card .card-name {color: red; font-weight: bold;}
+.attack.card .card-name {color: $attack-red; font-weight: bold;}
 
 .cell.card {
   width: auto;

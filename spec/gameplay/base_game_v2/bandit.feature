@@ -51,7 +51,6 @@ Feature: Bandit
       And Belle should discard Gold from her deck
       And these card moves should happen
 
-
   Scenario: Bandit hits nothing or Copper
     When Belle's deck contains Estate, Artisan
     And Chas's deck contains Copper, Village

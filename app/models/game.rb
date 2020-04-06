@@ -4,7 +4,7 @@ class Game < ApplicationRecord
 
   accepts_nested_attributes_for :journals
 
-  attr_reader :game_state, :question, :last_fixed_journal_order, :current_journal
+  attr_reader :game_state, :questions, :last_fixed_journal_order, :current_journal
 
   # Execute the game's journals in memory.
   def process
@@ -20,13 +20,16 @@ class Game < ApplicationRecord
     fiber = Fiber.new { @game_state.run }
 
     # Kick the fiber off, and wait for the first question
-    @question = fiber.resume
+    @questions = *fiber.resume
 
     # Until we run out of answers, post journals in as answers to questions
     journals.each do |j|
       # Allow tests to ignore individual journals
       next if j.ignore
-      @question = fiber.resume(j)
+      @questions = *fiber.resume(j)
+    rescue => e
+      @questions = []
+      return
     end
 
     # Before going back to the users, see if the question:
@@ -35,11 +38,11 @@ class Game < ApplicationRecord
     # In that case, we synthesise the journal and carry on.
     # Buuut, we have to keep a hold of who the last _active_ person is, in case
     # there's a follow-up no-choice for the same player.
-    spawner = journals.last&.player
-    while @question.can_be_auto_answered?(@game_state, spawner: spawner)
-      auto_journal = @question.auto_answer(@game_state)
-      @question = fiber.resume(auto_journal)
-    end
+    # spawner = journals.last&.player
+    # while @questions.any? { |q| q.can_be_auto_answered?(@game_state, spawner: spawner) }
+    #   auto_journal = @questions.lazy.map { |q| q.auto_answer(@game_state) }.detect(&:itself)
+    #   @questions = *fiber.resume(auto_journal)
+    # end
   end
 
   def push_journal(journal)
@@ -61,5 +64,9 @@ class Game < ApplicationRecord
 
   def last_fixed_journal_for(user)
     journals.where('journals.order <= ?', @last_fixed_journal_order).or(journals.where.not(user: user)).last
+  end
+
+  def controls_for(user)
+    @questions.flat_map { |q| q&.controls_for(user, @game_state) }.compact
   end
 end

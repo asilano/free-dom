@@ -56,7 +56,7 @@ module GameEngine
 
     def shuffle_discard_under_deck
       discards, other = cards.partition { |c| c.location == :discard }
-      @cards = other + discards.shuffle.each { |c| c.location = :deck }
+      @cards = other + discards.shuffle(random: game_state.rng).each { |c| c.location = :deck }
       @game.current_journal.histories << History.new("#{name} shuffled their discards.",
                                                      player: self,
                                                      css_classes: %w[shuffle])

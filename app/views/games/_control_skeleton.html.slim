@@ -1,3 +1,4 @@
 = form_with model: @game.journals.build, id: "control_form_#{control_skeleton.object_id}" do |f|
-  = f.hidden_field :game_id
-  = f.hidden_field :type, value: @game.question.journal_type
+  = f.hidden_field :game_id, value: @game.id
+  = f.hidden_field :type, value: control_skeleton.journal_type
+  = f.hidden_field :fiber_id, value: control_skeleton.fiber_id

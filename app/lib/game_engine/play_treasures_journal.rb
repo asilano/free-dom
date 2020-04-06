@@ -1,7 +1,8 @@
 module GameEngine
   class PlayTreasuresJournal < Journal
     define_question('Play Treasures, or pass').with_controls do |_game_state|
-      [MultiCardControl.new(player: @player,
+      [MultiCardControl.new(journal_type: PlayTreasuresJournal,
+                            player: @player,
                             scope: :hand,
                             text: 'Play',
                             filter: ->(card) { card.treasure? },

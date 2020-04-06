@@ -8,6 +8,7 @@ class ButtonControl < Control
   end
 
   def single_answer?(_)
+    return false if @journal_type == GameEngine::StartGameJournal
     @values.count <= 1
   end
 end

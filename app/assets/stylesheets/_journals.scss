@@ -17,6 +17,11 @@
       padding-left: 8px;
     }
   }
+
+  .error-journal {
+    color: $error-red;
+    font-style: italic;
+  }
 }
 
 .undo-button {
@@ -35,6 +40,10 @@
     &:hover {
       transform: rotate(45deg) scale(1.2);
       fill: $dark-blue;
+    }
+
+    .error-journal & {
+      fill: $error-red;
     }
   }
 }

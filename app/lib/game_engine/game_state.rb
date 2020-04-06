@@ -1,3 +1,5 @@
+require 'fiber'
+
 # GameState is the in-memory record of the game. It applies journals to itself,
 # to update the game's state.
 module GameEngine
@@ -7,8 +9,8 @@ module GameEngine
     class InvalidJournalError < ArgumentError
     end
 
-    attr_reader :logs, :players, :piles, :turn_player, :game
-    attr_accessor :state
+    attr_reader :players, :piles, :turn_player, :game
+    attr_accessor :state, :rng, :fid_prefix, :next_fid
 
     def initialize(seed, game)
       @seed = seed
@@ -18,13 +20,13 @@ module GameEngine
       @piles = []
       @turn_player = nil
 
-      # TODO: Temporary debug output
-      @logs = []
+      @next_fid = 0
+      @fid_prefix = '1'
     end
 
     def run
       # Initialise
-      srand(@seed)
+      @rng = Random.new(@seed)
       @state = :waiting
 
       # Ask the game creator what cards are in the Kingdom. We expect this to
@@ -68,7 +70,7 @@ module GameEngine
 
     def get_journal(journal_class, from:, opts: {})
       template = journal_class.from(from).in(@game).with(opts)
-      journal = Fiber.yield(template.question)
+      journal = Fiber.yield(template.question.tap { |q| q.fiber_id = @fid_prefix })
       while journal.is_a? GameEngine::HackJournal
         journal.process(self)
         journal = Fiber.yield(template.question)
@@ -90,6 +92,36 @@ module GameEngine
       @piles.detect { |p| p.cards.present? && yield(p.cards.first) }
     end
 
+    # Set up nested Fibers, one for each entry in forks, to handle the supplied block.
+    # Present all the combined questions up to the caller.
+    def in_parallel(forks, &block)
+      # Unless there's only one fork, of course. Then fibering is unnecessary
+      return if forks.empty?
+      return forks.each(&block) if forks.length == 1
+
+      sub_fibers = forks.map do |forker|
+        FiberWrapper.new(self) { block.call(forker) }
+      end
+
+      questions = sub_fibers.map do |sub|
+        sub.resume
+      end
+      while questions.any?
+        # Get a journal for any of the questions, and post it into the
+        # relevant fiber
+        journal = Fiber.yield(questions)
+        target = sub_fibers.detect { |sub| journal.fiber_id =~ /^#{sub.fid_prefix}(\.|$)/ }
+        raise InvalidJournalError, "Incorrect fiber for journal: #{journal}" unless target
+
+        new_q = target.resume(journal)
+        questions[sub_fibers.index(target)] = target.alive? ? new_q : nil
+      end
+    end
+
+    def next_fiber_id
+      @next_fid += 1
+    end
+
     private
 
     def cleanup
@@ -104,6 +136,39 @@ module GameEngine
 
       # # Draw a new hand
       @turn_player.draw_cards 5
+    end
+  end
+
+  class FiberWrapper
+    attr_reader :fiber, :fiber_id, :next_fid, :fid_prefix, :rng
+    delegate :alive?, to: :fiber
+
+    def initialize(game_state, &block)
+      @game_state = game_state
+      @next_fid = 0
+      @fiber_id = game_state.next_fiber_id
+      @fid_prefix = [game_state.fid_prefix, @fiber_id.to_s].join('.')
+      @rng = Random.new("#{@game_state.rng.seed}#{@fid_prefix.gsub('.')}".to_i)
+      @fiber = Fiber.new(&block)
+    end
+
+    def resume(*args)
+      outer_rng = @game_state.rng
+      @game_state.rng = @rng
+
+      outer_next_fid = @game_state.next_fid
+      @game_state.next_fid = @next_fid
+
+      outer_fid_prefix = @game_state.fid_prefix
+      @game_state.fid_prefix = @fid_prefix
+
+      result = @fiber.resume(*args)
+
+      @game_state.fid_prefix = outer_fid_prefix
+      @game_state.next_fid = outer_next_fid
+      @game_state.rng = outer_rng
+
+      result
     end
   end
 end

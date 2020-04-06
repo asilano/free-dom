@@ -1,10 +1,10 @@
 module MonkeyPatches
   module Array
     module Shuffling
-      def shuffle
+      def shuffle(*args)
         sort
       end
-      def shuffle!
+      def shuffle!(*args)
         sort!
       end
     end

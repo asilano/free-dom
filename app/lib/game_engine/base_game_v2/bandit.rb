@@ -40,7 +40,8 @@ module GameEngine
       class TrashTreasureJournal < Journal
         define_question('Choose a treasure to trash').with_controls do |_game_state|
           filter = ->(card) { card && card.revealed? && card.treasure? && !card.is_a?(GameEngine::BasicCards::Copper) }
-          [OneCardControl.new(player: @player,
+          [OneCardControl.new(journal_type: TrashTreasureJournal,
+                              player: @player,
                               scope: :deck,
                               text: 'Trash',
                               filter: filter,

@@ -20,7 +20,7 @@ class Journal < ApplicationRecord
     end
 
     def question
-      self.class::Question.new(@player, @opts)
+      self.class::Question.new(self, @player, @opts)
     end
 
     def matches?(journal)
@@ -38,10 +38,13 @@ class Journal < ApplicationRecord
     end
 
     class Question
-      attr_reader :opts, :player
-      def initialize(player, opts)
+      attr_reader :template, :opts, :player
+      attr_accessor :fiber_id
+      def initialize(template, player, opts)
+        @template = template
         @opts = opts
         @player = player
+        @fiber_id = nil
       end
 
       def journal_type
@@ -49,7 +52,8 @@ class Journal < ApplicationRecord
       end
 
       def controls_for(user, game_state)
-        get_controls(game_state).select { |ctrl| ctrl.player.user == user }
+        get_controls(game_state).each { |ctrl| ctrl.fiber_id = @fiber_id }
+                                .select { |ctrl| ctrl.player.user == user }
       end
 
       def self.with_controls(&controls)
@@ -57,6 +61,8 @@ class Journal < ApplicationRecord
       end
 
       def can_be_auto_answered?(game_state, spawner:)
+        return false unless @player
+
         # A question can be skipped over with an autoanswer if:
         # * it's a question for someone other than the "spawner"
         # * the question has only one possible answer
