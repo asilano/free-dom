@@ -50,7 +50,7 @@
               li.main-journal{class=journal.histories.first.css_class}
                 - if journal.order > last_fixed_journal.order
                   = form_with url: journal_path(journal), method: :delete do |f|
-                    = f.button inline_svg('action-undo.svg',
+                    = f.button inline_svg_tag('action-undo.svg',
                                           class: 'undo-arrow',
                                           title: 'Undo to here',
                                           desc: 'Click to undo this and all later actions',
@@ -63,7 +63,7 @@
             - else
               li.main-journal.error-journal
                 = form_with url: journal_path(journal), method: :delete do |f|
-                  = f.button inline_svg('action-undo.svg',
+                  = f.button inline_svg_tag('action-undo.svg',
                                         class: 'undo-arrow',
                                         title: 'Undo to here',
                                         desc: 'Click to undo this and all later actions',

@@ -30,6 +30,10 @@ gem 'jbuilder', '~> 2.5'
 # gem 'redis', '~> 4.0'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
+
+# Peg sprockets-rails to avoid whine about precompiles scss in prod
+gem 'sprockets-rails', '~> 2.3.3'
+
 gem 'slim-rails'
 gem 'foundation-rails', '~> 6.0'
 gem 'foundation_rails_helper', '~> 3.0'
@@ -50,7 +54,7 @@ group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
   # Adds support for Capybara system testing and selenium driver
-  gem 'capybara', '~> 2.13'
+  gem 'capybara'
   gem 'webdrivers'
 
   gem 'rspec-rails'
