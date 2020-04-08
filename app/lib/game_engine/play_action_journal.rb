@@ -1,6 +1,7 @@
 module GameEngine
   class PlayActionJournal < Journal
-    define_question('Play an Action, or pass').with_controls do |_game_state|
+    define_question('Play an Action, or pass').prevent_auto
+                                              .with_controls do |_game_state|
       [OneCardControl.new(journal_type: PlayActionJournal,
                           player: @player,
                           scope: :hand,

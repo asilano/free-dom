@@ -10,7 +10,7 @@ module GameEngine
     end
 
     attr_reader :players, :piles, :turn_player, :game
-    attr_accessor :state, :rng, :fid_prefix, :next_fid
+    attr_accessor :state, :rng, :fid_prefix, :next_fid, :last_active_player
 
     def initialize(seed, game)
       @seed = seed
@@ -19,6 +19,7 @@ module GameEngine
       @players = []
       @piles = []
       @turn_player = nil
+      @last_active_player = nil
 
       @next_fid = 0
       @fid_prefix = '1'
@@ -70,13 +71,18 @@ module GameEngine
 
     def get_journal(journal_class, from:, opts: {})
       template = journal_class.from(from).in(@game).with(opts)
-      journal = Fiber.yield(template.question.tap { |q| q.fiber_id = @fid_prefix })
+      journal = Fiber.yield(template.question.tap do |q|
+        q.fiber_id = @fid_prefix
+        q.auto_candidate = from != @last_active_player
+      end)
       while journal.is_a? GameEngine::HackJournal
         journal.process(self)
         journal = Fiber.yield(template.question)
       end
       raise UnexpectedJournalError, "Unexpected journal type: #{journal.class}. Expecting: #{template.class::Parent}" unless template.matches? journal
       raise InvalidJournalError, "Invalid journal: #{journal}" unless template.valid? journal
+
+      @last_active_player = journal.player unless journal.auto
       journal
     end
 
@@ -162,8 +168,11 @@ module GameEngine
       outer_fid_prefix = @game_state.fid_prefix
       @game_state.fid_prefix = @fid_prefix
 
+      outer_last_active_player = @game_state.last_active_player
+
       result = @fiber.resume(*args)
 
+      @game_state.last_active_player = outer_last_active_player
       @game_state.fid_prefix = outer_fid_prefix
       @game_state.next_fid = outer_next_fid
       @game_state.rng = outer_rng

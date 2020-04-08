@@ -27,7 +27,9 @@ class Game < ApplicationRecord
       # Allow tests to ignore individual journals
       next if j.ignore
       @questions = *fiber.resume(j)
+      @questions.compact!
     rescue => e
+      raise
       @questions = []
       return
     end
@@ -38,11 +40,12 @@ class Game < ApplicationRecord
     # In that case, we synthesise the journal and carry on.
     # Buuut, we have to keep a hold of who the last _active_ person is, in case
     # there's a follow-up no-choice for the same player.
-    # spawner = journals.last&.player
-    # while @questions.any? { |q| q.can_be_auto_answered?(@game_state, spawner: spawner) }
-    #   auto_journal = @questions.lazy.map { |q| q.auto_answer(@game_state) }.detect(&:itself)
-    #   @questions = *fiber.resume(auto_journal)
-    # end
+    while @questions.any? { |q| q.auto_candidate && q.can_be_auto_answered?(@game_state) }
+      auto_journal = @questions.lazy.map { |q| q.auto_answer(@game_state) }.detect(&:itself)
+      auto_journal.auto = true
+      @questions = *fiber.resume(auto_journal)
+      @questions.compact!
+    end
   end
 
   def push_journal(journal)

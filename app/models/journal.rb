@@ -3,7 +3,8 @@ class Journal < ApplicationRecord
   belongs_to :user
 
   attr_reader :histories
-  attr_accessor :ignore  # Used for tests
+  attr_accessor :auto
+  attr_accessor :ignore # Used for tests
 
   # Nested classes let GameEngine request the right journal at the right time
   class Template
@@ -39,7 +40,7 @@ class Journal < ApplicationRecord
 
     class Question
       attr_reader :template, :opts, :player
-      attr_accessor :fiber_id
+      attr_accessor :fiber_id, :auto_candidate
       def initialize(template, player, opts)
         @template = template
         @opts = opts
@@ -56,29 +57,42 @@ class Journal < ApplicationRecord
                                 .select { |ctrl| ctrl.player.user == user }
       end
 
+      def self.prevent_auto
+        define_method(:can_be_auto_answered?) { |_| false }
+        self
+      end
+
       def self.with_controls(&controls)
         define_method(:get_controls, &controls)
       end
 
-      def can_be_auto_answered?(game_state, spawner:)
+      def can_be_auto_answered?(game_state)
         return false unless @player
 
         # A question can be skipped over with an autoanswer if:
         # * it's a question for someone other than the "spawner"
         # * the question has only one possible answer
-        return false if spawner == @player
+        return false unless @auto_candidate
+
         controls = controls_for(@player.user, game_state)
         controls.length == 1 && controls.first.single_answer?(game_state)
       end
 
       def auto_answer(game_state)
+        return nil unless can_be_auto_answered?(game_state)
+
         control = controls_for(@player.user, game_state).first
         game_state.game.journals.create(
-          type: journal_type,
-          user: @player.user,
-          order: (game_state.game.journals.maximum(:order) || 0) + 1,
-          params: { control.key => control.single_answer }
+          type:     journal_type,
+          user:     @player.user,
+          order:    (game_state.game.journals.maximum(:order) || 0) + 1,
+          fiber_id: @fiber_id,
+          params:   { control.key => control.single_answer }
         )
+      end
+
+      def to_s
+        "#{self.class} for #{@player.name} (#{@opts}) - Game is #{@template.game.class}"
       end
 
       private

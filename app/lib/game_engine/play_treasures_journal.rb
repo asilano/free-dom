@@ -1,6 +1,7 @@
 module GameEngine
   class PlayTreasuresJournal < Journal
-    define_question('Play Treasures, or pass').with_controls do |_game_state|
+    define_question('Play Treasures, or pass').prevent_auto
+                                              .with_controls do |_game_state|
       [MultiCardControl.new(journal_type: PlayTreasuresJournal,
                             player: @player,
                             scope: :hand,

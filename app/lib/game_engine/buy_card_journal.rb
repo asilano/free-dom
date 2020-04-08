@@ -1,6 +1,7 @@
 module GameEngine
   class BuyCardJournal < Journal
-    define_question('Buy a card, or pass').with_controls do |_game_state|
+    define_question('Buy a card, or pass').prevent_auto
+                                          .with_controls do |_game_state|
       [OneCardControl.new(journal_type: BuyCardJournal,
                           player: @player,
                           scope: :supply,

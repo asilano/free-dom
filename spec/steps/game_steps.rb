@@ -106,10 +106,10 @@ module GameSteps
       @game.process
       cards_now = extract_game_cards
       cards_now[:players].each.with_index do |cards, ix|
-        expect(cards).to eq @cards_before[:players][ix]
+        expect(cards).to match_array @cards_before[:players][ix]
       end
       cards_now[:supply].each.with_index do |cards, ix|
-        expect(cards).to eq @cards_before[:supply][ix]
+        expect(cards).to match_array @cards_before[:supply][ix]
       end
     end
 

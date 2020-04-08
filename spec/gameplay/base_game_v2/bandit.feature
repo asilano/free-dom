@@ -40,7 +40,7 @@ Feature: Bandit
     And Belle should need to 'Choose a treasure to trash'
     And Gold, Silver should be revealed on Chas's deck
     And Chas should need to 'Choose a treasure to trash'
-    When Chas chooses Gold on her deck
+    When Chas chooses Gold on his deck
     Then cards should move as follows:
       And Chas should trash Gold from his deck
       And Chas should discard Silver from his deck
@@ -63,7 +63,34 @@ Feature: Bandit
       And these card moves should happen
 
   Scenario: Bandit hits empty deck
-    When pending
+    When Belle's deck contains nothing
+    And Chas's deck contains nothing
+    And Chas's discard contains Gold, Silver
+    Then I should need to 'Play an Action, or pass'
+    When I choose Bandit in my hand
+    Then cards should move as follows:
+      Then I should gain Gold
+      And Chas should move Silver, Gold from his discard to his deck
+      And these card moves should happen
+    And Gold, Silver should be revealed on Chas's deck
+    And Chas should need to 'Choose a treasure to trash'
+    When Chas chooses Gold on his deck
+    Then cards should move as follows:
+      And Chas should trash Gold from his deck
+      And Chas should discard Silver from his deck
+      And these card moves should happen
 
   Scenario: Bandit results in no choices
-    When pending
+    When Belle's deck contains Gold, Village
+    And Chas's deck contains Estate, Silver
+    Then I should need to 'Play an Action, or pass'
+    When I choose Bandit in my hand
+    Then cards should move as follows:
+      Then I should gain Gold
+      And Chas should trash Silver from his deck
+      And Chas should discard Estate from his deck
+      Then Belle should trash Gold from her deck
+      And Belle should discard Village from her deck
+      And these card moves should happen
+
+
