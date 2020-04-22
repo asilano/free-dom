@@ -92,5 +92,3 @@ Feature: Bandit
       Then Belle should trash Gold from her deck
       And Belle should discard Village from her deck
       And these card moves should happen
-
-

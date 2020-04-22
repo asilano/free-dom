@@ -3,7 +3,7 @@ class MultiCardControl < Control
 
   def initialize(opts = {})
     super
-    @filter = opts[:filter] || ->(_card) { true }
+    @filter = filter_from(opts[:filter]) || ->(_card) { true }
     @preselect = opts[:preselect] || ->(_card) { false }
     if opts.key? :submit_text
       @cardless_button = { text: opts[:submit_text],

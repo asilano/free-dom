@@ -3,13 +3,13 @@ module GameEngine
     define_question('Play Treasures, or pass').prevent_auto
                                               .with_controls do |_game_state|
       [MultiCardControl.new(journal_type: PlayTreasuresJournal,
-                            player: @player,
-                            scope: :hand,
-                            text: 'Play',
-                            filter: ->(card) { card.treasure? },
-                            preselect: ->(card) { !card.special? },
-                            submit_text: 'Play selected treasures (select none to stop)',
-                            css_class: 'play-treasure')]
+                            player:       @player,
+                            scope:        :hand,
+                            text:         'Play',
+                            filter:       :treasure?,
+                            preselect:    ->(card) { !card.special? },
+                            submit_text:  'Play selected treasures (select none to stop)',
+                            css_class:    'play-treasure')]
     end
 
     validation do

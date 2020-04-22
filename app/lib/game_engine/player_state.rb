@@ -63,6 +63,7 @@ module GameEngine
     end
 
     def reveal_cards(num, from:)
+      num = cards_by_location(from).length if num == :all
       shuffle_discard_under_deck if from == :deck && deck_cards.length < num && discarded_cards.present?
       revealed_cards = cards_by_location(from).take(num)
       @game.current_journal.histories << History.new(

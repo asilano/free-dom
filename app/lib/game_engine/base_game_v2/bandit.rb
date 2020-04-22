@@ -13,20 +13,7 @@ module GameEngine
         super
 
         # Player gains a Gold
-        pile = game_state.find_pile_by_top_card { |c| c.is_a? BasicCards::Gold }
-        card = pile&.cards&.first
-
-        if card
-          game.current_journal.histories << History.new("#{played_by.name} gained a Gold.",
-                                                        player: played_by,
-                                                        css_classes: %w[gain-card])
-          card.be_gained_by(played_by, from: pile.cards)
-        else
-          game.current_journal.histories << History.new("#{played_by.name} couldn't gain a Gold.",
-                                                        player: played_by,
-                                                        css_classes: %w[gain-card])
-
-        end
+        Helpers.gain_card_from_supply(game_state, player: played_by, card_class: BasicCards::Gold)
 
         # Now, attack everyone else
         launch_attack(victims: played_by.other_players)
@@ -64,7 +51,6 @@ module GameEngine
 
         process do |_game_state|
           # Done looking at cards. Trash up to one, and discard the rest!
-
           if params['choice'] == 'none'
             @histories << History.new("#{player.name} trashed nothing.",
                                       player: player,

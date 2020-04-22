@@ -27,4 +27,14 @@ class Control
   def single_answer
     nil
   end
+
+  def filter_from(option)
+    return nil unless option
+
+    if option.is_a? Symbol
+      ->(obj) { obj.send(option) }
+    else
+      option
+    end
+  end
 end

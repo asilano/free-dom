@@ -3,13 +3,13 @@ module GameEngine
     define_question('Play an Action, or pass').prevent_auto
                                               .with_controls do |_game_state|
       [OneCardControl.new(journal_type: PlayActionJournal,
-                          player: @player,
-                          scope: :hand,
-                          text: 'Play',
-                          filter: ->(card) { card.action? },
-                          null_choice: { text: 'Leave Action Phase',
-                                         value: 'none' },
-                          css_class: 'play-action')]
+                          player:       @player,
+                          scope:        :hand,
+                          text:         'Play',
+                          filter:       :action?,
+                          null_choice:  { text:  'Leave Action Phase',
+                                          value: 'none' },
+                          css_class:    'play-action')]
     end
 
     validation do
