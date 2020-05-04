@@ -38,7 +38,7 @@ module GameSteps
   end
 
   module ActionSteps
-    step ':player_name choose(s) :cards in/on my/his/her/the :scope' do |name, cards, scope|
+    step ':player_name choose(s) :cards in/on my/his/her/the :scope( cards)' do |name, cards, scope|
       user = get_player(name).user
       question = @questions.detect { |q| q&.player&.name == user.name }
       controls = question.controls_for(user, @game.game_state)
@@ -81,7 +81,7 @@ module GameSteps
     step ':cards should be revealed on :player_name deck' do |cards, name|
       @game.process
       player = get_player(name)
-      expect(player.deck_cards.select(&:revealed).map { |c| c.class.to_s }).to match_array(cards.map(&:to_s))
+      expect(player.revealed_cards.select { |c| c.revealed_from == :deck }.map { |c| c.class.to_s }).to match_array(cards.map(&:to_s))
     end
 
     step 'cards should move as follows:' do
@@ -118,14 +118,15 @@ module GameSteps
       send 'these card moves should happen'
     end
 
-    step ':player_name should discard :cards from/in( my/his/her) :location' do |name, cards, location|
+    step ':player_name should discard :cards from/in( my/his/her) :location( cards)' do |name, cards, location|
       players_cards = cards_for_player(name, location: location)
       if cards == 'everything'
-        players_cards.each { |c| c[:location] = :discard }
+        players_cards.each { |c| c[:location] = :discard; c.delete(:revealed_from) }
       else
         cards.each do |type|
           card = players_cards.delete_at(players_cards.index { |c| c[:class] == type })
           card[:location] = :discard
+          card.delete(:revealed_from)
         end
       end
     end
@@ -139,6 +140,17 @@ module GameSteps
       end
 
       players_cards.take(count).each { |c| c[:location] = :hand }
+    end
+
+    step ':player_name should reveal :count cards from my/his/her deck' do |name, count|
+      players_cards = cards_for_player(name, location: :deck)
+      if players_cards.count < count
+        # Not enough to draw. "Shuffle" the discards
+        shuffle_discard_under_deck(cards_for_player(name))
+        players_cards = cards_for_player(name, location: :deck)
+      end
+
+      players_cards.take(count).each { |c| c[:location] = :revealed; c[:revealed_from] = :deck }
     end
 
     step ':player_name should gain :cards' do |name, cards|
@@ -166,6 +178,7 @@ module GameSteps
         instance_ix = players_cards.index { |c| c[:class] == card && c[:location] == source.to_sym }
         instance = players_cards[instance_ix]
         instance[:location] = destination.to_sym
+        instance.delete(:revealed_from)
         if destination == 'deck'
           players_cards.delete_at(instance_ix)
           players_cards.unshift(instance)
@@ -173,12 +186,13 @@ module GameSteps
       end
     end
 
-    step ':player_name should trash :cards from my/his/her :source' do |name, cards, source|
+    step ':player_name should trash :cards from my/his/her :source( cards)' do |name, cards, source|
       players_cards = cards_for_player(name)
       cards.each do |card|
         instance_ix = players_cards.index { |c| c[:class] == card && c[:location] == source.to_sym }
         instance = players_cards.delete_at(instance_ix)
         instance[:location] = :trash
+        instance.delete(:revealed_from)
       end
     end
 
@@ -205,7 +219,10 @@ module GameSteps
 
   def extract_game_cards
     player_cards = @game.game_state.players.map do |ply|
-      ply.cards.map { |c| { class: c.class, location: c.location } }
+      ply.cards.map do |c|
+        ((c.location == :revealed && c.revealed_from) ? { revealed_from: c.revealed_from } : {})
+          .merge({ class: c.class, location: c.location })
+      end
     end
     supply_cards = @game.game_state.piles.map do |p|
       p.cards.map { |c| { class: c.class, location: c.location } }
@@ -249,6 +266,9 @@ OneCardControl.define_method(:handle_choice) do |choice|
     { @key => pile_ix }
   when :deck
     card_ix = @player.deck_cards.index { |c| c.is_a? choice }
+    { @key => card_ix }
+  when :revealed
+    card_ix = @player.cards_revealed_to(@question).index { |c| c.is_a? choice }
     { @key => card_ix }
   end
 end

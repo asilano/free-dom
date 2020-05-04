@@ -7,6 +7,7 @@ module GameEngine
     end.with_controls do |game_state|
       if game_state.players.length > 1
         [ButtonControl.new(journal_type: StartGameJournal,
+                           question: self,
                            player: @player,
                            scope: :player,
                            values: [['Start the game', 'start']])]

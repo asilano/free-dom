@@ -3,6 +3,7 @@ module GameEngine
     define_question('Buy a card, or pass').prevent_auto
                                           .with_controls do |_game_state|
       [OneCardControl.new(journal_type: BuyCardJournal,
+                          question: self,
                           player: @player,
                           scope: :supply,
                           text: 'Buy',

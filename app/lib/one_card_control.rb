@@ -25,7 +25,9 @@ class OneCardControl < Control
     when :hand
       @player.hand_cards
     when :deck
-      @player.deck_cards.select(&:revealed?)
+      @player.deck_cards
+    when :revealed
+      @player.cards_revealed_to(@question)
     when :supply
     end
   end

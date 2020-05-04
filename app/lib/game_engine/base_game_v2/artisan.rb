@@ -16,14 +16,15 @@ module GameEngine
         define_question('Choose a card to gain into your hand').with_controls do |game_state|
           filter = ->(card) { card && card.cost <= 5 }
           [OneCardControl.new(journal_type: GainCardJournal,
-                              player: @player,
-                              scope: :supply,
-                              text: 'Gain',
-                              filter: filter,
-                              null_choice: if game_state.piles.map(&:cards).map(&:first).none?(&filter)
-                                             { text: 'Gain nothing', value: 'none' }
-                                           end,
-                              css_class: 'gain-card')]
+                              question:     self,
+                              player:       @player,
+                              scope:        :supply,
+                              text:         'Gain',
+                              filter:       filter,
+                              null_choice:  if game_state.piles.map(&:cards).map(&:first).none?(&filter)
+                                              { text: 'Gain nothing', value: 'none' }
+                                            end,
+                              css_class:    'gain-card')]
         end
 
         validation do
@@ -62,13 +63,14 @@ module GameEngine
       class PlaceCardJournal < Journal
         define_question('Choose a card to put onto your deck').with_controls do |_game_state|
           [OneCardControl.new(journal_type: PlaceCardJournal,
-                              player: @player,
-                              scope: :hand,
-                              text: 'Put on deck',
-                              null_choice: if @player.hand_cards.blank?
-                                             { text: 'Put nothing on deck',
-                                               value: 'none' }
-                                           end)]
+                              question:     self,
+                              player:       @player,
+                              scope:        :hand,
+                              text:         'Put on deck',
+                              null_choice:  if @player.hand_cards.blank?
+                                              { text:  'Put nothing on deck',
+                                                value: 'none' }
+                                            end)]
         end
 
         validation do

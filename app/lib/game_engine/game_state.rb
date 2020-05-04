@@ -69,21 +69,25 @@ module GameEngine
       end
     end
 
-    def get_journal(journal_class, from:, opts: {})
+    def get_journal(journal_class, from:, revealed_cards: nil, opts: {})
       template = journal_class.from(from).in(@game).with(opts)
       journal = Fiber.yield(template.question.tap do |q|
         q.fiber_id = @fid_prefix
         q.auto_candidate = from != @last_active_player
+        if revealed_cards
+          q.revealed_cards = revealed_cards
+          revealed_cards.each { |c| c.interacting_with = q }
+        end
       end)
       while journal.is_a? GameEngine::HackJournal
         journal.process(self)
         journal = Fiber.yield(template.question)
       end
-      raise UnexpectedJournalError, "Unexpected journal type: #{journal.class}. Expecting: #{template.class::Parent}" unless template.matches? journal
+      raise UnexpectedJournalError, "Unexpected journal type: #{journal.class}. Expecting: #{template.class.parent}" unless template.matches? journal
       raise InvalidJournalError, "Invalid journal: #{journal}" unless template.valid? journal
 
       @last_active_player = journal.player unless journal.auto
-      journal
+      journal.tap { |j| j.question = template.question }
     end
 
     def player_for(user)

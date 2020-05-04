@@ -34,6 +34,7 @@ module GameEngine
       class PlaceVictoryJournal < Journal
         define_question('Choose a victory to put on your deck').with_controls do |_game_state|
           [OneCardControl.new(journal_type: PlaceVictoryJournal,
+                              question:     self,
                               player:       @player,
                               scope:        :hand,
                               text:         'Place',

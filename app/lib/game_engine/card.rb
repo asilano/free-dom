@@ -2,8 +2,7 @@ module GameEngine
   class Card
     extend CardDecorators::CardDecorators
     attr_reader :game_state
-    attr_accessor :location, :player, :pile, :revealed
-    alias revealed? revealed
+    attr_accessor :location, :player, :pile, :interacting_with, :revealed_from
     delegate :game, to: :game_state
     delegate :action?, :treasure?, :special?, :victory?, :curse?, :reaction?, :attack?, :readable_name, :types, to: :class
 
@@ -51,7 +50,6 @@ module GameEngine
       @game_state = game_state
       @pile = pile
       @player = player
-      @revealed = false
     end
 
     def cost
@@ -113,13 +111,15 @@ module GameEngine
     end
 
     # Default effect of a card being revealed.
-    def be_revealed
-      @revealed = true
+    def be_revealed(from:)
+      @location = :revealed
+      @revealed_from = from
     end
 
     # Default effect of a card being unrevealed. This is not expected to ever be overridden
     def be_unrevealed
-      @revealed = false
+      @location = @revealed_from
+      @revealed_from = nil
     end
 
     # Is this card (in play and) currently still doing something, so it cannot

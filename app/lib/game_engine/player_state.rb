@@ -35,6 +35,14 @@ module GameEngine
       cards_by_location(:discard)
     end
 
+    def revealed_cards
+      cards_by_location(:revealed)
+    end
+
+    def cards_revealed_to(question)
+      cards_by_location(:revealed).select { |c| c.interacting_with == question }
+    end
+
     def other_players
       @game_state.players.reject { |p| p == self }
     end
@@ -69,7 +77,7 @@ module GameEngine
       @game.current_journal.histories << History.new(
         "#{name} revealed #{revealed_cards.map(&:readable_name).join(', ')}"
       )
-      revealed_cards.each(&:be_revealed)
+      revealed_cards.each { |c| c.be_revealed(from: from) }
     end
   end
 end

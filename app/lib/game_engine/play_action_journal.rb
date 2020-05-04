@@ -3,6 +3,7 @@ module GameEngine
     define_question('Play an Action, or pass').prevent_auto
                                               .with_controls do |_game_state|
       [OneCardControl.new(journal_type: PlayActionJournal,
+                          question: self,
                           player:       @player,
                           scope:        :hand,
                           text:         'Play',

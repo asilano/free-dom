@@ -3,7 +3,7 @@ class Journal < ApplicationRecord
   belongs_to :user
 
   attr_reader :histories
-  attr_accessor :auto
+  attr_accessor :auto, :question
   attr_accessor :ignore # Used for tests
 
   # Nested classes let GameEngine request the right journal at the right time
@@ -21,11 +21,11 @@ class Journal < ApplicationRecord
     end
 
     def question
-      self.class::Question.new(self, @player, @opts)
+      @question ||= self.class::Question.new(self, @player, @opts)
     end
 
     def matches?(journal)
-      journal.is_a? self.class::Parent
+      journal.is_a? self.class.parent
     end
 
     def valid?(journal)
@@ -40,7 +40,7 @@ class Journal < ApplicationRecord
 
     class Question
       attr_reader :template, :opts, :player
-      attr_accessor :fiber_id, :auto_candidate
+      attr_accessor :fiber_id, :auto_candidate, :revealed_cards
       def initialize(template, player, opts)
         @template = template
         @opts = opts
@@ -49,7 +49,11 @@ class Journal < ApplicationRecord
       end
 
       def journal_type
-        self.class::Parent
+        self.class.parents.detect { |klass| klass < Journal }
+      end
+
+      def card_type
+        self.class.parents.detect { |klass| klass < GameEngine::Card }
       end
 
       def controls_for(user, game_state)
@@ -108,13 +112,11 @@ class Journal < ApplicationRecord
   def self.inherited(subclass)
     super
     subclass.const_set('Template', Class.new(Template))
-    subclass::Template.const_set('Parent', subclass)
   end
 
   def self.define_question(text = nil, &block)
     raise ArgumentError, 'Supply exactly one of fixed text or text block' unless text.nil? == block_given?
     self::Template.const_set('Question', Class.new(Template::Question))
-    self::Template::Question.const_set('Parent', self)
     if text
       self::Template::Question.define_method(:text) { |_| text }
     else
