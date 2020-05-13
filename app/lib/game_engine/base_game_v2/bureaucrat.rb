@@ -24,8 +24,10 @@ module GameEngine
 
       def attack(victim:)
         if victim.hand_cards.none?(&:victory?)
-          # Reveal hand (actually, because of Patron)
-          victim.reveal_cards(:all, from: :hand)
+          # Reveal hand (actually, because of Patron); then immediately unreveal
+          victim.reveal_cards(:all, from: :hand).each do |card|
+            card.be_unrevealed if card.location == :revealed
+          end
         else
           game_state.get_journal(PlaceVictoryJournal, from: victim).process(game_state)
         end
