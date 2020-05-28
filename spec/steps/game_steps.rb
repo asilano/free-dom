@@ -35,6 +35,16 @@ module GameSteps
                              action: :set,
                              cards: cards.map(&:to_s) })
     end
+
+    step 'the :card pile is empty' do |card|
+      make_journal(user:   nil,
+                   type:   GameEngine::HackJournal,
+                   params: { scope:      :supply,
+                             action:     :set,
+                             card_class: card.to_s,
+                             cards:      []
+                           })
+    end
   end
 
   module ActionSteps
@@ -64,6 +74,14 @@ module GameSteps
 
       expect(@questions.compact.map(&:player)).to include(be == player)
       expect(@questions.compact.select { |q| q.player == player }.map { |q| q.text(@game.game_state) }).to include(be == question)
+    end
+
+    step ':player_name should not need to act' do |name|
+      @game.process
+      @questions = @game.questions
+      player = get_player(name)
+
+      expect(@questions.compact.map(&:player)).not_to include(be == player)
     end
 
     step ':player_name hand should contain :cards' do |name, cards|

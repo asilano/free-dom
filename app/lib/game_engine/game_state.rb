@@ -65,6 +65,11 @@ module GameEngine
 
         cleanup
 
+        if game_ended?
+          players.each(&:calculate_score)
+          return
+        end
+
         turn_seat = (turn_seat + 1) % @players.length
       end
     end
@@ -114,7 +119,8 @@ module GameEngine
       end
 
       questions = sub_fibers.map do |sub|
-        sub.resume
+        q = sub.resume
+        q if sub.alive?
       end
       while questions.any?
         # Get a journal for any of the questions, and post it into the
@@ -146,6 +152,14 @@ module GameEngine
 
       # # Draw a new hand
       @turn_player.draw_cards 5
+    end
+
+    # Game ends if the Province pile (or Colony pile, if it exists), or
+    # any three other piles, are empty.
+    def game_ended?
+      piles.detect { |p| p.card_class == BasicCards::Province }.cards.empty? ||
+        # piles.detect { |p| p.card_class == Prosperity::Colony }.cards.empty? ||
+        piles.count { |p| p.cards.empty? } >= 3
     end
   end
 

@@ -5,7 +5,7 @@
         - game_title = "Game #{@game.id}"
         - game_title << " — #{@game.name}" if @game.name.present?
         h2= game_title
-- if @game.game_state == :waiting && !@game.users.include?(current_user)
+- if @game.run_state == :waiting && !@game.users.include?(current_user)
   .cell.border-under
     .grid-container.fluid.grid-x
       .cell
@@ -14,6 +14,17 @@
           = f.hidden_field :game_id
           = f.hidden_field :type, value: GameEngine::AddPlayerJournal
           = f.submit 'Join game'
+- elsif @game.run_state == :ended
+  .cell.border-under#game-summary
+    h3 Game Over &mdash; Scores
+    ul.scores
+      - @game.game_state.players.sort_by(&:score).reverse.each.with_index do |player, ix|
+        li
+          .player-result #{player.name} &mdash; #{player.score} points
+          .player-deck
+            - player.decklist.each do |entry|
+              - score_part = entry[:score].nil? '' : " (@ #{pluralize(entry[:score], 'pt')})"
+              span{class=entry[:types]} #{entry[:count]}x #{entry[:name]}#{score_part}#{entry[:last] ? ', ' : '.'}
 
 .cell.border-under
   .grid-container.fluid
@@ -39,7 +50,7 @@
             ul.question-list
               - @game.questions.compact.each do |question|
                 li= question.player.name + ': ' + question.text(@game.game_state)
-          - else
+          - elsif @game.run_state != :ended
             strong> No question - check journals!
 
         ul#journal-log

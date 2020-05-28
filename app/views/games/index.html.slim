@@ -4,29 +4,32 @@
 .cell.grid-x.grid-frame.grid-padding-x.align-center
   - if current_user
     .cell.small-8#games-list
-      - if @games.empty?
+      - if @games.all?(:empty?) || (@games[:mine].blank? && @games.dig(:others, :waiting).blank?)
         .empty-list There aren't any games at the moment
       - else
-        - unless current_user.games.empty?
+        - unless @games[:mine].blank?
           .game-list-section
             h1 My games
 
-            table.hover
-              tbody
-                - current_user.games.each do |game|
-                  tr
-                    td.name-column = link_to game do
-                      .game-id = game.id
-                      .game-name = game.name
-                    td
-                    td = button_to 'Destroy', game, data: { confirm: 'Are you sure?' }, method: :delete, class: 'button no-gap-under alert'
-        - unless (Game.all - current_user.games).empty?
+            - @games[:mine].each do |run_state, games|
+              h2= run_state.to_s.titleize
+              table.hover
+                tbody
+                  - games.each do |game|
+                    tr{class=run_state}
+                      td.name-column = link_to game do
+                        .game-id = game.id
+                        .game-name = game.name
+                      td
+                      td = button_to 'Destroy', game, data: { confirm: 'Are you sure?' }, method: :delete, class: 'button no-gap-under alert'
+
+        - unless @games.dig(:others, :waiting).blank?
           .game-list-section
             h1 Open games
 
             table.hover
               tbody
-                - (Game.all - current_user.games).each do |game|
+                - @games.dig(:others, :waiting).each do |game|
                   tr
                     td.name-column = link_to game do
                       .game-id = game.id

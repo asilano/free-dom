@@ -1,13 +1,14 @@
 module GameEngine
   class PlayerState
     attr_reader :user, :cards, :game_state, :game
-    attr_accessor :seat, :actions, :buys, :cash
+    attr_accessor :seat, :actions, :buys, :cash, :score
 
     def initialize(user, game_state)
       @user = user
       @game_state = game_state
       @game = game_state.game
       @cards = []
+      @score = 0
     end
 
     def name
@@ -79,5 +80,23 @@ module GameEngine
       )
       revealed_cards.each { |c| c.be_revealed(from: from) }
     end
+
+    # Processors
+    def calculate_score
+      @score += cards.select(&:victory?).map(&:points).sum
+    end
+
+    def decklist
+      cards.group_by(&:class).map do |klass, cs|
+        exemplar = cs.first
+        entry = {
+          types: exemplar.class.types,
+          count: cs.count,
+          name:  klass.readable_name
+        }
+        entry[:score] = exemplar.score if exemplar.victory?]
+      end
+    end
   end
+
 end

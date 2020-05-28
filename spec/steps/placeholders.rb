@@ -8,6 +8,12 @@ placeholder :count do
   match(/^no$/) { 0 }
 end
 
+placeholder :card do
+  match SINGLE_CARD_NO_CAPTURE do |card_name|
+    CARD_TYPES[card_name]
+  end
+end
+
 placeholder :cards do
   match CARD_LIST_NO_CAPTURE do |card_list|
     card_list.split(/,\s*/).flat_map do |kind|

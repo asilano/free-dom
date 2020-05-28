@@ -24,7 +24,12 @@ module GameEngine
 
     process do |_game_state|
       # Tell the game if the player has stopped playing treasures
-      return :stop if params['choice'].blank?
+      if params['choice'].blank?
+        @histories << History.new("#{player.name} played no treasures (total: $#{player.cash})",
+                                  player:      player,
+                                  css_classes: %w[play-treasure])
+        return :stop
+      end
 
       # Play all the chosen cards in hand order
       cards = params['choice'].map { |ch| player.hand_cards[ch.to_i] }

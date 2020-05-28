@@ -5,7 +5,11 @@ class GamesController < ApplicationController
   # GET /games
   # GET /games.json
   def index
-    @games = Game.all
+    games = Game.all.each(&:process)
+    games = games.group_by { |g| g.users.include?(current_user) ? :mine : :others }
+    @games = games.transform_values do |g_group|
+      g_group.group_by(&:run_state)
+    end
   end
 
   # GET /games/1

@@ -10,7 +10,7 @@ class OneCardControl < Control
   def single_answer?(_game_state)
     return false unless cards_in_scope
 
-    choices = [@cardless_button] + cards_in_scope.map { |c| @filter[c] }
+    choices = [@cardless_button] + cards_in_scope.uniq(&:class).map { |c| @filter[c] }
     choices.count(&:itself) <= 1
   end
 

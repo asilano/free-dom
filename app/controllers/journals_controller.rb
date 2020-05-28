@@ -43,13 +43,18 @@ class JournalsController < ApplicationController
 
   def determine_order
     earlier_journals = if @journal.fiber_id
-      @journal.game.journals.where(fiber_id: nil)
-                            .or(@journal.game.journals.where('fiber_id < ?', @journal.fiber_id))
-    else
-      @journal.game.journals
-    end
+                         @journal.game.journals.select(:fiber_id, :order)
+                                 .reject do |other|
+                                   next false if other.fiber_id.nil?
 
-    (earlier_journals.maximum(:order) || 0) + 1
+                                   # Lean on Gem to compare what are, effectively, sem-vers
+                                   Gem::Version.new(other.fiber_id) > Gem::Version.new(@journal.fiber_id)
+                                 end
+                       else
+                         @journal.game.journals
+                       end
+
+    (earlier_journals.map(&:order).max || 0) + 1
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

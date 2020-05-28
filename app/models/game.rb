@@ -4,12 +4,13 @@ class Game < ApplicationRecord
 
   accepts_nested_attributes_for :journals
 
-  attr_reader :game_state, :questions, :last_fixed_journal_order, :current_journal
+  attr_reader :game_state, :questions, :last_fixed_journal_order, :current_journal, :run_state
 
   # Execute the game's journals in memory.
   def process
     # Initialise things
     @last_fixed_journal_order = 0
+    @run_state = journals.where(type: 'GameEngine::StartGameJournal').blank? ? :waiting : :running
     @journal_stack = []
 
     # Spawn a GameState object, seeding it with our creating time
@@ -27,6 +28,12 @@ class Game < ApplicationRecord
       # Allow tests to ignore individual journals
       next if j.ignore
       @questions = *fiber.resume(j)
+
+      unless fiber.alive?
+        @run_state = :ended
+        return
+      end
+
       @questions.compact!
     rescue => e
       raise

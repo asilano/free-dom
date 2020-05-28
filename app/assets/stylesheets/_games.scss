@@ -7,8 +7,13 @@
     width: 100%;
   }
 
-  .game-list-section h1 {
-    font-size: 2rem;
+  .game-list-section {
+     h1 {
+      font-size: 2rem;
+     }
+     h2 {
+      font-size: 1.5rem;
+     }
   }
 
   // Allow the game-name link to be as much of the table-cell as possible
@@ -76,4 +81,8 @@
     top: calc(50% - 15px);
     left: 15px;
   }
+}
+
+#game-summary {
+  margin-left: 10px;
 }

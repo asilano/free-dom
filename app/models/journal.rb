@@ -1,6 +1,6 @@
 class Journal < ApplicationRecord
   belongs_to :game
-  belongs_to :user
+  belongs_to :user, optional: true
 
   attr_reader :histories
   attr_accessor :auto, :question
