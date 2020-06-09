@@ -23,8 +23,8 @@
           .player-result #{player.name} &mdash; #{player.score} points
           .player-deck
             - player.decklist.each do |entry|
-              - score_part = entry[:score].nil? '' : " (@ #{pluralize(entry[:score], 'pt')})"
-              span{class=entry[:types]} #{entry[:count]}x #{entry[:name]}#{score_part}#{entry[:last] ? ', ' : '.'}
+              - score_part = entry[:score].nil? ? '' : " (@ #{pluralize(entry[:score], 'pt')})"
+              span{class=entry[:types]} #{entry[:count]}x #{entry[:name]}#{score_part}#{entry[:last] ? '.' : ', '}
 
 .cell.border-under
   .grid-container.fluid

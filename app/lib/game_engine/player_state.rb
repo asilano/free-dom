@@ -87,15 +87,25 @@ module GameEngine
     end
 
     def decklist
-      cards.group_by(&:class).map do |klass, cs|
+      list = cards.group_by(&:class).map do |klass, cs|
         exemplar = cs.first
         entry = {
           types: exemplar.class.types,
           count: cs.count,
-          name:  klass.readable_name
+          name:  klass.readable_name,
+          last:  false
         }
-        entry[:score] = exemplar.score if exemplar.victory?]
+        entry[:score] = exemplar.points if exemplar.victory?
+        entry
       end
+      list.sort! do |a, b|
+        next 0 unless a[:score] || b[:score]
+        next 1 if a[:score].nil?
+        next -1 if b[:score].nil?
+        b[:score] <=> a[:score]
+      end
+      list.last[:last] = true
+      list
     end
   end
 
