@@ -1,9 +1,10 @@
 class GameEngine::Pile
-  attr_reader :card_class, :cards
+  attr_reader :card_class, :cards, :tokens
 
   def initialize(card_class)
     @card_class = card_class
     @cards = []
+    @tokens = []
   end
 
   def fill_with(cards)
