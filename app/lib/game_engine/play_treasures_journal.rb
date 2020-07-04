@@ -3,7 +3,7 @@ module GameEngine
     define_question('Play Treasures, or pass').prevent_auto
                                               .with_controls do |_game_state|
       [MultiCardControl.new(journal_type: PlayTreasuresJournal,
-                            question: self,
+                            question:     self,
                             player:       @player,
                             scope:        :hand,
                             text:         'Play',

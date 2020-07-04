@@ -257,7 +257,8 @@ module GameSteps
 
   def shuffle_discard_under_deck(cards)
     discards, other = cards.partition { |c| c[:location] == :discard }
-    cards.replace(other + discards.shuffle.each { |c| c[:location] = :deck })
+    cards.replace(other + discards.sort_by { |c| c[:class].readable_name }
+                                  .each    { |c| c[:location] = :deck })
   end
 
   def make_journal(**kwargs)

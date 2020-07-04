@@ -52,6 +52,14 @@ module GameEngine
     def draw_cards(num)
       shuffle_discard_under_deck if deck_cards.length < num && discarded_cards.present?
       drawn_cards = deck_cards.take(num)
+      if drawn_cards.blank?
+        @game.current_journal.histories << History.new("#{name} drew no cards.",
+                                                       player: self,
+                                                       css_classes: %w[draw-cards])
+        return
+      end
+
+      @game.fix_journal
       @game.current_journal.histories << History.new(
         "#{name} drew #{History.secret_log(private_to: user,
                                            private_msg: drawn_cards.map(&:readable_name).join(', '),
@@ -79,6 +87,14 @@ module GameEngine
         "#{name} revealed #{revealed_cards.map(&:readable_name).join(', ')}"
       )
       revealed_cards.each { |c| c.be_revealed(from: from) }
+    end
+
+    def grant_actions(num)
+      @actions += num
+    end
+
+    def grant_buys(num)
+      @buys += num
     end
 
     # Processors
