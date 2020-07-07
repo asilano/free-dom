@@ -46,10 +46,11 @@ module GameEngine
           cards = params['choice'].map { |ch| player.hand_cards[ch.to_i] }
           texts_for_history = cards.map(&:readable_name)
           cards.each(&:discard)
-
           @histories << History.new("#{player.name} discarded #{texts_for_history.join(', ')}",
                                     player:      player,
                                     css_classes: %w[discard])
+
+          game_state.observe
 
           # Draw that many replacements
           player.draw_cards(params['choice'].length)

@@ -157,6 +157,7 @@ class Journal < ApplicationRecord
   def game_state
     game.game_state
   end
+  delegate :observe, to: :game_state
 
   def player
     game_state.player_for(user)

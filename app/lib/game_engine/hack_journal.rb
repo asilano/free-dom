@@ -21,6 +21,7 @@ module GameEngine
       params['cards'].each do |type|
         card = type.constantize.new(game_state)
         card.location = location.to_sym
+        card.player = player
         player.cards << card
       end
 

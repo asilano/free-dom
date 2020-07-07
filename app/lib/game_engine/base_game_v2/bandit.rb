@@ -14,6 +14,7 @@ module GameEngine
 
         # Player gains a Gold
         Helpers.gain_card_from_supply(game_state, player: played_by, card_class: BasicCards::Gold)
+        observe
 
         # Now, attack everyone else
         launch_attack(victims: played_by.other_players)
@@ -67,6 +68,8 @@ module GameEngine
             card.trash(from: player.cards)
           end
 
+          observe
+
           # Discard any remaining revealed cards.
           return if player.cards_revealed_to(@question).empty?
 
@@ -74,6 +77,7 @@ module GameEngine
                                     player: player,
                                     css_classes: %w[discard-card])
           player.cards_revealed_to(@question).each(&:discard)
+          observe
         end
       end
     end

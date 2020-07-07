@@ -15,6 +15,7 @@ module GameEngine
     def initialize(seed, game)
       @seed = seed
       @game = game
+      @scheduler = Scheduler.new
 
       @players = []
       @piles = []
@@ -50,17 +51,20 @@ module GameEngine
         # Play actions until the player stops or runs out
         until @turn_player.actions.zero?
           get_journal(GameEngine::PlayActionJournal, from: @turn_player).process(self)
+          observe
         end
 
         # Play treasures until the player stops or runs out
         play_treasures = :continue
         until play_treasures == :stop
           play_treasures = get_journal(GameEngine::PlayTreasuresJournal, from: @turn_player).process(self)
+          observe
         end
 
         # Buy cards until the player stops our runs out of buys
         until @turn_player.buys.zero?
           get_journal(GameEngine::BuyCardJournal, from: @turn_player).process(self)
+          observe
         end
 
         cleanup
@@ -138,6 +142,14 @@ module GameEngine
       @next_fid += 1
     end
 
+    def trigger(&block)
+      @scheduler.trigger(&block)
+    end
+
+    def observe
+      @scheduler.work
+    end
+
     private
 
     def cleanup
@@ -150,8 +162,12 @@ module GameEngine
       # Discard all non-tracking in-play cards
       @turn_player.played_cards.reject(&:tracking?).each(&:discard)
 
+      observe
+
       # # Draw a new hand
       @turn_player.draw_cards 5
+
+      observe
     end
 
     # Game ends if the Province pile (or Colony pile, if it exists), or

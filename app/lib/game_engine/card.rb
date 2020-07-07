@@ -3,7 +3,7 @@ module GameEngine
     extend CardDecorators::CardDecorators
     attr_reader :game_state
     attr_accessor :location, :player, :pile, :interacting_with, :revealed_from
-    delegate :game, to: :game_state
+    delegate :game, :observe, to: :game_state
     delegate :action?, :treasure?, :special?, :victory?, :curse?, :reaction?, :attack?, :readable_name, :types, to: :class
 
     # By default, 10 cards in a pile

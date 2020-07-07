@@ -17,6 +17,7 @@ module GameEngine
                                       player: played_by,
                                       card_class: BasicCards::Silver,
                                       to: :deck)
+        observe
 
         # Now, attack everyone else
         launch_attack(victims: played_by.other_players)
@@ -59,6 +60,7 @@ module GameEngine
                                     player:      player,
                                     css_classes: %w[place-card])
           card.put_on_deck(player, from: player.cards)
+          observe
         end
       end
     end

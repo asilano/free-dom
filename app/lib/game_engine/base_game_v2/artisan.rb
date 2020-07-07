@@ -55,6 +55,7 @@ module GameEngine
                                     player: player,
                                     css_classes: %w[gain-card])
           card.be_gained_by(player, from: pile.cards, to: :hand)
+          observe
 
           game_state.get_journal(PlaceCardJournal, from: player).process(game_state)
         end
@@ -94,6 +95,7 @@ module GameEngine
           @histories << History.new("#{player.name} put #{card.readable_name} onto their deck.",
                                     player: player)
           card.put_on_deck(player, from: player.cards)
+          observe
         end
       end
     end
