@@ -33,7 +33,7 @@ module GameEngine
           end
           return true if no_choices && journal.params['choice'] == 'none'
           return false if !no_choices && journal.params['choice'] == 'none'
-          return false unless journal.params['choice'].integer?
+          return false unless journal.params['choice']&.integer?
 
           choice = journal.params['choice'].to_i
           choice < journal.game_state.piles.length &&
@@ -77,7 +77,7 @@ module GameEngine
         validation do
           return true if player.hand_cards.empty? && journal.params['choice'] == 'none'
           return false if player.hand_cards.present? && journal.params['choice'] == 'none'
-          return false unless journal.params['choice'].integer?
+          return false unless journal.params['choice']&.integer?
 
           choice = journal.params['choice'].to_i
           choice < journal.player.hand_cards.length

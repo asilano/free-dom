@@ -97,6 +97,10 @@ module GameEngine
       @buys += num
     end
 
+    def grant_cash(num)
+      @cash += num
+    end
+
     # Processors
     def calculate_score
       @score += cards.select(&:victory?).map(&:points).sum

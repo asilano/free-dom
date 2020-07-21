@@ -169,7 +169,7 @@ module GameSteps
       players_cards.take(count).each { |c| c[:location] = :hand }
     end
 
-    step ':player_name should reveal :count cards from my/his/her deck' do |name, count|
+    step ':player_name should reveal :count card(s) from my/his/her deck' do |name, count|
       players_cards = cards_for_player(name, location: :deck)
       if players_cards.count < count
         # Not enough to draw. "Shuffle" the discards
@@ -235,6 +235,26 @@ module GameSteps
 
       expect(can_pick).to all(should ? be_truthy : be_falsey)
     end
+
+    step ':player_name should have :count action(s)' do |name, count|
+      @game.process
+      expect(get_player(name).actions).to eq count.to_i
+    end
+
+    step ':player_name should have :count buy(s)' do |name, count|
+      @game.process
+      expect(get_player(name).buys).to eq count.to_i
+    end
+
+    step ':player_name should have :amount cash' do |name, amount|
+      @game.process
+      expect(get_player(name).cash).to eq amount.to_i
+    end
+
+    step ':player_name total score should be :score' do |name, score|
+      @game.process
+      expect(get_player(name).calculate_score).to eq score.to_i
+    end
   end
 
   def get_player(name)
@@ -294,6 +314,9 @@ OneCardControl.define_method(:handle_choice) do |choice|
     { @key => pile_ix }
   when :deck
     card_ix = @player.deck_cards.index { |c| c.is_a? choice }
+    { @key => card_ix }
+  when :discard
+    card_ix = @player.discarded_cards.index { |c| c.is_a? choice }
     { @key => card_ix }
   when :revealed
     card_ix = @player.cards_revealed_to(@question).index { |c| c.is_a? choice }

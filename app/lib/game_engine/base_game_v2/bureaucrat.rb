@@ -46,7 +46,7 @@ module GameEngine
         end
 
         validation do
-          return false unless journal.params['choice'].integer?
+          return false unless journal.params['choice']&.integer?
 
           choice = journal.params['choice'].to_i
           choice < journal.player.hand_cards.length &&

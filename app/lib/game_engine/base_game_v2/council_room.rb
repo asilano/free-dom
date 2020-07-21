@@ -11,9 +11,11 @@ module GameEngine
         super
 
         played_by.draw_cards(4)
+        observe
+
         played_by.grant_buys(1)
 
-        played_by.other_players.each { |ply| ply.draw_cards(1) }
+        played_by.other_players.each { |ply| ply.draw_cards(1); observe }
       end
     end
   end

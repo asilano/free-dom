@@ -26,7 +26,7 @@ module GameEngine
         validation do
           return true if journal.params['choice'].blank?
           return false if journal.params['choice'].length > 4
-          return false unless journal.params['choice'].all?(&:integer?)
+          return false unless journal.params['choice']&.all?(&:integer?)
 
           journal.params['choice'].all? do |choice|
             choice.to_i < journal.player.hand_cards.length

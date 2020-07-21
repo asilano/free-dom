@@ -15,7 +15,7 @@ module GameEngine
 
     validation do
       return true if journal.params['choice'] == 'none'
-      return false unless journal.params['choice'].integer?
+      return false unless journal.params['choice']&.integer?
 
       choice = journal.params['choice'].to_i
       choice < journal.game_state.piles.length &&

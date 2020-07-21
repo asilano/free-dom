@@ -122,12 +122,20 @@ module GameEngine
       @revealed_from = nil
     end
 
+    def move_to_hand
+      @location = :hand
+    end
+
     # Is this card (in play and) currently still doing something, so it cannot
     # be discarded? Generally, no, and subclasses will override. The obvious candidates
     # will be Durations; but more exotic examples also exist, and Throne Room-type
     # cards copying Durations track as well.
     def tracking?
       false
+    end
+
+    def inspect
+      "#{readable_name}.#{Digest::MD5.base64digest(object_id.to_s)}"
     end
   end
 end

@@ -26,6 +26,8 @@ class OneCardControl < Control
       @player.hand_cards
     when :deck
       @player.deck_cards
+    when :discard
+      @player.discarded_cards
     when :revealed
       @player.cards_revealed_to(@question)
     when :supply
