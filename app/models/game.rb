@@ -68,7 +68,7 @@ class Game < ApplicationRecord
 
   # Mark a journal as not able to be undone
   def fix_journal(journal: :current)
-    journal = @journal_stack.last if journal == :current
+    journal = @current_journal #@journal_stack.last if journal == :current
     journal ||= journals.last
     @last_fixed_journal_order = journal.order
   end

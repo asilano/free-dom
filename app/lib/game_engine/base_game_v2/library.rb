@@ -20,6 +20,14 @@ module GameEngine
             game_state.get_journal(SetAsideJournal, from: played_by, opts: { card: drawn.first}).process(game_state)
           end
         end
+
+        # Discard any set-aside cards
+        if (set_aside = played_by.cards_by_location(:library)).any?
+          game.current_journal.histories << History.new("#{played_by.name} discarded #{set_aside.map(&:readable_name).join(', ')}.",
+                                                         player: played_by,
+                                                         css_classes: %w[discard])
+          set_aside.each(&:discard)
+        end
       end
 
       class SetAsideJournal < Journal
@@ -34,9 +42,25 @@ module GameEngine
         end
 
         validation do
+          return true if journal.params['choice'] == 'keep'
           return false unless journal.params['choice']&.integer?
 
           journal.player.hand_cards[journal.params['choice'].to_i] == opts[:card]
+        end
+
+        process do |game_state|
+          # Do nothing if the player chose to keep - it should be totally secret
+          # but create a private history for the player.
+          if params['choice'] == 'keep'
+            @histories << History.new_secret("#{player.name} chose to keep #{@question.opts[:card].readable_name}.",
+                                             player: player)
+            return
+          end
+
+          card = player.hand_cards[params['choice'].to_i]
+          @histories << History.new("#{player.name} chose to set aside #{card.readable_name}.",
+                                    player: player)
+          card.move_to(:library)
         end
       end
     end

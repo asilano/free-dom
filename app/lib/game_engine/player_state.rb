@@ -61,10 +61,10 @@ module GameEngine
 
       @game.fix_journal
       @game.current_journal.histories << History.new(
-        "#{name} drew #{History.secret_log(private_to: user,
-                                           private_msg: drawn_cards.map(&:readable_name).join(', '),
-                                           public_msg: "#{drawn_cards.length} #{'card'.pluralize(drawn_cards.length)}"
-                                           )}.",
+        "#{name} drew #{History.personal_log(private_to: user,
+                                             private_msg: drawn_cards.map(&:readable_name).join(', '),
+                                             public_msg: "#{drawn_cards.length} #{'card'.pluralize(drawn_cards.length)}"
+                                             )}.",
         player: self,
         css_classes: %w[draw-cards]
       )

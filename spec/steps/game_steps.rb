@@ -126,9 +126,9 @@ module GameSteps
       cards_now[:players].each.with_index do |cards, ix|
         grouped_cards = cards.group_by { |c| c[:location] }
         group_before = @cards_before[:players][ix].group_by { |c| c[:location] }
-        grouped_cards.each do |location, set|
+        grouped_cards.each do |location, group_now|
           begin
-            expect(set).to match_array(group_before[location])
+            expect(group_now).to match_array(group_before[location])
           rescue RSpec::Expectations::ExpectationNotMetError
             $!.message << "\n - in location #{location}"
             raise

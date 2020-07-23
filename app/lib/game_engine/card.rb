@@ -126,6 +126,11 @@ module GameEngine
       @location = :hand
     end
 
+    # Move a card to an unusual location
+    def move_to(location)
+      @location = location
+    end
+
     # Is this card (in play and) currently still doing something, so it cannot
     # be discarded? Generally, no, and subclasses will override. The obvious candidates
     # will be Durations; but more exotic examples also exist, and Throne Room-type
