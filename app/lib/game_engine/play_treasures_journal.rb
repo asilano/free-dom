@@ -34,17 +34,7 @@ module GameEngine
       # Play all the chosen cards in hand order
       cards = params['choice'].map { |ch| player.hand_cards[ch.to_i] }
       texts_for_history = []
-      cards.each do |card|
-        card.location = :play
-        cash_gain = card.cash
-        player.cash += cash_gain
-
-        texts_for_history << "#{card.readable_name} ($#{cash_gain})"
-      end
-
-      @histories << History.new("#{player.name} played #{texts_for_history.join(', ')} (total: $#{player.cash})",
-                                player: player,
-                                css_classes: %w[play-treasure])
+      cards.each { |card| card.play_as_treasure(played_by: player) }
 
       # Ask again, unless the player now has no treasures in hand
       player.hand_cards.any?(&:treasure?) ? :continue : :stop

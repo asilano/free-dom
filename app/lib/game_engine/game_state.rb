@@ -69,6 +69,8 @@ module GameEngine
 
         cleanup
 
+        Triggers::EndOfTurn.trigger
+
         if game_ended?
           players.each(&:calculate_score)
           return

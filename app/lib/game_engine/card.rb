@@ -3,7 +3,7 @@ module GameEngine
     extend CardDecorators::CardDecorators
     attr_reader :game_state
     attr_accessor :location, :player, :pile, :interacting_with, :revealed_from
-    delegate :game, :observe, to: :game_state
+    delegate :game, :observe, :trigger, to: :game_state
     delegate :action?, :treasure?, :special?, :victory?, :curse?, :reaction?, :attack?, :readable_name, :types, to: :class
 
     # By default, 10 cards in a pile
@@ -65,6 +65,16 @@ module GameEngine
       game.current_journal.histories << History.new("#{played_by.name} played #{readable_name}.",
                                                     player: played_by,
                                                     css_classes: types + %w[play-action])
+    end
+
+    def play_as_treasure(played_by:)
+      @location = :play
+      Triggers::TreasurePlayed.trigger(self, played_by)
+      cash_gain = cash
+      player.cash += cash_gain
+      game.current_journal.histories << History.new("#{played_by.name} played #{readable_name} ($#{cash_gain}) (total: $#{played_by.cash}).",
+                                                    player: played_by,
+                                                    css_classes: types + %w[play-treasure])
     end
 
     # Default effect of a player gaining a card
