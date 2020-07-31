@@ -39,6 +39,8 @@ class Journal < ApplicationRecord
     end
 
     class Question
+      include ActionView::Helpers::TextHelper
+
       attr_reader :template, :opts, :player
       attr_accessor :fiber_id, :auto_candidate, :revealed_cards
       def initialize(template, player, opts)
