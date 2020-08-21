@@ -236,6 +236,43 @@ module GameSteps
       expect(can_pick).to all(should ? be_truthy : be_falsey)
     end
 
+    step ':player_name :whether_to be able to choose nothing in the supply' do |name, should|
+      user = get_player(name).user
+      question = @questions.detect { |q| q.player.name == user.name }
+      controls = question.controls_for(user, @game.game_state)
+      control = controls.detect { |c| c.scope == :supply }
+
+      if should
+        expect(control.cardless_button).to_not be_nil
+      else
+        expect(control.cardless_button).to be_nil
+      end
+    end
+
+    step ':player_name :whether_to be able to choose :cards in his/her/my hand' do |name, should, cards|
+      player = get_player(name)
+      user = player.user
+      question = @questions.detect { |q| q.player.name == user.name }
+      controls = question.controls_for(user, @game.game_state)
+      control = controls.detect { |c| c.scope == :hand }
+
+      if cards.empty?
+        # :cards was "nothing"
+        if should
+          expect(control.cardless_button).to_not be_nil
+        else
+          expect(control.cardless_button).to be_nil
+        end
+      else
+        can_pick = cards.map do |card|
+          hand_card = player.hand_cards.detect { |c| c.is_a? card }
+          hand_card && control.filter[hand_card]
+        end
+
+        expect(can_pick).to all(should ? be_truthy : be_falsey)
+      end
+    end
+
     step ':player_name should have :count action(s)' do |name, count|
       @game.process
       expect(get_player(name).actions).to eq count.to_i
