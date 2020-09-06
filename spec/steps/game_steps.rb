@@ -53,8 +53,10 @@ module GameSteps
       question = @questions.detect { |q| q&.player&.name == user.name }
       controls = question.controls_for(user, @game.game_state)
       scope = scope.to_sym
-      expect(controls).to include(have_attributes(scope: scope))
-      control = controls.detect { |c| c.scope == scope }
+      unless controls.map(&:scope).any? { |s| s == :everywhere }
+        expect(controls).to include(have_attributes(scope: scope))
+      end
+      control = controls.detect { |c| c.scope == scope || c.scope == :everywhere }
       make_journal(user: user,
                    type: question.journal_type,
                    fiber_id: question.fiber_id,
@@ -357,6 +359,9 @@ OneCardControl.define_method(:handle_choice) do |choice|
     { @key => card_ix }
   when :revealed
     card_ix = @player.cards_revealed_to(@question).index { |c| c.is_a? choice }
+    { @key => card_ix }
+  when :everywhere
+    card_ix = @player.cards.index { |c| c.is_a? choice }
     { @key => card_ix }
   end
 end

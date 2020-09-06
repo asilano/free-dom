@@ -77,6 +77,12 @@ module GameEngine
                                                     css_classes: types + %w[play-treasure])
     end
 
+    def react(response, reacted_by:)
+      game.current_journal.histories << History.new("#{reacted_by.name} reacted with #{readable_name}.",
+                                                    player: reacted_by,
+                                                    css_classes: %w[react])
+    end
+
     # Default effect of a player gaining a card
     def be_gained_by(player, from:, to: :discard)
       from.delete(self)

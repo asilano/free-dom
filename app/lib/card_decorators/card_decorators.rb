@@ -68,8 +68,10 @@ module CardDecorators
     end
 
     def reaction?; false; end
-    def reaction(opts = {})
+    def reaction(from:, to:)
       define_singleton_method(:reaction?) { true }
+      define_method(:reacts_from) { from }
+      define_method(:reacts_to) { to }
     end
   #     def self.is_reaction?
   #       true
