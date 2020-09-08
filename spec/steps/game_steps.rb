@@ -66,6 +66,19 @@ module GameSteps
       # as the last action played
       @last_action_played = cards[0] if question.journal_type == GameEngine::PlayActionJournal
     end
+
+    step ':player_name choose(s) the option :option' do |name, option|
+      user = get_player(name).user
+      question = @questions.detect { |q| q&.player&.name == user.name }
+      controls = question.controls_for(user, @game.game_state)
+      expect(controls).to include(have_attributes(scope: :player))
+
+      control = controls.detect { |c| c.scope == :player }
+      make_journal(user: user,
+                   type: question.journal_type,
+                   fiber_id: question.fiber_id,
+                   params: control.handle_choice(option))
+    end
   end
 
   module CheckSteps
@@ -385,4 +398,7 @@ MultiCardControl.define_method(:handle_choice) do |choice|
     end
     { @key => indices }
   end
+end
+ButtonControl.define_method(:handle_choice) do |choice|
+  { @key => @values.detect { |opt| opt[0] == choice }[1] }
 end

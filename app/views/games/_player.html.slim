@@ -1,9 +1,16 @@
 - player = @game.game_state.player_for(current_user)
 .cell.player#current-player
   h2= current_user.name
+  - if @game.questions.any? { |q| q.player == player }
+    p
+      strong> Current question:
+      ul.question-list
+        - @game.questions.compact.each do |question|
+          li= question.text(@game.game_state)
+
   / Player-button controls
   - @game.controls_for(current_user).select { |ctrl| ctrl.scope == :player }.each do |ctrl|
-    = form_with model: @game.journals.build do |f|
+    = form_with model: @game.journals.build, class: 'player-buttons' do |f|
       = f.hidden_field :game_id
       = f.hidden_field :type, value: ctrl.journal_type
       - ctrl.values.each do |val|
