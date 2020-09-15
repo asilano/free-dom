@@ -21,7 +21,7 @@ Feature: Moat
     Then I should need to 'Play an Action, or pass'
     When I choose Militia in my hand
     Then Belle should need to 'React, or pass'
-    And Chas should need to 'Discard 1 card'
+    And Chas should need to 'Discard down by 1 card'
     When Belle chooses Moat in her hand
     Then Belle should need to 'React, or pass'
     When Belle chooses 'Stop reacting' in my hand
@@ -34,9 +34,9 @@ Feature: Moat
     Then I should need to 'Play an Action, or pass'
     When I choose Militia in my hand
     Then Belle should need to 'React, or pass'
-    And Chas should need to 'Discard 1 card'
+    And Chas should need to 'Discard down by 1 card'
     When Belle chooses 'Stop reacting' in her hand
-    Then Belle should need to 'Discard 2 cards'
+    Then Belle should need to 'Discard down by 2 cards'
 
   Scenario: Holding Moat autoignores an attack, when set
     When pending

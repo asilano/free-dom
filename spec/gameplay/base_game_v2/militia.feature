@@ -15,13 +15,13 @@ Feature: Militia
     And Chas's hand contains Province, Gold, Bandit, Estate
     Then I should need to 'Play an Action, or pass'
     When I choose Militia in my hand
-    Then Belle should need to 'Discard 2 cards'
-    And Chas should need to 'Discard 1 card'
+    Then Belle should need to 'Discard down by 2 cards'
+    And Chas should need to 'Discard down by 1 card'
     When Belle chooses Estate in her hand
     Then cards should move as follows:
       Then Belle should discard Estate from her hand
       And these card moves should happen
-    And Belle should need to 'Discard 1 card'
+    And Belle should need to 'Discard down by 1 card'
     When Chas chooses Estate in his hand
     Then cards should move as follows:
       Then Chas should discard Estate from his hand

@@ -25,7 +25,7 @@ module GameEngine
       end
 
       class DiscardJournal < Journal
-        define_question { |_| "Discard #{pluralize(@player.hand_cards.length - 3, 'card')}" }.with_controls do |_game_state|
+        define_question { |_| "Discard down by #{pluralize(@player.hand_cards.length - 3, 'card')}" }.with_controls do |_game_state|
           [OneCardControl.new(journal_type: DiscardJournal,
                               question:     self,
                               player:       @player,

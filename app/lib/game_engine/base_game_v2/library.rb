@@ -17,7 +17,7 @@ module GameEngine
           break if drawn.blank?
 
           if drawn.first.action?
-            game_state.get_journal(SetAsideJournal, from: played_by, opts: { card: drawn.first}).process(game_state)
+            game_state.get_journal(SetAsideJournal, from: played_by, opts: { card: drawn.first }).process(game_state)
           end
         end
 
