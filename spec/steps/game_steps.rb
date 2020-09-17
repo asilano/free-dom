@@ -25,6 +25,7 @@ module GameSteps
       list = cards.map(&:to_s) + kingdom_journal.params['card_list']
       kingdom_journal.params['card_list'] = list.uniq.take 10
       kingdom_journal.save
+      @game.reload
     end
 
     step ':player_name :location contains :cards' do |name, location, cards|
