@@ -68,6 +68,21 @@ module GameSteps
       @last_action_played = cards[0] if question.journal_type == GameEngine::PlayActionJournal
     end
 
+    step ':player_name choose(s) :multi_options in/on my/his/her/the :scope' do |name, choices, scope|
+      user = get_player(name).user
+      question = @questions.detect { |q| q&.player&.name == user.name }
+      controls = question.controls_for(user, @game.game_state)
+      scope = scope.to_sym
+      unless controls.map(&:scope).any? { |s| s == :everywhere }
+        expect(controls).to include(have_attributes(scope: scope))
+      end
+      control = controls.detect { |c| c.scope == scope || c.scope == :everywhere }
+      make_journal(user:     user,
+                   type:     question.journal_type,
+                   fiber_id: question.fiber_id,
+                   params:   control.handle_choice(choices))
+    end
+
     step ':player_name choose(s) the option :option' do |name, option|
       user = get_player(name).user
       question = @questions.detect { |q| q&.player&.name == user.name }

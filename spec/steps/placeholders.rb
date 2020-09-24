@@ -38,6 +38,14 @@ placeholder :cards do
   end
 end
 
+placeholder :multi_options do
+  match(/((\w* for #{SINGLE_CARD_NO_CAPTURE},? ?)+)/) do |capture|
+    capture.scan(/(\w*) for #{SINGLE_CARD}/).map do |option, card|
+      [CARD_TYPES[card], option]
+    end
+  end
+end
+
 placeholder :whether_to do
   match /should not/ do
     false
