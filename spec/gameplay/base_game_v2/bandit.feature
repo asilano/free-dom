@@ -19,15 +19,15 @@ Feature: Bandit
     And Belle should need to 'Choose a treasure to trash'
     When Belle chooses Silver in her revealed cards
     Then cards should move as follows:
-      Then Belle should trash Silver from her revealed cards
-      And Belle should discard Gold from her revealed cards
+      Then Belle should trash Silver from her deck
+      And Belle should discard Gold from her deck
       And these card moves should happen
     And Gold, Silver should be revealed on Chas's deck
     And Chas should need to 'Choose a treasure to trash'
     When Chas chooses Gold in his revealed cards
     Then cards should move as follows:
-      And Chas should trash Gold from his revealed cards
-      And Chas should discard Silver from his revealed cards
+      And Chas should trash Gold from his deck
+      And Chas should discard Silver from his deck
       And these card moves should happen
 
   Scenario: Play Bandit normally (in parallel)
@@ -46,13 +46,13 @@ Feature: Bandit
     And Chas should need to 'Choose a treasure to trash'
     When Chas chooses Gold in his revealed cards
     Then cards should move as follows:
-      And Chas should trash Gold from his revealed cards
-      And Chas should discard Silver from his revealed cards
+      And Chas should trash Gold from his deck
+      And Chas should discard Silver from his deck
       And these card moves should happen
     When Belle chooses Silver in her revealed cards
     Then cards should move as follows:
-      Then Belle should trash Silver from her revealed cards
-      And Belle should discard Gold from her revealed cards
+      Then Belle should trash Silver from her deck
+      And Belle should discard Gold from her deck
       And these card moves should happen
 
   Scenario: Bandit hits nothing or Copper
@@ -81,8 +81,8 @@ Feature: Bandit
     And Chas should need to 'Choose a treasure to trash'
     When Chas chooses Gold in his revealed cards
     Then cards should move as follows:
-      And Chas should trash Gold from his revealed cards
-      And Chas should discard Silver from his revealed cards
+      And Chas should trash Gold from his deck
+      And Chas should discard Silver from his deck
       And these card moves should happen
 
   Scenario: Bandit results in no choices

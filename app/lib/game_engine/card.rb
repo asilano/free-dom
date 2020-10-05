@@ -2,7 +2,8 @@ module GameEngine
   class Card
     extend CardDecorators::CardDecorators
     attr_reader :game_state
-    attr_accessor :location, :player, :pile, :interacting_with, :revealed_from
+    attr_accessor :location, :player, :pile, :revealed, :peeked, :interacting_with
+
     delegate :game, :observe, :trigger, to: :game_state
     delegate :action?, :treasure?, :special?, :victory?, :curse?, :reaction?, :attack?, :readable_name, :types, to: :class
 
@@ -127,15 +128,13 @@ module GameEngine
     end
 
     # Default effect of a card being revealed.
-    def be_revealed(from:)
-      @location = :revealed
-      @revealed_from = from
+    def be_revealed
+      @revealed = true
     end
 
     # Default effect of a card being unrevealed. This is not expected to ever be overridden
     def be_unrevealed
-      @location = @revealed_from
-      @revealed_from = nil
+      @revealed = false
     end
 
     def move_to_hand

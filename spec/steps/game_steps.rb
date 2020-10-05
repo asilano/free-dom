@@ -130,7 +130,7 @@ module GameSteps
     step ':cards should be revealed on :player_name deck' do |cards, name|
       @game.process
       player = get_player(name)
-      expect(player.revealed_cards.select { |c| c.revealed_from == :deck }.map { |c| c.class.to_s }).to match_array(cards.map(&:to_s))
+      expect(player.revealed_cards.select { |c| c.location == :deck }.map { |c| c.class.to_s }).to match_array(cards.map(&:to_s))
     end
 
     step 'cards should move as follows:' do
@@ -154,6 +154,7 @@ module GameSteps
     step 'these card moves should happen' do
       @game.process
       cards_now = extract_game_cards
+      byebug if @cards_before.values.flatten.any? { |c| !c.key? :revealed }
       cards_now[:players].each.with_index do |cards, ix|
         grouped_cards = cards.group_by { |c| c[:location] }
         group_before = @cards_before[:players][ix].group_by { |c| c[:location] }
@@ -179,12 +180,12 @@ module GameSteps
     step ':player_name should discard :cards from/in( my/his/her) :location( cards)' do |name, cards, location|
       players_cards = cards_for_player(name, location: location)
       if cards == 'everything'
-        players_cards.each { |c| c[:location] = :discard; c.delete(:revealed_from) }
+        players_cards.each { |c| c[:location] = :discard; c[:revealed] = false }
       else
         cards.each do |type|
           card = players_cards.delete_at(players_cards.index { |c| c[:class] == type })
           card[:location] = :discard
-          card.delete(:revealed_from)
+          card[:revealed] = false
         end
       end
     end
@@ -208,7 +209,7 @@ module GameSteps
         players_cards = cards_for_player(name, location: :deck)
       end
 
-      players_cards.take(count).each { |c| c[:location] = :revealed; c[:revealed_from] = :deck }
+      players_cards.take(count).each { |c| c[:revealed] = true }
     end
 
     step ':player_name should gain :cards' do |name, cards|
@@ -226,7 +227,7 @@ module GameSteps
           pile = @cards_before[:supply].detect { |p_cards| p_cards.first[:class] == card }
           pile.delete_at(0)
         end
-        players_cards << { class: card, location: destination.to_sym }
+        players_cards << { class: card, location: destination.to_sym, revealed: false }
       end
     end
 
@@ -236,7 +237,7 @@ module GameSteps
         instance_ix = players_cards.index { |c| c[:class] == card && c[:location] == source.to_sym }
         instance = players_cards[instance_ix]
         instance[:location] = destination.to_sym
-        instance.delete(:revealed_from)
+        instance[:revealed] = false
         if destination == 'deck'
           players_cards.delete_at(instance_ix)
           players_cards.unshift(instance)
@@ -250,7 +251,7 @@ module GameSteps
         instance_ix = players_cards.index { |c| c[:class] == card && c[:location] == source.to_sym }
         instance = players_cards.delete_at(instance_ix)
         instance[:location] = :trash
-        instance.delete(:revealed_from)
+        instance[:revealed] = false
       end
     end
 
@@ -335,12 +336,21 @@ module GameSteps
   def extract_game_cards
     player_cards = @game.game_state.players.map do |ply|
       ply.cards.map do |c|
-        ((c.location == :revealed && c.revealed_from) ? { revealed_from: c.revealed_from } : {})
-          .merge({ class: c.class, location: c.location })
+        {
+          class:    c.class,
+          location: c.location,
+          revealed: !!c.revealed
+        }
       end
     end
     supply_cards = @game.game_state.piles.map do |p|
-      p.cards.map { |c| { class: c.class, location: c.location } }
+      p.cards.map do |c|
+        {
+          class:    c.class,
+          location: c.location,
+          revealed: !!c.revealed
+        }
+      end
     end
     { players: player_cards, supply: supply_cards }
   end

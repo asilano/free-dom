@@ -65,6 +65,7 @@ module GameEngine
             @histories << History.new("#{player.name} trashed #{card.readable_name} from their deck.",
                                       player: player,
                                       css_classes: %w[trash-card])
+            card.be_unrevealed
             card.trash(from: player.cards)
           end
 
@@ -76,7 +77,7 @@ module GameEngine
           @histories << History.new("#{player.name} discarded #{player.cards_revealed_to(@question).map(&:readable_name).join(', ')} from their deck.",
                                     player: player,
                                     css_classes: %w[discard-card])
-          player.cards_revealed_to(@question).each(&:discard)
+          player.cards_revealed_to(@question).each(&:be_unrevealed).each(&:discard)
           observe
         end
       end
