@@ -42,7 +42,7 @@ class Journal < ApplicationRecord
       include ActionView::Helpers::TextHelper
 
       attr_reader :template, :opts, :player
-      attr_accessor :fiber_id, :auto_candidate, :revealed_cards
+      attr_accessor :fiber_id, :auto_candidate
       def initialize(template, player, opts)
         @template = template
         @opts = opts

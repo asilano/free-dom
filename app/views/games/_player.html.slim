@@ -64,7 +64,25 @@
   .grid-container.fluid
     .grid-x.grid-margin-x
       .cell.card.back-wrapper{class=('no-card' if player.deck_cards.empty?)}
-        .card-back= player.deck_cards.count
+        .card-back
+          = player.deck_cards.count
+          - if player.deck_cards.any?(&:revealed) || player.deck_cards.any?(&:peeked)
+            .detail= "(#{player.deck_cards.count(&:peeked)} seen, #{player.deck_cards.count(&:revealed)} revealed)"
+
+  / Peeked cards
+  - player.peeked_cards.group_by(&:interacting_with).each do |qn, cards|
+    h5= "Seen with #{qn.card_type.readable_name}"
+    - peeked_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :peeked && ctrl.question == qn }
+    = render partial: 'control_skeleton', collection: peeked_controls
+    .grid-container.fluid
+      .card-grid class=('reorder-cards' if peeked_controls.any?(ReorderCardsControl))
+        = render partial: 'card', collection: cards, locals: { controls: peeked_controls }
+        - if peeked_controls.any?(&:cardless_button)
+          .cell.card.null-card
+            .card-name
+            - peeked_controls.each do |ctrl|
+              - if ctrl.cardless_button
+                .card-ctrl= render partial: 'controls/cardless_button', object: ctrl.cardless_button, as: :button, locals: { control: ctrl }
 
   / Revealed cards
   - player.revealed_cards.group_by(&:interacting_with).each do |qn, cards|

@@ -46,6 +46,7 @@
 }
 
 .card {
+  background-color: $body-background;
   border: 3px solid $black;
   border-radius: 3px;
   margin: 5px 0;
@@ -75,6 +76,20 @@
 
   .card-name + .card-ctrl {
     margin-top: 8px;
+  }
+}
+
+.reorder-cards .card:not(.null-card) {
+  box-shadow: 5px 5px 5px $medium-gray;
+  transform: perspective(10cm) rotateY(-30deg);
+  transition: transform 0.5s;
+
+  &:not(:first-child) {
+    margin-left: -16px;
+  }
+
+  &:hover {
+    transform: perspective(10cm) rotateY(-20deg);
   }
 }
 
@@ -142,7 +157,7 @@
   border-right-width: 15px;
   border-radius: 3px;
   background-color: $action-cream;
-  height: 40px;
+  min-height: 40px;
   width: 160px;
   text-align: center;
 
@@ -157,5 +172,9 @@
 
 .this-player .card-back {
   font-size: 1.5em;
-  height: 55px;
+  min-height: 55px;
+
+  .detail {
+    font-size: 0.8rem;
+  }
 }

@@ -15,6 +15,7 @@
 //= require jquery3
 //= require foundation
 //= require onmount
+//= require sortable-rails-jquery
 //= require_tree .
 
 Foundation.Tooltip.defaults.triggerClass = ''

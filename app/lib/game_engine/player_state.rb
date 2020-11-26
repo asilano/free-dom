@@ -40,8 +40,16 @@ module GameEngine
       cards.select(&:revealed)
     end
 
+    def peeked_cards
+      cards.select(&:peeked)
+    end
+
     def cards_revealed_to(question)
       revealed_cards.select { |c| c.interacting_with == question }
+    end
+
+    def cards_peeked_to(question)
+      peeked_cards.select { |c| c.interacting_with == question }
     end
 
     def other_players
@@ -61,11 +69,10 @@ module GameEngine
 
       @game.fix_journal
       @game.current_journal.histories << History.new(
-        "#{name} drew #{History.personal_log(private_to: user,
+        "#{name} drew #{History.personal_log(private_to:  user,
                                              private_msg: drawn_cards.map(&:readable_name).join(', '),
-                                             public_msg: "#{drawn_cards.length} #{'card'.pluralize(drawn_cards.length)}"
-                                             )}.",
-        player: self,
+                                             public_msg:  "#{drawn_cards.length} #{'card'.pluralize(drawn_cards.length)}")}.",
+        player:      self,
         css_classes: %w[draw-cards]
       )
       drawn_cards.each(&:be_drawn)
@@ -75,7 +82,7 @@ module GameEngine
       discards, other = cards.partition { |c| c.location == :discard }
       @cards = other + discards.shuffle(random: game_state.rng).each { |c| c.location = :deck }
       @game.current_journal.histories << History.new("#{name} shuffled their discards.",
-                                                     player: self,
+                                                     player:      self,
                                                      css_classes: %w[shuffle])
     end
 
@@ -87,6 +94,19 @@ module GameEngine
         "#{name} revealed #{revealed_cards.map(&:readable_name).join(', ')}"
       )
       revealed_cards.each(&:be_revealed)
+    end
+
+    def peek_cards(num, from:)
+      num = cards_by_location(from).length if num == :all
+      shuffle_discard_under_deck if from == :deck && deck_cards.length < num && discarded_cards.present?
+      peeked_cards = cards_by_location(from).take(num)
+      @game.current_journal.histories << History.new(
+        "#{name} looked at #{History.personal_log(private_to: user,
+                                                  private_msg: peeked_cards.map(&:readable_name).join(', '),
+                                                  public_msg: "#{peeked_cards.length} #{'card'.pluralize(peeked_cards.length)}"
+                                                  )}."
+      )
+      peeked_cards.each(&:be_peeked)
     end
 
     def grant_actions(num)

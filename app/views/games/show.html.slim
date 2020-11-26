@@ -44,7 +44,7 @@
       = render partial: 'pile_section'
 
       .cell.small-12.medium-6.large-4
-        p
+        .current-question
           - if @game.questions.any?
             strong> Current question:
             ul.question-list

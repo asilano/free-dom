@@ -137,6 +137,16 @@ module GameEngine
       @revealed = false
     end
 
+    # Default effect of a card being looked at.
+    def be_peeked
+      @peeked = true
+    end
+
+    # Default effect of a card stopping being looked at. This is not expected to ever be overridden
+    def be_unpeeked
+      @peeked = false
+    end
+
     def move_to_hand
       @location = :hand
     end

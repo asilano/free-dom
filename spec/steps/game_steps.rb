@@ -68,7 +68,7 @@ module GameSteps
       @last_action_played = cards[0] if question.journal_type == GameEngine::PlayActionJournal
     end
 
-    step ':player_name choose(s) :multi_options in/on my/his/her/the :scope' do |name, choices, scope|
+    step ':player_name choose(s) :multi_options in/on my/his/her/the :scope( cards)' do |name, choices, scope|
       user = get_player(name).user
       question = @questions.detect { |q| q&.player&.name == user.name }
       controls = question.controls_for(user, @game.game_state)
@@ -119,6 +119,12 @@ module GameSteps
       @game.process
       player = get_player(name)
       expect(player.hand_cards.map { |c| c.class.to_s }).to match_array(cards.map(&:to_s))
+    end
+
+    step ':player_name deck should contain :cards' do |name, cards|
+      @game.process
+      player = get_player(name)
+      expect(player.deck_cards.map { |c| c.class.to_s }).to match_array(cards.map(&:to_s))
     end
 
     step ':player_name should have :cards in play' do |name, cards|
@@ -243,6 +249,10 @@ module GameSteps
           players_cards.unshift(instance)
         end
       end
+    end
+
+    step ':player_name should move :cards from my/his/her :source to in play' do |name, cards, source|
+      send ':player_name should move :cards from my/his/her :source to my/his/her :destination', name, cards, source, 'play'
     end
 
     step ':player_name should trash :cards from my/his/her :source( cards)' do |name, cards, source|
@@ -383,26 +393,7 @@ OneCardControl.define_method(:handle_choice) do |choice|
 
   # Otherwise, find the index requested
   choice = choice.first if choice.is_a? Array
-  case @scope
-  when :hand
-    card_ix = @player.hand_cards.index { |c| c.is_a? choice }
-    { @key => card_ix }
-  when :supply
-    pile_ix = @game_state.piles.index { |pile| pile.cards.first.is_a? choice }
-    { @key => pile_ix }
-  when :deck
-    card_ix = @player.deck_cards.index { |c| c.is_a? choice }
-    { @key => card_ix }
-  when :discard
-    card_ix = @player.discarded_cards.index { |c| c.is_a? choice }
-    { @key => card_ix }
-  when :revealed
-    card_ix = @player.cards_revealed_to(@question).index { |c| c.is_a? choice }
-    { @key => card_ix }
-  when :everywhere
-    card_ix = @player.cards.index { |c| c.is_a? choice }
-    { @key => card_ix }
-  end
+  { @key => find_index(@player, @game_state, @scope, @question, choice) }
 end
 MultiCardControl.define_method(:handle_choice) do |choice|
   # First, check for choosing nothing
@@ -425,6 +416,37 @@ MultiCardControl.define_method(:handle_choice) do |choice|
     { @key => indices }
   end
 end
+MultiCardChoicesControl.define_method(:handle_choice) do |choices|
+  # First, check for choosing nothing
+  return { @key => [] } if choices == []
+
+  params = {}
+
+  choices.each do |pair|
+    params[find_index(@player, @game_state, @scope, @question, pair[0])] = @choices.detect { |opt| opt[0] == pair[1] }[1]
+  end
+  { @key => params }
+end
+
 ButtonControl.define_method(:handle_choice) do |choice|
   { @key => @values.detect { |opt| opt[0] == choice }[1] }
+end
+
+def find_index(player, game_state, scope, question, card)
+  case scope
+  when :hand
+    player.hand_cards.index { |c| c.is_a? card }
+  when :supply
+    game_state.piles.index { |pile| pile.cards.first.is_a? card }
+  when :deck
+    player.deck_cards.index { |c| c.is_a? card }
+  when :discard
+    player.discarded_cards.index { |c| c.is_a? card }
+  when :revealed
+    player.cards_revealed_to(@question).index { |c| c.is_a? card }
+  when :peeked
+    player.cards_peeked_to(@question).index { |c| c.is_a? card }
+  when :everywhere
+    player.cards.index { |c| c.is_a? card }
+  end
 end

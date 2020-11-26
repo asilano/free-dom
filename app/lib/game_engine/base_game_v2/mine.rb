@@ -42,7 +42,7 @@ module GameEngine
             return
           end
 
-          # Trash the chosen card on its owner's deck
+          # Trash the chosen card
           card = player.hand_cards[params['choice'].to_i]
           card_cost = card.cost
           @histories << History.new("#{player.name} trashed #{card.readable_name} from their hand.",

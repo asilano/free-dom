@@ -39,9 +39,9 @@ placeholder :cards do
 end
 
 placeholder :multi_options do
-  match(/((\w* for #{SINGLE_CARD_NO_CAPTURE},? ?)+)/) do |capture|
-    capture.scan(/(\w*) for #{SINGLE_CARD}/).map do |option, card|
-      [CARD_TYPES[card], option]
+  match(/(((\w*|'[^']*') for #{SINGLE_CARD_NO_CAPTURE},? ?)+)/) do |capture|
+    capture.scan(/(\w*|'[^']*') for #{SINGLE_CARD}/).map do |option, card|
+      [CARD_TYPES[card], option.sub(/^'/,'').sub(/'$/,'')]
     end
   end
 end

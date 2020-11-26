@@ -48,7 +48,7 @@ module GameEngine
           journal.player.hand_cards[journal.params['choice'].to_i] == opts[:card]
         end
 
-        process do |game_state|
+        process do |_game_state|
           # Do nothing if the player chose to keep - it should be totally secret
           # but create a private history for the player.
           if params['choice'] == 'keep'

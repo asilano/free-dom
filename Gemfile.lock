@@ -305,6 +305,7 @@ GEM
       actionpack (>= 3.1)
       railties (>= 3.1)
       slim (>= 3.0, < 5.0)
+    sortable-rails (1.7.0)
     spring (2.1.0)
     spring-commands-rspec (1.0.4)
       spring (>= 0.9.1)
@@ -387,6 +388,7 @@ DEPENDENCIES
   sassc-rails
   simplecov
   slim-rails
+  sortable-rails
   spring
   spring-commands-rspec
   sprockets-rails (~> 2.3.3)
@@ -397,7 +399,7 @@ DEPENDENCIES
   webdrivers
 
 RUBY VERSION
-   ruby 2.5.1p57
+   ruby 2.6.6p146
 
 BUNDLED WITH
    2.1.4

@@ -80,15 +80,12 @@ module GameEngine
       end
     end
 
-    def get_journal(journal_class, from:, revealed_cards: nil, opts: {})
+    def get_journal(journal_class, from:, revealed_cards: [], peeked_cards: [], opts: {})
       template = journal_class.from(from).in(@game).with(opts)
       journal = Fiber.yield(template.question.tap do |q|
         q.fiber_id = @fid_prefix
         q.auto_candidate = from != @last_active_player
-        if revealed_cards
-          q.revealed_cards = revealed_cards
-          revealed_cards.each { |c| c.interacting_with = q }
-        end
+        (revealed_cards + peeked_cards).each { |c| c.interacting_with = q }
       end)
       while journal.is_a? GameEngine::HackJournal
         journal.process(self)
