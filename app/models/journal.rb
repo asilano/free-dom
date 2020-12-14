@@ -6,6 +6,8 @@ class Journal < ApplicationRecord
   attr_accessor :auto, :question
   attr_accessor :ignore # Used for tests
 
+  delegate :opts, to: :question
+
   # Nested classes let GameEngine request the right journal at the right time
   class Template
     attr_reader :opts, :player, :game

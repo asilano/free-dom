@@ -31,7 +31,7 @@ module GameEngine
       end
 
       class SetAsideJournal < Journal
-        define_question('Set aside or keep action').with_controls do |game_state|
+        define_question('Set aside or keep action').with_controls do |_game_state|
           [OneCardControl.new(journal_type: SetAsideJournal,
                               question:     self,
                               player:       @player,
@@ -52,7 +52,7 @@ module GameEngine
           # Do nothing if the player chose to keep - it should be totally secret
           # but create a private history for the player.
           if params['choice'] == 'keep'
-            @histories << History.new_secret("#{player.name} chose to keep #{@question.opts[:card].readable_name}.",
+            @histories << History.new_secret("#{player.name} chose to keep #{opts[:card].readable_name}.",
                                              player: player)
             return
           end

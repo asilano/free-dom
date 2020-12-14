@@ -55,7 +55,7 @@ module GameEngine
 
           # Note the chosen card, then stop noting it when Throne Room is discarded
           card = player.hand_cards[params['choice'].to_i]
-          @question.opts[:original].doubled = card
+          opts[:original].doubled = card
 
           # Play the chosen card, then play it again
           card.play_as_action(played_by: player)

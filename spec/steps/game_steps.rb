@@ -90,10 +90,10 @@ module GameSteps
       expect(controls).to include(have_attributes(scope: :player))
 
       control = controls.detect { |c| c.scope == :player }
-      make_journal(user: user,
-                   type: question.journal_type,
+      make_journal(user:     user,
+                   type:     question.journal_type,
                    fiber_id: question.fiber_id,
-                   params: control.handle_choice(option))
+                   params:   control.handle_choice(option))
     end
   end
 

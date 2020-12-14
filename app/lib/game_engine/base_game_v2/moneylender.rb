@@ -17,10 +17,10 @@ module GameEngine
           opts = [["Don't trash", 'none']]
           opts.prepend(['Trash', 'trash']) if @player.hand_cards.any? { |c| c.is_a? BasicCards::Copper }
           [ButtonControl.new(journal_type: TrashCopperJournal,
-                              question: self,
-                              player: @player,
-                              scope: :player,
-                              values: opts)]
+                             question:     self,
+                             player:       @player,
+                             scope:        :player,
+                             values:       opts)]
         end
 
         validation do

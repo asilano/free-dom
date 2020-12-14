@@ -31,7 +31,7 @@ module GameEngine
 
       # Retrieve the card and make it react
       card = player.cards[params['choice'].to_i]
-      card.react(@question.opts[:response], reacted_by: player)
+      card.react(opts[:response], reacted_by: player)
       :continue
     end
   end

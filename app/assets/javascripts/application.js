@@ -29,7 +29,6 @@ $(function() {
   FontAwesome.dom.watch({observeMutationsRoot: document})
 })
 
-
 $.onmount('body', function() {
   $(this).addClass('js-active')
   $(document).foundation()
