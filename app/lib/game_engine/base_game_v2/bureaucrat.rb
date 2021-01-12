@@ -14,9 +14,9 @@ module GameEngine
 
         # Player gains a Silver
         Helpers.gain_card_from_supply(game_state,
-                                      player: played_by,
+                                      player:     played_by,
                                       card_class: BasicCards::Silver,
-                                      to: :deck)
+                                      to:         :deck)
         observe
 
         # Now, attack everyone else

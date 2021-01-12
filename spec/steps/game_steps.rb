@@ -46,6 +46,16 @@ module GameSteps
                              cards:      []
                            })
     end
+
+    step 'the :card pile contains :cards' do |card, cards|
+      make_journal(user:   nil,
+                   type:   GameEngine::HackJournal,
+                   params: { scope:      :supply,
+                             action:     :set,
+                             card_class: card.to_s,
+                             cards:      cards.map(&:to_s)
+                           })
+    end
   end
 
   module ActionSteps

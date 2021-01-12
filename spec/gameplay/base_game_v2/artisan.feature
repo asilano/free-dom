@@ -8,9 +8,7 @@ Feature: Artisan
   Scenario: Play Artisan normally
     Then I should need to 'Play an Action, or pass'
     When I choose Artisan in my hand
-    Then I should have Artisan in play
-    And my hand should contain Estate, Copper, Silver
-    And I should need to 'Choose a card to gain into your hand'
+    Then I should need to 'Choose a card to gain into your hand'
     And I should be able to choose the Copper, Duchy, Workshop, Market piles
     And I should not be able to choose the Gold, Province piles
     When I choose Market in the supply
