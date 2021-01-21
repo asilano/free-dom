@@ -16,7 +16,7 @@ Rails.application.configure do
 
   # Ensures that a master key has been made available in either ENV["RAILS_MASTER_KEY"]
   # or in config/master.key. This key is used to decrypt credentials (and other encrypted files).
-  # config.require_master_key = true
+  config.require_master_key = true
 
   # Disable serving static files from the `/public` folder by default since
   # Apache or NGINX already handles this.
@@ -70,11 +70,11 @@ Rails.application.configure do
   config.action_mailer.perform_deliveries = true
   config.action_mailer.raise_delivery_errors = false
   config.action_mailer.smtp_settings = {
-    address:              ENV['MAIL_SERV'],
-    port:                 ENV['MAIL_PORT'].to_i,
-    domain:               ENV['MAIL_DOM'],
-    user_name:            ENV['MAIL_USER'],
-    password:             ENV['MAIL_PASS'],
+    address:              Rails.configuration.mail[:server],
+    port:                 Rails.configuration.mail[:port].to_i,
+    domain:               Rails.configuration.mail[:domain],
+    user_name:            Rails.configuration.mail[:username],
+    password:             Rails.configuration.mail[:password],
     authentication:       'plain',
     enable_starttls_auto: true
   }
