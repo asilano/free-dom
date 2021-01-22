@@ -70,11 +70,11 @@ Rails.application.configure do
   config.action_mailer.perform_deliveries = true
   config.action_mailer.raise_delivery_errors = false
   config.action_mailer.smtp_settings = {
-    address:              Rails.configuration.mail[:server],
-    port:                 Rails.configuration.mail[:port].to_i,
-    domain:               Rails.configuration.mail[:domain],
-    user_name:            Rails.configuration.mail[:username],
-    password:             Rails.configuration.mail[:password],
+    address:              Rails.application.credentials.mail[:server],
+    port:                 Rails.application.credentials.mail[:port].to_i,
+    domain:               Rails.application.credentials.mail[:domain],
+    user_name:            Rails.application.credentials.mail[:username],
+    password:             Rails.application.credentials.mail[:password],
     authentication:       'plain',
     enable_starttls_auto: true
   }
