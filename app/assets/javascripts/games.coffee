@@ -21,3 +21,13 @@ $.onmount '.reorder-cards', ->
         sel = $(el).find('select')
         sel.val(ix + 1)
         $(el).children('span.reorder-position').text(sel.children('option:selected').text())
+
+scrollPosition = 0
+$.onmount 'body', ->
+  $('html').scrollTop(scrollPosition)
+  SECONDS = 30
+  reloader = ->
+    console.log("Reload!")
+    scrollPosition = $('html').scrollTop()
+    Turbolinks.visit(location.toString(), {action: 'replace'})
+  setTimeout reloader, SECONDS * 1000
