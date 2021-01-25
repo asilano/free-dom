@@ -65,8 +65,8 @@ class Users::RegistrationsController < Devise::RegistrationsController
   def send_sign_up_email
     if @user.persisted?
       mailer = SignUpMailer.with(user: @user)
-      mailer.welcome.deliver_later
-      mailer.new_user.deliver_later
+      mailer.welcome.deliver_now
+      mailer.new_user.deliver_now
     end
   end
 end
