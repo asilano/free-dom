@@ -43,7 +43,7 @@
     .grid-x.grid-margin-x
       = render partial: 'pile_section'
 
-      .cell.small-12.medium-6.large-4
+      .cell.small-12.medium-6.large-4#journal-log
         .current-question
           - if @game.questions.any?
             strong> Current question:
@@ -53,7 +53,7 @@
           - elsif @game.run_state != :ended
             strong> No question - check journals!
 
-        ul#journal-log
+        ul
           - last_fixed_journal = @game.last_fixed_journal_for(current_user)
           - last_shown_journal_id = 0
           - @game.journals.each do |journal|
