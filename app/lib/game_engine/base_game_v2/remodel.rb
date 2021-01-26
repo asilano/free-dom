@@ -92,7 +92,7 @@ module GameEngine
           pile = game_state.piles[params['choice'].to_i]
           card = pile.cards.first
 
-          @histories << History.new("#{player.name} gained #{card.readable_name} to their hand.",
+          @histories << History.new("#{player.name} gained #{card.readable_name}.",
                                     player: player,
                                     css_classes: %w[gain-card])
           card.be_gained_by(player, from: pile.cards)
