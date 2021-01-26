@@ -76,7 +76,7 @@
                                             class: 'undo-arrow',
                                             title: 'Undo to here',
                                             desc: 'Click to undo this and all later actions',
-                                            aria: true), class: 'undo-button'
+                                            aria: true), class: 'undo-button unstyle'
                   span= display_event_for_user(journal.histories.first.event)
                   - if content_for? "journal_#{journal.id}_histories"
                     ul.sub-histories
@@ -88,7 +88,7 @@
                                         class: 'undo-arrow',
                                         title: 'Undo to here',
                                         desc: 'Click to undo this and all later actions',
-                                        aria: true), class: 'undo-button'
+                                        aria: true), class: 'undo-button unstyle'
                 span= "#{journal.user.name}'s choice for '#{journal.class.from(journal.user).in(@game).question.text(@game.game_state)}', which is now invalid"
 
   = link_to 'Back', games_path

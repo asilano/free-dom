@@ -1,3 +1,17 @@
+button, [type=button], .button {
+  &:not(.unstyle) {
+    box-shadow: grey 5px 5px 8px;
+    border-radius: 5px;
+    position: relative;
+
+    &:active {
+      top: 3px;
+      left: 3px;
+      box-shadow: grey 2px 2px 5px;
+    }
+  }
+}
+
 button.play-action,
 [type=button].play-action {
   background-color: $action-cream;
