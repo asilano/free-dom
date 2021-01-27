@@ -50,13 +50,18 @@
 
   / Cards in discard
   h5 Discarded
+  - discard_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :discard }
+  = render partial: 'control_skeleton', collection: discard_controls
   .grid-container.fluid
     .card-grid
       - if player.discarded_cards.blank?
         .cell.card.no-card
           .card-name
+          - discard_controls.each do |ctrl|
+            - if ctrl.cardless_button
+              .card-ctrl= render partial: 'controls/cardless_button', object: ctrl.cardless_button, as: :button, locals: { control: ctrl }
       - else
-        = render partial: 'card', collection: player.discarded_cards, locals: { controls: [] }
+        = render partial: 'card', collection: player.discarded_cards, locals: { controls: discard_controls }
 
   / Deck representation
   h5 Deck
