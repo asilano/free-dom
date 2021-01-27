@@ -5,19 +5,14 @@ class JournalsController < ApplicationController
   # POST /journals.json
   def create
     @journal = Journal.new(journal_params)
-    unless @journal.order.present?
-      new_order = determine_order
-      @journal.game.journals.where('"order" >= ?', new_order).update_all('"order" = "order" + 1')
-      @journal.order = new_order
-    end
     @journal.user_id ||= current_user.id
 
     respond_to do |format|
+      format.html { redirect_to @journal.game }
       if @journal.save
-        format.html { redirect_to @journal.game }
         format.json { render :show, status: :created, location: @journal }
       else
-        format.html { render :new }
+        flash.alert = "Couldn't create journal (was the game up-to-date?)"
         format.json { render json: @journal.errors, status: :unprocessable_entity }
       end
     end
@@ -39,22 +34,6 @@ class JournalsController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_journal
     @journal = Journal.find(params[:id])
-  end
-
-  def determine_order
-    earlier_journals = if @journal.fiber_id
-                         @journal.game.journals.select(:fiber_id, :order)
-                                 .reject do |other|
-                                   next false if other.fiber_id.nil?
-
-                                   # Lean on Gem to compare what are, effectively, sem-vers
-                                   Gem::Version.new(other.fiber_id) > Gem::Version.new(@journal.fiber_id)
-                                 end
-                       else
-                         @journal.game.journals
-                       end
-
-    (earlier_journals.map(&:order).max || 0) + 1
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

@@ -2,6 +2,8 @@ class Journal < ApplicationRecord
   belongs_to :game
   belongs_to :user, optional: true
 
+  validates :order, uniqueness: { scope: :fiber_id }
+
   attr_reader :histories
   attr_accessor :auto, :question
   attr_accessor :ignore # Used for tests
@@ -145,6 +147,22 @@ class Journal < ApplicationRecord
 
   def self.validation(&block)
     self::Template.define_method(:do_validate, &block)
+  end
+
+  def self.expected_order(fiber_id, game)
+    earlier_journals = if fiber_id
+      game.journals.select(:fiber_id, :order)
+              .reject do |other|
+                next false if other.fiber_id.nil?
+
+                # Lean on Gem to compare what are, effectively, sem-vers
+                Gem::Version.new(other.fiber_id) > Gem::Version.new(fiber_id)
+              end
+    else
+      game.journals
+    end
+
+    (earlier_journals.map(&:order).max || 0) + 1
   end
 
   def skip_owner_check

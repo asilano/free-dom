@@ -2,3 +2,4 @@
   = f.hidden_field :game_id, value: @game.id
   = f.hidden_field :type, value: control_skeleton.journal_type
   = f.hidden_field :fiber_id, value: control_skeleton.fiber_id
+  = f.hidden_field :order, value: Journal.expected_order(control_skeleton.fiber_id, @game)

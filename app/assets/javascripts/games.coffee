@@ -27,6 +27,7 @@ refreshTimer = undefined
 $.onmount 'body', ->
   clearTimeout(refreshTimer)
   $('html').scrollTop(scrollPosition)
+  scrollPosition = 0
 
   journals = $('#journal-log')[0]
   journals.scrollTop = journals.scrollHeight
