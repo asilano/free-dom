@@ -45,6 +45,8 @@ gem 'inline_svg'
 
 gem 'devise'
 
+gem 'discordrb-webhooks'
+
 # for railties app_generator_test
 gem "bootsnap", ">= 1.1.0", require: false
 

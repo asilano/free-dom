@@ -16,6 +16,7 @@ class GamesController < ApplicationController
   # GET /games/1.json
   def show
     @game.process
+    @game.notify_discord if flash[:notify_discord]
   end
 
   # GET /games/new
@@ -38,6 +39,20 @@ class GamesController < ApplicationController
         format.json { render :show, status: :created, location: @game }
       else
         format.html { render :new }
+        format.json { render json: @game.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # PATCH /games/1
+  # PATCH /games/1.json
+  def update
+    respond_to do |format|
+      if @game.update_attributes(game_params)
+        format.html { redirect_to @game, notice: 'Game was successfully updated.' }
+        format.json { render :show, status: :created, location: @game }
+      else
+        format.html { render :show, alert: 'Game update failed' }
         format.json { render json: @game.errors, status: :unprocessable_entity }
       end
     end
@@ -67,10 +82,12 @@ class GamesController < ApplicationController
   # Never trust parameters from the scary internet, only allow the white list through.
   def game_params
     params.require(:game).permit(:name,
+                                 :discord_webhook,
                                  journals_attributes: [
                                    :user_id,
                                    :type,
                                    :order,
+                                   :fiber_id,
                                    params: {}
                                  ])
   end

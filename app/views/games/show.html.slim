@@ -5,6 +5,16 @@
         - game_title = "Game #{@game.id}"
         - game_title << " — #{@game.name}" if @game.name.present?
         h2= game_title
+      .cell#discord-report
+        - if @game.discord_webhook.present?
+          span> Posting to Discord
+          span.js> - click to edit
+        - else
+          span> Not posting to Discord
+          span.js> - click to add
+        = form_with model: @game, class: 'inline hide-js' do |f|
+          = text_field_tag 'game[discord_webhook]', @game.discord_webhook, class: 'inline'
+          = f.submit 'Change', class: 'inline hide-js'
 - if @game.run_state == :waiting && !@game.users.include?(current_user)
   .cell.border-under
     .grid-container.fluid.grid-x

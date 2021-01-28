@@ -10,6 +10,7 @@ class JournalsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to @journal.game }
       if @journal.save
+        flash[:notify_discord] = true
         format.json { render :show, status: :created, location: @journal }
       else
         flash.alert = "Couldn't create journal (was the game up-to-date?)"

@@ -13,6 +13,8 @@
       = link_to random_name_path, class: 'random-regenerate', remote: true do
         i.fas.fa-sync{ title='Regenerate' }
 
+  .field
+    = f.text_field :discord_webhook, help_text: 'Paste a webhook URL for a Discord channel here to receive game alerts'
   = f.fields :journals do |j|
     = j.hidden_field :type
     = j.hidden_field :user_id

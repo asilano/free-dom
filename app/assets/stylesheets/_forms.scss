@@ -2,3 +2,8 @@
 input[type=checkbox] ~ hr {
   margin-top: 0;
 }
+
+form.inline, form .inline {
+  display: inline;
+  max-width: 20%;
+}

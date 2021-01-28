@@ -36,3 +36,6 @@ $.onmount('body', function() {
 $.onmount('.js', function() {
   $(this).removeClass('js')
 })
+$.onmount('.hide-js', function() {
+  $(this).hide()
+})

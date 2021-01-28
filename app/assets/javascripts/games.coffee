@@ -36,3 +36,7 @@ $.onmount 'body', ->
     scrollPosition = $('html').scrollTop()
     Turbolinks.visit(location.toString(), {action: 'replace'})
   refreshTimer = setTimeout reloader, SECONDS * 1000
+
+$.onmount '#discord-report', ->
+  $(this).on 'click', 'span', (e) ->
+    $(this).siblings('form').toggle()
