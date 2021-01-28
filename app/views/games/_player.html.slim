@@ -13,6 +13,8 @@
     = form_with model: @game.journals.build, class: 'player-buttons' do |f|
       = f.hidden_field :game_id
       = f.hidden_field :type, value: ctrl.journal_type
+      = f.hidden_field :fiber_id, value: ctrl.fiber_id
+      = f.hidden_field :order, value: Journal.expected_order(ctrl.fiber_id, @game)
       - ctrl.values.each do |val|
         = f.button val[0], value: val[1], name: "journal[params][#{ctrl.key}]", class: 'button', data: { disable_with: val[0] }
 

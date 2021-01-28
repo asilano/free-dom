@@ -2,7 +2,7 @@ class Journal < ApplicationRecord
   belongs_to :game
   belongs_to :user, optional: true
 
-  validates :order, uniqueness: { scope: :fiber_id }
+  validates :order, uniqueness: { scope: [:fiber_id, :game_id] }
 
   attr_reader :histories
   attr_accessor :auto, :question
