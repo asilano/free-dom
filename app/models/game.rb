@@ -1,3 +1,5 @@
+require 'discordrb/webhooks'
+
 class Game < ApplicationRecord
   has_many :journals, -> { order(:order).extending(PersistedExtension) }, dependent: :destroy, inverse_of: :game
   has_many :users, -> { unscope(:order).distinct }, through: :journals
@@ -79,5 +81,20 @@ class Game < ApplicationRecord
 
   def controls_for(user)
     @questions.flat_map { |q| q&.controls_for(user, @game_state) }.compact
+  end
+
+  def notify_discord
+    return if discord_webhook.blank?
+
+    to_act = @questions.map { |q| q.player.user }
+    to_act_ids = to_act.map(&:id).sort
+    return if to_act_ids == last_notified_players
+
+    update(last_notified_players: to_act_ids)
+    client = Discordrb::Webhooks::Client.new(url: discord_webhook)
+    client.execute do |builder|
+      builder.content = "#{to_act.map(&:discord_mention).join(', ')} to act."
+      builder.username = 'FreeDom Server'
+    end
   end
 end

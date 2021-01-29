@@ -8,4 +8,8 @@ class User < ApplicationRecord
   has_many :games, -> { distinct }, through: :journals
 
   validates :name, presence: true
+
+  def discord_mention
+    name
+  end
 end
