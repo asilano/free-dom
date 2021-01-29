@@ -37,7 +37,7 @@
                     td = button_to 'Join', journals_path(journal: { game_id: game.id,
                                                                     user_id: current_user.id,
                                                                     type:    GameEngine::AddPlayerJournal,
-                                                                    order:   game.journals.maximum(:order) + 1 }),
+                                                                    order:   (game.journals.maximum(:order) || 0) + 1 }),
                                                          method:  :post,
                                                          class:   'button no-gap-under'
                     td = button_to 'Destroy', game, data: { confirm: 'Are you sure?' }, method: :delete, class: 'button no-gap-under alert'
