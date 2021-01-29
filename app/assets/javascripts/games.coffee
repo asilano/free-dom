@@ -24,7 +24,7 @@ $.onmount '.reorder-cards', ->
 
 scrollPosition = 0
 refreshTimer = undefined
-$.onmount 'body', ->
+$.onmount 'body[data-controller=games][data-action=show]', ->
   clearTimeout(refreshTimer)
   $('html').scrollTop(scrollPosition)
   scrollPosition = 0
