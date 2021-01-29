@@ -45,9 +45,9 @@ module GameEngine
 
           card = player.discarded_cards[params['choice'].to_i]
 
-          @histories << History.new("#{player.name} returned #{card.readable_name} from their discard to their hand.",
+          @histories << History.new("#{player.name} returned #{card.readable_name} from their discard to their deck.",
                                     player: player)
-          card.move_to_hand
+          card.put_on_deck(player, from: player.cards)
         end
       end
     end

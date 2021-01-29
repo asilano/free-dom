@@ -16,7 +16,7 @@ Feature: Harbinger
     And I should need to 'Choose a card to return from your discard'
     When I choose Silver in my discard
     Then cards should move as follows:
-      Then I should move Silver from my discard to my hand
+      Then I should move Silver from my discard to my deck
       And these card moves should happen
 
   Scenario: Playing Harbinger when discard is empty
