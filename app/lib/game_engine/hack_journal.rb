@@ -1,5 +1,7 @@
 module GameEngine
   class HackJournal < Journal
+    define_question('Hack the game state')
+
     process do |game_state|
       prevent_undo
 
