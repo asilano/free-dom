@@ -12,6 +12,8 @@
       .field
         = f.password_field :password_confirmation, autocomplete: "off"
       .field
+        = f.text_field :discord_uid, label: 'Discord ID', help_text: t('.discord_uid_microcopy_html')
+      .field
         = f.text_field :name
       .field
         = f.check_box :contact_me, help_text: t('.contact_me_microcopy')

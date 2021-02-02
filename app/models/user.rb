@@ -8,8 +8,11 @@ class User < ApplicationRecord
   has_many :games, -> { distinct }, through: :journals
 
   validates :name, presence: true
+  validates :discord_uid, numericality: true, allow_blank: true
 
   def discord_mention
-    name
+    return name if discord_uid.blank?
+
+    "<@#{discord_uid}>"
   end
 end

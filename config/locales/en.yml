@@ -32,7 +32,8 @@
 en:
   devise:
     registrations:
-      new:
+      new: &reg_text
         contact_me_microcopy: 'Check this box if you would like us to keep you informed about news and updates via email. Note: these emails are extremely low-traffic!'
+        discord_uid_microcopy_html: Let the server tag you in Discord messages when it's your turn. You can find your Discord ID by <a href='https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-'>following these instructions</a>.
       edit:
-        contact_me_microcopy: 'Check this box if you would like us to keep you informed about news and updates via email. Note: these emails are extremely low-traffic!'
+        <<: *reg_text
