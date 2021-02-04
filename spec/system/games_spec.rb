@@ -109,6 +109,15 @@ RSpec.describe 'Games' do
         expect(game.reload.users.to_a).to include user
       end
 
+      it 'lets me join a game from its show page' do
+        game = FactoryBot.create(:game_with_two_players)
+        expect(game.users).to_not include user
+        visit game_path(game)
+        click_button 'Join'
+        expect(current_path).to eql(game_path(game))
+        expect(game.reload.users.to_a).to include user
+      end
+
       it "lists games separately whether I'm in them" do
         you = FactoryBot.create(:user)
         mine = FactoryBot.create(:game_with_kingdom, name: 'Mine')

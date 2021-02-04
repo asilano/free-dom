@@ -23,6 +23,8 @@
         = form_with model: @game.journals.build do |f|
           = f.hidden_field :game_id
           = f.hidden_field :type, value: GameEngine::AddPlayerJournal
+          = f.hidden_field :user_id, value: current_user.id
+          = f.hidden_field :order, value: (@game.journals.maximum(:order) || 0) + 1
           = f.submit 'Join game'
 - elsif @game.run_state == :ended
   .cell.border-under#game-summary
