@@ -100,11 +100,11 @@ class Game < ApplicationRecord
   end
 
   def send_discord_log
-    send_msg_to_discord journals.each
-                                .select { |j| j.id > (last_notified_journal || 0) }
-                                .map(&:format_for_discord)
-                                .compact
-                                .join("\n")
+    journals.each.select { |j| j.id > (last_notified_journal || 0) }.each do |j|
+      log = j.format_for_discord
+      send_msg_to_discord log if log
+      sleep 1
+    end
   end
 
   def send_discord_notify_players
