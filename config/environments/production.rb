@@ -1,3 +1,6 @@
+Rails.application.default_url_options =
+  { host: "free-dom.#{'staging.chris.' if ENV['STAGING_SERVER']}nsict.org" }
+
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -65,10 +68,7 @@ Rails.application.configure do
   # Use a real queuing backend for Active Job (and separate queues per environment)
   # config.active_job.queue_adapter     = :resque
   # config.active_job.queue_name_prefix = "dominion_#{Rails.env}"
-
   config.action_mailer.perform_caching = false
-  config.action_mailer.default_url_options =
-    { host: "free-dom.#{'staging.chris.' if ENV['STAGING_SERVER']}nsict.org" }
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.perform_deliveries = true
   config.action_mailer.raise_delivery_errors = false

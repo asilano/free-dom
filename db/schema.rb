@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_01_165933) do
+ActiveRecord::Schema.define(version: 2021_02_04_150929) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,6 +22,7 @@ ActiveRecord::Schema.define(version: 2021_02_01_165933) do
     t.datetime "updated_at", null: false
     t.string "discord_webhook"
     t.json "last_notified_players"
+    t.integer "last_notified_journal"
   end
 
   create_table "journals", force: :cascade do |t|

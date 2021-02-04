@@ -15,4 +15,9 @@ module ApplicationHelper
       end
     end
   end
+
+  def display_event_for_public(event)
+    event.gsub(/\{(?<user_id>\d+)\?(?<private>[^|]*)\|(?<public>[^}]*)\}/,
+               '\k<public>')
+  end
 end

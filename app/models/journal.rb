@@ -196,4 +196,17 @@ class Journal < ApplicationRecord
   def prevent_undo
     game.fix_journal(journal: self)
   end
+
+  def format_for_discord
+    return unless persisted?
+
+    if histories.present?
+      unless histories.first.secret?
+        histories.map { |hist| ApplicationController.helpers.display_event_for_public(hist.event) }
+                 .join("\n - ")
+      end
+    else
+      "#{user&.name || 'The game'}'s choice for '#{self.class.from(user).in(game).question.text(game_state)}', which is now invalid"
+    end
+  end
 end

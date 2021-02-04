@@ -84,16 +84,39 @@ class Game < ApplicationRecord
 
   def notify_discord
     return if discord_webhook.blank?
+    return if (to_act_ids = users_to_act.map(&:id).sort) == last_notified_players
 
-    to_act = @questions.map { |q| q.player.user }
-    to_act_ids = to_act.map(&:id).sort
-    return if to_act_ids == last_notified_players
+    send_discord_log
+    sleep 1
+    send_discord_notify_players
 
-    update(last_notified_players: to_act_ids)
+    update(last_notified_players: to_act_ids, last_notified_journal: journals.maximum(:id))
+  end
+
+  private
+
+  def users_to_act
+    @questions.map { |q| q.player.user }
+  end
+
+  def send_discord_log
+    send_msg_to_discord journals.each
+                                .select { |j| j.id > (last_notified_journal || 0) }
+                                .map(&:format_for_discord)
+                                .compact
+                                .join("\n")
+  end
+
+  def send_discord_notify_players
+    send_msg_to_discord "#{users_to_act.map(&:discord_mention).join(', ')} to act."
+  end
+
+  def send_msg_to_discord(msg)
     client = Discordrb::Webhooks::Client.new(url: discord_webhook)
     client.execute do |builder|
-      builder.content = "#{to_act.map(&:discord_mention).join(', ')} to act."
+      builder.content = msg
       builder.username = 'FreeDom Server'
+      builder.avatar_url = Rails.application.routes.url_helpers.root_url + 'discord-avatar.png'
     end
   end
 end
