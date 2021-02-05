@@ -42,11 +42,15 @@ module GameEngine
       end
 
       turn_seat = 0
+      round = 1
       loop do
         @turn_player = @players[turn_seat]
         @turn_player.actions = 1
         @turn_player.buys = 1
         @turn_player.cash = 0
+
+        @game.current_journal.histories << History.new("#{@turn_player.name} started turn #{round}.#{turn_seat + 1}.",
+                                                       player: @turn_player)
 
         # Play actions until the player stops or runs out
         until @turn_player.actions.zero?
@@ -77,6 +81,7 @@ module GameEngine
         end
 
         turn_seat = (turn_seat + 1) % @players.length
+        round += 1 if turn_seat.zero?
       end
     end
 
