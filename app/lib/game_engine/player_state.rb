@@ -145,7 +145,7 @@ module GameEngine
           name:  klass.readable_name,
           last:  false
         }
-        entry[:score] = exemplar.points if exemplar.victory?
+        entry[:score] = exemplar.points if exemplar.respond_to?(:points)
         entry
       end
       list.sort! do |a, b|

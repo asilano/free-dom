@@ -36,7 +36,9 @@
           .player-deck
             - player.decklist.each do |entry|
               - score_part = entry[:score].nil? ? '' : " (@ #{pluralize(entry[:score], 'pt')})"
-              span{class=entry[:types]} #{entry[:count]}x #{entry[:name]}#{score_part}#{entry[:last] ? '.' : ', '}
+              span> #{entry[:count]}x
+              span.card{class=entry[:types]} #{entry[:name]}#{score_part}
+              span #{entry[:last] ? '.' : ', '}
 
 .cell.border-under
   .grid-container.fluid
