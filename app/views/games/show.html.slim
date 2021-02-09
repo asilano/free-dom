@@ -35,9 +35,9 @@
           .player-result #{player.name} &mdash; #{player.score} points
           .player-deck
             - player.decklist.each do |entry|
-              - score_part = entry[:score].nil? ? '' : " (@ #{pluralize(entry[:score], 'pt')})"
+              - score_part = entry[:score].nil? ? '' : " (#{pluralize(entry[:score], 'pt')})"
               span> #{entry[:count]}x
-              span.card{class=entry[:types]} #{entry[:name]}#{score_part}
+              span.card{data-tooltip class=entry[:types] title=entry[:text]} #{entry[:name]}#{score_part}
               span #{entry[:last] ? '.' : ', '}
 
 .cell.border-under

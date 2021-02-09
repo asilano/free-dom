@@ -143,16 +143,21 @@ module GameEngine
           types: exemplar.class.types,
           count: cs.count,
           name:  klass.readable_name,
+          text:  exemplar.try(:text),
           last:  false
         }
         entry[:score] = exemplar.points if exemplar.respond_to?(:points)
+        entry[:cash] = exemplar.cash if exemplar.respond_to?(:cash)
         entry
       end
-      list.sort! do |a, b|
-        next 0 unless a[:score] || b[:score]
-        next 1 if a[:score].nil?
-        next -1 if b[:score].nil?
-        b[:score] <=> a[:score]
+      list.sort_by! do |exemplar|
+        [-(exemplar[:score] || -Float::INFINITY),
+         -(exemplar[:cash] || -Float::INFINITY),
+         exemplar[:name]]
+        # next 0 unless a[:score] || b[:score]
+        # next 1 if a[:score].nil?
+        # next -1 if b[:score].nil?
+        # b[:score] <=> a[:score]
       end
       list.last[:last] = true
       list

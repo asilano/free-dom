@@ -28,13 +28,16 @@
 }
 
 .scores .player-deck {
-  .card { padding: 2px; }
+  .card { padding: 2px 4px; }
   .action {background-color: $action-cream}
   .reaction {background-color: $reaction-blue}
   .duration {background-color: $duration-orange}
   .treasure {background-color: $treasure-yellow}
   .victory {background-color: $victory-green}
   .curse {background-color: $curse-purple}
+  .attack {
+    color: $attack-red;
+  }
 }
 
 .card-token {
