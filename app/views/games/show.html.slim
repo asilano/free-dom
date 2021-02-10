@@ -1,3 +1,6 @@
+- content_for :title, (@game.name.presence || "Game ##{@game.id}")
+- if @game.questions.present?
+  - content_for :waiting_title, "Waiting for #{@game.questions.map(&:player).map(&:name).join(', ')}"
 .cell
   .grid-container.fluid
     .grid-x
