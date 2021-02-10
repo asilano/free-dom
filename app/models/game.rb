@@ -93,6 +93,10 @@ class Game < ApplicationRecord
     update(last_notified_players: to_act_ids, last_notified_journal: journals.maximum(:id))
   end
 
+  def discord_log_creation
+    send_msg_to_discord "Game #{name} (##{id}) created."
+  end
+
   private
 
   def users_to_act

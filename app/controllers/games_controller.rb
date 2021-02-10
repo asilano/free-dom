@@ -34,7 +34,10 @@ class GamesController < ApplicationController
 
     respond_to do |format|
       if @game.save
+        @game.discord_log_creation
         @game.journals.create!(type: GameEngine::AddPlayerJournal, user: current_user, order: @game.journals.maximum(:order) + 1)
+        flash[:notify_discord] = true
+
         format.html { redirect_to @game, notice: 'Game was successfully created.' }
         format.json { render :show, status: :created, location: @game }
       else
