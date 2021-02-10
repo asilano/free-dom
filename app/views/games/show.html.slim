@@ -31,17 +31,27 @@
           = f.submit 'Join game'
 - elsif @game.run_state == :ended
   .cell.border-under#game-summary
-    h3 Game Over &mdash; Scores
-    ul.scores
-      - @game.game_state.players.sort_by(&:score).reverse.each.with_index do |player, ix|
-        li
-          .player-result #{player.name} &mdash; #{player.score} points
-          .player-deck
-            - player.decklist.each do |entry|
-              - score_part = entry[:score].nil? ? '' : " (#{pluralize(entry[:score], 'pt')})"
-              span> #{entry[:count]}x
-              span.card{data-tooltip class=entry[:types] title=entry[:text]} #{entry[:name]}#{score_part}
-              span #{entry[:last] ? '.' : ', '}
+    .grid-container.fluid.grid-x
+      .cell
+        h3 Game Over &mdash; Scores
+        ul.scores
+          - @game.game_state.players.sort_by(&:score).reverse.each.with_index do |player, ix|
+            li
+              .player-result #{player.name} &mdash; #{player.score} points
+              .player-deck
+                - player.decklist.each do |entry|
+                  - score_part = entry[:score].nil? ? '' : " (#{pluralize(entry[:score], 'pt')})"
+                  span> #{entry[:count]}x
+                  span.card{data-tooltip class=entry[:types] title=entry[:text]} #{entry[:name]}#{score_part}
+                  span #{entry[:last] ? '.' : ', '}
+- elsif @game.questions.present?
+  .cell.border-under
+    .grid-container.fluid.grid-x
+      .cell
+        strong> Current question:
+        ul.question-list
+          - @game.questions.compact.each do |question|
+            li= question.player.name + ': ' + question.text(@game.game_state)
 
 .cell.border-under
   .grid-container.fluid
