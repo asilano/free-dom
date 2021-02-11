@@ -77,6 +77,11 @@ module GameEngine
 
         if game_ended?
           players.each(&:calculate_score)
+          @game.current_journal.histories << History.new("Game ended.")
+          players.sort_by(&:score).reverse.each_with_index do |ply, ix|
+            @game.current_journal.histories << History.new("#{(ix + 1).ordinalize}: #{ply.name} with #{ply.score} points.",
+                                                           player: ply)
+          end
           return
         end
 

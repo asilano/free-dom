@@ -88,7 +88,7 @@ class Game < ApplicationRecord
 
     send_discord_log
     sleep 1
-    send_discord_notify_players
+    send_discord_notify_players if to_act_ids.present?
 
     update(last_notified_players: to_act_ids, last_notified_journal: journals.maximum(:id))
   end
