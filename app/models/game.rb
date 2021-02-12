@@ -116,6 +116,8 @@ class Game < ApplicationRecord
   end
 
   def send_msg_to_discord(msg)
+    return if discord_webhook.blank?
+
     client = Discordrb::Webhooks::Client.new(url: discord_webhook)
     client.execute do |builder|
       builder.content = msg
