@@ -169,12 +169,13 @@
 }
 
 .card-back {
-  border: 10px solid $card-back-blue;
-  border-left-width: 15px;
-  border-right-width: 15px;
+  border: 7px solid $action-cream;
+  border-left-width: 10px;
+  border-right-width: 10px;
   border-radius: 3px;
-  background-color: $action-cream;
+  background-color: $card-back-blue;
   min-height: 40px;
+  padding: 3px 0;
   width: 160px;
   text-align: center;
 
