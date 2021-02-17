@@ -139,17 +139,16 @@
   }
 
   .pile-cost {
-    width: 70px;
-    height: 0px;
-    text-align: center;
-    border: 20px solid $medium-gray;
-    border-left-color: transparent;
+    background: $medium-gray;
+    height: 40px;
     position: relative;
+    text-align: center;
+    width: 70px;
 
     .cost-text {
       position: absolute;
-      top: -15px;
-      left: 8px;
+      top: calc(50% - 15px);
+      left: calc(50% - 15px);
     }
   }
 
