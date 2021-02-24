@@ -87,6 +87,10 @@
   }
 }
 
+.player:not(:last-child) {
+  border-right: 1px solid $dark-gray;
+}
+
 #game-summary {
   margin-left: 10px;
 

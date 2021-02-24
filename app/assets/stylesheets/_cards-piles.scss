@@ -14,14 +14,12 @@
 }
 
 // The following section is order-dependent
-.card-name, .card-token {
-  .action.card & {background-color: $action-cream}
-  .reaction.card & {background-color: $reaction-blue}
-  .duration.card & {background-color: $duration-orange}
-  .treasure.card & {background-color: $treasure-yellow}
-  .victory.card & {background-color: $victory-green}
-  .curse.card & {background-color: $curse-purple}
-}
+.action.card    {background-color: $action-cream}
+.reaction.card  {background-color: $reaction-blue}
+.duration.card  {background-color: $duration-orange}
+.treasure.card  {background-color: $treasure-yellow}
+.victory.card   {background-color: $victory-green}
+.curse.card     {background-color: $curse-purple}
 .attack.card .card-name {
   color: $attack-red;
   font-weight: bold;
@@ -49,8 +47,12 @@
 }
 
 .cell.card {
-  width: auto;
+  align-items: center;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
   min-width: 120px;
+  width: auto;
 
   &.back-wrapper {
     display: flex;
@@ -79,6 +81,7 @@
 
   .card-name {
     height: 24px;
+    width: 100%;
   }
 
   .card-ctrl {
@@ -174,8 +177,8 @@
   border-radius: 3px;
   background-color: $card-back-blue;
   min-height: 40px;
-  padding: 3px 0;
-  width: 160px;
+  min-width: 150px;
+  padding: 3px 5px;
   text-align: center;
 
   .back-wrapper & {

@@ -1,4 +1,4 @@
-.cell.auto.player
+.cell.shrink.player
   h3= other_player.user.name
   / Cards held in hand representation
   h5 Hand
@@ -21,18 +21,46 @@
       .card-grid
         = render partial: 'card', object: other_player.discarded_cards.first
         - if other_player.discarded_cards.count > 1
-          .card-back= other_player.discarded_cards.count - 1
+          .cell.card
+            .card-back #{other_player.discarded_cards.count - 1} more
 
   / Deck representation
   h5 Deck
   .grid-container.fluid
     .grid-x.grid-margin-x
       .cell.card.back-wrapper{class=('no-card' if other_player.deck_cards.empty?)}
-        .card-back= other_player.deck_cards.count
+        .card-back
+          = other_player.deck_cards.count
+          - if other_player.deck_cards.any?(&:revealed) || other_player.deck_cards.any?(&:peeked)
+            .detail= "(#{other_player.deck_cards.count(&:peeked)} seen, #{other_player.deck_cards.count(&:revealed)} revealed)"
 
-  / - if other_player.deck_cards.any?(&:revealed?)
-  /   .card-grid
-  /     .subset-indicator
-  /       div Revealed:
-  /       div[] (Top &rarr; Bottom)
-  /     = render partial: 'card', collection: other_player.deck_cards.select(&:revealed?), locals: { controls: [] }
+  / Peeked cards
+  - other_player.peeked_cards.group_by(&:interacting_with).each do |qn, cards|
+    h5= "Seen with #{qn.card_type.readable_name}"
+    - peeked_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :peeked && ctrl.question == qn }
+    = render partial: 'control_skeleton', collection: peeked_controls
+    .grid-container.fluid
+      .card-grid class=('reorder-cards' if peeked_controls.any?(ReorderCardsControl))
+        = render partial: 'card', collection: cards, locals: { controls: peeked_controls }
+        - if peeked_controls.any?(&:cardless_button)
+          .cell.card.null-card
+            .card-name
+            - peeked_controls.each do |ctrl|
+              - if ctrl.cardless_button
+                .card-ctrl= render partial: 'controls/cardless_button', object: ctrl.cardless_button, as: :button, locals: { control: ctrl }
+
+  / Revealed cards
+  - other_player.revealed_cards.group_by(&:interacting_with).each do |qn, cards|
+    h5= "Revealed to #{qn.card_type.readable_name}"
+    - revealed_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :revealed && ctrl.question == qn }
+    = render partial: 'control_skeleton', collection: revealed_controls
+    .grid-container.fluid
+      .card-grid
+        = render partial: 'card', collection: cards, locals: { controls: revealed_controls }
+        - if revealed_controls.any?(&:cardless_button)
+          .cell.card.null-card
+            .card-name
+            - revealed_controls.each do |ctrl|
+              - if ctrl.cardless_button
+                .card-ctrl= render partial: 'controls/cardless_button', object: ctrl.cardless_button, as: :button, locals: { control: ctrl }
+
