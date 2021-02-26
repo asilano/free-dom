@@ -86,7 +86,7 @@ Feature: Merchant
     And I should have 1 action
     When I choose "Leave Action Phase" in my hand
     Then I should need to "Play Treasures, or pass"
-    And I choose nothing in my hand
+    And I choose 'Stop playing treasures' in my hand
     Then I should need to "Buy a card, or pass"
     And I choose "Buy nothing" in the supply
     Then cards should move as follows:
@@ -97,7 +97,7 @@ Feature: Merchant
     And Belle should need to 'Play an Action, or pass'
     When Belle chooses "Leave Action Phase" in her hand
     Then Belle should need to "Play Treasures, or pass"
-    When Belle chooses nothing in her hand
+    When Belle chooses 'Stop playing treasures' in her hand
     Then Belle should need to "Buy a card, or pass"
     When Belle chooses "Buy nothing" in the supply
     Then cards should move as follows:
@@ -108,7 +108,7 @@ Feature: Merchant
     And Chas should need to 'Play an Action, or pass'
     When Chas chooses "Leave Action Phase" in his hand
     Then Chas should need to "Play Treasures, or pass"
-    When Chas chooses nothing in his hand
+    When Chas chooses 'Stop playing treasures' in his hand
     Then Chas should need to "Buy a card, or pass"
     When Chas chooses "Buy nothing" in the supply
     Then cards should move as follows:

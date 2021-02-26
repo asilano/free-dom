@@ -6,7 +6,7 @@ Feature: Basic turn
     Then I should need to "Play an Action, or pass"
     When I choose "Leave Action Phase" in my hand
     Then I should need to "Play Treasures, or pass"
-    When I choose nothing in my hand
+    When I choose 'Stop playing treasures' in my hand
     Then I should need to "Buy a card, or pass"
     When I choose "Buy nothing" in the supply
     Then cards should move as follows:
@@ -22,7 +22,13 @@ Feature: Basic turn
     Then I should need to "Play an Action, or pass"
     When I choose "Leave Action Phase" in my hand
     Then I should need to "Play Treasures, or pass"
-    When I choose everything in my hand
+    When I choose Copper in my hand
+    Then my hand should contain Estate x2, Copper x2
+    And I should have Copper in play
+    When I choose Copper in my hand
+    Then my hand should contain Estate x2, Copper
+    And I should have Copper x2 in play
+    When I choose Copper in my hand
     Then my hand should contain Estate x2
     And I should have Copper x3 in play
     And I should need to "Buy a card, or pass"
@@ -43,13 +49,13 @@ Feature: Basic turn
     Then I should need to "Play an Action, or pass"
     When I choose "Leave Action Phase" in my hand
     Then I should need to "Play Treasures, or pass"
-    When I choose Copper, Copper in my hand
+    When I choose Copper in my hand
+    Then my hand should contain Estate x2, Copper x2
+    And I should have Copper in play
+    When I choose Copper in my hand
     Then my hand should contain Copper, Estate x2
     And I should have Copper x2 in play
-    And I should need to "Play Treasures, or pass"
-    When I choose nothing in my hand
-    Then my hand should contain Copper, Estate x2
-    And I should have Copper x2 in play
+    When I choose 'Stop playing treasures' in my hand
     And I should need to "Buy a card, or pass"
     And I should be able to choose the Copper, Estate, Cellar piles
     And I should not be able to choose the Silver, Workshop, Market, Gold, Province piles
