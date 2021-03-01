@@ -18,6 +18,7 @@
   = f.fields :journals do |j|
     = j.hidden_field :type
     = j.hidden_field :user_id
+    = j.hidden_field :fiber_id
     = j.hidden_field :order
     #card_selects
       - all_cards = GameEngine::Card.expansions.map(&:kingdom_cards).flatten.shuffle

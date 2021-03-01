@@ -6,12 +6,12 @@ class Game < ApplicationRecord
 
   accepts_nested_attributes_for :journals
 
-  attr_reader :game_state, :questions, :last_fixed_journal_order, :current_journal, :run_state
+  attr_reader :game_state, :questions, :fiber_last_fixed_journal_orders, :current_journal, :run_state
 
   # Execute the game's journals in memory.
   def process
     # Initialise things
-    @last_fixed_journal_order = 0
+    @fiber_last_fixed_journal_orders = {}
     @run_state = journals.where(type: 'GameEngine::StartGameJournal').blank? ? :waiting : :running
     @journal_stack = []
 
@@ -69,9 +69,9 @@ class Game < ApplicationRecord
 
   # Mark a journal as not able to be undone
   def fix_journal(journal: :current)
-    journal = @current_journal #@journal_stack.last if journal == :current
+    journal = @current_journal if journal == :current
     journal ||= journals.last
-    @last_fixed_journal_order = journal.order
+    @fiber_last_fixed_journal_orders[journal.fiber_id] = journal.order
   end
 
   def last_fixed_journal_for(user)

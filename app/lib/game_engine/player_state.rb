@@ -90,8 +90,18 @@ module GameEngine
       num = cards_by_location(from).length if num == :all
       shuffle_discard_under_deck if from == :deck && deck_cards.length < num && discarded_cards.present?
       revealed_cards = cards_by_location(from).take(num)
+      if revealed_cards.blank?
+        @game.current_journal.histories << History.new("#{name} revealed no cards.",
+                                                       player: self,
+                                                       css_classes: %w[reveal-cards])
+        return
+      end
+
+      @game.fix_journal
       @game.current_journal.histories << History.new(
-        "#{name} revealed #{revealed_cards.map(&:readable_name).join(', ')}"
+        "#{name} revealed #{revealed_cards.map(&:readable_name).join(', ')}",
+        player: self,
+        css_classes: %w[reveal-cards]
       )
       revealed_cards.each(&:be_revealed)
     end
@@ -100,11 +110,21 @@ module GameEngine
       num = cards_by_location(from).length if num == :all
       shuffle_discard_under_deck if from == :deck && deck_cards.length < num && discarded_cards.present?
       peeked_cards = cards_by_location(from).take(num)
+      if revealed_cards.blank?
+        @game.current_journal.histories << History.new("#{name} looked at no cards.",
+                                                       player: self,
+                                                       css_classes: %w[peek-cards])
+        return
+      end
+
+      @game.fix_journal
       @game.current_journal.histories << History.new(
         "#{name} looked at #{History.personal_log(private_to: user,
                                                   private_msg: peeked_cards.map(&:readable_name).join(', '),
                                                   public_msg: "#{peeked_cards.length} #{'card'.pluralize(peeked_cards.length)}"
-                                                  )}."
+                                                  )}.",
+        player: self,
+        css_classes: %w[peek-cards]
       )
       peeked_cards.each(&:be_peeked)
     end

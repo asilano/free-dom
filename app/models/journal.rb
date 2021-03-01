@@ -151,16 +151,19 @@ class Journal < ApplicationRecord
 
   def self.expected_order(fiber_id, game)
     earlier_journals = if fiber_id
-      game.journals.select(:fiber_id, :order)
-              .reject do |other|
-                next false if other.fiber_id.nil?
+                         game.journals
+                             .select(:fiber_id, :order)
+                             .reject do |other|
+                               next false if other.fiber_id.nil?
 
-                # Lean on Gem to compare what are, effectively, sem-vers
-                Gem::Version.new(other.fiber_id) > Gem::Version.new(fiber_id)
-              end
-    else
-      game.journals
-    end
+                               # Ignore fibers which are unrelated to this one
+                               # That is, ignore fibers which are neither prefixes
+                               # nor suffixes of this one.
+                               !GameEngine::FiberWrapper.fibers_related(fiber_id, other.fiber_id)
+                             end
+                       else
+                         game.journals
+                       end
 
     (earlier_journals.map(&:order).max || 0) + 1
   end
@@ -195,6 +198,15 @@ class Journal < ApplicationRecord
 
   def prevent_undo
     game.fix_journal(journal: self)
+  end
+
+  def fixed_for_user(for_user)
+    return true if for_user != user
+
+    game.fiber_last_fixed_journal_orders
+        .keys
+        .select { |fid| GameEngine::FiberWrapper.fibers_related(fid, fiber_id) }
+        .all? { |fid| order <= game.fiber_last_fixed_journal_orders[fid] }
   end
 
   def format_for_discord

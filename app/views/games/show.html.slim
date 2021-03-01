@@ -81,7 +81,6 @@
             strong> No question - check journals!
 
         ul
-          - last_fixed_journal = @game.last_fixed_journal_for(current_user)
           - last_shown_journal_id = 0
           - @game.journals.each do |journal|
             - next unless journal.persisted?
@@ -97,7 +96,7 @@
             - if journal.histories.present?
               - unless journal.histories.first.secret? && journal.user != current_user
                 li.main-journal class=journal.histories.first.css_class data={journal_id: journal.id}
-                  - if journal.order > last_fixed_journal.order
+                  - unless journal.fixed_for_user(current_user)
                     = form_with url: journal_path(journal), method: :delete do |f|
                       = f.button inline_svg_tag('action-undo.svg',
                                             class: 'undo-arrow',
