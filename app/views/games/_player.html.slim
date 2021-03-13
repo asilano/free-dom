@@ -62,8 +62,12 @@
           - discard_controls.each do |ctrl|
             - if ctrl.cardless_button
               .card-ctrl= render partial: 'controls/cardless_button', object: ctrl.cardless_button, as: :button, locals: { control: ctrl }
-      - else
+      - elsif player.discarded_cards.length == 1 || discard_controls.present?
         = render partial: 'card', collection: player.discarded_cards, locals: { controls: discard_controls }
+      - else
+        = render partial: 'card', collection: player.discarded_cards, locals: { stacked: true }
+        .cell.card.no-card.stack-info
+          .card-name #{player.discarded_cards.count - 1} more
 
   / Deck representation
   h5 Deck

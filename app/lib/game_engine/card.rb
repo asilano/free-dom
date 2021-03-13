@@ -87,8 +87,8 @@ module GameEngine
     # Default effect of a player gaining a card
     def be_gained_by(player, from:, to: :discard)
       from.delete(self)
-      if to == :deck
-        # Add self onto the front of the player's cards, so it's on top of the deck
+      if %i[deck discard].include? to
+        # Add self onto the front of the player's cards, so it's on top of the deck/discard
         player.cards.unshift(self)
       else
         player.cards << self
@@ -109,7 +109,11 @@ module GameEngine
 
     # Default effect of a card being put into discard from wherever it is
     # (via the rules-significant word "discard")
+    # Note - the discard is ordered, just like the deck, but the rules word
+    # "discard" implies the player already owns it.
     def discard
+      @player.cards.delete(self)
+      @player.cards.unshift(self)
       @location = :discard
     end
 

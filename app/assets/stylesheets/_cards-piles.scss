@@ -11,6 +11,8 @@
       @include xy-grid-layout(1, '.cell', true, map-get($grid-margin-gutters, medium) / 2, 'margin');
       @include xy-gutters(map-get($grid-margin-gutters, medium) / 2, $negative:true);
   }
+
+  position: relative;
 }
 
 // The following section is order-dependent
@@ -196,5 +198,27 @@
 
   .detail {
     font-size: 0.8rem;
+  }
+}
+
+// Stacks of cards
+.cell.card {
+  &.stacked {
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    &:first-child {
+      position: relative;
+      z-index: 10;
+    }
+
+    .card-grid:hover & {
+      position: relative;
+    }
+  }
+
+  .card-grid:hover &.stack-info {
+    display: none;
   }
 }

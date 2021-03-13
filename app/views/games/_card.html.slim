@@ -1,5 +1,6 @@
 - controls ||= []
-.cell.card{class=card.class.types}
+- stacked ||= false
+.cell.card{class=(card.class.types + [stacked ? 'stacked' : ''])}
   .card-name{data-tooltip title=card.try(:text)}= card.readable_name
   - controls.each do |ctrl|
     .card-ctrl
