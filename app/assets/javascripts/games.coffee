@@ -35,7 +35,7 @@ $.onmount 'body[data-controller=games][data-action=show]', ->
   reloader = ->
     scrollPosition = $('html').scrollTop()
     Turbolinks.visit(location.toString(), {action: 'replace'})
-  refreshTimer = setTimeout reloader, SECONDS * 1000
+  # refreshTimer = setTimeout reloader, SECONDS * 1000
 
 $.onmount '#discord-report', ->
   $(this).on 'click', 'span', (e) ->

@@ -94,7 +94,7 @@ module GameEngine
         @game.current_journal.histories << History.new("#{name} revealed no cards.",
                                                        player: self,
                                                        css_classes: %w[reveal-cards])
-        return
+        return []
       end
 
       @game.fix_journal
@@ -110,11 +110,11 @@ module GameEngine
       num = cards_by_location(from).length if num == :all
       shuffle_discard_under_deck if from == :deck && deck_cards.length < num && discarded_cards.present?
       peeked_cards = cards_by_location(from).take(num)
-      if revealed_cards.blank?
+      if peeked_cards.blank?
         @game.current_journal.histories << History.new("#{name} looked at no cards.",
                                                        player: self,
                                                        css_classes: %w[peek-cards])
-        return
+        return []
       end
 
       @game.fix_journal

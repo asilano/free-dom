@@ -170,7 +170,7 @@ module GameSteps
     step 'these card moves should happen' do
       @game.process
       cards_now = extract_game_cards
-      byebug if @cards_before.values.flatten.any? { |c| !c.key? :revealed }
+      #byebug if @cards_before.values.flatten.any? { |c| !c.key? :revealed }
       cards_now[:players].each.with_index do |cards, ix|
         grouped_cards = cards.group_by { |c| c[:location] }
         group_before = @cards_before[:players][ix].group_by { |c| c[:location] }

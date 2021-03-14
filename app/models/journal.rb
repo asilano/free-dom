@@ -29,7 +29,7 @@ class Journal < ApplicationRecord
     end
 
     def matches?(journal)
-      journal.is_a? self.class.parent
+      journal.is_a? self.class.module_parent
     end
 
     def valid?(journal)
@@ -55,11 +55,11 @@ class Journal < ApplicationRecord
       end
 
       def journal_type
-        self.class.parents.detect { |klass| klass < Journal }
+        self.class.module_parents.detect { |klass| klass < Journal }
       end
 
       def card_type
-        self.class.parents.detect { |klass| klass < GameEngine::Card }
+        self.class.module_parents.detect { |klass| klass < GameEngine::Card }
       end
 
       def controls_for(user, game_state)
