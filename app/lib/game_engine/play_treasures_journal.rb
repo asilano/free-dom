@@ -11,14 +11,17 @@ module GameEngine
                           null_choice:  { text:  'Stop playing treasures',
                                           value: 'none' },
                           css_class:    'play-treasure')]
-  end
+    end
 
+    # For back-compatibility, allow arrays of choices
     validation do
       return true if journal.params['choice'] == 'none'
-      return false unless journal.params['choice']&.integer?
+      return false unless journal.params['choice']
+      return false unless Array(journal.params['choice']).all?(&:integer?)
 
-      choice = journal.params['choice'].to_i
-      choice < journal.player.hand_cards.length && journal.player.hand_cards[choice].treasure?
+      Array(journal.params['choice']).map(&:to_i).all? do |choice|
+        choice < journal.player.hand_cards.length && journal.player.hand_cards[choice].treasure?
+      end
     end
 
     process do |_game_state|
@@ -31,8 +34,8 @@ module GameEngine
       end
 
       # Play all the chosen cards in hand order
-      card = player.hand_cards[params['choice'].to_i]
-      card.play_as_treasure(played_by: player)
+      cards = Array(params['choice']).map { |ch| player.hand_cards[ch.to_i] }
+      cards.each { |card| card.play_as_treasure(played_by: player) }
 
       # Ask again, unless the player now has no treasures in hand
       player.hand_cards.any?(&:treasure?) ? :continue : :stop
