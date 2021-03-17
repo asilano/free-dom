@@ -7,7 +7,7 @@ services:
 before_install:
 - gem update --system
 - gem install bundler
-- 
+-
 - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost
   &
 install:
@@ -28,7 +28,7 @@ before_script:
 - "./cc-test-reporter before-build"
 script: xvfb-run bin/rails spec
 after_script:
-- "./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT"
+- "./cc-test-reporter after-build --debug --exit-code $TRAVIS_TEST_RESULT"
 env:
   global:
     secure: VPECYZrWzS43neyZWx/1ZSWE5yUhGnhS1pZQGS2B83/dvIII/H2nlB3Lbr36UYdI3rM+ZpQYyxUD6bxcfhxYd99fArvzVeYftB/GTV0KUQOYr9QDLyhrK/WJ1OhyAPPFDqlMot7Dd2RzUOdkEnuhkK3QGGtGfQ0SUkQ22AiqGdQ=
