@@ -26,7 +26,7 @@ before_script:
   > ./cc-test-reporter
 - chmod +x ./cc-test-reporter
 - "./cc-test-reporter before-build"
-script: xvfb-run bin/rails spec
+script: xvfb-run bin/rspec
 after_script:
 - "./cc-test-reporter after-build --debug --exit-code $TRAVIS_TEST_RESULT"
 env:
