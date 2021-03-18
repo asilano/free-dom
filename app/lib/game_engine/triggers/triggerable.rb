@@ -32,6 +32,7 @@ module GameEngine
       end
 
       private
+
       def initialize(options, &block)
         @whenever = options.delete(:whenever)
         @effect = block
