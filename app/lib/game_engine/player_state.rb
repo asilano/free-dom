@@ -35,14 +35,15 @@ module GameEngine
         entry[:cash] = exemplar.cash if exemplar.respond_to?(:cash)
         entry
       end
+
+      # Sort so that:
+      # * Anything with a point value is first, highest to lowest
+      # * Next, anything with a cash value, highest to lowest
+      # * Lastly, everything else alphabetically
       list.sort_by! do |exemplar|
         [-(exemplar[:score] || -Float::INFINITY),
          -(exemplar[:cash] || -Float::INFINITY),
          exemplar[:name]]
-        # next 0 unless a[:score] || b[:score]
-        # next 1 if a[:score].nil?
-        # next -1 if b[:score].nil?
-        # b[:score] <=> a[:score]
       end
       list.last[:last] = true
       list
