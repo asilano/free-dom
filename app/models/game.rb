@@ -74,10 +74,6 @@ class Game < ApplicationRecord
     @fiber_last_fixed_journal_orders[journal.fiber_id] = journal.order
   end
 
-  def last_fixed_journal_for(user)
-    journals.where('journals.order <= ?', @last_fixed_journal_order).or(journals.where.not(user: user)).last
-  end
-
   def controls_for(user)
     @questions.flat_map { |q| q&.controls_for(user, @game_state) }.compact
   end

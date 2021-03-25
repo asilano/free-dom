@@ -1,6 +1,7 @@
 FactoryBot.define do
   factory :game do
     name { "Test game" }
+    discord_webhook { nil }
     created_at { Time.now }
   end
 
