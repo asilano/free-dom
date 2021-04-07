@@ -18,7 +18,7 @@ module GameEngine
       end
 
       class ReturnCardJournal < Journal
-        define_question('Choose a card to return from your discard').with_controls do |game_state|
+        define_question('Choose a card to return from your discard').with_controls do |_game_state|
           [OneCardControl.new(journal_type: ReturnCardJournal,
                               question:     self,
                               player:       @player,
@@ -35,7 +35,7 @@ module GameEngine
           choice < journal.player.discarded_cards.length
         end
 
-        process do |game_state|
+        process do |_game_state|
           # Just log if the player chose nothing
           if params['choice'] == 'none'
             @histories << History.new("#{player.name} returned nothing",

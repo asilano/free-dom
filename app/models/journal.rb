@@ -12,6 +12,8 @@ class Journal < ApplicationRecord
 
   # Nested classes let GameEngine request the right journal at the right time
   class Template
+    include JournalsHelper::Validations
+
     attr_reader :opts, :player, :game
 
     def initialize(player, game)

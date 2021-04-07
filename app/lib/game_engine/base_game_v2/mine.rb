@@ -72,14 +72,7 @@ module GameEngine
         end
 
         validation do
-          filter = ->(card) { card && card.treasure? && card.cost <= opts[:trashed_cost] + 3 }
-          no_choices = journal.game_state.piles.map(&:cards).map(&:first).none?(&filter)
-          return true if no_choices && journal.params['choice'] == 'none'
-          return false if !no_choices && journal.params['choice'] == 'none'
-          return false unless journal.params['choice']&.integer?
-
-          choice = journal.params['choice'].to_i
-          choice < journal.game_state.piles.length && filter[journal.game_state.piles[choice].cards.first]
+          valid_gain_choice(filter: ->(card) { card && card.treasure? && card.cost <= opts[:trashed_cost] + 3 })
         end
 
         process do |_game_state|

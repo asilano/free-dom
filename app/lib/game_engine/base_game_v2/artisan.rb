@@ -28,16 +28,7 @@ module GameEngine
         end
 
         validation do
-          no_choices = journal.game_state.piles.map(&:cards).map(&:first).none? do |card|
-            card && card.cost <= 5
-          end
-          return true if no_choices && journal.params['choice'] == 'none'
-          return false if !no_choices && journal.params['choice'] == 'none'
-          return false unless journal.params['choice']&.integer?
-
-          choice = journal.params['choice'].to_i
-          choice < journal.game_state.piles.length &&
-            ->(card) { card && card.cost <= 5 }[journal.game_state.piles[choice].cards.first]
+          valid_gain_by_cost(max_cost: 5)
         end
 
         process do |game_state|
