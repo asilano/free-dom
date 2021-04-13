@@ -1,5 +1,5 @@
 class MultiCardChoicesControl < Control
-  attr_reader :key, :filter, :preselect, :choices
+  attr_reader :key, :preselect, :choices
 
   def initialize(opts = {})
     super

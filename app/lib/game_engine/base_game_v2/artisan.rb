@@ -12,42 +12,16 @@ module GameEngine
         game_state.get_journal(GainCardJournal, from: played_by).process(game_state)
       end
 
-      class GainCardJournal < Journal
-        define_question('Choose a card to gain into your hand').with_controls do |game_state|
-          filter = ->(card) { card && card.cost <= 5 }
-          [OneCardControl.new(journal_type: GainCardJournal,
-                              question:     self,
-                              player:       @player,
-                              scope:        :supply,
-                              text:         'Gain',
-                              filter:       filter,
-                              null_choice:  if game_state.piles.map(&:cards).map(&:first).none?(&filter)
-                                              { text: 'Gain nothing', value: 'none' }
-                                            end,
-                              css_class:    'gain-card')]
-        end
+      class GainCardJournal < CommonJournals::GainJournal
+        configure question_text: 'Choose a card to gain into your hand',
+                  filter:        ->(card) { card && card.cost <= 5 },
+                  destination:   :hand
 
         validation do
           valid_gain_by_cost(max_cost: 5)
         end
 
-        process do |game_state|
-          if params['choice'] == 'none'
-            @histories << History.new("#{player.name} gained nothing.",
-                                      player: player,
-                                      css_classes: %w[gain-card])
-            return
-          end
-
-          pile = game_state.piles[params['choice'].to_i]
-          card = pile.cards.first
-
-          @histories << History.new("#{player.name} gained #{card.readable_name} to their hand.",
-                                    player: player,
-                                    css_classes: %w[gain-card])
-          card.be_gained_by(player, from: pile.cards, to: :hand)
-          observe
-
+        def post_process
           game_state.get_journal(PlaceCardJournal, from: player).process(game_state)
         end
       end

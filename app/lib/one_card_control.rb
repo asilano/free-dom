@@ -1,6 +1,4 @@
 class OneCardControl < Control
-  attr_reader :filter
-
   def initialize(opts = {})
     super
     @filter = filter_from(opts[:filter]) || ->(_card) { true }
@@ -10,12 +8,12 @@ class OneCardControl < Control
   def single_answer?(_game_state)
     return false unless cards_in_scope
 
-    choices = [@cardless_button] + cards_in_scope.uniq(&:class).map { |c| @filter[c] }
+    choices = [@cardless_button] + cards_in_scope.uniq(&:class).map { |c| filter(c) }
     choices.count(&:itself) <= 1
   end
 
   def single_answer
-    cards_in_scope.index { |c| @filter[c] } || @cardless_button[:value]
+    cards_in_scope.index { |c| filter(c) } || @cardless_button[:value]
   end
 
   private

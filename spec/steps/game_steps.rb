@@ -47,6 +47,18 @@ module GameSteps
                            })
     end
 
+    step 'the supply is empty' do
+      @game.game_state.piles.each do |pile|
+        make_journal(user:   nil,
+                     type:   GameEngine::HackJournal,
+                     params: { scope:      :supply,
+                               action:     :set,
+                               card_class: pile.card_class.to_s,
+                               cards:      []
+                             })
+      end
+    end
+
     step 'the :card pile contains :cards' do |card, cards|
       make_journal(user:   nil,
                    type:   GameEngine::HackJournal,
@@ -282,7 +294,7 @@ module GameSteps
       control = controls.detect { |c| c.scope == :supply }
       can_pick = cards.map do |card|
         pile = @game.game_state.piles.detect { |p| p.cards.first.is_a? card }
-        pile && control.filter[pile.cards.first]
+        pile && control.filter(pile.cards.first)
       end
 
       expect(can_pick).to all(should ? be_truthy : be_falsey)
@@ -318,7 +330,7 @@ module GameSteps
       else
         can_pick = cards.map do |card|
           hand_card = player.hand_cards.detect { |c| c.is_a? card }
-          hand_card && control.filter[hand_card]
+          hand_card && control.filter(hand_card)
         end
 
         expect(can_pick).to all(should ? be_truthy : be_falsey)
@@ -410,7 +422,7 @@ MultiCardControl.define_method(:handle_choice) do |choice|
   return { @key => [] } if choice == []
 
   if choice == 'everything'
-    set = @player.cards_by_location(@scope).map.with_index.select { |c, ix| @filter[c] }.map(&:second)
+    set = @player.cards_by_location(@scope).map.with_index.select { |c, ix| filter(c) }.map(&:second)
     return { @key => set }
   end
 

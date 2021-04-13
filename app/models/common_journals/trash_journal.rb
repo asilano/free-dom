@@ -2,7 +2,7 @@ module CommonJournals
   class TrashJournal < Journal
     def self.configure(question_text: nil, question_block: nil, filter: nil)
       define_question(question_text, &question_block).with_controls do |_game_state|
-        [OneCardControl.new(journal_type: self,
+        [OneCardControl.new(journal_type: journal_type,
                             question:     self,
                             player:       @player,
                             scope:        :hand,

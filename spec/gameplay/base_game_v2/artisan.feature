@@ -33,3 +33,19 @@ Feature: Artisan
     When I choose 'Put nothing on deck' in my hand
     Then cards should not move
     And I should need to 'Play Treasures, or pass'
+
+  Scenario: No cards to gain - still have to place
+    Then I should need to 'Play an Action, or pass'
+    When I choose Artisan in my hand
+      # Hack all piles to be empty
+      And the supply is empty
+    Then I should need to 'Choose a card to gain into your hand'
+    When I choose 'Gain nothing' in the supply
+    Then cards should not move
+    And I should need to 'Choose a card to put onto your deck'
+    When I choose Copper in my hand
+    Then cards should move as follows:
+      Then I should move Copper from my hand to my deck
+      And these card moves should happen
+    And I should need to 'Play Treasures, or pass'
+

@@ -38,4 +38,14 @@ class Control
       option
     end
   end
+
+  def filter(*args)
+    instance_exec(*args, &@filter)
+  end
+
+  private
+
+  def opts
+    @question.opts
+  end
 end

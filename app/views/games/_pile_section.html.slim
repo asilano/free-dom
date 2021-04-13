@@ -21,6 +21,6 @@
             .card-token= token.to_s.humanize
           - pile_controls.each do |ctrl|
             .card-ctrl
-              - if ctrl.filter[pile.cards.first]
+              - if ctrl.filter(pile.cards.first)
                 = render partial: ctrl, as: :control, locals: { value: ix, card: pile.cards.first }
         .pile-count{class=('empty' if pile.cards.empty?)}= "#{pile.cards.count} of #{pile.card_class.starting_size(@game.users.count)}"

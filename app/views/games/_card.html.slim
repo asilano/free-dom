@@ -4,5 +4,5 @@
   .card-name{data-tooltip title=card.try(:text)}= card.readable_name
   - controls.each do |ctrl|
     .card-ctrl
-      - if ctrl.filter[card]
+      - if ctrl.filter(card)
         = render partial: ctrl, as: :control, locals: { value: card_counter, card: card }

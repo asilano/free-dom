@@ -21,41 +21,12 @@ module GameEngine
         end
       end
 
-      class GainCardJournal < Journal
-        define_question('Choose a card to gain').with_controls do |game_state|
-          filter = ->(card) { card && card.cost <= opts[:trashed_cost] + 2 }
-          [OneCardControl.new(journal_type: GainCardJournal,
-                              question:     self,
-                              player:       @player,
-                              scope:        :supply,
-                              text:         'Gain',
-                              filter:       filter,
-                              null_choice:  if game_state.piles.map(&:cards).map(&:first).none?(&filter)
-                                              { text: 'Gain nothing', value: 'none' }
-                                            end,
-                              css_class:    'gain-card')]
-        end
+      class GainCardJournal < CommonJournals::GainJournal
+        configure question_text: 'Choose a card to gain',
+                  filter:        ->(card) { card && card.cost <= opts[:trashed_cost] + 2 }
 
         validation do
-          valid_gain_choice(filter: ->(card) { card && card.cost <= opts[:trashed_cost] + 3 })
-        end
-
-        process do |_game_state|
-          if params['choice'] == 'none'
-            @histories << History.new("#{player.name} gained nothing.",
-                                      player: player,
-                                      css_classes: %w[gain-card])
-            return
-          end
-
-          pile = game_state.piles[params['choice'].to_i]
-          card = pile.cards.first
-
-          @histories << History.new("#{player.name} gained #{card.readable_name}.",
-                                    player: player,
-                                    css_classes: %w[gain-card])
-          card.be_gained_by(player, from: pile.cards)
-          observe
+          valid_gain_choice(filter: ->(card) { card && card.cost <= opts[:trashed_cost] + 2 })
         end
       end
     end

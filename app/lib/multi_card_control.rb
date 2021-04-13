@@ -1,5 +1,5 @@
 class MultiCardControl < Control
-  attr_reader :key, :filter, :preselect
+  attr_reader :key, :preselect
 
   def initialize(opts = {})
     super
