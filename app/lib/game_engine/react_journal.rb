@@ -2,9 +2,11 @@ module GameEngine
   class ReactJournal < Journal
     define_question('React, or pass').prevent_auto
                                      .with_controls do |_game_state|
-      filter = ->(card) { card.reaction? &&
-                          card.reacts_to == @opts[:react_to] &&
-                          card.location == card.reacts_from }
+      filter = lambda do |card|
+        card.reaction? &&
+          card.reacts_to == @opts[:react_to] &&
+          card.location == card.reacts_from
+      end
       [OneCardControl.new(journal_type: ReactJournal,
                           question:     self,
                           player:       @player,

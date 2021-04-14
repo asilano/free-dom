@@ -21,8 +21,9 @@ module CommonJournals
       return false if journal.params['choice'] == 'none' && @player.hand_cards.present?
       return true if journal.params['choice'] == 'none'
       return false unless journal.params['choice']&.integer?
+      return false if journal.params['choice'].to_i >= journal.player.hand_cards.length
 
-      journal.params['choice'].to_i < journal.player.hand_cards.length
+      !filter || instance_exec(journal.player.hand_cards[journal.params['choice'].to_i], &filter)
     end
 
     process do |_game_state|

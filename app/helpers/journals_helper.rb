@@ -1,5 +1,15 @@
 module JournalsHelper
   module Validations
+    def valid_hand_card(filter: ->(_){ true }, allow_decline: true)
+      no_choices = journal.player.hand_cards.none?(&filter)
+      return true if journal.params['choice'] == 'none' && (no_choices || allow_decline)
+      return false if !no_choices && journal.params['choice'] == 'none'
+      return false unless journal.params['choice']&.integer?
+
+      choice = journal.params['choice'].to_i
+      choice < journal.player.hand_cards.length && filter[journal.player.hand_cards[choice]]
+    end
+
     def valid_gain_choice(filter:, allow_decline: true)
       no_choices = journal.game_state.piles.map(&:cards).map(&:first).none?(&filter)
       return true if journal.params['choice'] == 'none' && (no_choices || allow_decline)
