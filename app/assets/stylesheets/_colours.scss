@@ -4,7 +4,7 @@ $duration-orange: #ffa500;
 $treasure-yellow: #ffd700;
 $victory-green: #00e000;
 $curse-purple: #ba55d3;
-$attack-red: #ff0000;
+$attack-red: #f00;
 
 $card-back-blue: $reaction-blue;
 $dark-blue: darkblue;
@@ -12,13 +12,13 @@ $empty-pile-red: #dd7e7e;
 
 // Player colours for the journal log
 $player-backgrounds: (
-  player0: #ffcccc,
-  player1: #ffffdd,
-  player2: #ccffcc,
-  player3: #ddffff,
-  player4: #ddddff,
-  player5: #ffddff,
+  player0: #fcc,
+  player1: #ffd,
+  player2: #cfc,
+  player3: #dff,
+  player4: #ddf,
+  player5: #fdf,
 );
 
 // Non-game related colours
-$error-red: #dd0000;
+$error-red: #d00;

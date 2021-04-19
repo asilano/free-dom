@@ -1,4 +1,6 @@
-button, [type=button], .button {
+button,
+[type=button],
+.button {
   &:not(.unstyle) {
     box-shadow: grey 5px 5px 8px;
     border-radius: 5px;

@@ -1,44 +1,33 @@
 .card-grid {
   @include xy-grid;
   @include xy-grid-layout(1, '.cell', true, map-get($grid-margin-gutters, small) / 2, 'margin');
-      @include xy-gutters(map-get($grid-margin-gutters, small) / 2, $negative:true);
-
-  @include breakpoint(medium) {
-      @include xy-grid-layout(1, '.cell', true, map-get($grid-margin-gutters, medium) / 2, 'margin');
-      @include xy-gutters(map-get($grid-margin-gutters, medium) / 2, $negative:true);
-  }
-  @include breakpoint(large up) {
-      @include xy-grid-layout(1, '.cell', true, map-get($grid-margin-gutters, medium) / 2, 'margin');
-      @include xy-gutters(map-get($grid-margin-gutters, medium) / 2, $negative:true);
-  }
+  @include xy-gutters(map-get($grid-margin-gutters, small) / 2, $negative:true);
 
   position: relative;
+
+  @include breakpoint(medium) {
+    @include xy-grid-layout(1, '.cell', true, map-get($grid-margin-gutters, medium) / 2, 'margin');
+    @include xy-gutters(map-get($grid-margin-gutters, medium) / 2, $negative:true);
+  }
+  @include breakpoint(large up) {
+    @include xy-grid-layout(1, '.cell', true, map-get($grid-margin-gutters, medium) / 2, 'margin');
+    @include xy-gutters(map-get($grid-margin-gutters, medium) / 2, $negative:true);
+  }
 }
 
 // The following section is order-dependent
-.action.card    {background-color: $action-cream}
-.reaction.card  {background-color: $reaction-blue}
-.duration.card  {background-color: $duration-orange}
-.treasure.card  {background-color: $treasure-yellow}
-.victory.card   {background-color: $victory-green}
-.curse.card     {background-color: $curse-purple}
+.action.card    { background-color: $action-cream; }
+.reaction.card  { background-color: $reaction-blue; }
+.duration.card  { background-color: $duration-orange; }
+.treasure.card  { background-color: $treasure-yellow; }
+.victory.card   { background-color: $victory-green; }
+.curse.card     { background-color: $curse-purple; }
 .attack.card .card-name {
   color: $attack-red;
   font-weight: bold;
 }
 
-.scores .player-deck {
-  .card { padding: 2px 4px; }
-  .action {background-color: $action-cream}
-  .reaction {background-color: $reaction-blue}
-  .duration {background-color: $duration-orange}
-  .treasure {background-color: $treasure-yellow}
-  .victory {background-color: $victory-green}
-  .curse {background-color: $curse-purple}
-  .attack {
-    color: $attack-red;
-  }
-}
+.scores .player-deck .card { padding: 2px 4px; }
 
 .card-token {
   font-size: 0.8em;
