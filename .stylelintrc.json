@@ -7,9 +7,10 @@
     "stylelint-order"
   ],
   "rules": {
+    "block-opening-brace-space-before": "always-multi-line",
     "color-hex-case": "lower",
-    "declaration-no-important": true,
     "declaration-empty-line-before": null,
+    "declaration-no-important": true,
     "order/properties-order": [
       [
         "composes",
