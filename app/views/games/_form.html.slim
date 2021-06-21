@@ -27,11 +27,11 @@
           .pileLabel= label_tag("cards_#{ix}", "Kingdom card #{ix + 1}: ")
           .pileSelect= select_tag("#{j.object_name}[params][card_list][]",
                                   option_groups_from_collection_for_select(GameEngine::Card.expansions,
-                                        :kingdom_cards,
-                                        :name,
-                                        :name,
-                                        :readable_name,
-                                        all_cards[ix]),
+                                                                           :kingdom_cards,
+                                                                           :readable_name,
+                                                                           :name,
+                                                                           :readable_name,
+                                                                           all_cards[ix]),
                                   id: "cards_#{ix}")
 
   .actions = f.submit class: 'button'

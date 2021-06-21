@@ -53,7 +53,10 @@ module CardModules
     def discard
       @player.cards.delete(self)
       @player.cards.unshift(self)
+      old_location = @location
       @location = :discard
+
+      GameEngine::Triggers::CardDiscarded.trigger(self, @player, old_location)
     end
 
     # Default effect of a card being drawn. This is not expected to ever be overridden

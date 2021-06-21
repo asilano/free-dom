@@ -23,6 +23,7 @@ module GameEngine
       randomise_players(game_state)
       populate_piles(game_state)
       create_player_decks(game_state)
+      setup_cards(game_state)
     end
 
     private
@@ -58,6 +59,10 @@ module GameEngine
         player.cards[0, 5].each { |c| c.location = :hand }
         player.cards[5, 5].each { |c| c.location = :deck }
       end
+    end
+
+    def setup_cards(game_state)
+      game_state.piles.each { |pile| pile.card_class.do_setup(game_state) if pile.card_class.respond_to? :do_setup }
     end
 
     class Template

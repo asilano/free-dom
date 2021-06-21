@@ -22,6 +22,8 @@ module GameEngine
       @turn_player = nil
       @last_active_player = nil
 
+      @facts = {}
+
       @next_fid = 0
       @fid_prefix = '1'
     end
@@ -51,6 +53,8 @@ module GameEngine
 
         @game.current_journal.histories << History.new("#{@turn_player.name} started turn #{round}.#{turn_seat + 1}.",
                                                        player: @turn_player)
+
+        Triggers::StartOfTurn.trigger
 
         # Play actions until the player stops or runs out
         until @turn_player.actions.zero?
@@ -157,6 +161,22 @@ module GameEngine
 
     def observe
       @scheduler.work
+    end
+
+    def set_fact(name, value)
+      @facts[name] = value
+    end
+
+    def get_fact(name)
+      @facts[name]
+    end
+
+    def access_fact(name)
+      define_singleton_method(name) { @facts[name] }
+    end
+
+    def inspect
+      "<GameSate:#{object_id}>"
     end
 
     private

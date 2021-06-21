@@ -48,5 +48,9 @@ module GameEngine
       list.last[:last] = true
       list
     end
+
+    def inspect
+      "PlayerState:#{name}"
+    end
   end
 end

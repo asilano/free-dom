@@ -1,7 +1,10 @@
 #!./bin/rails runner
-File.open("#{Rails.root}/spec/support/hashed_card_types.rb", 'w') do |f|
-  f.write('CARD_TYPES = {')
-  str = GameEngine::Card.all_card_types.map { |ty| "'#{ty.readable_name}' => #{ty.name}" }.join(",\n")
+longest_name_len = GameEngine::Card.all_card_types.map { |ty| ty.readable_name.length }.max
+File.open(Rails.root.join('spec', 'support', 'hashed_card_types.rb'), 'w') do |f|
+  f.write("CARD_TYPES = {\n")
+  str = GameEngine::Card.all_card_types.map do |ty|
+    "  '#{ty.readable_name}'#{' ' * (longest_name_len - ty.readable_name.length + 1)}=> #{ty.name}"
+  end.join(",\n")
   f.write(str)
-  f.write('}')
+  f.write("\n}.freeze\n")
 end

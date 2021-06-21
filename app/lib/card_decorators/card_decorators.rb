@@ -96,6 +96,11 @@ module CardDecorators
       @pile_size_given = true
     end
 
+    # Pre-game setup, as on Trade Route or Border Guard
+    def setup(&block)
+      define_singleton_method(:do_setup, &block)
+    end
+
   #   def action(opts = Hash.new(nil))
   #     def self.is_action?
   #       true

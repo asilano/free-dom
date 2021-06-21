@@ -5,7 +5,8 @@ module GameEngine
 
       included do
         @observers = []
-        attr_reader :whenever, :effect
+        attr_reader :effect
+        attr_accessor :whenever
       end
 
       class_methods do
@@ -22,7 +23,10 @@ module GameEngine
 
         def trigger(*args, **kwargs)
           watchers = filter_watchers(*args, **kwargs)
-          watchers.each { |w| w.effect.call }
+          watchers.each do |w|
+            ret = w.effect.call(*args, **kwargs)
+            w.whenever = false if ret == :unwatch
+          end
           @observers -= watchers.reject(&:whenever)
         end
 

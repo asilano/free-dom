@@ -68,6 +68,15 @@ module GameSteps
                              cards:      cards.map(&:to_s)
                            })
     end
+
+    step ':player_name has/have the :artifact' do |name, artifact|
+      player = get_player(name)
+      make_journal(user:   player.user,
+                   type:   GameEngine::HackJournal,
+                   params: { scope: :artifact_owner,
+                             key:   :"#{artifact.downcase}"
+                           })
+    end
   end
 
   module ActionSteps
@@ -273,6 +282,10 @@ module GameSteps
       end
     end
 
+    step ':player_name should move :cards from in play to my/his/her :destination' do |name, cards, destination|
+      send ':player_name should move :cards from my/his/her :source to my/his/her :destination', name, cards, 'play', destination
+    end
+
     step ':player_name should move :cards from my/his/her :source to in play' do |name, cards, source|
       send ':player_name should move :cards from my/his/her :source to my/his/her :destination', name, cards, source, 'play'
     end
@@ -355,6 +368,15 @@ module GameSteps
     step ':player_name total score should be :score' do |name, score|
       @game.process
       expect(get_player(name).calculate_score).to eq score.to_i
+    end
+
+    step ':player_name :whether_to have the :artifact' do |name, should, artifact|
+      @game.process
+      if should
+        expect(@game.game_state.send(:"#{artifact.downcase}_owner")).to eq get_player(name)
+      else
+        expect(@game.game_state.send(:"#{artifact.downcase}_owner")).not_to eq get_player(name)
+      end
     end
   end
 

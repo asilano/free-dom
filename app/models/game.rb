@@ -93,6 +93,10 @@ class Game < ApplicationRecord
     send_msg_to_discord "Game #{name} (##{id}) created."
   end
 
+  def inspect
+    "<Game id: #{id}, name: #{name}>"
+  end
+
   private
 
   def users_to_act

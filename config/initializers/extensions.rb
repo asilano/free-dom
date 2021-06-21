@@ -1,4 +1,8 @@
 class Module
+  def readable_name
+    name.demodulize
+  end
+
   # Return a list of card classes within this module - that is, module constants
   # which are classes, and whose superclass is Card
   def card_classes
@@ -7,7 +11,7 @@ class Module
     model_names.map { |mn| "#{name}::#{mn}".constantize }.sort_by  { |c| [c.raw_cost, c.readable_name] }
   end
 
-  alias :kingdom_cards :card_classes
+  alias kingdom_cards card_classes
 end
 
 class String

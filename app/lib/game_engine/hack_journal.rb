@@ -10,6 +10,8 @@ module GameEngine
         modify_player_cards(game_state)
       when 'supply'
         modify_supply_cards(game_state)
+      when 'artifact_owner'
+        set_artifact_owner(game_state)
       end
     end
 
@@ -46,6 +48,10 @@ module GameEngine
 
       @histories << History.new("HACK! #{params['card_class']} pile #{params['action']}: #{params['cards'].map(&:demodulize).map(&:titleize).join(', ')}.",
                                 css_classes: %w[hack])
+    end
+
+    def set_artifact_owner(game_state)
+      game_state.set_fact(:"#{params['key']}_owner", player)
     end
   end
 end

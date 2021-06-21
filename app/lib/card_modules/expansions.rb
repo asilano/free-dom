@@ -12,7 +12,7 @@ module CardModules
 
     module ClassMethods
       def expansions
-        [GameEngine::BaseGameV2]
+        [GameEngine::BaseGameV2, GameEngine::Renaissance]
       end
 
       def basic_victory_types
