@@ -1,7 +1,6 @@
 module GameEngine
   module Triggers
-    class StartOfTurn
-      include Triggerable
+    class StartOfTurn < Trigger
     end
   end
 end

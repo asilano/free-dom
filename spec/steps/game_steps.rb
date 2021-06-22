@@ -437,7 +437,7 @@ OneCardControl.define_method(:handle_choice) do |choice|
 
   # Otherwise, find the index requested
   choice = choice.first if choice.is_a? Array
-  { @key => find_index(@player, @game_state, @scope, @question, choice) }
+  { @key => find_index(@player, @game_state, @scope, @question, @filter, choice) }
 end
 MultiCardControl.define_method(:handle_choice) do |choice|
   # First, check for choosing nothing
@@ -476,21 +476,21 @@ ButtonControl.define_method(:handle_choice) do |choice|
   { @key => @values.detect { |opt| opt[0] == choice }[1] }
 end
 
-def find_index(player, game_state, scope, question, card)
+def find_index(player, game_state, scope, question, filter, card)
   case scope
   when :hand
-    player.hand_cards.index { |c| c.is_a? card }
+    player.hand_cards.index { |c| c.is_a?(card) && filter[c] }
   when :supply
-    game_state.piles.index { |pile| pile.cards.first.is_a? card }
+    game_state.piles.index { |pile| pile.cards.first.is_a?(card) && filter[pile.cards.first] }
   when :deck
-    player.deck_cards.index { |c| c.is_a? card }
+    player.deck_cards.index { |c| c.is_a?(card) && filter[c] }
   when :discard
-    player.discarded_cards.index { |c| c.is_a? card }
+    player.discarded_cards.index { |c| c.is_a?(card) && filter[c] }
   when :revealed
-    player.cards_revealed_to(@question).index { |c| c.is_a? card }
+    player.cards_revealed_to(@question).index { |c| c.is_a?(card) && filter[c] }
   when :peeked
-    player.cards_peeked_to(@question).index { |c| c.is_a? card }
+    player.cards_peeked_to(@question).index { |c| c.is_a?(card) && filter[c] }
   when :everywhere
-    player.cards.index { |c| c.is_a? card }
+    player.cards.index { |c| c.is_a?(card) && filter[c] }
   end
 end

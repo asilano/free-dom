@@ -56,7 +56,9 @@ module CardModules
       old_location = @location
       @location = :discard
 
-      GameEngine::Triggers::CardDiscarded.trigger(self, @player, old_location)
+      game_state.trigger do
+        GameEngine::Triggers::CardDiscarded.trigger(self, @player, old_location)
+      end
     end
 
     # Default effect of a card being drawn. This is not expected to ever be overridden

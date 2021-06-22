@@ -1,8 +1,6 @@
 module GameEngine
   module Triggers
-    class CardDiscarded
-      include Triggerable
-
+    class CardDiscarded < Trigger
       attr_reader :filter
 
       def self.filter_watchers(card_discarded, discarded_by, discarded_from)

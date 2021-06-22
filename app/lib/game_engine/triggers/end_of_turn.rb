@@ -1,7 +1,6 @@
 module GameEngine
   module Triggers
-    class EndOfTurn
-      include Triggerable
+    class EndOfTurn < Trigger
     end
   end
 end

@@ -32,6 +32,7 @@ module GameEngine
       # Initialise
       @rng = Random.new(@seed)
       @state = :waiting
+      Triggers::Trigger.clear_watchers
 
       # Ask the game creator what cards are in the Kingdom. We expect this to
       # proceed immediately, with a journal created with the game.

@@ -142,7 +142,6 @@ Feature: Border Guard
       And these card moves should happen
     And Belle should need to "Play an Action, or pass"
 
-
   Scenario: Playing Border Guard twice with Horn - check can keep second one
     Given pending
     And my deck contains nothing

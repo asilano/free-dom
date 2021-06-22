@@ -1,8 +1,6 @@
 module GameEngine
   module Triggers
-    class TreasurePlayed
-      include Triggerable
-
+    class TreasurePlayed < Trigger
       attr_reader :filter
 
       def self.filter_watchers(treasure_played, played_by)
