@@ -20,9 +20,12 @@ module GameEngine
 
         played_by.grant_actions(1)
 
+        lantern = game_state.lantern_owner == played_by
+        cards_to_reveal = lantern ? 3 : 2
         game_state.get_journal(ChooseCardForHandJournal,
                                from:           played_by,
-                               revealed_cards: played_by.reveal_cards(2, from: :deck))
+                               revealed_cards: played_by.reveal_cards(cards_to_reveal, from: :deck),
+                               opts:           {lanterned: lantern})
                   .process(game_state)
       end
 
@@ -48,7 +51,7 @@ module GameEngine
         end
 
         process do |game_state|
-          take_artifact = player.cards_revealed_to(@question).count(&:action?) == 2
+          take_artifact = player.cards_revealed_to(@question).count(&:action?) == (opts[:lanterned] ? 3 : 2)
 
           # Done looking at cards. Trash up to one, and discard the rest!
           if params['choice'] == 'none'
