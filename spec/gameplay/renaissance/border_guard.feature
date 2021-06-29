@@ -216,7 +216,7 @@ Feature: Border Guard
       And I should discard Market from my deck
       And these card moves should happen
     And I should need to 'Take Lantern or Horn'
-    When I choose the option 'Take the Horn'
+    When I choose the option 'Take the Horn (you already have it)'
     Then I should not have the Lantern
     And I should have the Horn
 
@@ -232,7 +232,7 @@ Feature: Border Guard
     When I choose <hand_card> in my revealed cards
     Then cards should move as follows:
       Then I should move <hand_card> from my deck to my hand
-      And I should discard <discard_cards> from my deck
+      And I should discard <discard_card> from my deck
       And these card moves should happen
     And I should need to <next_question>
     Examples:

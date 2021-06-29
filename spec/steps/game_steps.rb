@@ -74,7 +74,7 @@ module GameSteps
       make_journal(user:   player.user,
                    type:   GameEngine::HackJournal,
                    params: { scope: :artifact_owner,
-                             key:   :"#{artifact.downcase}"
+                             key:   :"#{artifact}"
                            })
     end
   end
@@ -373,9 +373,9 @@ module GameSteps
     step ':player_name :whether_to have the :artifact' do |name, should, artifact|
       @game.process
       if should
-        expect(@game.game_state.send(:"#{artifact.downcase}_owner")).to eq get_player(name)
+        expect(@game.game_state.artifacts[artifact].owner).to eq get_player(name)
       else
-        expect(@game.game_state.send(:"#{artifact.downcase}_owner")).not_to eq get_player(name)
+        expect(@game.game_state.artifacts[artifact].owner).not_to eq get_player(name)
       end
     end
   end

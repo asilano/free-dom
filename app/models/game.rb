@@ -38,6 +38,7 @@ class Game < ApplicationRecord
 
       @questions.compact!
     rescue => e
+      raise
       @questions = []
       return
     end

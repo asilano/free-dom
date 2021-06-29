@@ -9,7 +9,7 @@ module GameEngine
     class InvalidJournalError < ArgumentError
     end
 
-    attr_reader :players, :piles, :turn_player, :game
+    attr_reader :players, :piles, :turn_player, :game, :artifacts
     attr_accessor :state, :rng, :fid_prefix, :next_fid, :last_active_player
 
     def initialize(seed, game)
@@ -22,6 +22,7 @@ module GameEngine
       @turn_player = nil
       @last_active_player = nil
 
+      @artifacts = {}
       @facts = {}
 
       @next_fid = 0
@@ -162,6 +163,10 @@ module GameEngine
 
     def observe
       @scheduler.work
+    end
+
+    def create_artifact(klass)
+      @artifacts[klass.to_s.demodulize] = klass.new(self)
     end
 
     def set_fact(name, value)

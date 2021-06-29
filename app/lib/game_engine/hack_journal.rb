@@ -51,7 +51,7 @@ module GameEngine
     end
 
     def set_artifact_owner(game_state)
-      game_state.set_fact(:"#{params['key']}_owner", player)
+      game_state.artifacts[params['key']].give_to(player)
     end
   end
 end

@@ -1,25 +1,21 @@
 # Once per turn, when you discard a Border Guard from play, you may put it onto your deck.
 module GameEngine
   module CardlikeObjects
-    class Horn
+    class Horn < Artifact
       def initialize(game_state)
-        @game_state = game_state
-        @game_state.set_fact(:horn_owner, nil)
-        @game_state.access_fact(:horn_owner)
+        super(game_state)
 
         Triggers::StartOfTurn.watch_for(whenever: true) do
-          #@used_this_turn = false
-
-          filter = lambda do |card, player, from|
+            filter = lambda do |card, player, from|
             card.is_a?(Renaissance::BorderGuard) &&
-              player == @game_state.horn_owner &&
+              player == @owner &&
               from == :play
           end
           Triggers::CardDiscarded.watch_for(filter:   filter,
                                             whenever: true,
                                             stop_at:  :end_of_turn) do |card, player, _from|
-            used = game_state.get_journal(PlaceBorderGuardJournal, from: player,
-                                                                   opts: { border_guard: card }).process(game_state)
+            used = @game_state.get_journal(PlaceBorderGuardJournal, from: player,
+                                                                    opts: { border_guard: card }).process(@game_state)
             :unwatch if used
           end
         end

@@ -11,8 +11,8 @@ module GameEngine
       # Lantern - Border Guards you play reveal 3 cards and discard 2. (It takes all 3 being Actions to take the Horn.)
 
       setup do |game_state|
-        CardlikeObjects::Horn.new(game_state)
-        CardlikeObjects::Lantern.new(game_state)
+        game_state.create_artifact(CardlikeObjects::Horn)
+        game_state.create_artifact(CardlikeObjects::Lantern)
       end
 
       def play_as_action(played_by:)
@@ -20,7 +20,7 @@ module GameEngine
 
         played_by.grant_actions(1)
 
-        lantern = game_state.lantern_owner == played_by
+        lantern = game_state.artifacts['Lantern'].owned_by?(played_by)
         cards_to_reveal = lantern ? 3 : 2
         game_state.get_journal(ChooseCardForHandJournal,
                                from:           played_by,
@@ -82,8 +82,8 @@ module GameEngine
 
       class TakeArtifactJournal < Journal
         define_question('Take Lantern or Horn').with_controls do |game_state|
-          opts = [["Take the Lantern#{' (you already have it)' if game_state.lantern_owner == @player}", 'lantern']]
-          opts << ["Take the Horn#{' (you already have it)' if game_state.lantern_owner == @player}", 'horn']
+          opts = [["Take the Lantern#{' (you already have it)' if game_state.artifacts['Lantern'].owned_by?(@player)}", 'Lantern']]
+          opts << ["Take the Horn#{' (you already have it)' if game_state.artifacts['Horn'].owned_by?(@player)}", 'Horn']
           [ButtonControl.new(journal_type: journal_type,
                              question:     self,
                              player:       @player,
@@ -92,13 +92,13 @@ module GameEngine
         end
 
         validation do
-          %w[lantern horn].include? journal.params['choice']
+          %w[Lantern Horn].include? journal.params['choice']
         end
 
         process do |game_state|
-          game_state.set_fact(:"#{params['choice']}_owner", player)
+          game_state.artifacts[params['choice']].give_to(player)
 
-          @histories << History.new("#{player.name} took the #{params['choice'].titleize}.",
+          @histories << History.new("#{player.name} took the #{params['choice']}.",
                                     player: player)
         end
       end
