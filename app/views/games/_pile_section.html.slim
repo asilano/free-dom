@@ -24,3 +24,8 @@
               - if ctrl.filter(pile.cards.first)
                 = render partial: ctrl, as: :control, locals: { value: ix, card: pile.cards.first }
         .pile-count{class=('empty' if pile.cards.empty?)}= "#{pile.cards.count} of #{pile.card_class.starting_size(@game.users.count)}"
+      - if @game.game_state.artifacts.values.any? { |art| art.comes_from == pile.card_class && art.owner.nil? }
+        .card-grid
+          - @game.game_state.artifacts.values.select { |art| art.comes_from == pile.card_class && art.owner.nil? }.each do |art|
+            .cell.card.artifact
+              .card-name{data-tooltip title=art.text}= art.readable_name

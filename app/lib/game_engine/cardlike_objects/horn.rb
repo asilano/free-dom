@@ -2,6 +2,9 @@
 module GameEngine
   module CardlikeObjects
     class Horn < Artifact
+      comes_from Renaissance::BorderGuard
+      text "Once per turn, when you discard a Border Guard from play, you may put it onto your deck."
+
       def initialize(game_state)
         super(game_state)
 
