@@ -26,6 +26,7 @@ CARD_TYPES = {
   'Witch'        => GameEngine::BaseGameV2::Witch,
   'Artisan'      => GameEngine::BaseGameV2::Artisan,
   'Border Guard' => GameEngine::Renaissance::BorderGuard,
+  'Ducat'        => GameEngine::Renaissance::Ducat,
   'Estate'       => GameEngine::BasicCards::Estate,
   'Duchy'        => GameEngine::BasicCards::Duchy,
   'Province'     => GameEngine::BasicCards::Province,
