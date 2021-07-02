@@ -4,7 +4,7 @@ module GameEngine
     include PlayerModules::Manipulation
 
     attr_reader :user, :cards, :game_state, :game
-    attr_accessor :seat, :actions, :buys, :cash, :score
+    attr_accessor :seat, :actions, :buys, :cash, :score, :coffers
 
     delegate :name, to: :user
 
@@ -14,6 +14,8 @@ module GameEngine
       @game = game_state.game
       @cards = []
       @score = 0
+
+      @coffers = 0
     end
 
     # Processors
