@@ -37,7 +37,7 @@ module GameEngine
                               player:       @player,
                               scope:        :hand,
                               text:         'Set aside',
-                              filter:       ->(card) { card == @opts[:card] },
+                              filter:       ->(card) { card == opts[:card] },
                               null_choice:  { text: 'Keep', value: 'keep' })]
         end
 

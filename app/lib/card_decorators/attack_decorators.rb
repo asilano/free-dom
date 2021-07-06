@@ -14,12 +14,12 @@ module CardDecorators
           end
         end
         still_react = :continue
-        response = { react_to: :attack }
+        response = {}
         while still_react == :continue && has_reacts_proc[v]
 
           still_react = game_state.get_journal(GameEngine::ReactJournal,
                                                from: v,
-                                               opts: { response: response }).process(self)
+                                               opts: { response: response, react_to: :attack }).process(self)
         end
 
         attack(victim: v) unless response[:prevented]

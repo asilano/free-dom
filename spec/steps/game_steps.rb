@@ -191,7 +191,6 @@ module GameSteps
     step 'these card moves should happen' do
       @game.process
       cards_now = extract_game_cards
-      #byebug if @cards_before.values.flatten.any? { |c| !c.key? :revealed }
       cards_now[:players].each.with_index do |cards, ix|
         grouped_cards = cards.group_by { |c| c[:location] }
         group_before = @cards_before[:players][ix].group_by { |c| c[:location] }
@@ -442,7 +441,7 @@ OneCardControl.define_method(:handle_choice) do |choice|
 
   # Otherwise, find the index requested
   choice = choice.first if choice.is_a? Array
-  { @key => find_index(@player, @game_state, @scope, @question, @filter, choice) }
+  { @key => find_index(self, @player, @game_state, @scope, @filter, choice) }
 end
 MultiCardControl.define_method(:handle_choice) do |choice|
   # First, check for choosing nothing
@@ -472,7 +471,7 @@ MultiCardChoicesControl.define_method(:handle_choice) do |choices|
   params = {}
 
   choices.each do |pair|
-    params[find_index(@player, @game_state, @scope, @question, pair[0])] = @choices.detect { |opt| opt[0] == pair[1] }[1]
+    params[find_index(self, @player, @game_state, @scope, @filter, pair[0])] = @choices.detect { |opt| opt[0] == pair[1] }[1]
   end
   { @key => params }
 end
@@ -481,21 +480,21 @@ ButtonControl.define_method(:handle_choice) do |choice|
   { @key => @values.detect { |opt| opt[0] == choice }[1] }
 end
 
-def find_index(player, game_state, scope, question, filter, card)
+def find_index(control, player, game_state, scope, filter, card)
   case scope
   when :hand
-    player.hand_cards.index { |c| c.is_a?(card) && filter[c] }
+    player.hand_cards.index { |c| c.is_a?(card) && control.instance_exec(c, &filter) }
   when :supply
-    game_state.piles.index { |pile| pile.cards.first.is_a?(card) && filter[pile.cards.first] }
+    game_state.piles.index { |pile| pile.cards.first.is_a?(card) && control.instance_exec(pile.cards.first, &filter) }
   when :deck
-    player.deck_cards.index { |c| c.is_a?(card) && filter[c] }
+    player.deck_cards.index { |c| c.is_a?(card) && control.instance_exec(c, &filter) }
   when :discard
-    player.discarded_cards.index { |c| c.is_a?(card) && filter[c] }
+    player.discarded_cards.index { |c| c.is_a?(card) && control.instance_exec(c, &filter) }
   when :revealed
-    player.cards_revealed_to(@question).index { |c| c.is_a?(card) && filter[c] }
+    player.cards_revealed_to(@question).index { |c| c.is_a?(card) && control.instance_exec(c, &filter) }
   when :peeked
-    player.cards_peeked_to(@question).index { |c| c.is_a?(card) && filter[c] }
+    player.cards_peeked_to(@question).index { |c| c.is_a?(card) && control.instance_exec(c, &filter) }
   when :everywhere
-    player.cards.index { |c| c.is_a?(card) && filter[c] }
+    player.cards.index { |c| c.is_a?(card) && control.instance_exec(c, &filter) }
   end
 end
