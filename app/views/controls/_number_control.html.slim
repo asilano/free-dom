@@ -1,0 +1,6 @@
+.cell.card
+  .card-name= label_tag "journal[params][#{control.key}]", control.text
+  .card-ctrl= number_field_tag "journal[params][#{control.key}]", nil, min: control.min, max: control.max, class: 'cell ' + control.css_class, form: "control_form_#{control.object_id}", id: sanitize_to_id("journal[params][#{control.key}]")
+.cell.card.null-card
+  .card-name
+    .card-ctrl= render partial: 'controls/cardless_button', object: control.cardless_button, as: :button, locals: { control: control }

@@ -1,4 +1,4 @@
-.card-grid {
+.card-grid, .floating-control {
   @include xy-grid;
   @include xy-grid-layout(1, '.cell', true, map-get($grid-margin-gutters, small) / 2, 'margin');
   @include xy-gutters(map-get($grid-margin-gutters, small) / 2, $negative:true);

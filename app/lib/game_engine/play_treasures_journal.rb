@@ -2,15 +2,28 @@ module GameEngine
   class PlayTreasuresJournal < Journal
     define_question('Play Treasures, or pass').prevent_auto
                                               .with_controls do |_game_state|
-      [OneCardControl.new(journal_type: PlayTreasuresJournal,
-                          question:     self,
-                          player:       @player,
-                          scope:        :hand,
-                          text:         'Play',
-                          filter:       :treasure?,
-                          null_choice:  { text:  'Stop playing treasures',
-                                          value: 'none' },
-                          css_class:    'play-treasure')]
+      ctrls = []
+      ctrls << OneCardControl.new(journal_type: PlayTreasuresJournal,
+                                  question:     self,
+                                  player:       @player,
+                                  scope:        :hand,
+                                  text:         'Play',
+                                  filter:       :treasure?,
+                                  null_choice:  { text:  'Stop playing treasures',
+                                                  value: 'none' },
+                                  css_class:    'play-treasure')
+
+      if @player.coffers.positive?
+        ctrls << NumberControl.new(journal_type: SpendCoffersJournal,
+                                   question:     self,
+                                   player:       @player,
+                                   scope:        :with_hand,
+                                   min:          1,
+                                   max:          @player.coffers,
+                                   text:         "Coffers to spend (max: #{@player.coffers})",
+                                   submit_text:  'Spend coffers')
+      end
+      ctrls
     end
 
     # For back-compatibility, allow arrays of choices
@@ -39,6 +52,16 @@ module GameEngine
 
       # Ask again, unless the player now has no treasures in hand
       player.hand_cards.any?(&:treasure?) ? :continue : :stop
+    end
+
+    class Template
+      def matches?(journal)
+        return true if super
+        return false unless journal.is_a? GameEngine::SpendCoffersJournal
+
+        define_singleton_method(:journal) { journal }
+        valid? journal
+      end
     end
   end
 end

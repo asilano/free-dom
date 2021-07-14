@@ -31,6 +31,12 @@
           - hand_controls.each do |ctrl|
             - if ctrl.cardless_button
               .card-ctrl= render partial: 'controls/cardless_button', object: ctrl.cardless_button, as: :button, locals: { control: ctrl }
+  - if (with_hand_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :with_hand }).present?
+    = render partial: 'control_skeleton', collection: with_hand_controls
+    - with_hand_controls.each do |ctrl|
+      .grid-container.fluid
+        .floating-control
+          = render partial: ctrl, as: :control
 
   / Cards in play
   h5 In Play
@@ -126,5 +132,7 @@
       .counts
         .count= pluralize(player.actions, 'Action')
         .count= pluralize(player.buys, 'Buy')
+        - if player.coffers.positive?
+          .count #{player.coffers} Coffers
       .cash
         span.cost-text= player.cash

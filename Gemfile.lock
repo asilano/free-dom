@@ -347,7 +347,7 @@ GEM
       railties (>= 3.1)
       slim (>= 3.0, < 5.0)
     sortable-rails (1.7.0)
-    spring (2.1.0)
+    spring (2.1.1)
     spring-commands-rspec (1.0.4)
       spring (>= 0.9.1)
     sprockets (3.7.2)
@@ -423,7 +423,6 @@ DEPENDENCIES
   inline_svg
   jbuilder (~> 2.5)
   jquery-rails
-  listen (>= 3.0.5, < 3.2)
   mutant-rspec
   pg (>= 0.18, < 2.0)
   puma (~> 3.7)

@@ -13,6 +13,7 @@ Feature: Ducat
     Then I should have 1 coffers
     And I should have 2 buys
     And I should have 0 cash
+    And I should need to "Play Treasures, or pass"
     When I spend 1 Coffers
     Then I should have 1 cash
     And I should have 0 coffers
