@@ -44,10 +44,10 @@ module GameEngine
         end
 
         validation do
-          choice = journal.params['choice']
+          choice = params['choice']
           return false unless choice.is_a? Hash
           return false unless choice.keys.all?(&:integer?)
-          return false unless choice.keys.map(&:to_i).sort == (0...journal.player.peeked_cards.length).to_a
+          return false unless choice.keys.map(&:to_i).sort == (0...player.peeked_cards.length).to_a
 
           choice.values.all? { |v| %w[discard trash keep].include? v }
         end
@@ -100,12 +100,12 @@ module GameEngine
         end
 
         validation do
-          choice = journal.params['choice']
+          choice = params['choice']
           return false unless choice.is_a? Hash
           return false unless choice.keys.all?(&:integer?)
-          return false unless choice.keys.map(&:to_i).sort == (0...journal.player.peeked_cards.length).to_a
+          return false unless choice.keys.map(&:to_i).sort == (0...player.peeked_cards.length).to_a
 
-          choice.values.map(&:to_i).sort == (1..journal.player.peeked_cards.length).to_a
+          choice.values.map(&:to_i).sort == (1..player.peeked_cards.length).to_a
         end
 
         process do |_game_state|

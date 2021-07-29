@@ -107,11 +107,13 @@ module GameEngine
         journal.process(self)
         journal = Fiber.yield(template.question)
       end
-      raise UnexpectedJournalError, "Unexpected journal type: #{journal.class}. Expecting: #{template.class.parent}" unless template.matches? journal
+
+      journal.question = template.question
+      raise UnexpectedJournalError, "Unexpected journal type: #{journal.class}. Expecting: #{template.class.module_parent}" unless template.matches? journal
       raise InvalidJournalError, "Invalid journal: #{journal}" unless template.valid? journal
 
       @last_active_player = journal.player unless journal.auto
-      journal.tap { |j| j.question = template.question }
+      journal
     end
 
     def player_for(user)

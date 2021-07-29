@@ -9,7 +9,7 @@ module GameEngine
         super(game_state)
 
         Triggers::StartOfTurn.watch_for(whenever: true) do
-            filter = lambda do |card, player, from|
+          filter = lambda do |card, player, from|
             card.is_a?(Renaissance::BorderGuard) &&
               player == @owner &&
               from == :play
@@ -36,11 +36,11 @@ module GameEngine
         end
 
         validation do
-          return true if journal.params['choice'] == 'none'
-          return false unless journal.params['choice']&.integer?
+          return true if params['choice'] == 'none'
+          return false unless params['choice']&.integer?
 
-          choice = journal.params['choice'].to_i
-          journal.player.discarded_cards[choice] == opts[:border_guard]
+          choice = params['choice'].to_i
+          player.discarded_cards[choice] == opts[:border_guard]
         end
 
         process do |_game_state|

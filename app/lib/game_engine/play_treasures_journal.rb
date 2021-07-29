@@ -28,12 +28,12 @@ module GameEngine
 
     # For back-compatibility, allow arrays of choices
     validation do
-      return true if journal.params['choice'] == 'none'
-      return false unless journal.params['choice']
-      return false unless Array(journal.params['choice']).all?(&:integer?)
+      return true if params['choice'] == 'none'
+      return false unless params['choice']
+      return false unless Array(params['choice']).all?(&:integer?)
 
-      Array(journal.params['choice']).map(&:to_i).all? do |choice|
-        choice < journal.player.hand_cards.length && journal.player.hand_cards[choice].treasure?
+      Array(params['choice']).map(&:to_i).all? do |choice|
+        choice < player.hand_cards.length && player.hand_cards[choice].treasure?
       end
     end
 
@@ -57,10 +57,8 @@ module GameEngine
     class Template
       def matches?(journal)
         return true if super
-        return false unless journal.is_a? GameEngine::SpendCoffersJournal
-
-        define_singleton_method(:journal) { journal }
-        valid? journal
+        #return false unless
+        journal.is_a? GameEngine::SpendCoffersJournal
       end
     end
   end

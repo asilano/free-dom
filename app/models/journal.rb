@@ -1,4 +1,6 @@
 class Journal < ApplicationRecord
+  include JournalsHelper::Validations
+
   belongs_to :game
   belongs_to :user, optional: true
 
@@ -12,8 +14,6 @@ class Journal < ApplicationRecord
 
   # Nested classes let GameEngine request the right journal at the right time
   class Template
-    include JournalsHelper::Validations
-
     attr_reader :opts, :player, :game
 
     def initialize(player, game)
@@ -35,13 +35,9 @@ class Journal < ApplicationRecord
     end
 
     def valid?(journal)
-      define_singleton_method(:journal) { journal }
       return false unless journal.skip_owner_check || player == journal.player
-      do_validate
-    end
 
-    def do_validate
-      true
+      journal.do_validate
     end
 
     class Question
@@ -148,7 +144,11 @@ class Journal < ApplicationRecord
   end
 
   def self.validation(&block)
-    self::Template.define_method(:do_validate, &block)
+    define_method(:do_validate, &block)
+  end
+
+  def do_validate
+    true
   end
 
   def self.expected_order(fiber_id, game)

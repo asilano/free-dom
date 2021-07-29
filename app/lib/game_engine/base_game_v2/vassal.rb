@@ -32,7 +32,7 @@ module GameEngine
           end
 
         validation do
-          %w[play decline].include? journal.params['choice']
+          %w[play decline].include? params['choice']
         end
 
         process do |_game_state|

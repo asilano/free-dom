@@ -40,12 +40,12 @@ module GameEngine
         end
 
         validation do
-          return true if player.hand_cards.empty? && journal.params['choice'] == 'none'
-          return false if player.hand_cards.present? && journal.params['choice'] == 'none'
-          return false unless journal.params['choice']&.integer?
+          return true if player.hand_cards.empty? && params['choice'] == 'none'
+          return false if player.hand_cards.present? && params['choice'] == 'none'
+          return false unless params['choice']&.integer?
 
-          choice = journal.params['choice'].to_i
-          choice < journal.player.hand_cards.length
+          choice = params['choice'].to_i
+          choice < player.hand_cards.length
         end
 
         process do |_game_state|

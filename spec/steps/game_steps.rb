@@ -126,6 +126,19 @@ module GameSteps
                    fiber_id: question.fiber_id,
                    params:   control.handle_choice(option))
     end
+
+    step ':player_name spend(s) :amount Coffers' do |name, amount|
+      user = get_player(name).user
+      question = @questions.detect { |q| q&.player&.name == user.name }
+      controls = question.controls_for(user, @game.game_state)
+      expect(controls).to include(have_attributes(scope: :with_hand))
+
+      control = controls.detect { |c| c.scope == :with_hand }
+      make_journal(user:     user,
+                   type:     'GameEngine::SpendCoffersJournal',
+                   fiber_id: question.fiber_id,
+                   params:   control.handle_choice(amount))
+    end
   end
 
   module CheckSteps
@@ -349,6 +362,19 @@ module GameSteps
       end
     end
 
+    step ':player_name :whether_to be able to choose the option :option' do |name, should, option|
+      user = get_player(name).user
+      question = @questions.detect { |q| q.player.name == user.name }
+      controls = question.controls_for(user, @game.game_state)
+      control = controls.detect { |c| c.scope == :player }
+
+      if should
+        expect(control.values.map(&:first)).to include(option)
+      else
+        expect(control.values.map(&:first)).to_not include(option)
+      end
+    end
+
     step ':player_name should have :count action(s)' do |name, count|
       @game.process
       expect(get_player(name).actions).to eq count.to_i
@@ -364,7 +390,7 @@ module GameSteps
       expect(get_player(name).cash).to eq amount.to_i
     end
 
-    step ':player_name should have :amount coffers' do |name, amount|
+    step ':player_name should have :amount Coffers' do |name, amount|
       @game.process
       expect(get_player(name).coffers).to eq amount.to_i
     end
@@ -478,6 +504,10 @@ end
 
 ButtonControl.define_method(:handle_choice) do |choice|
   { @key => @values.detect { |opt| opt[0] == choice }[1] }
+end
+
+NumberControl.define_method(:handle_choice) do |choice|
+  { @key => choice.to_s }
 end
 
 def find_index(control, player, game_state, scope, filter, card)

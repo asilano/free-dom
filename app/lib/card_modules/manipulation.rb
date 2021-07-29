@@ -20,7 +20,7 @@ module CardModules
                                                                 css_classes: types + %w[play-treasure])
     end
 
-    def react(response, reacted_by:)
+    def react(_response, reacted_by:)
       game.current_journal.histories << GameEngine::History.new("#{reacted_by.name} reacted with #{readable_name}.",
                                                                 player: reacted_by,
                                                                 css_classes: %w[react])
@@ -38,6 +38,10 @@ module CardModules
       @player = player
       @pile = nil
       @location = to
+
+      game_state.trigger do
+        GameEngine::Triggers::CardGained.trigger(self, @player, from, to)
+      end
     end
 
     def put_on_deck(player, from:)

@@ -14,12 +14,12 @@ module GameEngine
     end
 
     validation do
-      return true if journal.params['choice'] == 'none'
-      return false unless journal.params['choice']&.integer?
+      return true if params['choice'] == 'none'
+      return false unless params['choice']&.integer?
 
-      choice = journal.params['choice'].to_i
-      choice < journal.game_state.piles.length &&
-        journal.game_state.piles[choice].cards.first&.player_can_buy?(player: journal.player)
+      choice = params['choice'].to_i
+      choice < game_state.piles.length &&
+        game_state.piles[choice].cards.first&.player_can_buy?(player: player)
     end
 
     process do |game_state|

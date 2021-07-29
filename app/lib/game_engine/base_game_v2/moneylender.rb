@@ -24,7 +24,7 @@ module GameEngine
         end
 
         validation do
-          %w[none trash].include? journal.params['choice']
+          %w[none trash].include? params['choice']
         end
 
         process do |_game_state|

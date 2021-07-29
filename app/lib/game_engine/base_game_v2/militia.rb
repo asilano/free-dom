@@ -35,10 +35,10 @@ module GameEngine
         end
 
         validation do
-          return false unless journal.params['choice']&.integer?
+          return false unless params['choice']&.integer?
 
-          choice = journal.params['choice'].to_i
-          choice < journal.player.hand_cards.length
+          choice = params['choice'].to_i
+          choice < player.hand_cards.length
         end
 
         process do |_game_state|

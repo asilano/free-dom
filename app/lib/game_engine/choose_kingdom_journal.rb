@@ -5,7 +5,7 @@ module GameEngine
     validate :valid_kingdom_choices
 
     validation do
-      journal.kingdom_choice_errors.empty?
+      kingdom_choice_errors.empty?
     end
 
     process do |game_state|

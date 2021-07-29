@@ -25,11 +25,11 @@ module GameEngine
         end
 
         validation do
-          return true if journal.params['choice'].blank?
-          return false unless journal.params['choice']&.all?(&:integer?)
+          return true if params['choice'].blank?
+          return false unless params['choice']&.all?(&:integer?)
 
-          journal.params['choice'].all? do |choice|
-            choice.to_i < journal.player.hand_cards.length
+          params['choice'].all? do |choice|
+            choice.to_i < player.hand_cards.length
           end
         end
 

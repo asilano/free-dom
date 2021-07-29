@@ -18,30 +18,30 @@ module GameEngine
         played_by.grant_cash(1)
 
         if game_state.piles.any? { |p| p.cards.empty? }
-          game_state.get_journal(DiscardCardsJournal, from: played_by).process(game_state)
+          count = game_state.piles.count { |p| p.cards.empty? }.clamp(0, @player.hand_cards.count)
+          game_state.get_journal(DiscardCardsJournal, from: played_by, opts: { count: count }).process(game_state)
         end
       end
 
       class DiscardCardsJournal < Journal
-        define_question do |game_state|
-          count = game_state.piles.count { |p| p.cards.empty? }.clamp(0, @player.hand_cards.count)
-          "Discard #{pluralize(count, 'card')}"
+        define_question do |_game_state|
+          "Discard #{pluralize(opts[:count], 'card')}"
         end.with_controls do |_game_state|
           [MultiCardControl.new(journal_type: DiscardCardsJournal,
-                      question:     self,
-                      player:       @player,
-                      scope:        :hand,
-                      text:         'Discard',
-                      submit_text:  'Discard selected cards',
-                      css_class:    'discard')]
+                                question:     self,
+                                player:       @player,
+                                scope:        :hand,
+                                text:         'Discard',
+                                submit_text:  'Discard selected cards',
+                                css_class:    'discard')]
         end
 
         validation do
-          return true if journal.params['choice'].blank?
-          return false unless journal.params['choice']&.all?(&:integer?)
+          return false unless params['choice'].length == opts[:count]
+          return false unless params['choice']&.all?(&:integer?)
 
-          journal.params['choice'].all? do |choice|
-            choice.to_i < journal.player.hand_cards.length
+          params['choice'].all? do |choice|
+            choice.to_i < player.hand_cards.length
           end
         end
 

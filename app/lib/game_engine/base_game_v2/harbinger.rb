@@ -28,11 +28,11 @@ module GameEngine
         end
 
         validation do
-          return true if journal.params['choice'] == 'none'
-          return false unless journal.params['choice']&.integer?
+          return true if params['choice'] == 'none'
+          return false unless params['choice']&.integer?
 
-          choice = journal.params['choice'].to_i
-          choice < journal.player.discarded_cards.length
+          choice = params['choice'].to_i
+          choice < player.discarded_cards.length
         end
 
         process do |_game_state|

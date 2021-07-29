@@ -42,12 +42,12 @@ module GameEngine
         end
 
         validation do
-          return true if player.cards_revealed_to(question).empty? && journal.params['choice'] == 'none'
-          return false if player.cards_revealed_to(question).present? && journal.params['choice'] == 'none'
-          return false unless journal.params['choice']&.integer?
+          return true if player.cards_revealed_to(question).empty? && params['choice'] == 'none'
+          return false if player.cards_revealed_to(question).present? && params['choice'] == 'none'
+          return false unless params['choice']&.integer?
 
-          choice = journal.params['choice'].to_i
-          choice < journal.player.cards_revealed_to(question).length
+          choice = params['choice'].to_i
+          choice < player.cards_revealed_to(question).length
         end
 
         process do |game_state|
@@ -92,7 +92,7 @@ module GameEngine
         end
 
         validation do
-          %w[Lantern Horn].include? journal.params['choice']
+          %w[Lantern Horn].include? params['choice']
         end
 
         process do |game_state|

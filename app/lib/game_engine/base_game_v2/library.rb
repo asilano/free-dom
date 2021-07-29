@@ -42,10 +42,10 @@ module GameEngine
         end
 
         validation do
-          return true if journal.params['choice'] == 'keep'
-          return false unless journal.params['choice']&.integer?
+          return true if params['choice'] == 'keep'
+          return false unless params['choice']&.integer?
 
-          journal.player.hand_cards[journal.params['choice'].to_i] == opts[:card]
+          player.hand_cards[params['choice'].to_i] == opts[:card]
         end
 
         process do |_game_state|
