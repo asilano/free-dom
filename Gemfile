@@ -16,7 +16,7 @@ end
 group :development, :test do
   gem 'sqlite3'
   gem "quiet_assets"
-  gem "better_errors", '~> 1.0'
+  gem "better_errors", '~> 2.9'
   gem "binding_of_caller"
 
   gem 'thin'
