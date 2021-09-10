@@ -7,7 +7,7 @@ module GameEngine
            'When you gain this, you may trash a Copper from your hand.'
       treasure special: true
       costs 2
-      setup do |game_state|
+      setup do |_game_state|
         filter = lambda do |card, *|
           card.is_a?(Renaissance::Ducat)
         end

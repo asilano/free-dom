@@ -27,6 +27,7 @@ CARD_TYPES = {
   'Artisan'      => GameEngine::BaseGameV2::Artisan,
   'Border Guard' => GameEngine::Renaissance::BorderGuard,
   'Ducat'        => GameEngine::Renaissance::Ducat,
+  'Lackeys'      => GameEngine::Renaissance::Lackeys,
   'Estate'       => GameEngine::BasicCards::Estate,
   'Duchy'        => GameEngine::BasicCards::Duchy,
   'Province'     => GameEngine::BasicCards::Province,
