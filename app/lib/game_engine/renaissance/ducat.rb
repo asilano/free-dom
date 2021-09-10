@@ -7,15 +7,8 @@ module GameEngine
            'When you gain this, you may trash a Copper from your hand.'
       treasure special: true
       costs 2
-      setup do |_game_state|
-        filter = lambda do |card, *|
-          card.is_a?(Renaissance::Ducat)
-        end
-
-        Triggers::CardGained.watch_for(filter:   filter,
-                                       whenever: true) do |card, player, _from|
-          card.game_state.get_journal(TrashCopperJournal, from: player).process(card.game_state)
-        end
+      on_gain do |card, player, _from|
+        card.game_state.get_journal(TrashCopperJournal, from: player).process(card.game_state)
       end
 
       def play_as_treasure(played_by:)

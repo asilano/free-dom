@@ -1,9 +1,10 @@
 # # This module is "extend"ed into Card.
 module CardDecorators
   module CardDecorators
-  #   ######
-  #   # Basic decorators
-  #   ######
+    # ######
+    # # Basic decorators
+    # ######
+
     # Define the text of a card
     def text(*lines)
       str = lines.join("\n")
@@ -14,6 +15,7 @@ module CardDecorators
     # Define the raw cost of a card, before any modifications like Bridge
     def costs(cost)
       raise unless cost.is_a? Integer
+
       define_singleton_method(:raw_cost) { cost }
     end
 
@@ -22,11 +24,12 @@ module CardDecorators
     # Define a card as a Treasure with the specified value
     def treasure(opts)
       raise ArgumentError, 'Treasure must specify cash or special' unless opts.key?(:cash) || opts[:special]
+
       define_singleton_method(:treasure?) { true }
-      if opts.key? :cash
-        define_method(:cash) { opts[:cash] }
-      end
+      define_method(:cash) { opts[:cash] } if opts.key? :cash
+
       return unless opts[:special]
+
       define_singleton_method(:special?) { true }
     end
 
@@ -35,6 +38,7 @@ module CardDecorators
     def victory?; false; end
     def victory(opts = {}, &block)
       raise ArgumentError, 'Victory must define points' unless block_given? || opts.key?(:points)
+
       define_singleton_method(:victory?) { true }
       if block_given?
         define_method(:points) do
@@ -45,6 +49,7 @@ module CardDecorators
       end
 
       return if @pile_size_given
+
       pile_size do |num_players|
         case num_players
         when 2
@@ -73,15 +78,9 @@ module CardDecorators
       define_method(:reacts_from) { from }
       define_method(:reacts_to) { to }
     end
-  #     def self.is_reaction?
-  #       true
-  #     end
-  #     class_attribute :react_trigger
-  #     self.react_trigger = opts[:to] || :attack
-  #   end
 
     def attack?; false; end
-    def attack(opts = {})
+    def attack
       define_singleton_method(:attack?) { true }
       include AttackDecorators
     end
@@ -99,6 +98,18 @@ module CardDecorators
     # Pre-game setup, as on Trade Route or Border Guard
     def setup(&block)
       define_singleton_method(:do_setup, &block)
+    end
+
+    def on_gain(&block)
+      setup do |_game_state|
+        filter = lambda do |card, *|
+          card.is_a?(self)
+        end
+
+        GameEngine::Triggers::CardGained.watch_for(filter:   filter,
+                                       whenever: true,
+                                       &block)
+      end
     end
 
   #   def action(opts = Hash.new(nil))
