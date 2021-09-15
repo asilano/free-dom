@@ -31,4 +31,18 @@ Feature: Lackeys
     And I should need to 'Play Treasures, or pass'
 
   Scenario: Get Villagers on gain
-    Given pending
+    Then I should need to "Play an Action, or pass"
+    When I choose "Leave Action Phase" in my hand
+    Then I should need to "Play Treasures, or pass"
+    When I choose Silver in my hand
+    Then I should need to "Play Treasures, or pass"
+    When I choose 'Stop playing treasures' in my hand
+    And I should need to "Buy a card, or pass"
+    When I choose Lackeys in the supply
+    Then cards should move as follows:
+      Then I should gain Lackeys
+      And I should discard everything from my hand
+      And I should discard everything from play
+      And I should draw 5 cards
+      And these card moves should happen
+    And I should have 2 Villagers

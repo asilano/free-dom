@@ -395,6 +395,11 @@ module GameSteps
       expect(get_player(name).coffers).to eq amount.to_i
     end
 
+    step ':player_name should have :amount Villagers' do |name, amount|
+      @game.process
+      expect(get_player(name).villagers).to eq amount.to_i
+    end
+
     step ':player_name total score should be :score' do |name, score|
       @game.process
       expect(get_player(name).calculate_score).to eq score.to_i

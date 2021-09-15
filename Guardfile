@@ -64,11 +64,16 @@ guard :rspec, cmd: "bundle exec bin/rspec", failed_mode: :keep do
   watch(rails.layouts)       { |m| rspec.spec.call("system/#{m[1]}") }
 
   # Turnip features and steps
-  watch(%r{^spec/acceptance/(.+)\.feature$})
-  watch(%r{^spec/acceptance/steps/(.+)_steps\.rb$}) do |m|
-    Dir[File.join("**/#{m[1]}.feature")][0] || "spec/acceptance"
+  watch(%r{^spec/gameplay/(.+)\.feature$})
+  watch(%r{^spec/gameplay/steps/(.+)_steps\.rb$}) do |m|
+    Dir[File.join("**/#{m[1]}.feature")][0] || "spec/gameplay"
   end
 
   # Game engine changes
-  watch(%r{^app/lib/game_engine/}) { rspec.spec.call('system/games') }
+  watch(%r{^app/lib/game_engine/}) do
+    [
+      rspec.spec.call('system/games'),
+      rspec.spec.call('gameplay')
+    ]
+  end
 end
