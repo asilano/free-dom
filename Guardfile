@@ -65,15 +65,15 @@ guard :rspec, cmd: "bundle exec bin/rspec", failed_mode: :keep do
 
   # Turnip features and steps
   watch(%r{^spec/gameplay/(.+)\.feature$})
-  watch(%r{^spec/gameplay/steps/(.+)_steps\.rb$}) do |m|
+  watch(%r{^spec/steps/(.+)_steps\.rb$}) do |m|
     Dir[File.join("**/#{m[1]}.feature")][0] || "spec/gameplay"
   end
 
   # Game engine changes
   watch(%r{^app/lib/game_engine/}) do
     [
-      rspec.spec.call('system/games'),
-      rspec.spec.call('gameplay')
+      File.join(rspec.spec_dir, 'system', 'games'),
+      File.join(rspec.spec_dir, 'gameplay')
     ]
   end
 end

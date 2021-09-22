@@ -3,13 +3,14 @@ require 'fiber'
 # GameState is the in-memory record of the game. It applies journals to itself,
 # to update the game's state.
 module GameEngine
-  class GameState
-    class UnexpectedJournalError < ArgumentError
-    end
-    class InvalidJournalError < ArgumentError
-    end
+  class UnexpectedJournalError < ArgumentError
+  end
+  class InvalidJournalError < ArgumentError
+  end
 
-    attr_reader :players, :piles, :turn_player, :game, :artifacts
+  class GameState
+
+    attr_reader :players, :piles, :turn_player, :game, :artifacts, :phase
     attr_accessor :state, :rng, :fid_prefix, :next_fid, :last_active_player
 
     def initialize(seed, game)
@@ -21,6 +22,7 @@ module GameEngine
       @piles = []
       @turn_player = nil
       @last_active_player = nil
+      @phase = nil
 
       @artifacts = {}
       @facts = {}
@@ -48,6 +50,7 @@ module GameEngine
       turn_seat = 0
       round = 1
       loop do
+        @phase = :action
         @turn_player = @players[turn_seat]
         @turn_player.actions = 1
         @turn_player.buys = 1
@@ -59,10 +62,13 @@ module GameEngine
         Triggers::StartOfTurn.trigger
 
         # Play actions until the player stops or runs out
-        until @turn_player.actions.zero?
-          get_journal(GameEngine::PlayActionJournal, from: @turn_player).process(self)
+        play_actions = :continue
+        until @turn_player.actions.zero? || play_actions == :stop
+          play_actions = get_journal(GameEngine::PlayActionJournal, from: @turn_player).process(self)
           observe
         end
+
+        @phase = :buy
 
         # Play treasures until the player stops or runs out
         play_treasures = :continue
@@ -98,14 +104,11 @@ module GameEngine
 
     def get_journal(journal_class, from:, revealed_cards: [], peeked_cards: [], opts: {})
       template = journal_class.from(from).in(@game).with(opts)
-      journal = Fiber.yield(template.question.tap do |q|
-        q.fiber_id = @fid_prefix
-        q.auto_candidate = from != @last_active_player
-        (revealed_cards + peeked_cards).each { |c| c.interacting_with = q }
-      end)
-      while journal.is_a? GameEngine::HackJournal
+
+      journal = Fiber.yield(questions_to_ask(template, revealed_cards, peeked_cards))
+      while journal.tag_along?
         journal.process(self)
-        journal = Fiber.yield(template.question)
+        journal = Fiber.yield(questions_to_ask(template, revealed_cards, peeked_cards))
       end
 
       journal.question = template.question
@@ -190,6 +193,7 @@ module GameEngine
     private
 
     def cleanup
+      @phase = :cleanup
       @game.current_journal.histories << History.new("#{@turn_player.name} ended their turn.",
                                                      player: @turn_player)
 
@@ -213,6 +217,19 @@ module GameEngine
       piles.detect { |p| p.card_class == BasicCards::Province }.cards.empty? ||
         # piles.detect { |p| p.card_class == Prosperity::Colony }.cards.empty? ||
         piles.count { |p| p.cards.empty? } >= 3
+    end
+
+    def questions_to_ask(template, revealed_cards, peeked_cards)
+      qs = [template.question]
+      if @phase == :action && @turn_player.villagers.positive?
+        qs << SpendVillagersJournal.from(@turn_player).in(@game).question
+      end
+
+      qs.each_with_index do |q, ix|
+        q.fiber_id = @fid_prefix
+        q.auto_candidate = template.player != @last_active_player
+        (revealed_cards + peeked_cards).each { |c| c.interacting_with = q } if ix.zero?
+      end
     end
   end
 

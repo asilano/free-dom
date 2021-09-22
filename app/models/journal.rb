@@ -181,9 +181,7 @@ class Journal < ApplicationRecord
     define_method(:do_process, &block)
   end
 
-  def game_state
-    game.game_state
-  end
+  delegate :game_state, to: :game
   delegate :observe, to: :game_state
 
   def player
@@ -196,6 +194,10 @@ class Journal < ApplicationRecord
     result = do_process(state)
     game.pop_journal
     result
+  end
+
+  def tag_along?
+    false
   end
 
   def prevent_undo

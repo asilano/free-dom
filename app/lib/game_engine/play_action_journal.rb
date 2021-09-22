@@ -19,11 +19,10 @@ module GameEngine
 
     process do |_game_state|
       if params['choice'] == 'none'
-        player.actions = 0
         @histories << History.new("#{player.name} stopped playing actions.",
                                   player: player,
                                   css_classes: %w[play-action])
-        return
+        return :stop
       end
 
       # Charge the player an Action-play slot

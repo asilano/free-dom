@@ -23,13 +23,13 @@ class Game < ApplicationRecord
     fiber = Fiber.new { @game_state.run }
 
     # Kick the fiber off, and wait for the first question
-    @questions = *fiber.resume
+    @questions = Array(fiber.resume).flatten
 
     # Until we run out of answers, post journals in as answers to questions
     journals.each do |j|
       # Allow tests to ignore individual journals
       next if j.ignore
-      @questions = *fiber.resume(j)
+      @questions = Array(fiber.resume(j)).flatten
 
       unless fiber.alive?
         @run_state = :ended
@@ -52,7 +52,7 @@ class Game < ApplicationRecord
     while @questions.any? { |q| q.auto_candidate && q.can_be_auto_answered?(@game_state) }
       auto_journal = @questions.lazy.map { |q| q.auto_answer(@game_state) }.detect(&:itself)
       auto_journal.auto = true
-      @questions = *fiber.resume(auto_journal)
+      @questions = Array(fiber.resume(auto_journal)).flatten
       @questions.compact!
     end
   end
@@ -101,7 +101,7 @@ class Game < ApplicationRecord
   private
 
   def users_to_act
-    @questions.map { |q| q.player.user }
+    @questions.map { |q| q.player.user }.uniq
   end
 
   def send_discord_log

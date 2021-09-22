@@ -12,8 +12,18 @@ module GameEngine
         modify_supply_cards(game_state)
       when 'artifact_owner'
         set_artifact_owner(game_state)
+      when 'villagers'
+        set_player_villagers(game_state)
+      else
+        raise InvalidJournalError, "Invalid journal: #{self}"
       end
     end
+
+    def tag_along?
+      true
+    end
+
+    private
 
     def modify_player_cards(game_state)
       location = params['scope']
@@ -52,6 +62,18 @@ module GameEngine
 
     def set_artifact_owner(game_state)
       game_state.artifacts[params['key']].give_to(player)
+
+      @histories << History.new("HACK! Artifact #{params['key']} given to #{player.name}.",
+                                css_classes: %w[hack])
+
+    end
+
+    def set_player_villagers(game_state)
+      player.villagers = params['count'].to_i
+
+      @histories << History.new("HACK! #{player.name} now has #{params["count"]} villagers.",
+                                css_classes: %w[hack])
+
     end
   end
 end

@@ -77,6 +77,14 @@ module GameSteps
                              key:   :"#{artifact}"
                            })
     end
+
+    step ':player_name has/have :count Villager(s)' do |name, count|
+      player = get_player(name)
+      make_journal(user:   player.user,
+                   type:   GameEngine::HackJournal,
+                   params: { scope: :villagers,
+                             count: count })
+    end
   end
 
   module ActionSteps
@@ -127,7 +135,7 @@ module GameSteps
                    params:   control.handle_choice(option))
     end
 
-    step ':player_name spend(s) :amount Coffers' do |name, amount|
+    step ':player_name spend(s) :amount Coffer(s)' do |name, amount|
       user = get_player(name).user
       question = @questions.detect { |q| q&.player&.name == user.name }
       controls = question.controls_for(user, @game.game_state)
@@ -139,24 +147,41 @@ module GameSteps
                    fiber_id: question.fiber_id,
                    params:   control.handle_choice(amount))
     end
+
+    step ':player_name spend(s) :amount Villager(s)' do |name, amount|
+      user = get_player(name).user
+      question = @questions.detect do |q|
+        q&.player&.name == user.name && q&.journal_type == GameEngine::SpendVillagersJournal
+      end
+      controls = question.controls_for(user, @game.game_state)
+      expect(controls).to include(have_attributes(scope: :with_hand))
+
+      control = controls.detect { |c| c.scope == :with_hand }
+      make_journal(user:     user,
+                   type:     'GameEngine::SpendVillagersJournal',
+                   fiber_id: question.fiber_id,
+                   params:   control.handle_choice(amount))
+    end
   end
 
   module CheckSteps
-    step ':player_name should need to :question' do |name, question|
+    step ':player_name :whether_to need to :question' do |name, should, question|
       @game.process
       @questions = @game.questions
       player = get_player(name)
 
-      expect(@questions.compact.map(&:player)).to include(be == player)
-      expect(@questions.compact.select { |q| q.player == player }.map { |q| q.text(@game.game_state) }).to include(be == question)
-    end
-
-    step ':player_name should not need to act' do |name|
-      @game.process
-      @questions = @game.questions
-      player = get_player(name)
-
-      expect(@questions.compact.map(&:player)).not_to include(be == player)
+      if should
+        expect(@questions.compact.map(&:player)).to include(be == player)
+        unless question == 'act'
+          expect(@questions.compact.select { |q| q.player == player }.map { |q| q.text(@game.game_state) }).to include(be == question)
+        end
+      else
+        if question == 'act'
+          expect(@questions.compact.map(&:player)).not_to include(be == player)
+        else
+          expect(@questions.compact.select { |q| q.player == player }.map { |q| q.text(@game.game_state) }).to_not include(be == question)
+        end
+      end
     end
 
     step ':player_name hand should contain :cards' do |name, cards|
@@ -390,12 +415,12 @@ module GameSteps
       expect(get_player(name).cash).to eq amount.to_i
     end
 
-    step ':player_name should have :amount Coffers' do |name, amount|
+    step ':player_name should have :amount Coffer(s)' do |name, amount|
       @game.process
       expect(get_player(name).coffers).to eq amount.to_i
     end
 
-    step ':player_name should have :amount Villagers' do |name, amount|
+    step ':player_name should have :amount Villager(s)' do |name, amount|
       @game.process
       expect(get_player(name).villagers).to eq amount.to_i
     end
