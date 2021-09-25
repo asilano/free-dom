@@ -16,8 +16,7 @@ module GameEngine
 
     validation do
       params['choice'].integer? &&
-        (1..player.villagers).include?(params['choice'].to_i) &&
-        true
+        (1..player.villagers).include?(params['choice'].to_i)
     end
 
     process do |_game_state|

@@ -8,6 +8,8 @@ module GameSteps
   module SetupSteps
     step 'I am in a :count player game' do |count|
       @game = FactoryBot.create(:game_with_kingdom)
+      @player_count = count
+      @player_names = PLAYER_NAMES[0, count]
       @user_alan = @game.users.first
       FactoryBot.create(:add_player_journal, game: @game, user: @user_alan)
 
@@ -85,6 +87,14 @@ module GameSteps
                    params: { scope: :villagers,
                              count: count })
     end
+
+    step ':player_name has/have :count Coffer(s)' do |name, count|
+      player = get_player(name)
+      make_journal(user:   player.user,
+                   type:   GameEngine::HackJournal,
+                   params: { scope: :coffers,
+                             count: count })
+    end
   end
 
   module ActionSteps
@@ -137,7 +147,9 @@ module GameSteps
 
     step ':player_name spend(s) :amount Coffer(s)' do |name, amount|
       user = get_player(name).user
-      question = @questions.detect { |q| q&.player&.name == user.name }
+      question = @questions.detect do |q|
+        q&.player&.name == user.name && q&.journal_type == GameEngine::SpendCoffersJournal
+      end
       controls = question.controls_for(user, @game.game_state)
       expect(controls).to include(have_attributes(scope: :with_hand))
 
@@ -161,6 +173,26 @@ module GameSteps
                    type:     'GameEngine::SpendVillagersJournal',
                    fiber_id: question.fiber_id,
                    params:   control.handle_choice(amount))
+    end
+
+    step ":player_name pass(es) through to (my/his/her) next turn" do |name|
+      name.replace('Alan') if name == 'I'
+      @player_names.rotate(@player_names.index(name)).each do |inner_name|
+        @game.process
+        @questions = @game.questions
+        if @game.game_state.phase == :action
+          step "#{inner_name} chooses 'Leave Action Phase' in his hand"
+        end
+        step "#{inner_name} should need to 'Play Treasures, or pass'"
+        step "#{inner_name} choose 'Stop playing treasures' in his hand"
+        step "#{inner_name} should need to 'Buy a card, or pass'"
+        step "#{inner_name} choose 'Buy nothing' in the supply"
+        step "cards should move as follows:"
+        step   "#{inner_name} should discard everything from his hand"
+        step   "#{inner_name} should discard everything from play"
+        step   "#{inner_name} should draw 5 cards"
+        step "these card moves should happen"
+      end
     end
   end
 

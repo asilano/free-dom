@@ -14,6 +14,8 @@ module GameEngine
         set_artifact_owner(game_state)
       when 'villagers'
         set_player_villagers(game_state)
+      when 'coffers'
+        set_player_coffers(game_state)
       else
         raise InvalidJournalError, "Invalid journal: #{self}"
       end
@@ -72,6 +74,14 @@ module GameEngine
       player.villagers = params['count'].to_i
 
       @histories << History.new("HACK! #{player.name} now has #{params["count"]} villagers.",
+                                css_classes: %w[hack])
+
+    end
+
+    def set_player_coffers(game_state)
+      player.coffers = params['count'].to_i
+
+      @histories << History.new("HACK! #{player.name} now has #{params["count"]} coffers.",
                                 css_classes: %w[hack])
 
     end

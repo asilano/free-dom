@@ -224,6 +224,9 @@ module GameEngine
       if @phase == :action && @turn_player.villagers.positive?
         qs << SpendVillagersJournal.from(@turn_player).in(@game).question
       end
+      if @phase == :buy && @turn_player.coffers.positive?
+        qs << SpendCoffersJournal.from(@turn_player).in(@game).question
+      end
 
       qs.each_with_index do |q, ix|
         q.fiber_id = @fid_prefix

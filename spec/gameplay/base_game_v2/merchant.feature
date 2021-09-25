@@ -84,38 +84,7 @@ Feature: Merchant
       Then I should draw 1 card
       And these card moves should happen
     And I should have 1 action
-    When I choose "Leave Action Phase" in my hand
-    Then I should need to "Play Treasures, or pass"
-    And I choose 'Stop playing treasures' in my hand
-    Then I should need to "Buy a card, or pass"
-    And I choose "Buy nothing" in the supply
-    Then cards should move as follows:
-      Then I should discard everything from my hand
-      And I should discard everything from play
-      And I should draw 5 cards
-      And these card moves should happen
-    And Belle should need to 'Play an Action, or pass'
-    When Belle chooses "Leave Action Phase" in her hand
-    Then Belle should need to "Play Treasures, or pass"
-    When Belle chooses 'Stop playing treasures' in her hand
-    Then Belle should need to "Buy a card, or pass"
-    When Belle chooses "Buy nothing" in the supply
-    Then cards should move as follows:
-      Then Belle should discard everything from her hand
-      And Belle should discard everything from play
-      And Belle should draw 5 cards
-      And these card moves should happen
-    And Chas should need to 'Play an Action, or pass'
-    When Chas chooses "Leave Action Phase" in his hand
-    Then Chas should need to "Play Treasures, or pass"
-    When Chas chooses 'Stop playing treasures' in his hand
-    Then Chas should need to "Buy a card, or pass"
-    When Chas chooses "Buy nothing" in the supply
-    Then cards should move as follows:
-      Then Chas should discard everything from his hand
-      And Chas should discard everything from play
-      And Chas should draw 5 cards
-      And these card moves should happen
+    When I pass through to my next turn
     And I should need to "Play an Action, or pass"
     When I choose "Leave Action Phase" in my hand
     Then I should need to "Play Treasures, or pass"

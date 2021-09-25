@@ -3,7 +3,7 @@ Feature: Villagers
   to grant +1 Action per Villager spent.
 
   "At any point" is tricky - if the player has Villagers, we ask to spend them whenever we ask anything else. There
-  may be situations where we want to ask more frequently, but those will be handled cas-by-case.
+  may be situations where we want to ask more frequently, but those will be handled case-by-case.
 
   Background:
     Given I am in a 3 player game
@@ -34,6 +34,24 @@ Feature: Villagers
     And I should need to "Spend Villagers"
     When I spend 1 Villager
     Then I should have 4 actions
+    And I should have 0 Villagers
+    And I should need to "Play an Action, or pass"
+    And I should not need to "Spend Villagers"
+
+  Scenario: Have 3 Villagers, spend 2 Villagers, then spend remaining Villager next turn (when stack empty)
+    Given I have 3 Villagers
+    Then I should need to "Play an Action, or pass"
+    And I should need to "Spend Villagers"
+    When I spend 2 Villagers
+    Then I should have 3 actions
+    And I should have 1 Villager
+    And I should need to "Play an Action, or pass"
+    And I should need to "Spend Villagers"
+    When I pass through to my next turn
+    Then I should need to "Play an Action, or pass"
+    And I should need to "Spend Villagers"
+    When I spend 1 Villager
+    Then I should have 2 actions
     And I should have 0 Villagers
     And I should need to "Play an Action, or pass"
     And I should not need to "Spend Villagers"
