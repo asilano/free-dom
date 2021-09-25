@@ -369,6 +369,10 @@ module GameSteps
       end
     end
 
+    step ':player_name should trash :cards from in play' do |name, cards|
+      send ':player_name should trash :cards from my/his/her :source( cards)', name, cards, 'play'
+    end
+
     step ':player_name :whether_to be able to choose the :cards pile(s)' do |name, should, cards|
       user = get_player(name).user
       question = @questions.detect { |q| q.player.name == user.name }

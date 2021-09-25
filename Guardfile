@@ -70,7 +70,13 @@ guard :rspec, cmd: "bundle exec bin/rspec", failed_mode: :keep do
   end
 
   # Game engine changes
-  watch(%r{^app/lib/game_engine/}) do
+  expansion_dirs = %w[base_game_v2 renaissance]
+  expansion_dirs.each do |exp|
+    watch(%r{^app/lib/game_engine/(#{exp}/.+)\.rb}) do |m|
+      Dir[File.join("spec/gameplay/#{m[1]}.feature")][0]
+    end
+  end
+  watch(%r{^app/lib/game_engine/(?!#{expansion_dirs.join("|")})}) do
     [
       File.join(rspec.spec_dir, 'system', 'games'),
       File.join(rspec.spec_dir, 'gameplay')
