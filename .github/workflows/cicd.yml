@@ -1,4 +1,4 @@
-name: Tests
+name: Test and Deploy
 
 on:
   pull_request:
@@ -68,3 +68,19 @@ jobs:
 
     - name: Publish code coverage
       run: cc-test-reporter after-build
+
+  deploy_staging:
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/master'
+    needs: [test]
+    steps:
+      - name: Clone
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Push to dokku staging
+        uses: dokku/github-action@master
+        with:
+          git_remote_url: 'ssh://dokku@free-dom.staging.chris.nsict.org/free-dom'
+          ssh_private_key: ${{ secrets.DOKKU_PRIVATE_KEY }}
