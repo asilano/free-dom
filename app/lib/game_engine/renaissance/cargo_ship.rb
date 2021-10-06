@@ -54,8 +54,11 @@ module GameEngine
             return
           end
 
+          @histories << History.new("#{player.name} set aside #{opts[:card].readable_name} on Cargo Ship.",
+                                    player: player)
           opts[:card].location = :set_aside
           opts[:card].location_card = opts[:ship]
+          opts[:ship].hosting << opts[:card]
 
           filter = lambda do |turn_player|
             turn_player == player
@@ -63,6 +66,7 @@ module GameEngine
           Triggers::StartOfTurn.watch_for(filter: filter) do
             opts[:card].location = :hand
             opts[:card].location_card = nil
+            opts[:ship].hosting.delete opts[:card]
           end
           :unwatch
         end

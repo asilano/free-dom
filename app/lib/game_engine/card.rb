@@ -6,7 +6,7 @@ module GameEngine
     include CardModules::Manipulation
 
     attr_reader :game_state
-    attr_accessor :location, :location_card, :player, :pile, :revealed, :peeked, :interacting_with
+    attr_accessor :location, :location_card, :hosting, :player, :pile, :revealed, :peeked, :interacting_with
 
     delegate :game, :observe, :trigger, to: :game_state
     delegate :action?, :treasure?, :special?, :victory?, :curse?, :reaction?, :attack?, :readable_name, :types, to: :class
@@ -18,6 +18,7 @@ module GameEngine
       @game_state = game_state
       @pile = pile
       @player = player
+      @hosting = []
     end
   end
 end

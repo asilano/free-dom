@@ -242,8 +242,8 @@ module GameEngine
 
     def self.fibers_related(id_a, id_b)
       id_a == id_b ||
-        id_a.start_with?("#{id_b}.") ||
-        id_b.start_with?("#{id_a}.")
+        id_a&.start_with?("#{id_b}.") ||
+        id_b&.start_with?("#{id_a}.")
     end
 
     def initialize(game_state, &block)

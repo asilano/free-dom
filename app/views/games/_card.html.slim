@@ -6,3 +6,6 @@
     .card-ctrl
       - if ctrl.filter(card)
         = render partial: ctrl, as: :control, locals: { value: card_counter, card: card }
+  - if card.hosting.present?
+    .nested-cards
+      = render partial: "card", collection: card.hosting
