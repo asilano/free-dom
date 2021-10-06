@@ -85,6 +85,11 @@ module CardDecorators
       include AttackDecorators
     end
 
+    def duration?; false; end
+    def duration
+      define_singleton_method(:duration?) { true }
+    end
+
     # Define starting pile sizes
     def pile_size(size = nil, &block)
       if block_given?
@@ -107,8 +112,8 @@ module CardDecorators
         end
 
         GameEngine::Triggers::CardGained.watch_for(filter:   filter,
-                                       whenever: true,
-                                       &block)
+                                                   whenever: true,
+                                                   &block)
       end
     end
 

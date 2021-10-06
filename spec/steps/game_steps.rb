@@ -175,9 +175,14 @@ module GameSteps
                    params:   control.handle_choice(amount))
     end
 
-    step ":player_name pass(es) through to (my/his/her) next turn" do |name|
-      name.replace('Alan') if name == 'I'
+    step ":player_name pass(es) through to :player_name next turn" do |name, next_name|
+      name.replace('Alan') if name == "I"
+      next_name.replace("Alan") if next_name == "I"
+
+      first = true
       @player_names.rotate(@player_names.index(name)).each do |inner_name|
+        break if inner_name == next_name && !first
+        first = false
         @game.process
         @questions = @game.questions
         if @game.game_state.phase == :action
@@ -333,7 +338,7 @@ module GameSteps
           pile = @cards_before[:supply].detect { |p_cards| p_cards.first[:class] == card }
           pile.delete_at(0)
         end
-        players_cards << { class: card, location: destination.to_sym, revealed: false }
+        players_cards << { class: card, location: destination.to_sym, location_card: {}, revealed: false }
       end
     end
 
@@ -344,7 +349,8 @@ module GameSteps
         instance = players_cards[instance_ix]
         instance[:location] = destination.to_sym
         instance[:revealed] = false
-        if destination == 'deck'
+        instance[:location_card] = {}
+        if destination == "deck"
           players_cards.delete_at(instance_ix)
           players_cards.unshift(instance)
         end
@@ -359,6 +365,10 @@ module GameSteps
       send ':player_name should move :cards from my/his/her :source to my/his/her :destination', name, cards, source, 'play'
     end
 
+    step ':player_name should move :cards from being set aside to my/his/her :destination' do |name, cards, destination|
+      send ':player_name should move :cards from my/his/her :source to my/his/her :destination', name, cards, "set_aside", destination
+    end
+
     step ':player_name should trash :cards from my/his/her :source( cards)' do |name, cards, source|
       players_cards = cards_for_player(name)
       cards.each do |card|
@@ -371,6 +381,22 @@ module GameSteps
 
     step ':player_name should trash :cards from in play' do |name, cards|
       send ':player_name should trash :cards from my/his/her :source( cards)', name, cards, 'play'
+    end
+
+    step ":player_name should set aside :cards from my :location on my/his/her :card :location" do |name, cards, source, host, destination|
+      players_cards = cards_for_player(name)
+      host_card = players_cards.detect { |c| c[:class] == host && c[:location] == destination.to_sym }
+      cards.each do |card|
+        instance_ix = players_cards.index { |c| c[:class] == card && c[:location] == source.to_sym }
+        instance = players_cards[instance_ix]
+        instance[:location] = :set_aside
+        instance[:location_card] = host_card
+        instance[:revealed] = false
+      end
+    end
+
+    step ":player_name should set aside :cards from my :location on my/his/her :card in play" do |name, cards, source, host|
+      send ":player_name should set aside :cards from my :location on my/his/her :card :location", name, cards, source, host, "play"
     end
 
     step ':player_name :whether_to be able to choose the :cards pile(s)' do |name, should, cards|
@@ -485,24 +511,23 @@ module GameSteps
 
   def extract_game_cards
     player_cards = @game.game_state.players.map do |ply|
-      ply.cards.map do |c|
-        {
-          class:    c.class,
-          location: c.location,
-          revealed: !!c.revealed
-        }
-      end
+      ply.cards.map { |c| extract_card(c) }
     end
     supply_cards = @game.game_state.piles.map do |p|
-      p.cards.map do |c|
-        {
-          class:    c.class,
-          location: c.location,
-          revealed: !!c.revealed
-        }
-      end
+      p.cards.map { |c| extract_card(c) }
     end
     { players: player_cards, supply: supply_cards }
+  end
+
+  def extract_card(card)
+    return {} if card.nil?
+
+    {
+      class:         card.class,
+      location:      card.location,
+      revealed:      !!card.revealed,
+      location_card: extract_card(card.location_card)
+    }
   end
 
   def cards_for_player(name, location: nil)

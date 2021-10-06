@@ -30,7 +30,7 @@ module CardModules
       end
 
       def types
-        %w[action attack curse reaction treasure victory].map do |type|
+        %w[action attack curse duration reaction treasure victory].map do |type|
           type if send("#{type}?")
         end.compact
       end

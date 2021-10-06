@@ -1,7 +1,7 @@
 module GameEngine
   module Triggers
     class Trigger
-      attr_reader :effect
+      attr_reader :effect, :filter
       attr_accessor :whenever
 
       def self.inherited(subclass)
@@ -31,8 +31,14 @@ module GameEngine
         0
       end
 
-      def self.filter_watchers(_)
-        @observers
+      def self.filter_watchers(*args, **kwargs)
+        @observers.select do |obs|
+          if kwargs.present?
+            obs.filter[*args, **kwargs]
+          else
+            obs.filter[*args]
+          end
+        end
       end
 
       def self.clear_watchers
@@ -48,7 +54,9 @@ module GameEngine
         set_options(options)
       end
 
-      def set_options(_options); end
+      def set_options(filter: nil)
+        @filter = filter || ->(*) { true }
+      end
     end
   end
 end

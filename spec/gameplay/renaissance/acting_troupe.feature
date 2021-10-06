@@ -6,7 +6,6 @@ Feature: Acting Troupe
     And the kingdom choice contains Acting Troupe
 
     Scenario: Playing Acting Troupe
-    And my deck contains Gold, Cellar, Copper
     Then I should need to 'Play an Action, or pass'
     When I choose Acting Troupe in my hand
     Then I should have 4 Villagers

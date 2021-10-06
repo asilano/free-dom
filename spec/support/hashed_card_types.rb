@@ -29,6 +29,7 @@ CARD_TYPES = {
   'Ducat'         => GameEngine::Renaissance::Ducat,
   'Lackeys'       => GameEngine::Renaissance::Lackeys,
   'Acting Troupe' => GameEngine::Renaissance::ActingTroupe,
+  'Cargo Ship'    => GameEngine::Renaissance::CargoShip,
   'Estate'        => GameEngine::BasicCards::Estate,
   'Duchy'         => GameEngine::BasicCards::Duchy,
   'Province'      => GameEngine::BasicCards::Province,

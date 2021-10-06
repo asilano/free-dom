@@ -59,7 +59,7 @@ module GameEngine
         @game.current_journal.histories << History.new("#{@turn_player.name} started turn #{round}.#{turn_seat + 1}.",
                                                        player: @turn_player)
 
-        Triggers::StartOfTurn.trigger
+        Triggers::StartOfTurn.trigger(@turn_player)
 
         # Play actions until the player stops or runs out
         play_actions = :continue
