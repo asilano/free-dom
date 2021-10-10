@@ -20,7 +20,10 @@ module GameEngine
                                                    whenever: true) { |*args| see_gain(*args) }
       end
 
-      def see_gain(card, *)
+      def see_gain(card, _player, _from, to, *)
+        # Can't act on the gained card unless it's where it was gained to
+        return unless card.location == to
+
         game_state.get_journal(SetAsideJournal,
                                from: player,
                                opts: { card: card, ship: self }).process(game_state)
