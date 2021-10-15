@@ -16,7 +16,7 @@
         .pile-cost
           span.cost-text= pile.cards.first&.cost || pile.card_class.raw_cost
         .card{class=pile.card_class.types}
-          .card-name{data-tooltip title=pile.text}= pile.card_class.readable_name
+          .card-name{data-tooltip data-allow-html="true" title=pile.text}= pile.card_class.readable_name
           - pile.tokens.each do |token|
             .card-token= token.to_s.humanize
           - pile_controls.each do |ctrl|
@@ -28,4 +28,4 @@
         .card-grid
           - @game.game_state.artifacts.values.select { |art| art.comes_from == pile.card_class && art.owner.nil? }.each do |art|
             .cell.card.artifact
-              .card-name{data-tooltip title=art.text}= art.readable_name
+              .card-name{data-tooltip data-allow-html="true" title=art.text}= art.readable_name

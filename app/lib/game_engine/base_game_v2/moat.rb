@@ -3,6 +3,7 @@ module GameEngine
     class Moat < GameEngine::Card
       text 'Action/Reaction (cost: 2)',
            '+2 Cards',
+           :hr,
            'When another player plays an Attack card, you may first reveal this' \
            ' from your hand, to be unaffected by it.'
       action

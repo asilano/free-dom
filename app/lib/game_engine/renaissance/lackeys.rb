@@ -3,6 +3,7 @@ module GameEngine
     class Lackeys < Card
       text 'Action (cost: 2)',
            '+2 Cards',
+           :hr,
            'When you gain this, +2 Villagers.'
       action
       costs 2

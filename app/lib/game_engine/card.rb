@@ -5,7 +5,7 @@ module GameEngine
     include CardModules::Introspection
     include CardModules::Manipulation
 
-    attr_reader :game_state
+    attr_reader :game_state, :facts
     attr_accessor :location, :location_card, :hosting, :player, :pile, :revealed, :peeked, :interacting_with
 
     delegate :game, :observe, :trigger, to: :game_state
@@ -19,6 +19,7 @@ module GameEngine
       @pile = pile
       @player = player
       @hosting = []
+      @facts = {}
     end
   end
 end

@@ -71,4 +71,4 @@
       .card-grid
         - @game.game_state.artifacts.values.select { |art| art.owner == other_player }.each do |art|
           .cell.card.artifact
-            .card-name{data-tooltip title=art.text}= art.readable_name
+            .card-name{data-tooltip data-allow-html="true" title=art.text}= art.readable_name

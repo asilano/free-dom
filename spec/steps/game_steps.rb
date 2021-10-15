@@ -335,11 +335,30 @@ module GameSteps
       players_cards = cards_for_player(name)
       cards.each do |card|
         if source == 'supply'
-          pile = @cards_before[:supply].detect { |p_cards| p_cards.first[:class] == card }
+          pile = @cards_before[:supply].detect { |p_cards| p_cards.last == card || p_cards.first[:class] == card }
           pile.delete_at(0)
         end
         players_cards << { class: card, location: destination.to_sym, location_card: {}, revealed: false }
       end
+    end
+
+    step ":player_name should return :cards to the supply from my/his/her :source" do |name, cards, source|
+      players_cards = cards_for_player(name)
+      cards.each do |card|
+        instance_ix = players_cards.index { |c| c[:class] == card && c[:location] == source.to_sym }
+        instance = players_cards[instance_ix]
+        players_cards.delete_at(instance_ix)
+
+        pile = @cards_before[:supply].detect { |p_cards| p_cards.last == card || p_cards.first[:class] == card }
+        instance[:location] = :pile
+        instance[:revealed] = false
+        instance[:location_card] = {}
+        pile.unshift(instance)
+      end
+    end
+
+    step ":player_name should return :cards to the supply from in play" do |name, cards|
+      send ":player_name should return :cards to the supply from my/his/her :source", name, cards, "play"
     end
 
     step ':player_name should move :cards from my/his/her :source to my/his/her :destination' do |name, cards, source, destination|
@@ -514,7 +533,7 @@ module GameSteps
       ply.cards.map { |c| extract_card(c) }
     end
     supply_cards = @game.game_state.piles.map do |p|
-      p.cards.map { |c| extract_card(c) }
+      p.cards.map { |c| extract_card(c) } + [p.card_class]
     end
     { players: player_cards, supply: supply_cards }
   end

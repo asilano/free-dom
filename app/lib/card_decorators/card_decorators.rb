@@ -7,7 +7,10 @@ module CardDecorators
 
     # Define the text of a card
     def text(*lines)
-      str = lines.join("\n")
+      str = lines
+        .slice_when { |l| l == :hr }
+        .map { |sub| sub.reject { |l| l == :hr}.join("\n") }
+        .join("<hr>")
       define_method(:text) { str }
       define_singleton_method(:card_text) { str }
     end

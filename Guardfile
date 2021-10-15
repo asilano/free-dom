@@ -76,9 +76,9 @@ guard :rspec, cmd: "bundle exec bin/rspec", failed_mode: :keep do
       Dir[File.join("spec/gameplay/#{m[1]}.feature")][0]
     end
   end
-  watch(%r{^app/lib/game_engine/(?!#{expansion_dirs.join("|")})}) do
+  watch(%r{^app/lib/(?!game_engine/(#{expansion_dirs.join("|")}))}) do
     [
-      File.join(rspec.spec_dir, 'system', 'games'),
+      File.join(rspec.spec_dir, 'system', 'games_spec.rb'),
       File.join(rspec.spec_dir, 'gameplay')
     ]
   end

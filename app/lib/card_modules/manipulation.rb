@@ -110,5 +110,19 @@ module CardModules
     def move_to(location)
       @location = location
     end
+
+    # Note - at time of coding, the player must own a card that is being returned to supply
+    def return_to_supply(pile: nil)
+      unless pile
+        pile = game_state.piles.detect { |p| p.card_class == self.class }
+      end
+      raise InvalidJournalError, "Can't find pile to move #{readable_name} to" unless pile
+
+      @player.cards.delete(self)
+      pile.cards.unshift(self)
+      @player = nil
+      @pile = pile
+      @location = :pile
+    end
   end
 end
