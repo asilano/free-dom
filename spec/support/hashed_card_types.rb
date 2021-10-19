@@ -31,6 +31,7 @@ CARD_TYPES = {
   'Acting Troupe' => GameEngine::Renaissance::ActingTroupe,
   'Cargo Ship'    => GameEngine::Renaissance::CargoShip,
   'Experiment'    => GameEngine::Renaissance::Experiment,
+  'Improve'       => GameEngine::Renaissance::Improve,
   'Estate'        => GameEngine::BasicCards::Estate,
   'Duchy'         => GameEngine::BasicCards::Duchy,
   'Province'      => GameEngine::BasicCards::Province,

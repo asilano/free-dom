@@ -197,6 +197,8 @@ module GameEngine
       @game.current_journal.histories << History.new("#{@turn_player.name} ended their turn.",
                                                      player: @turn_player)
 
+      Triggers::StartOfCleanup.trigger
+
       # Discard all hand cards
       @turn_player.hand_cards.each(&:discard)
 

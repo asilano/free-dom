@@ -117,6 +117,10 @@ module GameSteps
       @last_action_played = cards[0] if question.journal_type == GameEngine::PlayActionJournal
     end
 
+    step ":player_name choose(s) :cards in play" do |name, cards|
+      send ":player_name choose(s) :cards in/on my/his/her/the :scope( cards)", name, cards, "play"
+    end
+
     step ':player_name choose(s) :multi_options in/on my/his/her/the :scope( cards)' do |name, choices, scope|
       user = get_player(name).user
       question = @questions.detect { |q| q&.player&.name == user.name }
@@ -468,6 +472,30 @@ module GameSteps
       end
     end
 
+    step ':player_name :whether_to be able to choose :cards in play' do |name, should, cards|
+      player = get_player(name)
+      user = player.user
+      question = @questions.detect { |q| q.player.name == user.name }
+      controls = question.controls_for(user, @game.game_state)
+      control = controls.detect { |c| c.scope == :play }
+
+      if cards.empty?
+        # :cards was "nothing"
+        if should
+          expect(control.cardless_button).to_not be_nil
+        else
+          expect(control.cardless_button).to be_nil
+        end
+      else
+        can_pick = cards.map do |card|
+          played_card = player.played_cards.detect { |c| c.is_a? card }
+          played_card && control.filter(played_card)
+        end
+
+        expect(can_pick).to all(should ? be_truthy : be_falsey)
+      end
+    end
+
     step ':player_name :whether_to be able to choose the option :option' do |name, should, option|
       user = get_player(name).user
       question = @questions.detect { |q| q.player.name == user.name }
@@ -624,16 +652,18 @@ def find_index(control, player, game_state, scope, filter, card)
   case scope
   when :hand
     player.hand_cards.index { |c| c.is_a?(card) && control.instance_exec(c, &filter) }
-  when :supply
-    game_state.piles.index { |pile| pile.cards.first.is_a?(card) && control.instance_exec(pile.cards.first, &filter) }
   when :deck
     player.deck_cards.index { |c| c.is_a?(card) && control.instance_exec(c, &filter) }
   when :discard
     player.discarded_cards.index { |c| c.is_a?(card) && control.instance_exec(c, &filter) }
+  when :play
+    player.played_cards.index { |c| c.is_a?(card) && control.instance_exec(c, &filter) }
   when :revealed
     player.cards_revealed_to(@question).index { |c| c.is_a?(card) && control.instance_exec(c, &filter) }
   when :peeked
     player.cards_peeked_to(@question).index { |c| c.is_a?(card) && control.instance_exec(c, &filter) }
+  when :supply
+    game_state.piles.index { |pile| pile.cards.first.is_a?(card) && control.instance_exec(pile.cards.first, &filter) }
   when :everywhere
     player.cards.index { |c| c.is_a?(card) && control.instance_exec(c, &filter) }
   end
