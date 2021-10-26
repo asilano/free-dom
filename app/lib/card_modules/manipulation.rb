@@ -77,9 +77,13 @@ module CardModules
     def trash(from:)
       from.delete(self)
 
-      @player = nil
+      player_was, @player = @player, nil
       @pile = nil
       @location = :trash
+
+      game_state.trigger do
+        GameEngine::Triggers::CardTrashed.trigger(self, player_was, from)
+      end
     end
 
     # Default effect of a card being revealed.

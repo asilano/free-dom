@@ -11,8 +11,8 @@ module GameEngine
       # Lantern - Border Guards you play reveal 3 cards and discard 2. (It takes all 3 being Actions to take the Horn.)
 
       setup do |game_state|
-        game_state.create_artifact(CardlikeObjects::Horn)
-        game_state.create_artifact(CardlikeObjects::Lantern)
+        game_state.create_artifact(CardlikeObjects::Artifacts::Horn)
+        game_state.create_artifact(CardlikeObjects::Artifacts::Lantern)
       end
 
       def play_as_action(played_by:)

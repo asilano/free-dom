@@ -105,18 +105,32 @@ module CardDecorators
 
     # Pre-game setup, as on Trade Route or Border Guard
     def setup(&block)
-      define_singleton_method(:do_setup, &block)
+      setup_procs << block
+    end
+    def setup_procs
+      @setup_procs ||= []
+    end
+    def do_setup(game_state)
+      setup_procs.each { |p| p.call(game_state) }
     end
 
     def on_gain(&block)
+      on_trigger(GameEngine::Triggers::CardGained, &block)
+    end
+
+    def on_trash(&block)
+      on_trigger(GameEngine::Triggers::CardTrashed, &block)
+    end
+
+    def on_trigger(trigger_class, &block)
       setup do |_game_state|
         filter = lambda do |card, *|
           card.is_a?(self)
         end
 
-        GameEngine::Triggers::CardGained.watch_for(filter:   filter,
-                                                   whenever: true,
-                                                   &block)
+        trigger_class.watch_for(filter:   filter,
+                                whenever: true,
+                                &block)
       end
     end
 

@@ -32,6 +32,7 @@ CARD_TYPES = {
   'Cargo Ship'    => GameEngine::Renaissance::CargoShip,
   'Experiment'    => GameEngine::Renaissance::Experiment,
   'Improve'       => GameEngine::Renaissance::Improve,
+  'Flag Bearer'   => GameEngine::Renaissance::FlagBearer,
   'Estate'        => GameEngine::BasicCards::Estate,
   'Duchy'         => GameEngine::BasicCards::Duchy,
   'Province'      => GameEngine::BasicCards::Province,

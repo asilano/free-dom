@@ -1,0 +1,52 @@
+{
+	// Place your free-dom workspace snippets here. Each snippet is defined under a snippet name and has a scope, prefix, body and
+	// description. Add comma separated ids of the languages where the snippet is applicable in the scope field. If scope
+	// is left empty or omitted, the snippet gets applied to all languages. The prefix is what is
+	// used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
+	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders.
+	// Placeholders with the same ids are connected.
+	// Example:
+	// "Print to console": {
+	// 	"scope": "javascript,typescript",
+	// 	"prefix": "log",
+	// 	"body": [
+	// 		"console.log('$1');",
+	// 		"$2"
+	// 	],
+	// 	"description": "Log output to console"
+	// }
+	"Add Renaissance card": {
+		"scope": "ruby",
+		"prefix": "renaissance",
+		"body": [
+			"module GameEngine",
+			"  module Renaissance",
+			"    class ${1:${TM_FILENAME_BASE/.*/${0:/pascalcase}/}} < Card",
+			"      text \"$2\"",
+			"      ${3:action}",
+			"      costs $4",
+			"",
+			"    end",
+			"  end",
+			"end",
+			""
+		]
+	},
+	"Add feature test for card": {
+		"scope": "feature",
+		"prefix": "feature-card",
+		"body": [
+			"# ${2:Type (cost: n) - Card text}",
+			"Feature: ${1:${TM_FILENAME_BASE/.*/${0:/pascalcase}/}}",
+			"  Background:",
+			"    Given I am in a 3 player game",
+			"    And my hand contains ${1:${TM_FILENAME_BASE/.*/${0:/pascalcase}/}}, Market, Cargo Ship, Gold, Village",
+			"    And the kingdom choice contains ${1:${TM_FILENAME_BASE/.*/${0:/pascalcase}/}}",
+			"    Then I should need to \"Play an Action, or pass\"",
+			"",
+			"  Scenario: Playing ${1:${TM_FILENAME_BASE/.*/${0:/pascalcase}/}}",
+			"    Given pending",
+			""
+		]
+	}
+}

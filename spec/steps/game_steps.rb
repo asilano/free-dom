@@ -277,7 +277,7 @@ module GameSteps
           begin
             expect(group_now).to match_array(group_before[location])
           rescue RSpec::Expectations::ExpectationNotMetError
-            $!.message << "\n - in location #{location}"
+            $!.message << "\n - in location #{location}. Expected #{group_before[location].length}, got #{group_now.length}"
             raise
           end
         end
