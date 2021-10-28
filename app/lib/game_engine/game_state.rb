@@ -209,7 +209,7 @@ module GameEngine
 
       # # Draw a new hand
       cards_to_draw = 5
-      cards_to_draw += 1 if @artifacts['Flag'].owned_by?(@turn_player)
+      cards_to_draw += 1 if @artifacts['Flag']&.owned_by?(@turn_player)
       @turn_player.draw_cards cards_to_draw
 
       observe

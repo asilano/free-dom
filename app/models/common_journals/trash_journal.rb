@@ -67,6 +67,10 @@ module CommonJournals
       case self.class.scope
       when :hand
         "their hand"
+      when :play
+        "in play"
+      else
+        raise "Missing scope description for #{self.class.scope}"
       end
     end
   end

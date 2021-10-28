@@ -64,8 +64,8 @@ class Game < ApplicationRecord
 
   def pop_journal
     journal = @journal_stack.pop
-    @current_journal = journal unless journal.nil?
-    journal
+    # @current_journal = journal unless journal.nil?
+    # journal
   end
 
   # Mark a journal as not able to be undone
