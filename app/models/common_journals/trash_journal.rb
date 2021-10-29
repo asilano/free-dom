@@ -50,12 +50,12 @@ module CommonJournals
       end
 
       # Trash the chosen card from its owner's hand
-      card = self.class.potential_cards(player)[params['choice'].to_i]
-      @card_cost = card.cost
-      @histories << GameEngine::History.new("#{player.name} trashed #{card.readable_name} from #{from_where}.",
+      @card = self.class.potential_cards(player)[params['choice'].to_i]
+      @card_cost = @card.cost
+      @histories << GameEngine::History.new("#{player.name} trashed #{@card.readable_name} from #{from_where}.",
                                             player:      player,
                                             css_classes: %w[trash-card])
-      card.trash(from: player.cards)
+      @card.trash(from: player.cards)
       observe
 
       post_process if respond_to?(:post_process)

@@ -33,6 +33,7 @@ CARD_TYPES = {
   'Experiment'    => GameEngine::Renaissance::Experiment,
   'Improve'       => GameEngine::Renaissance::Improve,
   'Flag Bearer'   => GameEngine::Renaissance::FlagBearer,
+  'Hideout'       => GameEngine::Renaissance::Hideout,
   'Estate'        => GameEngine::BasicCards::Estate,
   'Duchy'         => GameEngine::BasicCards::Duchy,
   'Province'      => GameEngine::BasicCards::Province,
