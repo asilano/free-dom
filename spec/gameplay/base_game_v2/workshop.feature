@@ -8,7 +8,7 @@ Feature: Artisan
   Scenario: Play Workshop normally
     Then I should need to 'Play an Action, or pass'
     When I choose Workshop in my hand
-    And I should need to 'Choose a card to gain'
+    Then I should need to 'Choose a card to gain'
     And I should be able to choose the Copper, Workshop, Bureaucrat piles
     And I should not be able to choose the Market, Gold, Province piles
     When I choose Bureaucrat in the supply

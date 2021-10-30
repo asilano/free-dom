@@ -509,6 +509,11 @@ module GameSteps
       end
     end
 
+    step "the :card pile should cost :amount" do |card, amount|
+      pile = @game.game_state.piles.detect { |p| p.cards.first.is_a? card }
+      expect(pile.cards.first.cost).to eq(amount)
+    end
+
     step ':player_name should have :count action(s)' do |name, count|
       @game.process
       expect(get_player(name).actions).to eq count.to_i

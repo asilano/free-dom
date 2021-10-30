@@ -1,3 +1,9 @@
+placeholder :amount do
+  match /\d+/ do |amount|
+    amount.to_i
+  end
+end
+
 placeholder :count do
   match /\d+/ do |count|
     count.to_i

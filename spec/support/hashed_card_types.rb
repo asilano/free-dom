@@ -34,6 +34,7 @@ CARD_TYPES = {
   'Improve'       => GameEngine::Renaissance::Improve,
   'Flag Bearer'   => GameEngine::Renaissance::FlagBearer,
   'Hideout'       => GameEngine::Renaissance::Hideout,
+  'Inventor'      => GameEngine::Renaissance::Inventor,
   'Estate'        => GameEngine::BasicCards::Estate,
   'Duchy'         => GameEngine::BasicCards::Duchy,
   'Province'      => GameEngine::BasicCards::Province,

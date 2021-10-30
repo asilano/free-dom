@@ -5,7 +5,8 @@ module CardModules
     end
 
     def cost
-      self.class.raw_cost
+      inventors = game_state.get_fact(:inventors) || 0
+      (self.class.raw_cost - inventors).clamp(0..)
     end
 
     def player_can_buy?(player:)

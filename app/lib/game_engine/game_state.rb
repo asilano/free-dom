@@ -25,7 +25,7 @@ module GameEngine
       @phase = nil
 
       @artifacts = {}
-      @facts = {}
+      @facts = {enduring: {}, per_turn: {}}
 
       @next_fid = 0
       @fid_prefix = '1'
@@ -55,6 +55,7 @@ module GameEngine
         @turn_player.actions = 1
         @turn_player.buys = 1
         @turn_player.cash = 0
+        @facts[:per_turn] = {}
 
         @game.current_journal.histories << History.new("#{@turn_player.name} started turn #{round}.#{turn_seat + 1}.",
                                                        player: @turn_player)
@@ -174,16 +175,19 @@ module GameEngine
       @artifacts[klass.to_s.demodulize] = klass.new(self)
     end
 
-    def set_fact(name, value)
-      @facts[name] = value
+    def set_fact(name, value, duration: :per_turn)
+      raise unless %i[enduring per_turn].include? duration
+      @facts[duration][name] = value
     end
 
-    def get_fact(name)
-      @facts[name]
+    def get_fact(name, duration: :per_turn)
+      raise unless %i[enduring per_turn].include? duration
+      @facts[duration][name]
     end
 
-    def access_fact(name)
-      define_singleton_method(name) { @facts[name] }
+    def access_fact(name, duration: :per_turn)
+      raise unless %i[enduring per_turn].include? duration
+      define_singleton_method(name) { @facts[duration][name] }
     end
 
     def inspect
