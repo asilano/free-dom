@@ -496,6 +496,30 @@ module GameSteps
       end
     end
 
+    step ':player_name :whether_to be able to choose :cards in my/his/her discard' do |name, should, cards|
+      player = get_player(name)
+      user = player.user
+      question = @questions.detect { |q| q.player.name == user.name }
+      controls = question.controls_for(user, @game.game_state)
+      control = controls.detect { |c| c.scope == :discard }
+
+      if cards.empty?
+        # :cards was "nothing"
+        if should
+          expect(control.cardless_button).to_not be_nil
+        else
+          expect(control.cardless_button).to be_nil
+        end
+      else
+        can_pick = cards.map do |card|
+          discarded_card = player.discarded_cards.detect { |c| c.is_a? card }
+          discarded_card && control.filter(discarded_card)
+        end
+
+        expect(can_pick).to all(should ? be_truthy : be_falsey)
+      end
+    end
+
     step ':player_name :whether_to be able to choose the option :option' do |name, should, option|
       user = get_player(name).user
       question = @questions.detect { |q| q.player.name == user.name }
