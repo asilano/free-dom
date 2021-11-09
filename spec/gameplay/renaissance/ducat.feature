@@ -5,7 +5,7 @@ Feature: Ducat
     And my hand contains Ducat, Estate, Estate, Copper, Silver
     And the kingdom choice contains Ducat
 
-  Scenario: Play Ducat, spend Coffer immediately
+  Scenario: Play Ducat
     Then I should need to "Play an Action, or pass"
     When I choose "Leave Action Phase" in my hand
     Then I should need to "Play Treasures, or pass"

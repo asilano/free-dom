@@ -36,6 +36,7 @@ CARD_TYPES = {
   'Hideout'          => GameEngine::Renaissance::Hideout,
   'Inventor'         => GameEngine::Renaissance::Inventor,
   'Mountain Village' => GameEngine::Renaissance::MountainVillage,
+  'Patron'           => GameEngine::Renaissance::Patron,
   'Estate'           => GameEngine::BasicCards::Estate,
   'Duchy'            => GameEngine::BasicCards::Duchy,
   'Province'         => GameEngine::BasicCards::Province,

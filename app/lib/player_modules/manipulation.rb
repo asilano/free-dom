@@ -47,6 +47,8 @@ module PlayerModules
         css_classes: %w[reveal-cards]
       )
       revealed_cards.each(&:be_revealed)
+      @game_state.observe
+      revealed_cards
     end
 
     def peek_cards(num, from:)

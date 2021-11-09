@@ -89,6 +89,10 @@ module CardModules
     # Default effect of a card being revealed.
     def be_revealed
       @revealed = true
+
+      game_state.trigger do
+        GameEngine::Triggers::CardRevealed.trigger(self, @player, @location)
+      end
     end
 
     # Default effect of a card being unrevealed. This is not expected to ever be overridden

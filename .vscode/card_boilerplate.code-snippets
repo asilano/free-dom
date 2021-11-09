@@ -48,5 +48,13 @@
 			"    Given pending",
 			""
 		]
+	},
+	"Add pending scenario": {
+		"scope": "feature",
+		"prefix": "pending-scenario",
+		"body": [
+			"  Scenario: $1",
+			"    Given pending"
+		]
 	}
 }
