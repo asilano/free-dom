@@ -37,6 +37,7 @@ CARD_TYPES = {
   'Inventor'         => GameEngine::Renaissance::Inventor,
   'Mountain Village' => GameEngine::Renaissance::MountainVillage,
   'Patron'           => GameEngine::Renaissance::Patron,
+  'Priest'           => GameEngine::Renaissance::Priest,
   'Estate'           => GameEngine::BasicCards::Estate,
   'Duchy'            => GameEngine::BasicCards::Duchy,
   'Province'         => GameEngine::BasicCards::Province,

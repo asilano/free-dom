@@ -64,7 +64,7 @@ module GameEngine
 
         # Play actions until the player stops or runs out
         play_actions = :continue
-        until @turn_player.actions.zero? || play_actions == :stop
+        until (@turn_player.actions.zero? && @turn_player.villagers.zero?) || play_actions == :stop
           play_actions = get_journal(GameEngine::PlayActionJournal, from: @turn_player).process(self)
           observe
         end

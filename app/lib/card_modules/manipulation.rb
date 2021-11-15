@@ -74,7 +74,7 @@ module CardModules
     end
 
     # Default effect of a card being trashed.
-    def trash(from:)
+    def trash(from:, by: @player)
       from.delete(self)
 
       player_was, @player = @player, nil
@@ -82,7 +82,7 @@ module CardModules
       @location = :trash
 
       game_state.trigger do
-        GameEngine::Triggers::CardTrashed.trigger(self, player_was, from)
+        GameEngine::Triggers::CardTrashed.trigger(self, player_was, from, by)
       end
     end
 
