@@ -1,0 +1,8 @@
+- if player.villagers.positive? || player.coffers.positive?
+  .tokens
+    h5 Tokens
+    .counts
+      - if player.villagers.positive?
+        .count #{player.villagers} Villagers
+      - if player.coffers.positive?
+        .count #{player.coffers} Coffers

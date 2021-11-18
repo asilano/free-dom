@@ -65,10 +65,7 @@
                 .card-ctrl= render partial: 'controls/cardless_button', object: ctrl.cardless_button, as: :button, locals: { control: ctrl }
 
   / Artifacts
-  - if @game.game_state.artifacts.values.any? { |art| art.owner == other_player }
-    h5 Artifacts
-    .grid-container.fluid
-      .card-grid
-        - @game.game_state.artifacts.values.select { |art| art.owner == other_player }.each do |art|
-          .cell.card.artifact
-            .card-name{data-tooltip data-allow-html="true" title=art.text}= art.readable_name
+  = render partial: "artifacts_section", locals: { player: other_player }
+
+  / Tokens (Villagers, Coffers, Pirate...)
+  = render partial: "tokens_section", locals: { player: other_player }

@@ -23,6 +23,22 @@ Feature: Villagers
     And I should need to "Play an Action, or pass"
     And I should not need to "Spend Villagers"
 
+  Scenario: Have Villagers with no Actions left, still able to spend them
+    Given my hand contains Acting Troupe, Market
+    Then I should need to "Play an Action, or pass"
+    When I choose Acting Troupe in my hand
+    Then cards should move as follows:
+      Then I should trash Acting Troupe from in play
+      And these card moves should happen
+    And I should have 4 Villagers
+    And I should need to "Leave the Action phase"
+    And I should need to "Spend Villagers"
+    And I should not be able to choose Market in my hand
+    When I spend 1 Villager
+    Then I should need to "Play an Action, or pass"
+    And I should need to "Spend Villagers"
+    And I should be able to choose Market in my hand
+
   Scenario: Have 3 Villagers, spend 2 Villagers, then spend remaining Villager (when stack empty)
     Given I have 3 Villagers
     Then I should need to "Play an Action, or pass"

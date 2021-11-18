@@ -1,13 +1,15 @@
 module GameEngine
   class PlayActionJournal < Journal
-    define_question('Play an Action, or pass').prevent_auto
-                                              .with_controls do |_game_state|
+    define_question { |_| player.actions.zero? ? "Leave the Action phase" : "Play an Action, or pass" }
+        .prevent_auto
+        .with_controls do |_game_state|
+      filter = -> (card) { @player.actions.zero? ? false : card.action? }
       [OneCardControl.new(journal_type: PlayActionJournal,
                           question:     self,
                           player:       @player,
                           scope:        :hand,
                           text:         'Play',
-                          filter:       :action?,
+                          filter:       filter,
                           null_choice:  { text:  'Leave Action Phase',
                                           value: 'none' },
                           css_class:    'play-action')]

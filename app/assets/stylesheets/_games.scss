@@ -74,7 +74,9 @@
   border-radius: 50%;
 }
 
-.turn-status {
+.turn-status, .tokens {
+  margin-top: 10px;
+
   .counts, .cash {
     display: table-cell;
     position: relative;
