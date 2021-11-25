@@ -140,4 +140,18 @@ Feature: Library
     And I should need to 'Play Treasures, or pass'
 
   Scenario Outline: Playing Library, hybrid actions count
-    And Pending
+    And my hand contains Library, Estate x3
+    And my deck contains Gold, Research, Silver, Gardens, Copper, Village
+    Then I should need to 'Play an Action, or pass'
+    When I choose Library in my hand
+    Then cards should move as follows:
+      Then I should draw 2 cards
+      And these card moves should happen
+    And I should need to 'Set aside or keep action'
+    When I choose Research in my hand
+    Then cards should move as follows:
+      Then I should move Research from my hand to my library
+      And I should draw 3 cards
+      And I should move Research from my library to my discard
+      And these card moves should happen
+    And I should need to 'Play Treasures, or pass'

@@ -39,4 +39,4 @@ Feature: Moat
     Then Belle should need to 'Discard down by 2 cards'
 
   Scenario: Holding Moat autoignores an attack, when set
-    When pending
+    When pending automoat

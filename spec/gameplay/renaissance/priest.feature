@@ -64,7 +64,7 @@ Feature: Priest
 
   # Requires Lurker
   Scenario: Playing Priest, then trashing not owned
-    Given pending
+    Given pending Lurker
 
   Scenario: Playing two Priests, then trashing
     Given my hand contains Village, Village, Priest, Priest, Copper, Acting Troupe
@@ -139,8 +139,8 @@ Feature: Priest
 
   # Requires Sewers
   Scenario: Trashing as trigger during Priest doesn't grant cash.
-    Given pending
+    Given pending Sewers
 
   # Requires Loan or Counterfeit
   Scenario: Trashing during Treasure phase
-    Given pending
+    Given pending Loan or Counterfeit

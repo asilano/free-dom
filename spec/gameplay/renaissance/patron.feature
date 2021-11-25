@@ -14,17 +14,17 @@ Feature: Patron
 
   # Requires Courtier, Ambassador or Gladiator
   Scenario: Reveal Patron, specifically, in own hand
-    Given pending
+    Given pending Courtier, Ambassador or Gladiator
 
   # Requires Shanty Town, Menagerie, Hunting Party, Crossroads,
   # Poor House, City Quarter, Royal Blacksmith, or Grand Castle
   Scenario: Reveal Patron as part of whole hand
-    Given pending
+    Given pending Shanty Town, Menagerie, Hunting Party, Crossroads, Poor House, City Quarter, Royal Blacksmith, or Grand Castle
 
   # Requires Scrying Pool, Golem, Loan, Venture, Farming Village, Sage,
   # Hunting Party, Rebuild, Journeyman, or Ghost
   Scenario: Reveal Patron as part of "reveal top of deck until"
-    Given pending
+    Given pending Scrying Pool, Golem, Loan, Venture, Farming Village, Sage, Hunting Party, Rebuild, Journeyman, or Ghost
 
   Scenario: Reveal Patron as part of "reveal top n of deck"
     Given my hand contains Border Guard
@@ -38,7 +38,7 @@ Feature: Patron
 
   # Requires Gladiator
   Scenario: Reveal specifically from hand as part of opponent's effect
-    Given pending
+    Given pending Gladiator
 
   Scenario: Reveal from hand for accountability as part of opponent's attack
     Given my hand contains Bureaucrat
@@ -70,12 +70,12 @@ Feature: Patron
 
   # Requires Black Market
   Scenario: Reveal from Black Market stack
-    Given pending
+    Given pending Black Market
 
   # Requires Inn
   Scenario: Reveal specifically from discard
-    Given pending
+    Given pending Inn
 
   # Requires Bad Omens
   Scenario: Reveal from discard for accountability
-    Given pending
+    Given pending Bad Omens

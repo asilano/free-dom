@@ -5,6 +5,13 @@ module GameSteps
     [SetupSteps, ActionSteps, CheckSteps].each { |mod| base.include mod }
   end
 
+  step "pending :reason" do |reason|
+    skip reason
+  end
+  step "pending" do
+    skip
+  end
+
   module SetupSteps
     step 'I am in a :count player game' do |count|
       @game = FactoryBot.create(:game_with_kingdom)
@@ -180,10 +187,19 @@ module GameSteps
     end
 
     step ":player_name pass(es) through to :player_name next turn" do |name, next_name|
+      pass_through_turn(name, next_name, false)
+    end
+
+    step ":player_name pass(es) through to just before :player_name next turn" do |name, next_name|
+      pass_through_turn(name, next_name, true)
+    end
+
+    def pass_through_turn(name, next_name, just_before)
       name.replace('Alan') if name == "I"
       next_name.replace("Alan") if next_name == "I"
 
       first = true
+      prev_name = @player_names[@player_names.index(name) - 1]
       @player_names.rotate(@player_names.index(name)).each do |inner_name|
         break if inner_name == next_name && !first
         first = false
@@ -196,6 +212,7 @@ module GameSteps
         step "#{inner_name} choose 'Stop playing treasures' in his hand"
         step "#{inner_name} should need to 'Buy a card, or pass'"
         step "#{inner_name} choose 'Buy nothing' in the supply"
+        break if inner_name = prev_name && just_before
         step "cards should move as follows:"
         step   "#{inner_name} should discard everything from his hand"
         step   "#{inner_name} should discard everything from play"

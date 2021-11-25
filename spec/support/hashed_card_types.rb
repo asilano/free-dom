@@ -38,6 +38,7 @@ CARD_TYPES = {
   'Mountain Village' => GameEngine::Renaissance::MountainVillage,
   'Patron'           => GameEngine::Renaissance::Patron,
   'Priest'           => GameEngine::Renaissance::Priest,
+  'Research'         => GameEngine::Renaissance::Research,
   'Estate'           => GameEngine::BasicCards::Estate,
   'Duchy'            => GameEngine::BasicCards::Duchy,
   'Province'         => GameEngine::BasicCards::Province,
