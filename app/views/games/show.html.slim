@@ -115,6 +115,6 @@
                                         title: 'Undo to here',
                                         desc: 'Click to undo this and all later actions',
                                         aria: true), class: 'undo-button unstyle'
-                span= "#{journal.user&.name || 'The game'}'s choice for '#{journal.class.from(journal.user).in(@game).question.text(@game.game_state)}', which is now invalid"
+                span= "#{journal.user&.name || 'The game'}'s choice for '#{journal.class.from(journal.player).in(@game).question.text(@game.game_state)}', which is now invalid"
 
   = link_to 'Back', games_path
