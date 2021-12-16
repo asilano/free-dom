@@ -212,7 +212,7 @@ module GameSteps
         step "#{inner_name} choose 'Stop playing treasures' in his hand"
         step "#{inner_name} should need to 'Buy a card, or pass'"
         step "#{inner_name} choose 'Buy nothing' in the supply"
-        break if inner_name = prev_name && just_before
+        break if inner_name == prev_name && just_before
         step "cards should move as follows:"
         step   "#{inner_name} should discard everything from his hand"
         step   "#{inner_name} should discard everything from play"
