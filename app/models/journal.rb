@@ -124,7 +124,11 @@ class Journal < ApplicationRecord
     if text
       self::Template::Question.define_method(:text) { |_| text }
     else
-      self::Template::Question.define_method(:text, &block)
+      self::Template::Question.define_method(:text) do |state|
+        instance_exec(state, &block)
+      rescue
+        "Unable to determine question"
+      end
     end
     self::Template::Question
   end
