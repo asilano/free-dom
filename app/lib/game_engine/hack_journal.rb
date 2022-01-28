@@ -6,7 +6,7 @@ module GameEngine
       prevent_undo
 
       case params['scope']
-      when 'hand', 'deck', 'discard'
+      when 'hand', 'deck', 'discard', 'play'
         modify_player_cards(game_state)
       when 'supply'
         modify_supply_cards(game_state)

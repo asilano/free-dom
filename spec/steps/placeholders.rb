@@ -64,6 +64,6 @@ end
 
 placeholder :player_name do
   match /([a-zA-Z]+)('s)?/ do |name|
-    name == 'my' ? 'I' : name
+    %w[my me].include?(name) ? 'I' : name
   end
 end

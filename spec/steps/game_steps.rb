@@ -266,6 +266,18 @@ module GameSteps
       expect(player.revealed_cards.select { |c| c.location == :deck }.map { |c| c.class.to_s }).to match_array(cards.map(&:to_s))
     end
 
+    step ":cards in/on :player_name :scope :whether_to be visible to :player_name" do |cards, owner_name, scope, visible, viewer_name|
+      @game.process
+      owner = get_player(owner_name)
+      viewer = get_player(viewer_name)
+      scope = scope.to_sym
+      scope_cards = owner.cards.select { |c| c.location == scope }
+      scope_cards.each do |c|
+        next unless cards.include?(c.class)
+        expect(c.visible_to?(viewer)).to eq visible
+      end
+    end
+
     step 'cards should move as follows:' do
       # Process all but the last-added journal
       @game.journals.last.ignore = true

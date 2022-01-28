@@ -66,3 +66,14 @@ Feature: Basic turn
       And I should discard everything from play
       And I should draw 5 cards
       And these card moves should happen
+
+  Scenario: Basic visibility
+    Given my hand contains Estate x2, Copper x3, Vassal
+    And my deck contains Silver x2, Province x4
+    And my play contains Village, Gold x3
+    Then Estate x2, Copper x3, Vassal in my hand should be visible to me
+    And Estate x2, Copper x3, Vassal in my hand should not be visible to Belle
+    And Silver x2, Province x4 on my deck should not be visible to me
+    And Silver x2, Province x4 on my deck should not be visible to Chas
+    And Village, Gold x3 in my play should be visible to me
+    And Village, Gold x3 in my play should be visible to Belle

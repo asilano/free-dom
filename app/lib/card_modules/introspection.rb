@@ -25,6 +25,23 @@ module CardModules
       "#{readable_name}.#{Digest::MD5.base64digest(object_id.to_s)}"
     end
 
+    def visible_to?(check_player)
+      # Default visibility based on card location
+      visible = case location
+                when :deck
+                  false
+                when :hand, :discard
+                  check_player == player
+                else
+                  # Probably in some variation of "in play" (enduring etc.). Default to visible
+                  true
+                end
+
+      # Here, apply visibility effects
+
+      visible
+
+    end
     module ClassMethods
       def readable_name
         name.demodulize.underscore.titleize
