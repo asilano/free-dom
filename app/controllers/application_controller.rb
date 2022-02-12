@@ -1,6 +1,9 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   before_action :add_clacks_overhead
+  rescue_from ActiveRecord::RecordNotFound do
+    redirect_to :root
+  end
 
   def index
   end

@@ -57,7 +57,7 @@
   .grid-container.fluid
     - if @game.users.include? current_user
       .grid-x.grid-margin-x.this-player
-        = render 'player'
+        = render partial: "player", object: current_player
 
 .cell.border-under
   .grid-container.fluid

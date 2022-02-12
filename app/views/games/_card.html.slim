@@ -9,6 +9,6 @@
   - if card.hosting.present?
     .nested-cards
       = render partial: "card", collection: card.hosting.select { |cd| cd.visible_to? current_player }
-      - unless (non_visible_count = card.hosting.reject { |cd| cd.visible_to? current_player }).zero?
+      - unless (non_visible_count = card.hosting.count { |cd| !cd.visible_to? current_player }).zero?
         .cell.card.back-wrapper
           .card-back= non_visible_count

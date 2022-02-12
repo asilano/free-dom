@@ -1,14 +1,19 @@
 module CardModules
   module Manipulation
+    def location=(value)
+      @location = value
+      @visibility_effects.clear
+    end
+
     def play_as_action(played_by:)
-      @location = :play
+      self.location = :play
       game.current_journal.histories << GameEngine::History.new("#{played_by.name} played #{readable_name}.",
                                                                 player: played_by,
                                                                 css_classes: types + %w[play-action])
     end
 
     def play_as_treasure(played_by:, stop_before_cash: false)
-      @location = :play
+      self.location = :play
       GameEngine::Triggers::TreasurePlayed.trigger(self, played_by)
 
       return if stop_before_cash
@@ -37,7 +42,7 @@ module CardModules
       end
       @player = player
       @pile = nil
-      @location = to
+      self.location = to
 
       game_state.trigger do
         GameEngine::Triggers::CardGained.trigger(self, @player, from, to)
@@ -50,7 +55,7 @@ module CardModules
       # Add self onto the front of the player's cards, so it's on top of the deck
       player.cards.unshift(self)
       @player = player
-      @location = :deck
+      self.location = :deck
     end
 
     # Default effect of a card being put into discard from wherever it is
@@ -61,7 +66,7 @@ module CardModules
       @player.cards.delete(self)
       @player.cards.unshift(self)
       old_location = @location
-      @location = :discard
+      self.location = :discard
 
       game_state.trigger do
         GameEngine::Triggers::CardDiscarded.trigger(self, @player, old_location)
@@ -70,7 +75,7 @@ module CardModules
 
     # Default effect of a card being drawn. This is not expected to ever be overridden
     def be_drawn
-      @location = :hand
+      self.location = :hand
     end
 
     # Default effect of a card being trashed.
@@ -79,11 +84,20 @@ module CardModules
 
       player_was, @player = @player, nil
       @pile = nil
-      @location = :trash
+      self.location = :trash
 
       game_state.trigger do
         GameEngine::Triggers::CardTrashed.trigger(self, player_was, from, by)
       end
+    end
+
+    # Add a visibility effect to the card
+    def add_visibility_effect(source, to:, visible:)
+      @visibility_effects << {
+        source: source,
+        to: to,
+        visible: visible
+      }
     end
 
     # Default effect of a card being revealed.
@@ -111,12 +125,12 @@ module CardModules
     end
 
     def move_to_hand
-      @location = :hand
+      self.location = :hand
     end
 
     # Move a card to an unusual location
     def move_to(location)
-      @location = location
+      self.location = location
     end
 
     # Note - at time of coding, the player must own a card that is being returned to supply
@@ -130,7 +144,7 @@ module CardModules
       pile.cards.unshift(self)
       @player = nil
       @pile = pile
-      @location = :pile
+      self.location = :pile
     end
   end
 end

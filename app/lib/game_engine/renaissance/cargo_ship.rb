@@ -30,9 +30,9 @@ module GameEngine
       end
 
       def tracking?
-        player.try do |ply|
-          ply.cards.any? { |c| c.location == :set_aside && c.location_card == self }
-        end
+        return false unless player
+
+        player.cards.any? { |c| c.location == :set_aside && c.location_card == self }
       end
 
       class SetAsideJournal < Journal
@@ -59,9 +59,10 @@ module GameEngine
 
           @histories << History.new("#{player.name} set aside #{opts[:card].readable_name} on Cargo Ship.",
                                     player: player)
-          opts[:card].location = :set_aside
+          opts[:card].move_to :set_aside
           opts[:card].location_card = opts[:ship]
           opts[:ship].hosting << opts[:card]
+          opts[:card].add_visibility_effect(self, to: :all, visible: true)
 
           filter = lambda do |turn_player|
             turn_player == player

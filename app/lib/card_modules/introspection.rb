@@ -38,10 +38,15 @@ module CardModules
                 end
 
       # Here, apply visibility effects
+      @visibility_effects.each do |effect|
+        if effect[:to] == check_player || effect[:to] == :all
+          visible = effect[:visible]
+        end
+      end
 
       visible
-
     end
+
     module ClassMethods
       def readable_name
         name.demodulize.underscore.titleize

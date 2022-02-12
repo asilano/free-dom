@@ -12,6 +12,8 @@
 /tmp/*
 !/log/.keep
 !/tmp/.keep
+.idea/
+.vscode/
 
 /node_modules
 /yarn-error.log

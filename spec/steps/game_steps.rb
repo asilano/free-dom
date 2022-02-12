@@ -199,7 +199,7 @@ module GameSteps
       next_name.replace("Alan") if next_name == "I"
 
       first = true
-      prev_name = @player_names[@player_names.index(name) - 1]
+      prev_name = @player_names[@player_names.index(next_name) - 1]
       @player_names.rotate(@player_names.index(name)).each do |inner_name|
         break if inner_name == next_name && !first
         first = false
@@ -212,11 +212,11 @@ module GameSteps
         step "#{inner_name} choose 'Stop playing treasures' in his hand"
         step "#{inner_name} should need to 'Buy a card, or pass'"
         step "#{inner_name} choose 'Buy nothing' in the supply"
-        break if inner_name == prev_name && just_before
         step "cards should move as follows:"
         step   "#{inner_name} should discard everything from his hand"
         step   "#{inner_name} should discard everything from play"
         step   "#{inner_name} should draw 5 cards"
+        break if inner_name == prev_name && just_before
         step "these card moves should happen"
       end
     end
@@ -270,7 +270,7 @@ module GameSteps
       @game.process
       owner = get_player(owner_name)
       viewer = get_player(viewer_name)
-      scope = scope.to_sym
+      scope = scope.downcase.to_sym
       scope_cards = owner.cards.select { |c| c.location == scope }
       scope_cards.each do |c|
         next unless cards.include?(c.class)
@@ -306,7 +306,7 @@ module GameSteps
           begin
             expect(group_now).to match_array(group_before[location])
           rescue RSpec::Expectations::ExpectationNotMetError
-            $!.message << "\n - in location #{location}. Expected #{group_before[location].length}, got #{group_now.length}"
+            $!.message << "\n - in location #{location} for #{PLAYER_NAMES[ix]}. Expected #{group_before[location]&.length || 0}, got #{group_now.length}"
             raise
           end
         end

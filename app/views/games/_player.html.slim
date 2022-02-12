@@ -56,7 +56,7 @@
             - play_controls.each do |ctrl|
               - if ctrl.cardless_button
                 .card-ctrl= render partial: 'controls/cardless_button', object: ctrl.cardless_button, as: :button, locals: { control: ctrl }
-        - unless (non_visible_count = current_player.played_cards.reject { |cd| cd.visible_to? current_player }).zero?
+        - unless (non_visible_count = current_player.played_cards.count { |cd| !cd.visible_to? current_player }).zero?
           .cell.card.back-wrapper
             .card-back= non_visible_count
 
