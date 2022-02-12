@@ -39,6 +39,7 @@ CARD_TYPES = {
   'Patron'           => GameEngine::Renaissance::Patron,
   'Priest'           => GameEngine::Renaissance::Priest,
   'Research'         => GameEngine::Renaissance::Research,
+  'Silk Merchant'    => GameEngine::Renaissance::SilkMerchant,
   'Estate'           => GameEngine::BasicCards::Estate,
   'Duchy'            => GameEngine::BasicCards::Duchy,
   'Province'         => GameEngine::BasicCards::Province,
