@@ -40,6 +40,7 @@ CARD_TYPES = {
   'Priest'           => GameEngine::Renaissance::Priest,
   'Research'         => GameEngine::Renaissance::Research,
   'Silk Merchant'    => GameEngine::Renaissance::SilkMerchant,
+  'Old Witch'        => GameEngine::Renaissance::OldWitch,
   'Estate'           => GameEngine::BasicCards::Estate,
   'Duchy'            => GameEngine::BasicCards::Duchy,
   'Province'         => GameEngine::BasicCards::Province,
