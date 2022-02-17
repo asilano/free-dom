@@ -1,7 +1,7 @@
 module GameEngine
   module BasicCards
     class Province < GameEngine::Card
-      text 'Victory (cost: 8)', '6 points'
+      text '6 points'
       victory points: 6
       pile_size do |num_players|
         case num_players

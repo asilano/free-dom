@@ -1,8 +1,7 @@
 module GameEngine
   module Renaissance
     class SilkMerchant < Card
-      text "Action (cost: 4)",
-           "+2 Cards",
+      text "+2 Cards",
            "+1 Buy",
            "When you gain or trash this, +1 Coffers and +1 Villager."
       action

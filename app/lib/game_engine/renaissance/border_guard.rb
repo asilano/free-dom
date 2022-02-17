@@ -1,8 +1,7 @@
 module GameEngine
   module Renaissance
     class BorderGuard < Card
-      text 'Action (cost: 2)',
-           '+1 Action',
+      text '+1 Action',
            'Reveal the top 2 cards of your deck. Put one into your hand and discard the other. If both were Actions, take the Lantern or Horn.'
       action
       costs 2

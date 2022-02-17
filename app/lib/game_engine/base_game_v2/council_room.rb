@@ -1,8 +1,7 @@
 module GameEngine
   module BaseGameV2
     class CouncilRoom < GameEngine::Card
-      text 'Action (cost: 5)',
-           '+4 Cards, +1 Buy',
+      text '+4 Cards, +1 Buy',
            'Each other player draws a card.'
       action
       costs 5

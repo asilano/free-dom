@@ -1,8 +1,7 @@
 module GameEngine
   module Renaissance
     class Lackeys < Card
-      text 'Action (cost: 2)',
-           '+2 Cards',
+      text '+2 Cards',
            :hr,
            'When you gain this, +2 Villagers.'
       action

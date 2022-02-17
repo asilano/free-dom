@@ -1,8 +1,7 @@
 module GameEngine
   module Renaissance
     class OldWitch < Card
-      text "Action/Attack (cost: 5)",
-           "+3 Cards",
+      text "+3 Cards",
            "Each other player gains a Curse and may trash a Curse from their hand."
       action
       attack

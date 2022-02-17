@@ -1,8 +1,7 @@
 module GameEngine
   module Renaissance
     class Experiment < Card
-      text "Action (cost: 3)",
-           "+2 Cards",
+      text "+2 Cards",
            "+1 Action",
            "Return this to the Supply.",
            :hr,
