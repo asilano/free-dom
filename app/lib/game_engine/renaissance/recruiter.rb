@@ -18,7 +18,7 @@ module GameEngine
 
         def post_process
           player.villagers += @card_cost
-          @histories << History.new("#{player.name} gained #{@card_cost} Villagers (new total: #{player.villagers}).",
+          @histories << History.new("#{player.name} gained #{@card_cost} Villagers.",
                                     player: player)
         end
       end

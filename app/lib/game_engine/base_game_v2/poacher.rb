@@ -48,8 +48,8 @@ module GameEngine
           # Just log if the player chose nothing
           if params['choice'].blank?
             @histories << History.new("#{player.name} discarded nothing",
-                              player:      player,
-                              css_classes: %w[discard])
+                                      player:      player,
+                                      css_classes: %w[discard])
             return
           end
 

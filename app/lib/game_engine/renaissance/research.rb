@@ -26,7 +26,18 @@ module GameEngine
         def post_process
           # Move trashed-cost cards face down from deck to this card
           cards_to_move = player.deck_cards.take(@card_cost)
-          return if cards_to_move.blank?
+          if cards_to_move.blank?
+            @histories << History.new("#{player.name} set nothing aside on #{Research.readable_name}.")
+            return
+          end
+
+          log = "#{player.name} set aside " +
+            History.personal_log(private_to: player.user,
+                                 private_msg: cards_to_move.map(&:readable_name).join(", "),
+                                 public_msg: "#{cards_to_move.length} #{"card".pluralize(cards_to_move.length)}") +
+            " on #{Research.readable_name}."
+          @histories << History.new(log, player: player)
+
           cards_to_move.each do |card|
             card.move_to :set_aside
             card.location_card = opts[:research]
