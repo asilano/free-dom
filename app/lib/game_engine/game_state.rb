@@ -207,7 +207,7 @@ module GameEngine
       @turn_player.hand_cards.each(&:discard)
 
       # Discard all non-tracking in-play cards
-      @turn_player.played_cards.reject(&:tracking?).each(&:discard)
+      @turn_player.played_cards.each { |c| c.played_this_turn = false }.reject(&:tracking?).each(&:discard)
 
       observe
 

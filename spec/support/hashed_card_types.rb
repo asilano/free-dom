@@ -42,6 +42,7 @@ CARD_TYPES = {
   'Silk Merchant'    => GameEngine::Renaissance::SilkMerchant,
   'Old Witch'        => GameEngine::Renaissance::OldWitch,
   'Recruiter'        => GameEngine::Renaissance::Recruiter,
+  'Scepter'          => GameEngine::Renaissance::Scepter,
   'Estate'           => GameEngine::BasicCards::Estate,
   'Duchy'            => GameEngine::BasicCards::Duchy,
   'Province'         => GameEngine::BasicCards::Province,

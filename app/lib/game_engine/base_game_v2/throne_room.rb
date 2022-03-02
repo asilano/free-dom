@@ -16,11 +16,11 @@ module GameEngine
       def discard
         super
 
-        @doubled = nil
+        self.doubled = nil
       end
 
       def tracking?
-        @doubled&.tracking?
+        doubled&.tracking?
       end
 
       class ChooseActionJournal < Journal

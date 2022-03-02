@@ -6,7 +6,7 @@ module GameEngine
     include CardModules::Manipulation
 
     attr_reader :game_state, :facts, :visibility_effects, :location
-    attr_accessor :location_card, :hosting, :player, :pile, :revealed, :peeked, :interacting_with
+    attr_accessor :location_card, :hosting, :player, :pile, :revealed, :peeked, :interacting_with, :played_this_turn
 
     delegate :game, :observe, :trigger, to: :game_state
     delegate :action?, :treasure?, :special?, :victory?, :curse?, :reaction?, :attack?, :readable_name, :types, to: :class

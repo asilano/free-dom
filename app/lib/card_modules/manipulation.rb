@@ -7,6 +7,7 @@ module CardModules
 
     def play_as_action(played_by:)
       self.location = :play
+      self.played_this_turn = true
       game.current_journal.histories << GameEngine::History.new("#{played_by.name} played #{readable_name}.",
                                                                 player: played_by,
                                                                 css_classes: types + %w[play-action])
@@ -14,6 +15,7 @@ module CardModules
 
     def play_as_treasure(played_by:, stop_before_cash: false)
       self.location = :play
+      self.played_this_turn = true
       GameEngine::Triggers::TreasurePlayed.trigger(self, played_by)
 
       return if stop_before_cash
