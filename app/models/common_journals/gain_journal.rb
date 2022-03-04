@@ -1,5 +1,7 @@
 module CommonJournals
   class GainJournal < Journal
+    attr_reader :card
+
     def self.configure(question_text:  nil,
                        question_block: nil,
                        filter:         nil,
@@ -25,7 +27,7 @@ module CommonJournals
                                                 css_classes: %w[gain-card])
         else
           pile = game_state.piles[params['choice'].to_i]
-          card = pile.cards.first
+          @card = pile.cards.first
 
           @histories << GameEngine::History.new("#{player.name} gained #{card.readable_name}#{" to their #{destination}" unless destination == :discard}.",
                                                 player:      player,
