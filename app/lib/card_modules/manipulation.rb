@@ -3,6 +3,7 @@ module CardModules
     def location=(value)
       @location = value
       @visibility_effects.clear
+      be_unrevealed
     end
 
     def play_as_action(played_by:)

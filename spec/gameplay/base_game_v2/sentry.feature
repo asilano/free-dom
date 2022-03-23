@@ -60,7 +60,8 @@ Feature: Sentry
     Then cards should not move
     And I should need to 'Reorder the cards on top of your deck'
     When I choose '1st (topmost)' for Estate, '2nd (bottommost)' for Copper in my peeked cards
-    Then cards should not move
+    Then cards should move as follows:
+      Then I should move Estate, Copper from my deck to my deck
     And my deck should contain Estate, Copper
 
   Scenario: Playing Sentry, only reveal 1 card

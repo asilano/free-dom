@@ -74,7 +74,7 @@ Feature: Bandit
     When I choose Bandit in my hand
     Then cards should move as follows:
       Then I should gain Gold
-      And Chas should move Silver, Gold from his discard to his deck
+      And Chas should move Gold, Silver from his discard to his deck
       And Chas should reveal 2 cards from his deck
       And these card moves should happen
     And Gold, Silver should be revealed on Chas's deck

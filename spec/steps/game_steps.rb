@@ -304,7 +304,11 @@ module GameSteps
         group_before = @cards_before[:players][ix].group_by { |c| c[:location] }
         grouped_cards.each do |location, group_now|
           begin
-            expect(group_now).to match_array(group_before[location])
+            if location == :deck
+              expect(group_now).to eql(group_before[location])
+            else
+              expect(group_now).to match_array(group_before[location])
+            end
           rescue RSpec::Expectations::ExpectationNotMetError
             $!.message << "\n - in location #{location} for #{PLAYER_NAMES[ix]}. Expected #{group_before[location]&.length || 0}, got #{group_now.length}"
             raise
@@ -356,6 +360,15 @@ module GameSteps
       players_cards.take(count).each { |c| c[:revealed] = true }
     end
 
+    step ':player_name should unreveal :cards from my/his/her deck' do |name, cards|
+      players_cards = cards_for_player(name)
+      cards.each do |card|
+        instance_ix = players_cards.index { |c| c[:class] == card && c[:location] == :deck }
+        instance = players_cards[instance_ix]
+        instance[:revealed] = false
+      end
+    end
+
     step ':player_name should gain :cards' do |name, cards|
       send ':player_name should gain :cards from :source to my/his/her :destination', name, cards, 'supply', 'discard'
     end
@@ -371,7 +384,7 @@ module GameSteps
           pile = @cards_before[:supply].detect { |p_cards| p_cards.last == card || p_cards.first[:class] == card }
           pile.delete_at(0)
         end
-        players_cards << { class: card, location: destination.to_sym, location_card: {}, revealed: false }
+        players_cards.unshift({ class: card, location: destination.to_sym, location_card: {}, revealed: false })
       end
     end
 
@@ -396,7 +409,7 @@ module GameSteps
 
     step ':player_name should move :cards from my/his/her :source to my/his/her :destination' do |name, cards, source, destination|
       players_cards = cards_for_player(name)
-      cards.each do |card|
+      cards.reverse.each do |card|
         instance_ix = players_cards.index { |c| c[:class] == card && c[:location] == source.to_sym }
         instance = players_cards[instance_ix]
         instance[:location] = destination.to_sym
