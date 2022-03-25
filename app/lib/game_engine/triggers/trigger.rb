@@ -5,9 +5,11 @@ module GameEngine
       attr_accessor :whenever
 
       def self.inherited(subclass)
+        super
+
         @subclasses ||= []
         @subclasses << subclass
-        subclass.instance_variable_set('@observers', [])
+        subclass.instance_variable_set("@observers", [])
       end
 
       def self.watch_for(options = {}, &block)
@@ -54,8 +56,8 @@ module GameEngine
         set_options(options)
       end
 
-      def set_options(filter: nil)
-        @filter = filter || ->(*) { true }
+      def set_options(options)
+        @filter = options[:filter] || ->(*) { true }
       end
     end
   end
