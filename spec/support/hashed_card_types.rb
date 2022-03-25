@@ -45,6 +45,7 @@ CARD_TYPES = {
   'Scepter'          => GameEngine::Renaissance::Scepter,
   'Scholar'          => GameEngine::Renaissance::Scholar,
   'Sculptor'         => GameEngine::Renaissance::Sculptor,
+  'Seer'             => GameEngine::Renaissance::Seer,
   'Estate'           => GameEngine::BasicCards::Estate,
   'Duchy'            => GameEngine::BasicCards::Duchy,
   'Province'         => GameEngine::BasicCards::Province,
