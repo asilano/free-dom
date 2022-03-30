@@ -1,10 +1,16 @@
 #!./bin/rails runner
-longest_name_len = GameEngine::Card.all_card_types.map { |ty| ty.readable_name.length }.max
-File.open(Rails.root.join('spec', 'support', 'hashed_card_types.rb'), 'w') do |f|
-  f.write("CARD_TYPES = {\n")
-  str = GameEngine::Card.all_card_types.map do |ty|
+def write_one_dict(file, dict_name, objects)
+  longest_name_len = objects.map { |ty| ty.readable_name.length }.max
+
+  file.write("#{dict_name} = {\n")
+  str = objects.map do |ty|
     "  '#{ty.readable_name}'#{' ' * (longest_name_len - ty.readable_name.length + 1)}=> #{ty.name}"
   end.join(",\n")
-  f.write(str)
-  f.write("\n}.freeze\n")
+  file.write(str)
+  file.write("\n}.freeze\n\n")
+end
+
+File.open(Rails.root.join("spec", "support", "hashed_card_types.rb"), "w") do |f|
+  write_one_dict(f, "CARD_TYPES", GameEngine::Card.all_card_types)
+  write_one_dict(f, "ARTIFACT_TYPES", GameEngine::CardlikeObjects::Artifacts.card_classes)
 end

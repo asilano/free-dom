@@ -21,6 +21,10 @@ CARD_LIST = /(#{CARD_LIST_NO_CAPTURE})/
 # NamedRandCards = /(\d+) (?:other )?cards?(?: named "(.*)")?/
 # NamedRandCardsNoMatch = /\d+ (?:other ?cards?(?: named ".*")?/
 
+ARTIFACT_NAMES = ARTIFACT_TYPES.keys
+ARTIFACT_NO_CAPTURE = /#{ARTIFACT_NAMES.join("|")}/
+ARTIFACT = /(#{ARTIFACT_NO_CAPTURE})/
+
 Dir.glob('spec/steps/**/*.rb') { |f| load f }
 
 RSpec.configure do |config|

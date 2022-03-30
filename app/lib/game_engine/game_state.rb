@@ -70,6 +70,7 @@ module GameEngine
         end
 
         @phase = :buy
+        Triggers::StartOfBuyPhase.trigger(@turn_player)
 
         # Play treasures until the player stops or runs out
         play_treasures = :continue

@@ -289,7 +289,7 @@ module GameSteps
       # If the last-added journal was a PlayActionJournal, expect the last played action to move
       if @game.journals.last.is_a? GameEngine::PlayActionJournal
         action = cards_for_player(@game.journals.last.player.name, location: 'hand').detect { |c| c[:class] == @last_action_played }
-        action[:location] = :play
+        action[:location] = :play if action
       end
 
       # Unignore the last-added journal
