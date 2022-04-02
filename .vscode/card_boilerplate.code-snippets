@@ -56,5 +56,14 @@
 			"  Scenario: $1",
 			"    Given pending"
 		]
+	},
+	"Card moves": {
+		"scope": "feature",
+		"prefix": "**moves",
+		"body": [
+			"Then cards should move as follows:",
+			"\t${1}",
+			"\tAnd these moves should happen"
+		]
 	}
 }

@@ -49,6 +49,7 @@ CARD_TYPES = {
   'Spices'           => GameEngine::Renaissance::Spices,
   'Swashbuckler'     => GameEngine::Renaissance::Swashbuckler,
   'Treasurer'        => GameEngine::Renaissance::Treasurer,
+  'Villain'          => GameEngine::Renaissance::Villain,
   'Estate'           => GameEngine::BasicCards::Estate,
   'Duchy'            => GameEngine::BasicCards::Duchy,
   'Province'         => GameEngine::BasicCards::Province,
