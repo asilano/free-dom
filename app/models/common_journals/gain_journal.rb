@@ -5,16 +5,23 @@ module CommonJournals
     def self.configure(question_text:  nil,
                        question_block: nil,
                        filter:         nil,
-                       destination:    :discard)
+                       destination:    :discard,
+                       source:         :supply)
       define_question(question_text, &question_block).with_controls do |game_state|
         bound_filter = ->(*args) { instance_exec(*args, &filter) } if filter
+        from_cards = case source
+        when :supply
+          game_state.piles.map(&:cards).map(&:first)
+        when :trash
+          game_state.trashed_cards
+        end
         [OneCardControl.new(journal_type: journal_type,
                             question:     self,
                             player:       @player,
-                            scope:        :supply,
+                            scope:        source,
                             text:         'Gain',
                             filter:       filter,
-                            null_choice:  if filter && game_state.piles.map(&:cards).map(&:first).none?(&bound_filter)
+                            null_choice:  if filter && from_cards.none?(&bound_filter)
                                             { text: 'Gain nothing', value: 'none' }
                                           end,
                             css_class:    'gain-card')]
@@ -26,13 +33,20 @@ module CommonJournals
                                                 player:      player,
                                                 css_classes: %w[gain-card])
         else
-          pile = game_state.piles[params['choice'].to_i]
-          @card = pile.cards.first
+          case source
+          when :supply
+            pile = game_state.piles[params['choice'].to_i]
+            @card = pile.cards.first
+            from = pile.cards
+          when :trash
+            @card = game_state.trashed_cards[params["choice"].to_i]
+            from = game_state.trashed_cards
+          end
 
-          @histories << GameEngine::History.new("#{player.name} gained #{card.readable_name}#{" to their #{destination}" unless destination == :discard}.",
+          @histories << GameEngine::History.new("#{player.name} gained #{card.readable_name}#{" from #{source}" unless source == :supply}#{" to their #{destination}" unless destination == :discard}.",
                                                 player:      player,
                                                 css_classes: %w[gain-card])
-          card.be_gained_by(player, from: pile.cards, to: destination)
+          card.be_gained_by(player, from: from, to: destination)
           observe
         end
 

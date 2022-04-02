@@ -12,14 +12,18 @@ module JournalsHelper
       end
     end
 
-    def valid_gain_choice(filter:, allow_decline: true)
-      no_choices = game_state.piles.map(&:cards).map(&:first).none?(&filter)
-      return true if params['choice'] == 'none' && (no_choices || allow_decline)
-      return false if !no_choices && params['choice'] == 'none'
-      return false unless params['choice']&.integer?
+    def valid_gain_choice(filter:, allow_decline: true, source: game_state.piles, pile: true)
+      source_cards = pile ? source.map(&:cards).map(&:first) : source
+      no_choices = source_cards.none?(&filter)
+      return true if params["choice"] == "none" && (no_choices || allow_decline)
+      return false if !no_choices && params["choice"] == "none"
+      return false unless params["choice"]&.integer?
 
-      choice = params['choice'].to_i
-      choice < game_state.piles.length && filter[game_state.piles[choice].cards.first]
+      choice = params["choice"].to_i
+      return false if choice >= source.length
+
+      chosen_card = pile ? source[choice].cards.first : source[choice]
+      filter[chosen_card]
     end
 
     def valid_gain_by_cost(max_cost:, allow_decline: true)

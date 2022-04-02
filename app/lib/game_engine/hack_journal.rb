@@ -10,6 +10,8 @@ module GameEngine
         modify_player_cards(game_state)
       when 'supply'
         modify_supply_cards(game_state)
+      when 'trash'
+        modify_trash_cards(game_state)
       when 'artifact_owner'
         set_artifact_owner(game_state)
       when 'villagers'
@@ -59,6 +61,22 @@ module GameEngine
       end
 
       @histories << History.new("HACK! #{params['card_class']} pile #{params['action']}: #{params['cards'].map(&:demodulize).map(&:titleize).join(', ')}.",
+                                css_classes: %w[hack])
+    end
+
+    def modify_trash_cards(game_state)
+      case params["action"]
+      when "set"
+        game_state.trashed_cards.clear
+      end
+
+      params["cards"].each do |type|
+        card = type.constantize.new(game_state)
+        card.location = "trash"
+        game_state.trashed_cards << card
+      end
+
+      @histories << History.new("HACK! Trash cards #{params['action']}: #{params['cards'].map(&:demodulize).map(&:titleize).join(', ')}.",
                                 css_classes: %w[hack])
     end
 

@@ -1,5 +1,7 @@
 require 'rails_helper'
 
+PLAYER_NAMES = %w[Alan Belle Chas Donna Eddie Fiona].freeze
+
 CARD_NAMES = CARD_TYPES.keys
 SINGLE_CARD_NO_CAPTURE = /#{CARD_NAMES.join('|')}/
 SINGLE_CARD = /(#{SINGLE_CARD_NO_CAPTURE})/

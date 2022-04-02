@@ -1,6 +1,4 @@
 module GameSteps
-  PLAYER_NAMES = %w[Alan Belle Chas Donna Eddie Fiona].freeze
-
   def self.included(base)
     [SetupSteps, ActionSteps, CheckSteps].each { |mod| base.include mod }
   end
@@ -75,6 +73,15 @@ module GameSteps
                              action:     :set,
                              card_class: card.to_s,
                              cards:      cards.map(&:to_s)
+                           })
+    end
+
+    step 'the trash contains :cards' do |cards|
+      make_journal(user:   nil,
+                   type:   GameEngine::HackJournal,
+                   params: { scope:  :trash,
+                             action: :set,
+                             cards:  cards.map(&:to_s)
                            })
     end
 
@@ -538,6 +545,30 @@ module GameSteps
       end
     end
 
+    step ':player_name :whether_to be able to choose :cards in the trash' do |name, should, cards|
+      player = get_player(name)
+      user = player.user
+      question = @questions.detect { |q| q.player.name == user.name }
+      controls = question.controls_for(user, @game.game_state)
+      control = controls.detect { |c| c.scope == :trash }
+
+      if cards.empty?
+        # :cards was "nothing"
+        if should
+          expect(control.cardless_button).to_not be_nil
+        else
+          expect(control.cardless_button).to be_nil
+        end
+      else
+        can_pick = cards.map do |card|
+          trashed_card = @game.game_state.trashed_cards.detect { |c| c.is_a? card }
+          trashed_card && control.filter(trashed_card)
+        end
+
+        expect(can_pick).to all(should ? be_truthy : be_falsey)
+      end
+    end
+
     step ':player_name :whether_to be able to choose :cards in my/his/her discard' do |name, should, cards|
       player = get_player(name)
       user = player.user
@@ -735,6 +766,8 @@ def find_index(control, player, game_state, scope, filter, card)
     player.cards_peeked_to(@question).index { |c| c.is_a?(card) && control.instance_exec(c, &filter) }
   when :supply
     game_state.piles.index { |pile| pile.cards.first.is_a?(card) && control.instance_exec(pile.cards.first, &filter) }
+  when :trash
+    game_state.trashed_cards.index { |c| c.is_a?(card) && control.instance_exec(c, &filter) }
   when :everywhere
     player.cards.index { |c| c.is_a?(card) && control.instance_exec(c, &filter) }
   end

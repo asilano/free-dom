@@ -88,6 +88,7 @@ module CardModules
       player_was, @player = @player, nil
       @pile = nil
       self.location = :trash
+      game_state.trashed_cards << self
 
       game_state.trigger do
         GameEngine::Triggers::CardTrashed.trigger(self, player_was, from, by)

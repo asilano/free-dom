@@ -48,6 +48,7 @@ CARD_TYPES = {
   'Seer'             => GameEngine::Renaissance::Seer,
   'Spices'           => GameEngine::Renaissance::Spices,
   'Swashbuckler'     => GameEngine::Renaissance::Swashbuckler,
+  'Treasurer'        => GameEngine::Renaissance::Treasurer,
   'Estate'           => GameEngine::BasicCards::Estate,
   'Duchy'            => GameEngine::BasicCards::Duchy,
   'Province'         => GameEngine::BasicCards::Province,
@@ -60,6 +61,7 @@ CARD_TYPES = {
 ARTIFACT_TYPES = {
   'Flag'           => GameEngine::CardlikeObjects::Artifacts::Flag,
   'Horn'           => GameEngine::CardlikeObjects::Artifacts::Horn,
+  'Key'            => GameEngine::CardlikeObjects::Artifacts::Key,
   'Lantern'        => GameEngine::CardlikeObjects::Artifacts::Lantern,
   'Treasure Chest' => GameEngine::CardlikeObjects::Artifacts::TreasureChest
 }.freeze

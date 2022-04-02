@@ -65,6 +65,28 @@
       - @game.game_state.other_players(exclude_user: current_user).each do |player|
         = render partial: 'other_player', object: player
 
+.cell.border-under
+  - trash_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :trash }
+  = render partial: 'control_skeleton', collection: trash_controls
+  .grid-container.fluid
+    .grid-x.grid-margin-x
+      .cell
+        h5 Trash
+        .grid-container.fluid
+          .card-grid
+            - if @game.game_state.trashed_cards.blank?
+              .cell.card.no-card
+                .card-name
+                - trash_controls.each do |ctrl|
+                  - if ctrl.cardless_button
+                    .card-ctrl= render partial: 'controls/cardless_button', object: ctrl.cardless_button, as: :button, locals: { control: ctrl }
+            - elsif @game.game_state.trashed_cards.length == 1 || trash_controls.present?
+              = render partial: 'card', collection: @game.game_state.trashed_cards, locals: { controls: trash_controls }
+            - else
+              = render partial: 'card', collection: @game.game_state.trashed_cards, locals: { stacked: true }
+              .cell.card.no-card.stack-info
+                .card-name #{@game.game_state.trashed_cards.count - 1} more
+
 .cell
   .grid-container.fluid
     .grid-x.grid-margin-x

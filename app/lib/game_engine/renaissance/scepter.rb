@@ -30,7 +30,7 @@ module GameEngine
           %w[cash action].include? params["choice"]
         end
 
-        process do |_game_state|
+        process do |game_state|
           if params["choice"] == "cash"
             player.cash += 2
             @histories << History.new("#{player.name} chose to take cash from #{Scepter.readable_name} (new total: $#{player.cash}).",

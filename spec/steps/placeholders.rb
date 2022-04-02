@@ -69,7 +69,7 @@ placeholder :whether_to do
 end
 
 placeholder :player_name do
-  match /([a-zA-Z]+)('s)?/ do |name|
+  match(/(#{PLAYER_NAMES.join("|")}|my|me|I)('s)?/) do |name|
     %w[my me].include?(name) ? 'I' : name
   end
 end
