@@ -71,7 +71,7 @@ jobs:
 
   deploy_staging:
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/master'
+    if: github.ref == 'refs/heads/restart'
     needs: [test]
     steps:
       - name: Clone
@@ -82,5 +82,6 @@ jobs:
       - name: Push to dokku staging
         uses: dokku/github-action@master
         with:
+          git_push_flags: '--force'
           git_remote_url: 'ssh://dokku@free-dom.staging.chris.nsict.org/free-dom'
           ssh_private_key: ${{ secrets.DOKKU_PRIVATE_KEY }}
