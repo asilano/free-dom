@@ -3,35 +3,39 @@
     .grid-padding-x.alert
       - @game.errors.full_messages.each do |err|
         .cell = err
-  .field
-    = f.text_field :name, help_text: 'A name can help make a game memorable, but isn\'t required', id: 'game_name'
-    p.help-text
-      | Want inspiration for a game name? Here's a suggestion
-      span.js< you can click
-      | :
-      span.random-name =<> random_game_name
-      = link_to random_name_path, class: 'random-regenerate', remote: true do
-        i.fas.fa-sync{ title='Regenerate' }
+  .panel
+    .field
+      = f.text_field :name, help_text: 'A name can help make a game memorable, but isn\'t required', id: 'game_name'
+      p.help-text
+        | Want inspiration for a game name? Here's a suggestion
+        span.js< you can click
+        | :
+        span.random-name =<> random_game_name
+        = link_to random_name_path, class: 'random-regenerate', remote: true do
+          i.fas.fa-sync{ title='Regenerate' }
 
-  .field
-    = f.text_field :discord_webhook, help_text: 'Paste a webhook URL for a Discord channel here to receive game alerts'
-  = f.fields :journals do |j|
-    = j.hidden_field :type
-    = j.hidden_field :user_id
-    = j.hidden_field :fiber_id
-    = j.hidden_field :order
-    #card_selects
-      - all_cards = GameEngine::Card.expansions.map(&:kingdom_cards).flatten.shuffle
-      - 10.times do |ix|
-        .card-select-row
-          .pileLabel= label_tag("cards_#{ix}", "Kingdom card #{ix + 1}: ")
-          .pileSelect= select_tag("#{j.object_name}[params][card_list][]",
-                                  option_groups_from_collection_for_select(GameEngine::Card.expansions,
-                                                                           :kingdom_cards,
-                                                                           :readable_name,
-                                                                           :name,
-                                                                           :readable_name,
-                                                                           all_cards[ix]),
-                                  id: "cards_#{ix}")
+    .field
+      = f.text_field :discord_webhook, help_text: 'Paste a webhook URL for a Discord channel here to receive game alerts'
+  .panel
+    = f.fields :journals do |j|
+      = j.hidden_field :type
+      = j.hidden_field :user_id
+      = j.hidden_field :fiber_id
+      = j.hidden_field :order
+      #card_selects
+        - all_cards = GameEngine::Card.expansions.map(&:kingdom_cards).flatten.shuffle
+        - 10.times do |ix|
+          .card-select-row
+            .pileLabel= label_tag("cards_#{ix}", "Kingdom card #{ix + 1}: ")
+            .pileSelect= select_tag("#{j.object_name}[params][card_list][]",
+                                    option_groups_from_collection_for_select(GameEngine::Card.expansions,
+                                                                            :kingdom_cards,
+                                                                            :readable_name,
+                                                                            :name,
+                                                                            :readable_name,
+                                                                            all_cards[ix]),
+                                    id: "cards_#{ix}")
 
-  .actions = f.submit class: 'button'
+  .actions
+    = f.submit class: 'button'
+    = link_to 'Back', games_path, class: "button secondary space-left"

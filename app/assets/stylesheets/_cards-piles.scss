@@ -175,19 +175,6 @@
   }
 }
 
-.subset-indicator {
-  padding-left: 8px;
-  border-color: 3px solid $white;
-  border-radius: 3px;
-  margin: 5px 0 5px 5px;
-  background:
-    linear-gradient(
-      to right,
-      $light-gray,
-      $white
-    );
-}
-
 .card-back {
   min-width: 150px;
   min-height: 40px;
