@@ -1,5 +1,7 @@
 {
   "name": "dominion",
   "private": true,
-  "dependencies": {}
+  "dependencies": {
+    "@hotwired/stimulus": "^3.0.1"
+  }
 }

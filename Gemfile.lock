@@ -339,6 +339,8 @@ GEM
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (>= 2.8, < 4.0)
+    stimulus-rails (1.0.4)
+      railties (>= 6.0.0)
     temple (0.8.2)
     thor (1.2.1)
     thread_safe (0.3.6)
@@ -414,6 +416,7 @@ DEPENDENCIES
   spring
   spring-commands-rspec
   sprockets-rails (~> 2.3.3)
+  stimulus-rails
   turbolinks (~> 5)
   turnip
   uglifier (>= 1.3.0)

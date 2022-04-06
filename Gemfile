@@ -39,6 +39,7 @@ gem 'foundation-rails', '~> 6.0'
 gem 'foundation_rails_helper', '~> 4.0'
 gem 'autoprefixer-rails'
 gem 'jquery-rails'
+gem "stimulus-rails"
 gem 'sortable-rails'
 
 gem 'inline_svg'
