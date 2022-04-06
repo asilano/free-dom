@@ -15,6 +15,10 @@ module CardModules
         [GameEngine::BaseGameV2, GameEngine::Renaissance]
       end
 
+      def randomised_cardlikes
+        [GameEngine::CardlikeObjects::Projects]
+      end
+
       def basic_victory_types
         BASIC_VICTORY_TYPES.map(&:constantize)
       end

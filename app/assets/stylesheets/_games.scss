@@ -54,6 +54,17 @@
       cursor: pointer;
     }
   }
+
+  .card-select-row {
+    .pile-select {
+      display: inline-block;
+      width: calc(100% - 5em);
+    }
+    .delete-cardlike {
+      display: inline-block;
+      margin: 0 0 0 1em;
+    }
+  }
 }
 
 main.game-view {

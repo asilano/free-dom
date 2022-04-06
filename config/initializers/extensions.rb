@@ -1,6 +1,6 @@
 class Module
   def readable_name
-    name.demodulize
+    name.demodulize.underscore.titleize
   end
 
   # Return a list of card classes within this module - that is, module constants

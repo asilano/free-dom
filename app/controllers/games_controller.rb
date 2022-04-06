@@ -22,10 +22,34 @@ class GamesController < ApplicationController
   # GET /games/new
   def new
     @game = Game.new
-    @game.journals.build(type:     GameEngine::ChooseKingdomJournal,
-                         user:     current_user,
-                         fiber_id: '1',
-                         order:    0)
+    kingdom_journal = @game.journals.build(type:     GameEngine::ChooseKingdomJournal,
+                                           user:     current_user,
+                                           fiber_id: '1',
+                                           params:   {},
+                                           order:    0)
+    randomiser = (GameEngine::Card.expansions.map(&:kingdom_cards).flatten +
+                  GameEngine::Card.randomised_cardlikes.map(&:card_classes).flatten)
+                 .shuffle
+    kingdom_cards, cardlikes = randomiser.take_while.with_object([[], []]) do |card, sets|
+      if card < GameEngine::Card
+        sets[0] << card
+      else
+        sets[1] << card unless sets[1].length >= 2
+      end
+      sets[0].length < 10
+    end
+    kingdom_journal.params["card_list"] = kingdom_cards.sort_by(&:raw_cost) + cardlikes
+  end
+
+  # POST /games/new
+  def refresh_form
+    @game = Game.new(game_params)
+    if params["add-cardlike"]
+      @game.journals.first.params["card_list"] << ""
+    elsif params["delete-cardlike"]
+      @game.journals.first.params["card_list"].delete_at(params["delete-cardlike"].to_i)
+    end
+    render :new
   end
 
   # POST /games

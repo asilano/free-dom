@@ -48,10 +48,6 @@ module CardModules
     end
 
     module ClassMethods
-      def readable_name
-        name.demodulize.underscore.titleize
-      end
-
       def types
         %w[action attack curse duration reaction treasure victory].map do |type|
           type if send("#{type}?")

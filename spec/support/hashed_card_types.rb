@@ -67,3 +67,8 @@ ARTIFACT_TYPES = {
   'Treasure Chest' => GameEngine::CardlikeObjects::Artifacts::TreasureChest
 }.freeze
 
+PROJECT_TYPES = {
+  'Cathedral' => GameEngine::CardlikeObjects::Projects::Cathedral,
+  'City Gate' => GameEngine::CardlikeObjects::Projects::CityGate
+}.freeze
+

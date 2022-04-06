@@ -13,4 +13,5 @@ end
 File.open(Rails.root.join("spec", "support", "hashed_card_types.rb"), "w") do |f|
   write_one_dict(f, "CARD_TYPES", GameEngine::Card.all_card_types)
   write_one_dict(f, "ARTIFACT_TYPES", GameEngine::CardlikeObjects::Artifacts.card_classes)
+  write_one_dict(f, "PROJECT_TYPES", GameEngine::CardlikeObjects::Projects.card_classes)
 end
