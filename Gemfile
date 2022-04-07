@@ -34,13 +34,14 @@ gem 'jbuilder', '~> 2.5'
 # Peg sprockets-rails to avoid whine about precompiles scss in prod
 gem 'sprockets-rails', '~> 2.3.3'
 
-gem 'slim-rails'
+gem 'autoprefixer-rails'
 gem 'foundation-rails', '~> 6.0'
 gem 'foundation_rails_helper', '~> 4.0'
-gem 'autoprefixer-rails'
 gem 'jquery-rails'
-gem "stimulus-rails"
+gem 'slim-rails'
 gem 'sortable-rails'
+gem "stimulus-rails"
+gem 'webpacker', '~> 5.x'
 
 gem 'inline_svg'
 
@@ -86,8 +87,4 @@ end
 
 group :test do
   gem 'turnip'
-end
-
-source 'https://rails-assets.org' do
-  gem 'rails-assets-onmount'
 end

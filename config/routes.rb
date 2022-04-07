@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   resources :journals, only: %i[create destroy]
   resources :games, except: %i[edit] do
     collection do
-      post "new", to: "games#refresh_form"
+      post "new", to: "games#refresh_form", as: :new
     end
   end
   devise_for :users, controllers: { registrations: 'users/registrations' }

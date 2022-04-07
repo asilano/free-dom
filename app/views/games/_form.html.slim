@@ -38,8 +38,8 @@
                                     id: "cards_#{ix}")
     .panel
       h3 Cardlike objects
-      #cardlike_selects
-        = f.button "Add cardlike object", name: "add-cardlike", class: "button", type: "submit", formaction: new_game_path, formmethod: :post
+      #cardlike_selects data-controller="new-game-cardlikes"
+        = f.button "Add cardlike object", name: "add-cardlike", class: "button", type: "submit", formaction: new_games_path, formmethod: :post, data: { action: "click->new-game-cardlikes#add" }
         - all_cardlikes = GameEngine::Card.randomised_cardlikes.map(&:card_classes).flatten.shuffle
         - (card_params.length - 10).times do |ix|
           .card-select-row
@@ -52,7 +52,7 @@
                                                                              :readable_name,
                                                                              card_params[ix + 10]),
                                     id: "cards_#{ix + 10}")
-            = f.button "X", name: "delete-cardlike", value: ix + 10, class: "button alert delete-cardlike", type: "submit", formaction: new_game_path, formmethod: :post
+            = f.button "X", name: "delete-cardlike", value: ix + 10, class: "button alert delete-cardlike", type: "submit", formaction: new_games_path, formmethod: :post
 
   .actions
     = f.submit class: 'button'

@@ -4,5 +4,5 @@
 
 import { application } from "./application"
 
-import HelloController from "./hello_controller"
-application.register("hello", HelloController)
+import NewGameCardlikesController from "./new_game_cardlikes_controller.js"
+application.register("new-game-cardlikes", NewGameCardlikesController)

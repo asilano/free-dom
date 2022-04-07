@@ -3,9 +3,13 @@ module MonkeyPatches
     module Shuffling
       def shuffle(*args)
         sort
+      rescue
+        super
       end
       def shuffle!(*args)
         sort!
+      rescue
+        super
       end
     end
   end
