@@ -15,7 +15,7 @@ module GameEngine
       basic_piles = %w[Estate Duchy Province Copper Silver Gold Curse].map do |basic_type|
         "GameEngine::BasicCards::#{basic_type}"
       end
-      supply = basic_piles.map(&:constantize) + params['card_list'].map(&:constantize).sort_by(&:raw_cost)
+      supply = basic_piles.map(&:constantize) + params['card_list'].take(10).map(&:constantize).sort_by(&:raw_cost)
       supply.each do |card_class|
         game_state.piles << GameEngine::Pile.new(card_class)
       end
@@ -26,8 +26,8 @@ module GameEngine
     def kingdom_choice_errors
       card_list = params['card_list']
       return ['cards_list not an Array'] unless card_list.is_a? Array
-      return ["cards_list has #{card_list.uniq.length} members"] unless card_list.uniq.length == 10
-      card_list.map do |card|
+      return ["cards_list has #{card_list.uniq.length} members"] unless card_list.uniq.length >= 10
+      card_list.take(10).map do |card|
         begin
           card_class = card.constantize
           "#{card} is not a Card subclass" unless card_class.ancestors.include? GameEngine::Card
