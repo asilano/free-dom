@@ -1,0 +1,11 @@
+.card-select-row
+  .pile-label= label_tag("cards_#{ix + 10}", "Cardlike object #{ix + 1}: ")
+  .pile-select= select_tag("#{object_name}[params][card_list][]",
+                          option_groups_from_collection_for_select(GameEngine::Card.randomised_cardlikes,
+                                                                    :card_classes,
+                                                                    :readable_name,
+                                                                    :name,
+                                                                    :readable_name,
+                                                                    value),
+                          id: "cards_#{ix + 10}")
+  = button_tag "X", name: "delete-cardlike", value: ix + 10, class: "button alert delete-cardlike", type: "submit", formaction: new_games_path, formmethod: :post, data: { action: "click->repeatable-field#delete"}

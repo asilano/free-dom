@@ -52,6 +52,12 @@ class GamesController < ApplicationController
     render :new
   end
 
+  # GET /cardlike_fields
+  def cardlike_fields
+    render partial: "cardlike_fields",
+           locals: { ix: params[:ix].to_i, object_name: "journals_attributes", value: nil }
+  end
+
   # POST /games
   # POST /games.json
   def create

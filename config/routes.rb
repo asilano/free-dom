@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   resources :games, except: %i[edit] do
     collection do
       post "new", to: "games#refresh_form", as: :new
+      get "cardlike_fields"
     end
   end
   devise_for :users, controllers: { registrations: 'users/registrations' }

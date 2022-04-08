@@ -4,5 +4,5 @@
 
 import { application } from "./application"
 
-import NewGameCardlikesController from "./new_game_cardlikes_controller.js"
-application.register("new-game-cardlikes", NewGameCardlikesController)
+import RepeatableFieldController from "./repeatable_field_controller.js"
+application.register("repeatable-field", RepeatableFieldController)

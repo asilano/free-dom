@@ -38,22 +38,13 @@
                                     id: "cards_#{ix}")
     .panel
       h3 Cardlike objects
-      #cardlike_selects data-controller="new-game-cardlikes"
-        = f.button "Add cardlike object", name: "add-cardlike", class: "button", type: "submit", formaction: new_games_path, formmethod: :post, data: { action: "click->new-game-cardlikes#add" }
+      #cardlike_selects(data-controller="repeatable-field"
+                        data-repeatable-field-url-value=cardlike_fields_games_url
+                        data-repeatable-field-next-ix-value=(card_params.length - 10))
+        = f.button "Add cardlike object", name: "add-cardlike", class: "button", type: "submit", formaction: new_games_path, formmethod: :post, data: { action: "click->repeatable-field#add" }
         - all_cardlikes = GameEngine::Card.randomised_cardlikes.map(&:card_classes).flatten.shuffle
         - (card_params.length - 10).times do |ix|
-          .card-select-row
-            .pile-label= label_tag("cards_#{ix + 10}", "Cardlike object #{ix + 1}: ")
-            .pile-select= select_tag("#{j.object_name}[params][card_list][]",
-                                    option_groups_from_collection_for_select(GameEngine::Card.randomised_cardlikes,
-                                                                             :card_classes,
-                                                                             :readable_name,
-                                                                             :name,
-                                                                             :readable_name,
-                                                                             card_params[ix + 10]),
-                                    id: "cards_#{ix + 10}")
-            = f.button "X", name: "delete-cardlike", value: ix + 10, class: "button alert delete-cardlike", type: "submit", formaction: new_games_path, formmethod: :post
-
+          = render "cardlike_fields", ix: ix, object_name: j.object_name, value: card_params[ix + 10]
   .actions
     = f.submit class: 'button'
     = link_to 'Back', games_path, class: "button secondary space-left"
