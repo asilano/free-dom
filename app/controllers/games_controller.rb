@@ -44,18 +44,15 @@ class GamesController < ApplicationController
   # POST /games/new
   def refresh_form
     @game = Game.new(game_params)
-    if params["add-cardlike"]
+    if params["add-fields"]
       @game.journals.first.params["card_list"] << ""
-    elsif params["delete-cardlike"]
+    elsif params["delete-fields"]
       @game.journals.first.params["card_list"].delete_at(params["delete-cardlike"].to_i)
     end
-    render :new
-  end
-
-  # GET /cardlike_fields
-  def cardlike_fields
-    render partial: "cardlike_fields",
-           locals: { ix: params[:ix].to_i, object_name: "journals_attributes", value: nil }
+    respond_to do |format|
+      format.html { render :new }
+      format.turbo_stream
+    end
   end
 
   # POST /games

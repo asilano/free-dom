@@ -7,21 +7,11 @@ export default class extends Controller {
   }
 
   add(event) {
-    event.preventDefault();
-
-    var url = new URL(this.urlValue);
-    url.searchParams.append("ix", this.nextIxValue)
-
-    fetch(url)
-      .then((res) => { return res.text() })
-      .then((html) => {
-        const fragment = document
-          .createRange()
-          .createContextualFragment(html);
-
-        this.element.appendChild(fragment);
-        this.nextIxValue += 1;
-      });
+    var input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "add-fields";
+    input.value = 1;
+    event.target.form.append(input);
   }
 
   delete(event) {

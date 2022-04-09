@@ -17,9 +17,9 @@
 import $ from "jquery"
 import "onmount"
 import "../src/games"
-import Turbolinks from "turbolinks"
 import 'jquery-sortablejs'
 import Foundation from "foundation-sites"
+import "@hotwired/turbo-rails"
 
 import "controllers"
 
@@ -28,14 +28,12 @@ window.jQuery = $;
 require('foundation-sites');
 var onmount = require("onmount")
 
-Turbolinks.start();
-
 Foundation.Tooltip.defaults.triggerClass = ''
 
-$(document).on('ready show.bs closed.bs load page:change turbolinks:load', function () {
+$(document).on('ready show.bs closed.bs load page:change turbo:load', function () {
   onmount()
 })
-$(document).on('turbolinks:before-cache', function () { onmount.teardown() })
+$(document).on('turbo:before-cache', function () { onmount.teardown() })
 
 $(function() {
   FontAwesome.dom.watch({observeMutationsRoot: document})

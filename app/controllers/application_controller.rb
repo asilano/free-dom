@@ -4,6 +4,9 @@ class ApplicationController < ActionController::Base
   rescue_from ActiveRecord::RecordNotFound do
     redirect_to :root
   end
+  rescue_from ActionController::InvalidAuthenticityToken do
+    redirect_to new_user_session_path, status: 303
+  end
 
   def index
   end

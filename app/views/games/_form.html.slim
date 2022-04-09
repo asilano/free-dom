@@ -45,6 +45,6 @@
         - all_cardlikes = GameEngine::Card.randomised_cardlikes.map(&:card_classes).flatten.shuffle
         - (card_params.length - 10).times do |ix|
           = render "cardlike_fields", ix: ix, object_name: j.object_name, value: card_params[ix + 10]
-  .actions
+  #actions.actions
     = f.submit class: 'button'
     = link_to 'Back', games_path, class: "button secondary space-left"
