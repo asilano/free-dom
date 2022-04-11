@@ -1,6 +1,8 @@
 module GameEngine
   module CardlikeObjects
     class Artifact
+      extend CardDecorators::BasicDecorators
+
       attr_reader :owner
       delegate :readable_name, to: :class
 
@@ -8,15 +10,15 @@ module GameEngine
         define_method(:comes_from) { klass }
       end
 
-      def self.text(*lines)
-        str = lines.join("\n")
-        define_method(:text) { str }
-        define_singleton_method(:card_text) { str }
-      end
-
       def self.readable_name
         name.demodulize.underscore.titleize
       end
+
+      def self.raw_cost = nil
+
+      def self.types = ["Artifact"]
+
+      def self.randomiser? = false
 
       def initialize(game_state)
         @owner = nil

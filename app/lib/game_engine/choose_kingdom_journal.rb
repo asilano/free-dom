@@ -23,24 +23,31 @@ module GameEngine
       @histories << History.new("#{params['card_list'].map(&:demodulize).map(&:titleize).join(', ')} chosen for the kingdom.")
     end
 
-    def kingdom_choice_errors
-      card_list = params['card_list']
-      return ['cards_list not an Array'] unless card_list.is_a? Array
-      return ["cards_list has #{card_list.uniq.length} members"] unless card_list.uniq.length >= 10
-      card_list.take(10).map do |card|
-        begin
-          card_class = card.constantize
-          "#{card} is not a Card subclass" unless card_class.ancestors.include? GameEngine::Card
-        rescue NameError
-          "#{card} is not a type"
-        end
-      end.compact
-    end
-
     private
 
     def valid_kingdom_choices
       kingdom_choice_errors.each { |err| errors.add(:params, err) }
+    end
+
+    def kingdom_choice_errors
+      card_list = params["card_list"]
+      return ["cards_list not an Array"] unless card_list.is_a? Array
+      return ["cards_list has #{card_list.uniq.length} members"] unless card_list.uniq.length >= 10
+      card_list_errors(card_list)
+    end
+
+    def card_list_errors(card_list)
+      card_list.map.with_index do |card, ix|
+        card_class = card.constantize
+        if ix < 10
+          "#{card} is not a Card subclass" unless card_class.ancestors.include? GameEngine::Card
+        else
+          next "#{card} is not in the CardlikeObject namespace" unless card_class.module_parents.include? GameEngine::CardlikeObjects
+          "#{card} is not a randomised CardlikeObject" unless card_class.randomiser?
+        end
+      rescue NameError
+        "#{card} is not a type"
+      end.compact
     end
   end
 end

@@ -1,8 +1,6 @@
 module CardDecorators
   module AttackDecorators
     # Get the attack card to handle attacking each of the victims.
-    # All the attacks should be in parallel (unless there's a reason they can't)
-    # ...but we'll ignore that for a moment.
     def launch_attack(victims:)
       game_state.in_parallel(victims) do |v|
         # Allow attack reactions until the player stops or runs out

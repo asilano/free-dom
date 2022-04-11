@@ -1,28 +1,7 @@
 # # This module is "extend"ed into Card.
 module CardDecorators
   module CardDecorators
-    # ######
-    # # Basic decorators
-    # ######
-
-    # Define the text of a card
-    def text(*lines)
-      str = lines
-        .slice_when { |l| l == :hr }
-        .map { |sub| sub.reject { |l| l == :hr }.join("\n") }
-        .join("<hr>")
-      define_method(:text) { self.class.card_text }
-      define_singleton_method(:card_text) do
-        "<span class='metadata'>#{types.map(&:humanize).join("-")} (cost: #{raw_cost})</span>\n#{str}"
-      end
-    end
-
-    # Define the raw cost of a card, before any modifications like Bridge
-    def costs(cost)
-      raise unless cost.is_a? Integer
-
-      define_singleton_method(:raw_cost) { cost }
-    end
+    include BasicDecorators
 
     def treasure?; false; end
     def special?; false; end

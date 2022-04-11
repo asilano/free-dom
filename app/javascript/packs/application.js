@@ -15,7 +15,6 @@
 // const images = require.context('../images', true)
 // const imagePath = (name) => images(name, true)
 import $ from "jquery"
-import "onmount"
 import "../src/games"
 import 'jquery-sortablejs'
 import Foundation from "foundation-sites"
