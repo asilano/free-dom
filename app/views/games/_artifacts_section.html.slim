@@ -3,5 +3,5 @@
   .grid-container.fluid
     .card-grid
       - @game.game_state.artifacts.values.select { |art| art.owner == player }.each do |art|
-        .cell.card.artifact
+        .cell.card.cardlike.artifact
           .card-name{data-tooltip data-allow-html="true" title=art.text}= art.readable_name

@@ -154,7 +154,8 @@
 .victory.card   { background-color: $victory-green; }
 .curse.card     { background-color: $curse-purple; }
 
-.artifact.card  { background-color: $artifact-brown; }
+.artifact.cardlike  { background-color: $artifact-brown; }
+.project.cardlike   { background-color: $project-pink; }
 
 .attack.card .card-name {
   color: $attack-red;

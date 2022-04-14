@@ -20,6 +20,10 @@ module GameEngine
         game_state.piles << GameEngine::Pile.new(card_class)
       end
 
+      params['card_list'][10..].map(&:constantize).sort_by(&:raw_cost).each do |cardlike|
+        game_state.cardlikes << cardlike.new
+      end
+
       @histories << History.new("#{params['card_list'].map(&:demodulize).map(&:titleize).join(', ')} chosen for the kingdom.")
     end
 
