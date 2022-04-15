@@ -104,3 +104,9 @@ footer {
 .tooltip {
   white-space: pre-line;
 }
+
+@each $player, $colour in $player-backgrounds {
+  .#{$player} {
+    background-color: $colour;
+  }
+}

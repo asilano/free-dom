@@ -15,12 +15,6 @@
     position: absolute;
   }
 
-  @each $player, $colour in $player-backgrounds {
-    .#{$player} {
-      background-color: $colour;
-    }
-  }
-
   li.main-journal {
     padding-left: 24px;
     position: relative;

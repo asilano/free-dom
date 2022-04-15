@@ -1,6 +1,6 @@
 module GameEngine
   class ChooseKingdomJournal < Journal
-    define_question 'Choose a Kingdom'
+    define_question "Choose a Kingdom"
 
     validate :valid_kingdom_choices
 
@@ -15,16 +15,16 @@ module GameEngine
       basic_piles = %w[Estate Duchy Province Copper Silver Gold Curse].map do |basic_type|
         "GameEngine::BasicCards::#{basic_type}"
       end
-      supply = basic_piles.map(&:constantize) + params['card_list'].take(10).map(&:constantize).sort_by(&:raw_cost)
+      supply = basic_piles.map(&:constantize) + params["card_list"].take(10).map(&:constantize).sort_by(&:raw_cost)
       supply.each do |card_class|
         game_state.piles << GameEngine::Pile.new(card_class)
       end
 
-      params['card_list'][10..].map(&:constantize).sort_by(&:raw_cost).each do |cardlike|
+      params["card_list"][10..].map(&:constantize).sort_by(&:raw_cost).each do |cardlike|
         game_state.cardlikes << cardlike.new
       end
 
-      @histories << History.new("#{params['card_list'].map(&:demodulize).map(&:titleize).join(', ')} chosen for the kingdom.")
+      @histories << History.new("#{params["card_list"].map(&:demodulize).map(&:titleize).join(', ')} chosen for the kingdom.")
     end
 
     private

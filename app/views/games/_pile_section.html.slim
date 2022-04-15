@@ -2,7 +2,7 @@
 = render partial: 'control_skeleton', collection: pile_controls
 
 .cell.small-12.medium-12.large-8.grid.grid-x
-  - @game.game_state.piles.each_with_index.each_slice((@game.game_state.piles.count / 2.0).round).with_index do |half, half_ix|
+  - @game.game_state.piles.each_with_index.each_slice((@game.game_state.piles.size / 2.0).round).with_index do |half, half_ix|
     .cell.small-12.medium-6.large-6
       - if pile_controls.any?(&:cardless_button)
         .pile{class=('hidden' if half_ix > 0)}
@@ -24,7 +24,7 @@
               .card-ctrl
                 - if ctrl.filter(pile.cards.first)
                   = render partial: ctrl, as: :control, locals: { value: ix, card: pile.cards.first }
-          .pile-count{class=('empty' if pile.cards.empty?)}= "#{pile.cards.count} of #{pile.card_class.starting_size(@game.users.count)}"
+          .pile-count{class=('empty' if pile.cards.empty?)}= "#{pile.cards.size} of #{pile.card_class.starting_size(@game.users.size)}"
         - if @game.game_state.artifacts.values.any? { |art| art.comes_from == pile.card_class && art.owner.nil? }
           .card-grid
             - @game.game_state.artifacts.values.select { |art| art.comes_from == pile.card_class && art.owner.nil? }.each do |art|
@@ -32,7 +32,7 @@
                 .card-name{data-tooltip data-allow-html="true" title=art.text}= art.readable_name
 
   - if @game.game_state.cardlikes.present?
-    - @game.game_state.cardlikes.each_with_index.each_slice((@game.game_state.cardlikes.count / 2.0).round).with_index do |half, half_ix|
+    - @game.game_state.cardlikes.each_with_index.each_slice((@game.game_state.cardlikes.size / 2.0).round).with_index do |half, half_ix|
       .cell.small-12.medium-6.large-6
         - half.each do |cardlike, ix|
           .pile
@@ -40,3 +40,9 @@
               span.cost-text= cardlike.cost
             .card.cardlike{class=cardlike.class.types}
               .card-name{data-tooltip data-allow-html="true" title=cardlike.text}= cardlike.readable_name
+              - cardlike.owners.sort_by(&:seat).each do |owner|
+                .cardlike-owner class="player#{owner.seat}"= owner.name
+              - pile_controls.each do |ctrl|
+                .card-ctrl
+                  - if ctrl.filter(cardlike)
+                    = render partial: ctrl, as: :control, locals: { value: ix + @game.game_state.piles.size, card: cardlike }

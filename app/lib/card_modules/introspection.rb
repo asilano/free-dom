@@ -1,5 +1,7 @@
 module CardModules
   module Introspection
+    include Purchasable
+
     def self.included(base)
       base.extend ClassMethods
     end
@@ -7,10 +9,6 @@ module CardModules
     def cost
       inventors = game_state.get_fact(:inventors) || 0
       (self.class.raw_cost - inventors).clamp(0..)
-    end
-
-    def player_can_buy?(player:)
-      cost <= player.cash
     end
 
     # Is this card (in play and) currently still doing something, so it cannot
