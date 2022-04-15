@@ -46,7 +46,7 @@ onmount('body[data-controller=games][data-action=show]', function() {
   const SECONDS = 30;
   reloader = function() {
     scrollPosition = $('html').scrollTop();
-    Turbolinks.visit(location.toString(), {action: 'replace'});
+    Turbo.visit(location.toString(), {action: 'replace'});
   };
 });
   // refreshTimer = setTimeout reloader, SECONDS * 1000

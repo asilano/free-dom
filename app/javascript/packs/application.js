@@ -22,7 +22,9 @@ import "@hotwired/turbo-rails"
 
 import "controllers"
 
-require("@rails/ujs").start();
+import Rails from "@rails/ujs";
+Rails.start();
+
 window.jQuery = $;
 require('foundation-sites');
 var onmount = require("onmount")
