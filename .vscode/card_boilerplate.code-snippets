@@ -63,7 +63,7 @@
 		"body": [
 			"Then cards should move as follows:",
 			"\t${1}",
-			"\tAnd these moves should happen"
+			"\tAnd these card moves should happen"
 		]
 	}
 }
