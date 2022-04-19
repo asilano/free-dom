@@ -50,6 +50,12 @@ placeholder :artifact do
   end
 end
 
+placeholder :project do
+  match PROJECT do |project|
+    PROJECT_TYPES[project]
+  end
+end
+
 placeholder :multi_options do
   match(/(((\w*|'[^']*') for #{SINGLE_CARD_NO_CAPTURE},? ?)+)/) do |capture|
     capture.scan(/(\w*|'[^']*') for #{SINGLE_CARD}/).map do |option, card|

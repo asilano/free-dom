@@ -35,6 +35,13 @@ module GameSteps
       @game.reload
     end
 
+    step 'the kingdom choice contains the :project project' do |project|
+      kingdom_journal = @game.journals.where(type: 'GameEngine::ChooseKingdomJournal').first
+      kingdom_journal.params['card_list'] << project.to_s
+      kingdom_journal.save
+      @game.reload
+    end
+
     step ':player_name :location contains :cards' do |name, location, cards|
       player = get_player(name)
       make_journal(user: player.user,
@@ -91,6 +98,15 @@ module GameSteps
                    type:   GameEngine::HackJournal,
                    params: { scope: :artifact_owner,
                              key:   :"#{artifact}"
+                           })
+    end
+
+    step ':player_name has/have the :project project' do |name, project|
+      player = get_player(name)
+      make_journal(user:   player.user,
+                   type:   GameEngine::HackJournal,
+                   params: { scope:   :project_owner,
+                             project: :"#{project}"
                            })
     end
 
@@ -482,6 +498,21 @@ module GameSteps
       end
 
       expect(can_pick).to all(should ? be_truthy : be_falsey)
+    end
+
+    step ':player_name :whether_to be able to choose the :project project' do |name, should, project|
+      user = get_player(name).user
+      question = @questions.detect { |q| q.player.name == user.name }
+      controls = question.controls_for(user, @game.game_state)
+      control = controls.detect { |c| c.scope == :supply }
+      project_instance = @game.game_state.cardlikes.detect { |c| c.is_a? project }
+      can_pick = project_instance && control.filter(project_instance)
+
+      if should
+        expect(can_pick).to be_truthy
+      else
+        expect(can_pick).to be_falsey
+      end
     end
 
     step ':player_name :whether_to be able to choose nothing in the supply' do |name, should|

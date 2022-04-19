@@ -10,9 +10,10 @@ module GameEngine
 
       def self.randomiser? = true
 
-      attr_reader :owners
+      attr_reader :game_state, :owners
 
-      def initialize
+      def initialize(game_state)
+        @game_state = game_state
         @owners = []
       end
 

@@ -14,6 +14,8 @@ module GameEngine
         modify_trash_cards(game_state)
       when 'artifact_owner'
         set_artifact_owner(game_state)
+      when 'project_owner'
+        set_project_owner(game_state)
       when 'villagers'
         set_player_villagers(game_state)
       when 'coffers'
@@ -84,6 +86,15 @@ module GameEngine
       game_state.artifacts[params['key']].give_to(player)
 
       @histories << History.new("HACK! Artifact #{params['key']} given to #{player.name}.",
+                                css_classes: %w[hack])
+
+    end
+
+    def set_project_owner(game_state)
+      cardlike = game_state.cardlikes.detect { |cl| cl.class.name == params["project"] }
+      cardlike.owners << player unless cardlike.owners.include? player
+
+      @histories << History.new("HACK! Project #{cardlike.readable_name} given to #{player.name}.",
                                 css_classes: %w[hack])
 
     end

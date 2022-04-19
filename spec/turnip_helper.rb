@@ -27,6 +27,10 @@ ARTIFACT_NAMES = ARTIFACT_TYPES.keys
 ARTIFACT_NO_CAPTURE = /#{ARTIFACT_NAMES.join("|")}/
 ARTIFACT = /(#{ARTIFACT_NO_CAPTURE})/
 
+PROJECT_NAMES = PROJECT_TYPES.keys
+PROJECT_NO_CAPTURE = /#{PROJECT_NAMES.join("|")}/
+PROJECT = /(#{PROJECT_NO_CAPTURE})/
+
 Dir.glob('spec/steps/**/*.rb') { |f| load f }
 
 RSpec.configure do |config|
