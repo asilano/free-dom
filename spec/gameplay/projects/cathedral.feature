@@ -6,12 +6,12 @@ Feature: Cathedral
     And the kingdom choice contains the Cathedral project
     Then I should need to "Play an Action, or pass"
 
-  Scenario: Playing Cathedral
+  Scenario: Cathedral occurring
     When I choose "Leave Action Phase" in my hand
     Then I should need to "Play Treasures, or pass"
     Given I have the Cathedral project
     And my deck contains Copper, Estate x2, Curse x2
-    When I pass through to me next turn
+    When I pass through to my next turn
     Then I should need to "Choose a card to trash"
     When I choose Copper in my hand
     Then cards should move as follows:
