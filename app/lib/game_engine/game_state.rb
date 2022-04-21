@@ -87,9 +87,11 @@ module GameEngine
           observe
         end
 
+        Triggers::EndOfBuyPhase.trigger(@turn_player)
+
         cleanup
 
-        Triggers::EndOfTurn.trigger
+        Triggers::EndOfTurn.trigger(@turn_player)
 
         if game_ended?
           players.each(&:calculate_score)
