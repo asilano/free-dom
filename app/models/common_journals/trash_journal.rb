@@ -1,8 +1,13 @@
 module CommonJournals
   class TrashJournal < Journal
-    def self.configure(question_text: nil, question_block: nil, scope: :hand, filter: nil)
+    def self.configure(question_text: nil,
+                       question_block: nil,
+                       scope: :hand,
+                       filter: nil,
+                       allow_null: false)
       define_singleton_method(:filter) { filter }
       define_singleton_method(:scope) { scope }
+      define_singleton_method(:allow_null) { allow_null }
       potential_cards = -> (player) do
         case scope
         when :hand
@@ -22,7 +27,7 @@ module CommonJournals
                             filter:       filter,
                             # If the card to trash has conditions, it's legal to trash
                             # nothing, to avoid trust issues.
-                            null_choice:  if potential_cards.call(@player).empty? || filter
+                            null_choice:  if potential_cards.call(@player).empty? || filter || allow_null
                                             { text: 'Trash nothing', value: 'none' }
                                           end,
                             css_class:    'trash-card')]
@@ -32,6 +37,7 @@ module CommonJournals
     validation do
       potentials = self.class.potential_cards(player)
       return false if params['choice'] == 'none' &&
+        !self.class.allow_null &&
         !self.class.filter &&
         potentials.present?
       return true if params['choice'] == 'none'
@@ -56,6 +62,8 @@ module CommonJournals
                                             player:      player,
                                             css_classes: %w[trash-card])
       @card.trash(from: player.cards)
+
+      pre_observe_process if respond_to?(:pre_observe_process)
       observe
 
       post_process if respond_to?(:post_process)

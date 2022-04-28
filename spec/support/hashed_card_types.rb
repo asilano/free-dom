@@ -70,6 +70,7 @@ ARTIFACT_TYPES = {
 PROJECT_TYPES = {
   'Cathedral' => GameEngine::CardlikeObjects::Projects::Cathedral,
   'City Gate' => GameEngine::CardlikeObjects::Projects::CityGate,
-  'Pageant'   => GameEngine::CardlikeObjects::Projects::Pageant
+  'Pageant'   => GameEngine::CardlikeObjects::Projects::Pageant,
+  'Sewers'    => GameEngine::CardlikeObjects::Projects::Sewers
 }.freeze
 

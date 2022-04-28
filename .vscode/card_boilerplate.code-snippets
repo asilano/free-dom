@@ -32,6 +32,24 @@
 			""
 		]
 	},
+	"Add cardlike-project": {
+		"scope": "ruby",
+		"prefix": "cl-project",
+		"body": [
+			"module GameEngine",
+			"  module CardlikeObjects",
+			"    module Projects",
+			"      class ${1:${TM_FILENAME_BASE/.*/${0:/pascalcase}/}} < Card",
+			"        text \"$2\"",
+			"        costs $4",
+			"",
+			"      end",
+			"    end",
+			"  end",
+			"end",
+			""
+		]
+	},
 	"Add feature test for card": {
 		"scope": "feature",
 		"prefix": "feature-card",

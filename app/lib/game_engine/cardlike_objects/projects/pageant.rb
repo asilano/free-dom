@@ -9,6 +9,8 @@ module GameEngine
           super(game_state)
 
           Triggers::EndOfBuyPhase.watch_for(whenever: true) do |turn_player|
+            next unless owners.include? turn_player
+
             game_state.game.current_journal.histories << History.new("#{readable_name} triggered for #{turn_player.name}.",
                                                                      player: turn_player)
 

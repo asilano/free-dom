@@ -11,4 +11,5 @@ Feature: Acting Troupe
     Then I should have 4 Villagers
     And cards should move as follows:
       Then I should trash Acting Troupe from in play
+      And these card moves should happen
     And I should need to "Spend Villagers"
