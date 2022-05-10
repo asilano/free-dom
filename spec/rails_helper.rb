@@ -86,7 +86,12 @@ end
 # The game relies on randomisation by shuffling, both in-place and non.
 # For test purposes, override shuffle to be sort (by suitable fields).
 require_relative './monkey_patches'
-Array.prepend MonkeyPatches::Array::Shuffling
 GameEngine::Card.prepend MonkeyPatches::GameEngine::Card::Sorting
 GameEngine::Card.extend MonkeyPatches::GameEngine::Card::Sorting
 GameEngine::PlayerState.prepend MonkeyPatches::GameEngine::PlayerState::Sorting
+
+# For Array, we have to replace the shuffle method wholesale, since some shuffle triggers also do so. Prepending
+# the monkey patch means it's always called instead of the overridden version.
+Array.define_method(:real_shuffle, Array.instance_method(:shuffle))
+Array.define_method(:shuffle, MonkeyPatches::Array::Shuffling.instance_method(:shuffle))
+Array.define_method(:shuffle!, MonkeyPatches::Array::Shuffling.instance_method(:shuffle!))

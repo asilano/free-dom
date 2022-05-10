@@ -432,7 +432,7 @@ module GameSteps
 
     step ':player_name should move :cards from my/his/her :source to my/his/her :destination' do |name, cards, source, destination|
       players_cards = cards_for_player(name)
-      cards.reverse.each do |card|
+      cards.reverse_each do |card|
         instance_ix = players_cards.index { |c| c[:class] == card && c[:location] == source.to_sym }
         instance = players_cards[instance_ix]
         instance[:location] = destination.to_sym

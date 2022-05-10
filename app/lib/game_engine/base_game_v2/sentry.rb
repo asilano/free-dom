@@ -15,14 +15,15 @@ module GameEngine
         observe
         played_by.grant_actions(1)
 
-        if played_by.deck_cards.empty?
+        peeked_cards = played_by.peek_cards(2, from: :deck)
+        if peeked_cards.empty?
           game.current_journal.histories << History.new("#{played_by.name} has no cards in their deck.",
                                                         player:      played_by,
                                                         css_classes: %w[peek-cards])
         else
           game_state.get_journal(ScryJournal,
                                  from:         played_by,
-                                 peeked_cards: played_by.peek_cards(2, from: :deck)).process(game_state)
+                                 peeked_cards: peeked_cards).process(game_state)
         end
       end
 

@@ -23,7 +23,9 @@ module PlayerModules
 
     def shuffle_discard_under_deck
       discards, other = cards.partition { |c| c.location == :discard }
-      @cards = other + discards.shuffle(random: game_state.rng).each { |c| c.location = :deck }
+      GameEngine::Triggers::Shuffle.trigger(self) do
+        @cards = other + discards.shuffle(random: game_state.rng).each { |c| c.location = :deck }
+      end
       @game.current_journal.histories << GameEngine::History.new("#{name} shuffled their discards.",
                                                                  player:      self,
                                                                  css_classes: %w[shuffle])

@@ -4,12 +4,10 @@ module MonkeyPatches
       def shuffle(*args)
         sort
       rescue
-        super
+        real_shuffle
       end
       def shuffle!(*args)
-        sort!
-      rescue
-        super
+        replace shuffle
       end
     end
   end

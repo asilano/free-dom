@@ -39,7 +39,7 @@
 			"module GameEngine",
 			"  module CardlikeObjects",
 			"    module Projects",
-			"      class ${1:${TM_FILENAME_BASE/.*/${0:/pascalcase}/}} < Card",
+			"      class ${1:${TM_FILENAME_BASE/.*/${0:/pascalcase}/}} < Project",
 			"        text \"$2\"",
 			"        costs $4",
 			"",

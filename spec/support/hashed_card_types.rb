@@ -68,9 +68,10 @@ ARTIFACT_TYPES = {
 }.freeze
 
 PROJECT_TYPES = {
-  'Cathedral' => GameEngine::CardlikeObjects::Projects::Cathedral,
-  'City Gate' => GameEngine::CardlikeObjects::Projects::CityGate,
-  'Pageant'   => GameEngine::CardlikeObjects::Projects::Pageant,
-  'Sewers'    => GameEngine::CardlikeObjects::Projects::Sewers
+  'Cathedral'  => GameEngine::CardlikeObjects::Projects::Cathedral,
+  'City Gate'  => GameEngine::CardlikeObjects::Projects::CityGate,
+  'Pageant'    => GameEngine::CardlikeObjects::Projects::Pageant,
+  'Sewers'     => GameEngine::CardlikeObjects::Projects::Sewers,
+  'Star Chart' => GameEngine::CardlikeObjects::Projects::StarChart
 }.freeze
 
