@@ -60,18 +60,18 @@ CARD_TYPES = {
 }.freeze
 
 ARTIFACT_TYPES = {
-  'Flag'           => GameEngine::CardlikeObjects::Artifacts::Flag,
-  'Horn'           => GameEngine::CardlikeObjects::Artifacts::Horn,
-  'Key'            => GameEngine::CardlikeObjects::Artifacts::Key,
-  'Lantern'        => GameEngine::CardlikeObjects::Artifacts::Lantern,
-  'Treasure Chest' => GameEngine::CardlikeObjects::Artifacts::TreasureChest
+  'Flag'           => GameEngine::CardShapedThings::Artifacts::Flag,
+  'Horn'           => GameEngine::CardShapedThings::Artifacts::Horn,
+  'Key'            => GameEngine::CardShapedThings::Artifacts::Key,
+  'Lantern'        => GameEngine::CardShapedThings::Artifacts::Lantern,
+  'Treasure Chest' => GameEngine::CardShapedThings::Artifacts::TreasureChest
 }.freeze
 
 PROJECT_TYPES = {
-  'Cathedral'  => GameEngine::CardlikeObjects::Projects::Cathedral,
-  'City Gate'  => GameEngine::CardlikeObjects::Projects::CityGate,
-  'Pageant'    => GameEngine::CardlikeObjects::Projects::Pageant,
-  'Sewers'     => GameEngine::CardlikeObjects::Projects::Sewers,
-  'Star Chart' => GameEngine::CardlikeObjects::Projects::StarChart
+  'Cathedral'  => GameEngine::CardShapedThings::Projects::Cathedral,
+  'City Gate'  => GameEngine::CardShapedThings::Projects::CityGate,
+  'Pageant'    => GameEngine::CardShapedThings::Projects::Pageant,
+  'Sewers'     => GameEngine::CardShapedThings::Projects::Sewers,
+  'Star Chart' => GameEngine::CardShapedThings::Projects::StarChart
 }.freeze
 

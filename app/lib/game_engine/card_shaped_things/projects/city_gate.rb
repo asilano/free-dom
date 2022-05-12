@@ -1,5 +1,5 @@
 module GameEngine
-  module CardlikeObjects
+  module CardShapedThings
     module Projects
       class CityGate < Project
         text "At the start of your turn, +1 Card, then put a card from your hand onto your deck."

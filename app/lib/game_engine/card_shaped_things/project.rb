@@ -1,5 +1,5 @@
 module GameEngine
-  module CardlikeObjects
+  module CardShapedThings
     class Project
       extend CardDecorators::BasicDecorators
       include CardModules::Purchasable

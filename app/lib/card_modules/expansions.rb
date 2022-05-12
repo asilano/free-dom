@@ -15,8 +15,8 @@ module CardModules
         [GameEngine::BaseGameV2, GameEngine::Renaissance]
       end
 
-      def randomised_cardlikes
-        [GameEngine::CardlikeObjects::Projects]
+      def randomised_card_shaped_things
+        [GameEngine::CardShapedThings::Projects]
       end
 
       def basic_victory_types

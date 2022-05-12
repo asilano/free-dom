@@ -1,5 +1,5 @@
 module GameEngine
-  module CardlikeObjects
+  module CardShapedThings
     module Artifacts
     end
   end

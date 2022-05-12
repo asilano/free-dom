@@ -9,7 +9,7 @@ module GameEngine
       costs 5
 
       setup do |game_state|
-        game_state.create_artifact(CardlikeObjects::Artifacts::Key)
+        game_state.create_artifact(CardShapedThings::Artifacts::Key)
       end
 
       def play_as_action(played_by:)

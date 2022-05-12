@@ -28,9 +28,9 @@ class GamesController < ApplicationController
                                            params:   {},
                                            order:    0)
     randomiser = (GameEngine::Card.expansions.map(&:kingdom_cards).flatten +
-                  GameEngine::Card.randomised_cardlikes.map(&:card_classes).flatten)
+                  GameEngine::Card.randomised_card_shaped_things.map(&:card_classes).flatten)
                  .shuffle
-    kingdom_cards, cardlikes = randomiser.take_while.with_object([[], []]) do |card, sets|
+    kingdom_cards, card_shapeds = randomiser.take_while.with_object([[], []]) do |card, sets|
       if card < GameEngine::Card
         sets[0] << card
       else
@@ -38,26 +38,14 @@ class GamesController < ApplicationController
       end
       sets[0].length < 10
     end
-    kingdom_journal.params["card_list"] = kingdom_cards.sort_by(&:raw_cost) + cardlikes
-  end
-
-  # POST /games/new
-  def refresh_form
-    @game = Game.new(game_params)
-    if params["add-fields"]
-      @game.journals.first.params["card_list"] << ""
-    elsif params["delete-fields"]
-      @game.journals.first.params["card_list"].delete_at(params["delete-cardlike"].to_i)
-    end
-    respond_to do |format|
-      format.html { render :new }
-      format.turbo_stream
-    end
+    kingdom_journal.params["card_list"] = kingdom_cards.sort_by(&:raw_cost) + card_shapeds
   end
 
   # POST /games
   # POST /games.json
   def create
+    return refresh_form if params["add-fields"] || params["delete-fields"]
+
     @game = Game.new(game_params)
 
     respond_to do |format|
@@ -124,5 +112,18 @@ class GamesController < ApplicationController
                                    :fiber_id,
                                    params: {}
                                  ])
+  end
+
+  def refresh_form
+    @game = Game.new(game_params)
+    if params["add-fields"]
+      @game.journals.first.params["card_list"] << ""
+    elsif params["delete-fields"]
+      @game.journals.first.params["card_list"].delete_at(params["delete-fields"].to_i)
+    end
+    respond_to do |format|
+      format.html { render :new }
+      format.turbo_stream { render :refresh_form }
+    end
   end
 end

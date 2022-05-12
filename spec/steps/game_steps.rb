@@ -505,7 +505,7 @@ module GameSteps
       question = @questions.detect { |q| q.player.name == user.name }
       controls = question.controls_for(user, @game.game_state)
       control = controls.detect { |c| c.scope == :supply }
-      project_instance = @game.game_state.cardlikes.detect { |c| c.is_a? project }
+      project_instance = @game.game_state.card_shapeds.detect { |c| c.is_a? project }
       can_pick = project_instance && control.filter(project_instance)
 
       if should

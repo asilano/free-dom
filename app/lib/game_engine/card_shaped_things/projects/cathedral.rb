@@ -1,5 +1,5 @@
 module GameEngine
-  module CardlikeObjects
+  module CardShapedThings
     module Projects
       class Cathedral < Project
         text "At the start of your turn, trash a card from your hand."

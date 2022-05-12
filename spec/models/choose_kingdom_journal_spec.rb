@@ -7,9 +7,9 @@ RSpec.describe GameEngine::ChooseKingdomJournal do
       expect(journal).to be_valid
     end
 
-    it "should be valid with randomiser cardlikes after 10th" do
+    it "should be valid with randomiser card_shapeds after 10th" do
       journal = FactoryBot.build(:kingdom_journal)
-      journal.params["card_list"][10] = "GameEngine::CardlikeObjects::Projects::Cathedral"
+      journal.params["card_list"][10] = "GameEngine::CardShapedThings::Projects::Cathedral"
       expect(journal).to be_valid
     end
   end
@@ -39,7 +39,7 @@ RSpec.describe GameEngine::ChooseKingdomJournal do
 
     it "should be invalid if the first 10 cards are not Cards" do
       journal = FactoryBot.build(:kingdom_journal)
-      journal.params["card_list"][9] = "GameEngine::CardlikeObjects::Projects::Cathedral"
+      journal.params["card_list"][9] = "GameEngine::CardShapedThings::Projects::Cathedral"
       expect(journal).to_not be_valid
     end
 
@@ -49,9 +49,9 @@ RSpec.describe GameEngine::ChooseKingdomJournal do
       expect(journal).to_not be_valid
     end
 
-    it "should be invalid if there any non-randomiser cardlikes after 10th" do
+    it "should be invalid if there any non-randomiser card_shapeds after 10th" do
       journal = FactoryBot.build(:kingdom_journal)
-      journal.params["card_list"][10] = "GameEngine::CardlikeObjects::Artifacts::Key"
+      journal.params["card_list"][10] = "GameEngine::CardShapedThings::Artifacts::Key"
       expect(journal).to_not be_valid
     end
   end

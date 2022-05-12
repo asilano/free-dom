@@ -1,5 +1,5 @@
 module GameEngine
-  module CardlikeObjects
+  module CardShapedThings
     module Artifacts
       class TreasureChest < Artifact
         comes_from Renaissance::Swashbuckler

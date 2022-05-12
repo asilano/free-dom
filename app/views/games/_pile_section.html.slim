@@ -28,21 +28,21 @@
         - if @game.game_state.artifacts.values.any? { |art| art.comes_from == pile.card_class && art.owner.nil? }
           .card-grid
             - @game.game_state.artifacts.values.select { |art| art.comes_from == pile.card_class && art.owner.nil? }.each do |art|
-              .cell.card.cardlike.artifact
+              .cell.card.card_shaped.artifact
                 .card-name{data-tooltip data-allow-html="true" title=art.text}= art.readable_name
 
-  - if @game.game_state.cardlikes.present?
-    - @game.game_state.cardlikes.each_with_index.each_slice((@game.game_state.cardlikes.size / 2.0).round).with_index do |half, half_ix|
+  - if @game.game_state.card_shapeds.present?
+    - @game.game_state.card_shapeds.each_with_index.each_slice((@game.game_state.card_shapeds.size / 2.0).round).with_index do |half, half_ix|
       .cell.small-12.medium-6.large-6
-        - half.each do |cardlike, ix|
+        - half.each do |card_shaped, ix|
           .pile
             .pile-cost
-              span.cost-text= cardlike.cost
-            .card.cardlike{class=cardlike.class.types}
-              .card-name{data-tooltip data-allow-html="true" title=cardlike.text}= cardlike.readable_name
-              - cardlike.owners.sort_by(&:seat).each do |owner|
-                .cardlike-owner class="player#{owner.seat}"= owner.name
+              span.cost-text= card_shaped.cost
+            .card.card_shaped{class=card_shaped.class.types}
+              .card-name{data-tooltip data-allow-html="true" title=card_shaped.text}= card_shaped.readable_name
+              - card_shaped.owners.sort_by(&:seat).each do |owner|
+                .card_shaped-owner class="player#{owner.seat}"= owner.name
               - pile_controls.each do |ctrl|
                 .card-ctrl
-                  - if ctrl.filter(cardlike)
-                    = render partial: ctrl, as: :control, locals: { value: ix + @game.game_state.piles.size, card: cardlike }
+                  - if ctrl.filter(card_shaped)
+                    = render partial: ctrl, as: :control, locals: { value: ix + @game.game_state.piles.size, card: card_shaped }

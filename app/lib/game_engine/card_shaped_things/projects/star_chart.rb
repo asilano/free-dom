@@ -1,5 +1,5 @@
 module GameEngine
-  module CardlikeObjects
+  module CardShapedThings
     module Projects
       class StarChart < Project
         text "When you shuffle, you may pick one of the cards to go on top."

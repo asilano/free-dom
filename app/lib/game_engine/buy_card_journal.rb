@@ -18,12 +18,12 @@ module GameEngine
       return false unless params["choice"]&.integer?
 
       choice = params["choice"].to_i
-      return false unless choice < game_state.piles.length + game_state.cardlikes.length
+      return false unless choice < game_state.piles.length + game_state.card_shapeds.length
 
       if choice < game_state.piles.length
         game_state.piles[choice].cards.first&.player_can_buy?(player: player)
       else
-        game_state.cardlikes[choice - game_state.piles.length].player_can_buy?(player: player)
+        game_state.card_shapeds[choice - game_state.piles.length].player_can_buy?(player: player)
       end
     end
 
@@ -42,7 +42,7 @@ module GameEngine
       if choice < game_state.piles.length
         buy_card(choice, player)
       else
-        buy_cardlike(choice - game_state.piles.length, player)
+        buy_card_shaped(choice - game_state.piles.length, player)
       end
     end
 
@@ -57,14 +57,14 @@ module GameEngine
       card.be_gained_by(player, from: pile.cards)
     end
 
-    def buy_cardlike(cardlike_index, player)
-      cardlike = game_state.cardlikes[cardlike_index]
-      player.cash -= cardlike.cost
+    def buy_card_shaped(card_shaped_index, player)
+      card_shaped = game_state.card_shapeds[card_shaped_index]
+      player.cash -= card_shaped.cost
 
-      @histories << History.new("#{player.name} bought the #{cardlike.class.types.join("-")} #{cardlike.readable_name} for #{cardlike.cost}.",
+      @histories << History.new("#{player.name} bought the #{card_shaped.class.types.join("-")} #{card_shaped.readable_name} for #{card_shaped.cost}.",
                                 player: player,
-                                css_classes: %w[buy-cardlike])
-      cardlike.be_bought_by(player)
+                                css_classes: %w[buy-card_shaped])
+      card_shaped.be_bought_by(player)
     end
   end
 end

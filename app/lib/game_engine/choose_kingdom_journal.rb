@@ -20,8 +20,8 @@ module GameEngine
         game_state.piles << GameEngine::Pile.new(card_class)
       end
 
-      params["card_list"][10..].map(&:constantize).sort_by(&:raw_cost).each do |cardlike|
-        game_state.cardlikes << cardlike.new(game_state)
+      params["card_list"][10..].map(&:constantize).sort_by(&:raw_cost).each do |card_shaped|
+        game_state.card_shapeds << card_shaped.new(game_state)
       end
 
       @histories << History.new("#{params["card_list"].map(&:demodulize).map(&:titleize).join(', ')} chosen for the kingdom.")
@@ -46,8 +46,8 @@ module GameEngine
         if ix < 10
           "#{card} is not a Card subclass" unless card_class.ancestors.include? GameEngine::Card
         else
-          next "#{card} is not in the CardlikeObject namespace" unless card_class.module_parents.include? GameEngine::CardlikeObjects
-          "#{card} is not a randomised CardlikeObject" unless card_class.randomiser?
+          next "#{card} is not in the CardShapedThing namespace" unless card_class.module_parents.include? GameEngine::CardShapedThings
+          "#{card} is not a randomised CardShapedThing" unless card_class.randomiser?
         end
       rescue NameError
         "#{card} is not a type"

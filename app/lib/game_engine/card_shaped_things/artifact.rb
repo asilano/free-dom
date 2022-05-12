@@ -1,5 +1,5 @@
 module GameEngine
-  module CardlikeObjects
+  module CardShapedThings
     class Artifact
       extend CardDecorators::BasicDecorators
 

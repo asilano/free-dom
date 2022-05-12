@@ -1,5 +1,5 @@
 module GameEngine
-  module CardlikeObjects
+  module CardShapedThings
     module Projects
       class Sewers < Project
         text "When you trash a card other than with this, you may trash a card from your hand."

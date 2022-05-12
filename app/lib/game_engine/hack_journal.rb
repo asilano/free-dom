@@ -91,10 +91,10 @@ module GameEngine
     end
 
     def set_project_owner(game_state)
-      cardlike = game_state.cardlikes.detect { |cl| cl.class.name == params["project"] }
-      cardlike.owners << player unless cardlike.owners.include? player
+      card_shaped = game_state.card_shapeds.detect { |cl| cl.class.name == params["project"] }
+      card_shaped.owners << player unless card_shaped.owners.include? player
 
-      @histories << History.new("HACK! Project #{cardlike.readable_name} given to #{player.name}.",
+      @histories << History.new("HACK! Project #{card_shaped.readable_name} given to #{player.name}.",
                                 css_classes: %w[hack])
 
     end

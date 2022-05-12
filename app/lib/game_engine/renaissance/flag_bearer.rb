@@ -10,7 +10,7 @@ module GameEngine
       # Flag - When drawing your hand, +1 Card
 
       setup do |game_state|
-        game_state.create_artifact(CardlikeObjects::Artifacts::Flag)
+        game_state.create_artifact(CardShapedThings::Artifacts::Flag)
       end
 
       take_flag = ->(_card, player, *_) {

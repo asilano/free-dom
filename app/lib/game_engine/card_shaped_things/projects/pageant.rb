@@ -1,5 +1,5 @@
 module GameEngine
-  module CardlikeObjects
+  module CardShapedThings
     module Projects
       class Pageant < Project
         text "At the end of your Buy phase, you may pay $1 for +1 Coffers."

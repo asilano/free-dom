@@ -37,14 +37,13 @@
                                                                             card_params[ix]),
                                     id: "cards_#{ix}")
     .panel
-      h3 Cardlike objects
-      #cardlike_selects(data-controller="repeatable-field"
-                        data-repeatable-field-url-value=cardlike_fields_games_url
-                        data-repeatable-field-next-ix-value=(card_params.length - 10))
-        = f.button "Add cardlike object", name: "add-cardlike", class: "button", type: "submit", formaction: new_games_path, formmethod: :post, data: { action: "click->repeatable-field#add" }
-        - all_cardlikes = GameEngine::Card.randomised_cardlikes.map(&:card_classes).flatten.shuffle
+      h3 Card-shaped things
+      #card_shaped_selects(data-controller="repeatable-field"
+                           data-repeatable-field-next-ix-value=(card_params.length - 10))
+        = f.button "Add card-shaped thing", name: "add-fields", class: "button", type: "submit", data: { action: "click->repeatable-field#add" }
+        - all_card_shapeds = GameEngine::Card.randomised_card_shaped_things.map(&:card_classes).flatten.shuffle
         - (card_params.length - 10).times do |ix|
-          = render "cardlike_fields", ix: ix, object_name: j.object_name, value: card_params[ix + 10]
+          = render "card_shaped_fields", ix: ix, object_name: j.object_name, value: card_params[ix + 10]
   #actions.actions
     = f.submit class: 'button'
     = link_to 'Back', games_path, class: "button secondary space-left"
