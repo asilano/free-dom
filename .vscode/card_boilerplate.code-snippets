@@ -32,12 +32,12 @@
 			""
 		]
 	},
-	"Add cardlike-project": {
+	"Add card-shaped-project": {
 		"scope": "ruby",
-		"prefix": "cl-project",
+		"prefix": "cs-project",
 		"body": [
 			"module GameEngine",
-			"  module CardlikeObjects",
+			"  module CardShapedThings",
 			"    module Projects",
 			"      class ${1:${TM_FILENAME_BASE/.*/${0:/pascalcase}/}} < Project",
 			"        text \"$2\"",

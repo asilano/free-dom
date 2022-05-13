@@ -54,6 +54,9 @@ module GameEngine
       @histories << History.new("#{player.name} bought #{card.readable_name} for #{card.cost}.",
                                 player: player,
                                 css_classes: %w[buy-card])
+
+      Triggers::CardBought.trigger(card, player)
+
       card.be_gained_by(player, from: pile.cards)
     end
 

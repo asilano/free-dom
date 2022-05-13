@@ -179,6 +179,22 @@ module GameSteps
                    params:   control.handle_choice(option))
     end
 
+    step ":player_name choose(s) the :project project" do |name, project|
+      user = get_player(name).user
+      question = @questions.detect { |q| q&.player&.name == user.name }
+      controls = question.controls_for(user, @game.game_state)
+
+      scope = :supply
+      unless controls.map(&:scope).any? { |s| s == :everywhere }
+        expect(controls).to include(have_attributes(scope: scope))
+      end
+      control = controls.detect { |c| c.scope == scope || c.scope == :everywhere }
+      make_journal(user: user,
+                   type: question.journal_type,
+                   fiber_id: question.fiber_id,
+                   params: control.handle_choice(project))
+    end
+
     step ':player_name spend(s) :amount Coffer(s)' do |name, amount|
       user = get_player(name).user
       question = @questions.detect do |q|
@@ -348,7 +364,7 @@ module GameSteps
       send 'these card moves should happen'
     end
 
-    step ':player_name should discard :cards from/in( my/his/her) :location( cards)' do |name, cards, location|
+    step ':player_name should discard :cards from/in( my/his/her) (in ):location( cards)' do |name, cards, location|
       players_cards = cards_for_player(name, location: location)
       if cards == 'everything'
         players_cards.each { |c| c[:location] = :discard; c[:revealed] = false }
@@ -796,7 +812,12 @@ def find_index(control, player, game_state, scope, filter, card)
   when :peeked
     player.cards_peeked_to(@question).index { |c| c.is_a?(card) && control.instance_exec(c, &filter) }
   when :supply
-    game_state.piles.index { |pile| pile.cards.first.is_a?(card) && control.instance_exec(pile.cards.first, &filter) }
+    ix = game_state.piles.index { |pile| pile.cards.first.is_a?(card) && control.instance_exec(pile.cards.first, &filter) }
+    if ix.nil?
+      ix = game_state.card_shapeds.index { |cs| cs.is_a?(card) && control.instance_exec(cs, &filter) }
+      ix += game_state.piles.length
+    end
+    ix
   when :trash
     game_state.trashed_cards.index { |c| c.is_a?(card) && control.instance_exec(c, &filter) }
   when :everywhere
