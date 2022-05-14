@@ -1,4 +1,5 @@
 class Journal < ApplicationRecord
+  include ActionView::Helpers::TextHelper
   include JournalsHelper::Validations
 
   belongs_to :game

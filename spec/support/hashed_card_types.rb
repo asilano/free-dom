@@ -74,6 +74,7 @@ PROJECT_TYPES = {
   'Sewers'      => GameEngine::CardShapedThings::Projects::Sewers,
   'Star Chart'  => GameEngine::CardShapedThings::Projects::StarChart,
   'Exploration' => GameEngine::CardShapedThings::Projects::Exploration,
-  'Fair'        => GameEngine::CardShapedThings::Projects::Fair
+  'Fair'        => GameEngine::CardShapedThings::Projects::Fair,
+  'Silos'       => GameEngine::CardShapedThings::Projects::Silos
 }.freeze
 
