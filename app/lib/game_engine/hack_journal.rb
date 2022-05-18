@@ -1,24 +1,26 @@
 module GameEngine
   class HackJournal < Journal
-    define_question('Hack the game state')
+    define_question("Hack the game state")
 
     process do |game_state|
       prevent_undo
 
-      case params['scope']
-      when 'hand', 'deck', 'discard', 'play'
+      case params["scope"]
+      when "hand", "deck", "discard", "play"
         modify_player_cards(game_state)
-      when 'supply'
+      when "supply"
         modify_supply_cards(game_state)
-      when 'trash'
+      when "trash"
         modify_trash_cards(game_state)
-      when 'artifact_owner'
+      when "artifact_owner"
         set_artifact_owner(game_state)
-      when 'project_owner'
+      when "project_owner"
         set_project_owner(game_state)
-      when 'villagers'
+      when "project_tokens"
+        set_project_tokens(game_state)
+      when "villagers"
         set_player_villagers(game_state)
-      when 'coffers'
+      when "coffers"
         set_player_coffers(game_state)
       else
         raise InvalidJournalError, "Invalid journal: #{self}"
@@ -92,7 +94,16 @@ module GameEngine
 
     def set_project_owner(game_state)
       card_shaped = game_state.card_shapeds.detect { |cl| cl.class.name == params["project"] }
-      card_shaped.owners << player unless card_shaped.owners.include? player
+      card_shaped.be_bought_by(player) unless card_shaped.owners.include? player
+
+      @histories << History.new("HACK! Project #{card_shaped.readable_name} given to #{player.name}.",
+                                css_classes: %w[hack])
+
+    end
+
+    def set_project_tokens(game_state)
+      card_shaped = game_state.card_shapeds.detect { |cl| cl.class.name == params["project"] }
+      card_shaped.player_tokens[player] = params["count"].to_i
 
       @histories << History.new("HACK! Project #{card_shaped.readable_name} given to #{player.name}.",
                                 css_classes: %w[hack])

@@ -4,7 +4,7 @@ def write_one_dict(file, dict_name, objects)
 
   file.write("#{dict_name} = {\n")
   str = objects.map do |ty|
-    "  '#{ty.readable_name}'#{' ' * (longest_name_len - ty.readable_name.length + 1)}=> #{ty.name}"
+    "  \"#{ty.readable_name}\"#{' ' * (longest_name_len - ty.readable_name.length + 1)}=> #{ty.name}"
   end.join(",\n")
   file.write(str)
   file.write("\n}.freeze\n\n")

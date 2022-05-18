@@ -41,7 +41,7 @@
             .card.card_shaped{class=card_shaped.class.types}
               .card-name{data-tooltip data-allow-html="true" title=card_shaped.text}= card_shaped.readable_name
               - card_shaped.owners.sort_by(&:seat).each do |owner|
-                .card_shaped-owner class="player#{owner.seat}"= owner.name
+                .card_shaped-owner class="player#{owner.seat}"= owner.name + (" - #{pluralize(card_shaped.player_tokens[owner], "token")}")
               - pile_controls.each do |ctrl|
                 .card-ctrl
                   - if ctrl.filter(card_shaped)

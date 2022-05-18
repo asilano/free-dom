@@ -125,6 +125,17 @@ module GameSteps
                    params: { scope: :coffers,
                              count: count })
     end
+
+    step "there is/are :count of :player_name tokens on the :project project" do |count, name, project|
+      player = get_player(name)
+      make_journal(user:   player.user,
+                   type:   GameEngine::HackJournal,
+                   params: {
+                     scope:   :project_tokens,
+                     project: :"#{project}",
+                     count:   count
+                   })
+    end
   end
 
   module ActionSteps
@@ -695,6 +706,12 @@ module GameSteps
       else
         expect(@game.game_state.artifacts[artifact].owner).not_to eq get_player(name)
       end
+    end
+
+    step "there should be :count of :player_name tokens on the :project project" do |count, name, project|
+      @game.process
+      project_card = @game.game_state.card_shapeds.detect { |cs| cs.is_a? project }
+      expect(project_card.player_tokens[get_player(name)]).to eq count
     end
   end
 
