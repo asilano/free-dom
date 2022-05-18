@@ -6,7 +6,7 @@ module GameEngine
         costs 3
 
         def initialize(game_state)
-          super(game_state)
+          super
 
           Triggers::CardTrashed.watch_for(whenever: true) do |card, trasher|
             next unless owners.include? trasher

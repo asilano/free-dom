@@ -6,7 +6,7 @@ module GameEngine
         costs 4
 
         def initialize(game_state)
-          super(game_state)
+          super
 
           Triggers::StartOfTurn.watch_for(whenever: true) do |turn_player|
             next unless owners.include? turn_player

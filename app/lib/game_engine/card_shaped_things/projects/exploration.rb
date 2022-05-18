@@ -6,7 +6,7 @@ module GameEngine
         costs 4
 
         def initialize(game_state)
-          super(game_state)
+          super
 
           Triggers::StartOfBuyPhase.watch_for(whenever: true) do |_turn_player|
             self.bought_this_turn = false
