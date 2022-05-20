@@ -6,7 +6,7 @@ module GameEngine
         text "At the start of your Buy phase, gain a Gold."
 
         def initialize(game_state)
-          super(game_state)
+          super
 
           Triggers::StartOfBuyPhase.watch_for(whenever: true) do |turn_player|
             next unless turn_player == @owner

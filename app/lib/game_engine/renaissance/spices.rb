@@ -13,9 +13,8 @@ module GameEngine
                                                              player: player)
       end
 
-      def play_as_treasure(played_by:)
-        super
-
+      def play(played_by:)
+        played_by.grant_cash(2)
         played_by.grant_buys(1)
       end
     end

@@ -18,9 +18,7 @@ module GameEngine
       on_gain(&gain_trash_trigger)
       on_trash(&gain_trash_trigger)
 
-      def play_as_action(played_by:)
-        super
-
+      def play(played_by:)
         played_by.draw_cards(2)
         played_by.grant_buys(1)
       end

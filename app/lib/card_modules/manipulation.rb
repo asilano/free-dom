@@ -6,26 +6,22 @@ module CardModules
       be_unrevealed
     end
 
-    def play_as_action(played_by:)
+    def play_card(played_by:)
       self.location = :play
       self.played_this_turn = true
       game.current_journal.histories << GameEngine::History.new("#{played_by.name} played #{readable_name}.",
                                                                 player: played_by,
-                                                                css_classes: types + %w[play-action])
-    end
+                                                                css_classes: types + %w[play])
 
-    def play_as_treasure(played_by:, stop_before_cash: false)
-      self.location = :play
-      self.played_this_turn = true
-      GameEngine::Triggers::TreasurePlayed.trigger(self, played_by)
+      GameEngine::Triggers::TreasurePlayed.trigger(self, played_by) if treasure?
 
-      return if stop_before_cash
+      play(played_by: played_by)
 
-      cash_gain = cash
-      player.cash += cash_gain
-      game.current_journal.histories << GameEngine::History.new("#{played_by.name} played #{readable_name} ($#{cash_gain}) (total: $#{played_by.cash}).",
-                                                                player: played_by,
-                                                                css_classes: types + %w[play-treasure])
+      if treasure?
+        game.current_journal.histories << GameEngine::History.new("(total: $#{played_by.cash}).",
+        player: played_by,
+        css_classes: types + %w[play])
+      end
     end
 
     def react(_response, reacted_by:)

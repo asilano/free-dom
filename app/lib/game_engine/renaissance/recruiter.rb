@@ -6,9 +6,7 @@ module GameEngine
       action
       costs 5
 
-      def play_as_action(played_by:)
-        super
-
+      def play(played_by:)
         played_by.draw_cards(3)
         game_state.get_journal(TrashCardJournal, from: played_by, opts: { research: self }).process(game_state)
       end

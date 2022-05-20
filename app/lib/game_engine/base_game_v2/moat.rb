@@ -9,9 +9,7 @@ module GameEngine
       reaction from: :hand, to: :attack#, once_only: true
       costs 2
 
-      def play_as_action(played_by:)
-        super
-
+      def play(played_by:)
         played_by.draw_cards(2)
         observe
       end

@@ -5,9 +5,7 @@ module GameEngine
       action
       costs 5
 
-      def play_as_action(played_by:)
-        super
-
+      def play(played_by:)
         cards = played_by.hand_cards
         texts_for_history = cards.map(&:readable_name)
         cards.each(&:discard)

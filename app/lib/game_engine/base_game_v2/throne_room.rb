@@ -7,9 +7,7 @@ module GameEngine
 
       attr_accessor :doubled
 
-      def play_as_action(played_by:)
-        super
-
+      def play(played_by:)
         game_state.get_journal(ChooseActionJournal, from: played_by, opts: { original: self }).process(game_state)
       end
 
@@ -52,9 +50,9 @@ module GameEngine
           opts[:original].doubled = card
 
           # Play the chosen card, then play it again
-          card.play_as_action(played_by: player)
+          card.play_card(played_by: player)
           observe
-          card.play_as_action(played_by: player)
+          card.play_card(played_by: player)
         end
       end
     end

@@ -11,9 +11,7 @@ module GameEngine
         game_state.create_artifact(CardShapedThings::Artifacts::TreasureChest)
       end
 
-      def play_as_action(played_by:)
-        super
-
+      def play(played_by:)
         played_by.draw_cards(3)
         return if played_by.discarded_cards.empty?
 

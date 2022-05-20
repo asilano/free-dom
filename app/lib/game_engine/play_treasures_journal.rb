@@ -35,7 +35,7 @@ module GameEngine
 
       # Play all the chosen cards in hand order
       cards = Array(params['choice']).map { |ch| player.hand_cards[ch.to_i] }
-      cards.each { |card| card.play_as_treasure(played_by: player) }
+      cards.each { |card| card.play_card(played_by: player) }
 
       # Ask again, unless the player now has no treasures in hand
       player.hand_cards.any?(&:treasure?) ? :continue : :stop

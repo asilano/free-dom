@@ -32,7 +32,7 @@ module GameEngine
 
       # Retrieve the card and make it play itself
       card = player.hand_cards[params['choice'].to_i]
-      card.play_as_action(played_by: player)
+      card.play_card(played_by: player)
     end
   end
 end

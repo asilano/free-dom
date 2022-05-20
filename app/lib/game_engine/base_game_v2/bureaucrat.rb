@@ -8,9 +8,7 @@ module GameEngine
       attack
       costs 4
 
-      def play_as_action(played_by:)
-        super
-
+      def play(played_by:)
         # Player gains a Silver
         Helpers.gain_card_from_supply(game_state,
                                       player:     played_by,

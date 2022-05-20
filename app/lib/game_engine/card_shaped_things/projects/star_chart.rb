@@ -6,7 +6,7 @@ module GameEngine
         costs 3
 
         def initialize(game_state)
-          super(game_state)
+          super
 
           Triggers::Shuffle.watch_for(whenever: true) do |shuffler|
             @old_shuffle = Array.instance_method(:shuffle)

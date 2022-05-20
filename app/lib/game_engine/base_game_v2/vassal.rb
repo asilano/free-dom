@@ -6,9 +6,7 @@ module GameEngine
       action
       costs 3
 
-      def play_as_action(played_by:)
-        super
-
+      def play(played_by:)
         played_by.cash += 2
         disc_card = played_by.discard_cards(1, from: :deck)[0]
 
@@ -42,7 +40,7 @@ module GameEngine
             return
           end
 
-          opts[:discarded].play_as_action(played_by: player)
+          opts[:discarded].play_card(played_by: player)
         end
       end
     end

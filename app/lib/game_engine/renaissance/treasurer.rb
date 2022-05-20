@@ -12,9 +12,7 @@ module GameEngine
         game_state.create_artifact(CardShapedThings::Artifacts::Key)
       end
 
-      def play_as_action(played_by:)
-        super
-
+      def play(played_by:)
         played_by.grant_cash(3)
         game_state.get_journal(ChooseModeJournal, from: played_by).process(game_state)
       end

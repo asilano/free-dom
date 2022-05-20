@@ -12,9 +12,14 @@ module CardDecorators
       define_singleton_method(:treasure?) { true }
       define_method(:cash) { opts[:cash] } if opts.key? :cash
 
-      return unless opts[:special]
-
-      define_singleton_method(:special?) { true }
+      if opts[:special]
+        define_singleton_method(:special?) { true }
+      else
+        define_method(:play) do |played_by:|
+          cash_gain = cash
+          played_by.cash += cash_gain
+        end
+      end
     end
 
     # Define a card as a Victory with the specified points. Default its

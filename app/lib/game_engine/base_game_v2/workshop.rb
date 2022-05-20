@@ -5,9 +5,7 @@ module GameEngine
       action
       costs 3
 
-      def play_as_action(played_by:)
-        super
-
+      def play(played_by:)
         game_state.get_journal(GainCardJournal, from: played_by).process(game_state)
       end
 

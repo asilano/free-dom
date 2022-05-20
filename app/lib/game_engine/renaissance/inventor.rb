@@ -5,9 +5,7 @@ module GameEngine
       action
       costs 4
 
-      def play_as_action(played_by:)
-        super
-
+      def play(played_by:)
         game_state.get_journal(GainCardJournal, from: played_by).process(game_state)
         prev_count = game_state.get_fact(:inventors)
         game_state.set_fact(:inventors, (prev_count || 0) + 1)

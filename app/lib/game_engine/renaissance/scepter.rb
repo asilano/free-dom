@@ -7,9 +7,7 @@ module GameEngine
 
       attr_accessor :replayed
 
-      def play_as_treasure(played_by:)
-        super(played_by: played_by, stop_before_cash: true)
-
+      def play(played_by:)
         game_state.get_journal(ChooseModeJournal, from: played_by, opts: { original: self }).process(game_state)
       end
 
@@ -33,7 +31,7 @@ module GameEngine
         process do |game_state|
           if params["choice"] == "cash"
             player.cash += 2
-            @histories << History.new("#{player.name} chose to take cash from #{Scepter.readable_name} (new total: $#{player.cash}).",
+            @histories << History.new("#{player.name} chose to take cash from #{Scepter.readable_name}.",
                                       player: player)
             return
           end
@@ -74,7 +72,7 @@ module GameEngine
           opts[:original].replayed = card
 
           # Play the chosen card
-          card.play_as_action(played_by: player)
+          card.play(played_by: player)
         end
       end
 

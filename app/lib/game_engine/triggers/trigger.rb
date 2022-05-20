@@ -5,8 +5,6 @@ module GameEngine
       attr_accessor :whenever
 
       def self.inherited(subclass)
-        super
-
         @subclasses ||= []
         @subclasses << subclass
         subclass.instance_variable_set("@observers", [])

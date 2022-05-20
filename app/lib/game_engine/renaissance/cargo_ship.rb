@@ -7,9 +7,7 @@ module GameEngine
       duration
       costs 3
 
-      def play_as_action(played_by:)
-        super
-
+      def play(played_by:)
         played_by.grant_cash(2)
 
         filter = lambda do |_, gainer, *|

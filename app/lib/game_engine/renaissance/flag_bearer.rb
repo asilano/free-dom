@@ -21,9 +21,7 @@ module GameEngine
       on_gain(&take_flag)
       on_trash(&take_flag)
 
-      def play_as_action(played_by:)
-        super
-
+      def play(played_by:)
         played_by.grant_cash(2)
       end
     end

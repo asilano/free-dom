@@ -14,9 +14,7 @@ module GameEngine
         game_state.create_artifact(CardShapedThings::Artifacts::Lantern)
       end
 
-      def play_as_action(played_by:)
-        super
-
+      def play(played_by:)
         played_by.grant_actions(1)
 
         lantern = game_state.artifacts['Lantern'].owned_by?(played_by)

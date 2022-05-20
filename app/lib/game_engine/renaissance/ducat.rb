@@ -11,14 +11,9 @@ module GameEngine
         card.game_state.get_journal(TrashCopperJournal, from: player).process(card.game_state)
       end
 
-      def play_as_treasure(played_by:)
-        super(played_by: played_by, stop_before_cash: true)
-
+      def play(played_by:)
         played_by.coffers += 1
         played_by.buys += 1
-        game.current_journal.histories << GameEngine::History.new("#{played_by.name} played #{readable_name} (total: $#{played_by.cash}).",
-                                                                  player:      played_by,
-                                                                  css_classes: types + %w[play-treasure])
       end
 
       class TrashCopperJournal < Journal

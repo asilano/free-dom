@@ -14,9 +14,7 @@ module GameEngine
           player: player)
       end
 
-      def play_as_action(played_by:)
-        super
-
+      def play(played_by:)
         played_by.villagers += 1
         played_by.grant_cash(2)
       end

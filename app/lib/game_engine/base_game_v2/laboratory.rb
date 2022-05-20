@@ -6,9 +6,7 @@ module GameEngine
       action
       costs 5
 
-      def play_as_action(played_by:)
-        super
-
+      def play(played_by:)
         played_by.draw_cards(2)
         played_by.grant_actions(1)
       end

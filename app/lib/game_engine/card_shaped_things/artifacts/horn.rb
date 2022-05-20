@@ -7,7 +7,7 @@ module GameEngine
         text "Once per turn, when you discard a Border Guard from play, you may put it onto your deck."
 
         def initialize(game_state)
-          super(game_state)
+          super
 
           Triggers::StartOfTurn.watch_for(whenever: true) do
             filter = lambda do |card, player, from|

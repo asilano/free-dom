@@ -6,7 +6,7 @@ module GameEngine
         text "At the start of your turn, +$1."
 
         def initialize(game_state)
-          super(game_state)
+          super
 
           Triggers::StartOfTurn.watch_for(whenever: true) do |turn_player|
             next unless turn_player == owner
