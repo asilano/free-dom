@@ -1,10 +1,10 @@
 module GameEngine
   module BaseGameV2
     class Poacher < GameEngine::Card
-      text '+1 Card',
-           '+1 Action',
-           '+1 Cash',
-           'Discard a card per empty Supply pile.'
+      text "+1 Card",
+           "+1 Action",
+           "+$1",
+           "Discard a card per empty Supply pile."
       action
       costs 4
 

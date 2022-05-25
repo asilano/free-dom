@@ -2,7 +2,8 @@ module GameEngine
   module Renaissance
     class Research < Card
       text "+1 Action",
-           "Trash a card from your hand. Per 1 Cash it costs, set aside a card from your deck face down (on this). At the start of your next turn, put those cards into your hand."
+           "Trash a card from your hand. Per $1 it costs, set aside a card from your deck face down (on this). " \
+           "At the start of your next turn, put those cards into your hand."
       action
       duration
       costs 4

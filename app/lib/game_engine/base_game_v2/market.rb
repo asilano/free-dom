@@ -1,10 +1,10 @@
 module GameEngine
   module BaseGameV2
     class Market < GameEngine::Card
-      text '+1 Card',
-           '+1 Action',
-           '+1 Buy',
-           '+1 Cash'
+      text "+1 Card",
+           "+1 Action",
+           "+1 Buy",
+           "+$1"
       action
       costs 5
 

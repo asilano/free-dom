@@ -1,7 +1,7 @@
 module GameEngine
   module Renaissance
     class Improve < Card
-      text "+2 Cash",
+      text "+$2",
            "At the start of Clean-up, you may trash an Action card you would discard from play this turn," \
            " to gain a card costing exactly $1 more than it."
       action

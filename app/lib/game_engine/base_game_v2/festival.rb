@@ -1,9 +1,9 @@
 module GameEngine
   module BaseGameV2
     class Festival < GameEngine::Card
-      text '+2 Actions',
-           '+1 Buy',
-           '+2 Cash'
+      text "+2 Actions",
+           "+1 Buy",
+           "+$2"
       action
       costs 5
 

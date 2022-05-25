@@ -1,13 +1,13 @@
 module GameEngine
   module BaseGameV2
     class Vassal < GameEngine::Card
-      text '+2 Cash',
-           'Discard the top card of your deck. If it\'s an Action card, you may play it.'
+      text "+$2",
+           "Discard the top card of your deck. If it\'s an Action card, you may play it."
       action
       costs 3
 
       def play(played_by:)
-        played_by.cash += 2
+        played_by.grant_cash(2)
         disc_card = played_by.discard_cards(1, from: :deck)[0]
 
         if disc_card&.action?

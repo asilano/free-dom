@@ -30,7 +30,7 @@ module GameEngine
 
         process do |game_state|
           if params["choice"] == "cash"
-            player.cash += 2
+            player.grant_cash(2)
             @histories << History.new("#{player.name} chose to take cash from #{Scepter.readable_name}.",
                                       player: player)
             return

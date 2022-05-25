@@ -2,7 +2,7 @@ module GameEngine
   module Renaissance
     class Patron < Card
       text "+1 Villager",
-           "+2 Cash",
+           "+$2",
            :hr,
            "When something causes you to reveal this (using the word \"reveal\"), +1 Coffers."
       action

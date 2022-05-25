@@ -1,8 +1,8 @@
 module GameEngine
   module BaseGameV2
     class Militia < GameEngine::Card
-      text '+2 Cash',
-           'Each other player discards down to 3 cards in hand.'
+      text "+$2",
+           "Each other player discards down to 3 cards in hand."
       action
       attack
       costs 4

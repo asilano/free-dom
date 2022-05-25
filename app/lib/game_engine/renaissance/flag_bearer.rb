@@ -1,7 +1,7 @@
 module GameEngine
   module Renaissance
     class FlagBearer < Card
-      text "+2 Cash",
+      text "+$2",
            :hr,
            "When you gain or trash this, take the Flag."
       action

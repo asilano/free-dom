@@ -1,7 +1,7 @@
 module GameEngine
   module Renaissance
     class CargoShip < Card
-      text "+2 Cash",
+      text "+$2",
            "Once this turn, when you gain a card, you may set it aside face up (on this). At the start of your next turn, put it into your hand."
       action
       duration

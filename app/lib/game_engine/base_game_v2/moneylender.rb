@@ -1,7 +1,7 @@
 module GameEngine
   module BaseGameV2
     class Moneylender < GameEngine::Card
-      text 'You may trash a Copper from your hand for +3 Cash.'
+      text "You may trash a Copper from your hand for +$3."
       action
       costs 4
 
