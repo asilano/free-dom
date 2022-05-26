@@ -9,7 +9,7 @@ module CardDecorators
       define_method(:text) { self.class.card_text }
       define_singleton_method(:cost_str) { " (cost: #{raw_cost})" if raw_cost }
       define_singleton_method(:card_text) do
-        "<span class='metadata'>#{types.map(&:humanize).join("-")}#{cost_str}</span>\n#{str}"
+        "<span class='metadata'>#{types.map(&:to_s).map(&:humanize).join("-")}#{cost_str}</span>\n#{str}"
       end
     end
 

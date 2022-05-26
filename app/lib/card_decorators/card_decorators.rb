@@ -3,18 +3,17 @@ module CardDecorators
   module CardDecorators
     include BasicDecorators
 
-    def treasure?; false; end
-    def special?; false; end
     # Define a card as a Treasure with the specified value
     def treasure(opts)
       raise ArgumentError, 'Treasure must specify cash or special' unless opts.key?(:cash) || opts[:special]
 
-      define_singleton_method(:treasure?) { true }
+      types << :treasure
       define_method(:cash) { opts[:cash] } if opts.key? :cash
 
       if opts[:special]
         define_singleton_method(:special?) { true }
       else
+        define_singleton_method(:special?) { false }
         define_method(:play) do |played_by:|
           cash_gain = cash
           played_by.cash += cash_gain
@@ -24,11 +23,10 @@ module CardDecorators
 
     # Define a card as a Victory with the specified points. Default its
     # pile size.
-    def victory?; false; end
     def victory(opts = {}, &block)
       raise ArgumentError, 'Victory must define points' unless block_given? || opts.key?(:points)
 
-      define_singleton_method(:victory?) { true }
+      types << :victory
       if block_given?
         define_method(:points) do
           instance_eval(&block)
@@ -50,33 +48,28 @@ module CardDecorators
       @pile_size_given = false
     end
 
-    def curse?; false; end
     def curse
-      define_singleton_method(:curse?) { true }
+      types << :curse
       define_method(:points) { -1 }
     end
 
-    def action?; false; end
     def action
-      define_singleton_method(:action?) { true }
+      types << :action
     end
 
-    def reaction?; false; end
     def reaction(from:, to:)
-      define_singleton_method(:reaction?) { true }
+      types << :reaction
       define_method(:reacts_from) { from }
       define_method(:reacts_to) { to }
     end
 
-    def attack?; false; end
     def attack
-      define_singleton_method(:attack?) { true }
+      types << :attack
       include AttackDecorators
     end
 
-    def duration?; false; end
     def duration
-      define_singleton_method(:duration?) { true }
+      types << :duration
     end
 
     # Define starting pile sizes

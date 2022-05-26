@@ -3,7 +3,10 @@ module CardModules
     include Purchasable
 
     def self.included(base)
+      base.class_attribute :card_types, default: []
       base.extend ClassMethods
+
+      base.define_singleton_method(:inherited) { |subclass| subclass.card_types = [] }
     end
 
     def cost
@@ -47,9 +50,11 @@ module CardModules
 
     module ClassMethods
       def types
-        %w[action attack curse duration reaction treasure victory].map do |type|
-          type if send("#{type}?")
-        end.compact
+        card_types
+      end
+
+      %i[action attack curse duration reaction treasure victory].each do |type|
+        define_method(:"#{type}?") { types.include? type }
       end
     end
   end
