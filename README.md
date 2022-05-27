@@ -1,7 +1,7 @@
 FreeDom
 ======
 
-[![Build Status](https://travis-ci.org/asilano/free-dom.png?branch=restart)](https://travis-ci.org/asilano/free-dom)
+[![Build Status](https://github.com/asilano/free-dom/actions/workflows/cicd.yml/badge.svg?branch=restart)](https://github.com/asilano/free-dom/actions/workflows/cicd.yml)
 [![Maintainability](https://api.codeclimate.com/v1/badges/d8e348ce1cb2fd161584/maintainability)](https://codeclimate.com/github/asilano/free-dom/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/d8e348ce1cb2fd161584/test_coverage)](https://codeclimate.com/github/asilano/free-dom/test_coverage)
 
