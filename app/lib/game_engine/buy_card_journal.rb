@@ -64,7 +64,7 @@ module GameEngine
       card_shaped = game_state.card_shapeds[card_shaped_index]
       player.cash -= card_shaped.cost
 
-      @histories << History.new("#{player.name} bought the #{card_shaped.class.types.join("-")} #{card_shaped.readable_name} for #{card_shaped.cost}.",
+      @histories << History.new("#{player.name} bought the #{card_shaped.types.join("-")} #{card_shaped.readable_name} for #{card_shaped.cost}.",
                                 player: player,
                                 css_classes: %w[buy-card_shaped])
       card_shaped.be_bought_by(player)

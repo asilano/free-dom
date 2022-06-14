@@ -9,6 +9,12 @@ module CardModules
       base.define_singleton_method(:inherited) { |subclass| subclass.card_types = [] }
     end
 
+    delegate :readable_name, :types, :raw_text, to: :class
+
+    %i[action attack curse duration reaction treasure victory].each do |type|
+      define_method(:"#{type}?") { types.include? type }
+    end
+
     def cost
       inventors = game_state.get_fact(:inventors) || 0
       (self.class.raw_cost - inventors).clamp(0..)
@@ -51,10 +57,6 @@ module CardModules
     module ClassMethods
       def types
         card_types
-      end
-
-      %i[action attack curse duration reaction treasure victory].each do |type|
-        define_method(:"#{type}?") { types.include? type }
       end
     end
   end

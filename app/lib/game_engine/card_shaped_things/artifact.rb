@@ -4,7 +4,7 @@ module GameEngine
       extend CardDecorators::BasicDecorators
 
       attr_reader :owner
-      delegate :readable_name, to: :class
+      delegate :types, :readable_name, to: :class
 
       def self.comes_from(klass)
         define_method(:comes_from) { klass }

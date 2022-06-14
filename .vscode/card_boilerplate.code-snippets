@@ -80,7 +80,7 @@
 		"prefix": "**moves",
 		"body": [
 			"Then cards should move as follows:",
-			"\t${1}",
+			"\tThen ${1}",
 			"\tAnd these card moves should happen"
 		]
 	}

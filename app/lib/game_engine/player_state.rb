@@ -28,7 +28,7 @@ module GameEngine
       list = cards.group_by(&:class).map do |klass, cs|
         exemplar = cs.first
         entry = {
-          types: exemplar.class.types,
+          types: exemplar.types,
           count: cs.count,
           name:  klass.readable_name,
           text:  exemplar.try(:text),

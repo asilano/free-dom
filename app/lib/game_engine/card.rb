@@ -9,7 +9,6 @@ module GameEngine
     attr_accessor :location_card, :hosting, :player, :pile, :revealed, :peeked, :interacting_with, :played_this_turn
 
     delegate :game, :observe, :trigger, to: :game_state
-    delegate :action?, :treasure?, :special?, :victory?, :curse?, :reaction?, :attack?, :readable_name, :types, to: :class
 
     # By default, 10 cards in a pile
     pile_size 10

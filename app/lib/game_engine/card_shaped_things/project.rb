@@ -4,7 +4,7 @@ module GameEngine
       extend CardDecorators::BasicDecorators
       include CardModules::Purchasable
 
-      delegate :readable_name, to: :class
+      delegate :types, :readable_name, to: :class
 
       def self.types = ["project"]
 
@@ -27,6 +27,10 @@ module GameEngine
 
       def cost
         self.class.raw_cost
+      end
+
+      def text_for(player)
+        player.name
       end
     end
   end

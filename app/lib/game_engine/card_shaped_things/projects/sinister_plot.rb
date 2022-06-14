@@ -27,6 +27,10 @@ module GameEngine
           player_tokens[player] = 0
         end
 
+        def text_for(owner)
+          super + " - #{pluralize(player_tokens[owner], "token")}"
+        end
+
         class AddOrRemoveTokenJournal < Journal
           define_question("Choose whether to add a token or remove your tokens").with_controls do |game_state|
             opts = [["Add a token", "add"], ["Remove your tokens", "remove"]]

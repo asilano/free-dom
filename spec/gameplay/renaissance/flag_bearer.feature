@@ -7,6 +7,7 @@ Feature: Flag Bearer
     And my hand contains Flag Bearer, Market, Chapel, Gold
     And my deck contains Estate x10
     And the kingdom choice contains Flag Bearer
+    And the kingdom choice contains the Capitalism project
     Then I should need to "Play an Action, or pass"
 
   Scenario: Playing Flag Bearer

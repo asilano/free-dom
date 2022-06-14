@@ -16,7 +16,7 @@
         .pile
           .pile-cost
             span.cost-text= pile.cards.first&.cost || pile.card_class.raw_cost
-          .card{class=pile.card_class.types}
+          .card{class=(pile.cards.first || pile.card_class).types}
             .card-name{data-tooltip data-allow-html="true" title=pile.text}= pile.card_class.readable_name
             - pile.tokens.each do |token|
               .card-token= token.to_s.humanize
@@ -38,10 +38,10 @@
           .pile
             .pile-cost
               span.cost-text= card_shaped.cost
-            .card.card_shaped{class=card_shaped.class.types}
+            .card.card_shaped{class=card_shaped.types}
               .card-name{data-tooltip data-allow-html="true" title=card_shaped.text}= card_shaped.readable_name
               - card_shaped.owners.sort_by(&:seat).each do |owner|
-                .card_shaped-owner class="player#{owner.seat}"= owner.name + (" - #{pluralize(card_shaped.player_tokens[owner], "token")}")
+                .card_shaped-owner class="player#{owner.seat}"= card_shaped.text_for(owner)
               - pile_controls.each do |ctrl|
                 .card-ctrl
                   - if ctrl.filter(card_shaped)

@@ -150,13 +150,23 @@
   }
 }
 
-// The following section is order-dependent
 .action.card    { background-color: $action-cream; }
 .reaction.card  { background-color: $reaction-blue; }
 .duration.card  { background-color: $duration-orange; }
 .treasure.card  { background-color: $treasure-yellow; }
 .victory.card   { background-color: $victory-green; }
 .curse.card     { background-color: $curse-purple; }
+
+@function dual-type-bg($top-colour, $bottom-colour) {
+  @return linear-gradient(to bottom,
+                          $top-colour,
+                          $top-colour 40%,
+                          $bottom-colour 60%,
+                          $bottom-colour);
+}
+.action.treasure.card {
+  background: dual-type-bg($action-cream, $treasure-yellow)
+}
 
 .artifact.card_shaped  { background-color: $artifact-brown; }
 .project.card_shaped   { background-color: $project-pink; }

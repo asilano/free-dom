@@ -2,6 +2,11 @@ module CardDecorators
   module BasicDecorators
     # Define the text of a card
     def text(*lines)
+      define_singleton_method(:raw_text) do
+        lines.reject { _1 == :hr }
+             .join(" ")
+      end
+
       str = lines
         .slice_when { |l| l == :hr }
         .map { |sub| sub.reject { |l| l == :hr }.join("\n") }
