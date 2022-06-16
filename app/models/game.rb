@@ -37,8 +37,8 @@ class Game < ApplicationRecord
       end
 
       @questions.compact!
-    rescue => e
-      raise #if Rails.env.test?
+    rescue
+      raise if Rails.env.test? || Rails.env.development?
       @questions = []
       return
     end
