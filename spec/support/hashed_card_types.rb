@@ -78,6 +78,7 @@ PROJECT_TYPES = {
   "Silos"         => GameEngine::CardShapedThings::Projects::Silos,
   "Sinister Plot" => GameEngine::CardShapedThings::Projects::SinisterPlot,
   "Academy"       => GameEngine::CardShapedThings::Projects::Academy,
-  "Capitalism"    => GameEngine::CardShapedThings::Projects::Capitalism
+  "Capitalism"    => GameEngine::CardShapedThings::Projects::Capitalism,
+  "Fleet"         => GameEngine::CardShapedThings::Projects::Fleet
 }.freeze
 

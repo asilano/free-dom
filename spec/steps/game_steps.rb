@@ -713,6 +713,11 @@ module GameSteps
       project_card = @game.game_state.card_shapeds.detect { |cs| cs.is_a? project }
       expect(project_card.player_tokens[get_player(name)]).to eq count
     end
+
+    step "the game should have ended" do
+      @game.process
+      expect(@game.run_state).to eq :ended
+    end
   end
 
   def get_player(name)

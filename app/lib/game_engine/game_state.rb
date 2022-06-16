@@ -52,48 +52,11 @@ module GameEngine
       turn_seat = 0
       round = 1
       loop do
-        @phase = :action
-        @turn_player = @players[turn_seat]
-        @turn_player.actions = 1
-        @turn_player.buys = 1
-        @turn_player.cash = 0
-        @facts[:per_turn] = {}
-
-        @game.current_journal.histories << History.new("#{@turn_player.name} started turn #{round}.#{turn_seat + 1}.",
-                                                       player: @turn_player)
-
-        Triggers::StartOfTurn.trigger(@turn_player)
-
-        # Play actions until the player stops or runs out
-        play_actions = :continue
-        until (@turn_player.actions.zero? && @turn_player.villagers.zero?) || play_actions == :stop
-          play_actions = get_journal(GameEngine::PlayActionJournal, from: @turn_player).process(self)
-          observe
-        end
-
-        @phase = :buy
-        Triggers::StartOfBuyPhase.trigger(@turn_player)
-
-        # Play treasures until the player stops or runs out
-        play_treasures = :continue
-        until play_treasures == :stop
-          play_treasures = get_journal(GameEngine::PlayTreasuresJournal, from: @turn_player).process(self)
-          observe
-        end
-
-        # Buy cards until the player stops our runs out of buys
-        until @turn_player.buys.zero?
-          get_journal(GameEngine::BuyCardJournal, from: @turn_player).process(self)
-          observe
-        end
-
-        Triggers::EndOfBuyPhase.trigger(@turn_player)
-
-        cleanup
-
-        Triggers::EndOfTurn.trigger(@turn_player)
+        player_turn(@players[turn_seat], round)
 
         if game_ended?
+          Triggers::GameEnding.trigger(@turn_player)
+
           players.each(&:calculate_score)
           @game.current_journal.histories << History.new("Game ended.")
           players.sort_by(&:score).reverse.each_with_index do |ply, ix|
@@ -106,6 +69,50 @@ module GameEngine
         turn_seat = (turn_seat + 1) % @players.length
         round += 1 if turn_seat.zero?
       end
+    end
+
+    def player_turn(player, round)
+      @turn_player = player
+
+      @phase = :action
+      @turn_player.actions = 1
+      @turn_player.buys = 1
+      @turn_player.cash = 0
+      @facts[:per_turn] = {}
+
+      @game.current_journal.histories << History.new("#{@turn_player.name} started turn #{round}.#{@turn_player.seat}.",
+                                                     player: @turn_player)
+
+      Triggers::StartOfTurn.trigger(@turn_player)
+
+      # Play actions until the player stops or runs out
+      play_actions = :continue
+      until (@turn_player.actions.zero? && @turn_player.villagers.zero?) || play_actions == :stop
+        play_actions = get_journal(GameEngine::PlayActionJournal, from: @turn_player).process(self)
+        observe
+      end
+
+      @phase = :buy
+      Triggers::StartOfBuyPhase.trigger(@turn_player)
+
+      # Play treasures until the player stops or runs out
+      play_treasures = :continue
+      until play_treasures == :stop
+        play_treasures = get_journal(GameEngine::PlayTreasuresJournal, from: @turn_player).process(self)
+        observe
+      end
+
+      # Buy cards until the player stops our runs out of buys
+      until @turn_player.buys.zero?
+        get_journal(GameEngine::BuyCardJournal, from: @turn_player).process(self)
+        observe
+      end
+
+      Triggers::EndOfBuyPhase.trigger(@turn_player)
+
+      cleanup
+
+      Triggers::EndOfTurn.trigger(@turn_player)
     end
 
     def get_journal(journal_class, from:, revealed_cards: [], peeked_cards: [], opts: {})
