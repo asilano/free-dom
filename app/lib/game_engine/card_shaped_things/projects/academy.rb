@@ -8,7 +8,8 @@ module GameEngine
         def initialize(game_state)
           super
 
-          Triggers::CardGained.watch_for(whenever: true) do |_card, gainer|
+          filter = ->(card, *) { card.action? }
+          Triggers::CardGained.watch_for(whenever: true, filter: filter) do |_card, gainer|
             next unless owners.include? gainer
 
             game_state.game.current_journal.histories << History.new("#{readable_name} triggered for #{gainer.name}.",
