@@ -69,6 +69,8 @@ group :development, :test do
   gem 'spring-commands-rspec'
   gem 'simplecov', require: false
   gem 'mutant-rspec'
+
+  gem "rails_stats"
 end
 
 group :development do

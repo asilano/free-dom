@@ -238,6 +238,8 @@ GEM
       json (>= 1.7, < 3)
       rails
       rubyzip (~> 2)
+    rails_stats (1.0.2)
+      rake
     railties (6.0.4.7)
       actionpack (= 6.0.4.7)
       activesupport (= 6.0.4.7)
@@ -402,6 +404,7 @@ DEPENDENCIES
   puma (~> 4.3)
   rails (~> 6.0.0)
   rails_real_favicon
+  rails_stats
   redis (~> 4.0)
   rspec-collection_matchers
   rspec-rails
