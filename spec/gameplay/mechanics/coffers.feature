@@ -22,7 +22,7 @@ Feature: Coffers
     Then I should need to "Play Treasures, or pass"
     And I should need to "Spend Coffers"
     When I spend 1 Coffers
-    Then I should have 1 cash
+    Then I should have $1
     And I should have 0 Coffers
     And I should need to "Play Treasures, or pass"
     And I should not need to "Spend Coffers"
@@ -34,12 +34,12 @@ Feature: Coffers
     Then I should need to "Play Treasures, or pass"
     And I should need to "Spend Coffers"
     When I spend 2 Coffers
-    Then I should have 2 cash
+    Then I should have $2
     And I should have 1 Coffers
     And I should need to "Play Treasures, or pass"
     And I should need to "Spend Coffers"
     When I spend 1 Coffers
-    Then I should have 3 cash
+    Then I should have $3
     And I should have 0 Coffers
     And I should need to "Play Treasures, or pass"
     And I should not need to "Spend Coffers"
@@ -51,7 +51,7 @@ Feature: Coffers
     Then I should need to "Play Treasures, or pass"
     And I should need to "Spend Coffers"
     When I spend 2 Coffers
-    Then I should have 2 cash
+    Then I should have $2
     And I should have 1 Coffers
     And I should need to "Play Treasures, or pass"
     And I should need to "Spend Coffers"
@@ -61,7 +61,7 @@ Feature: Coffers
     Then I should need to "Play Treasures, or pass"
     And I should need to "Spend Coffers"
     When I spend 1 Coffers
-    Then I should have 1 cash
+    Then I should have $1
     And I should have 0 Coffers
     And I should need to "Play Treasures, or pass"
     And I should not need to "Spend Coffers"

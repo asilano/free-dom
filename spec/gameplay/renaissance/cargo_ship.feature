@@ -10,13 +10,13 @@ Feature: Cargo Ship
     Scenario: Playing Cargo Ship for cash
       Then I should need to 'Play an Action, or pass'
       When I choose Cargo Ship in my hand
-      Then I should have 2 cash
+      Then I should have $2
       And I should need to "Play Treasures, or pass"
 
     Scenario: Playing Cargo Ship, gaining one card, setting it aside
       Then I should need to 'Play an Action, or pass'
       When I choose Cargo Ship in my hand
-      Then I should have 2 cash
+      Then I should have $2
       And I should need to "Play Treasures, or pass"
       When I choose "Stop playing treasures" in my hand
       Then I should need to "Buy a card, or pass"
@@ -50,7 +50,7 @@ Feature: Cargo Ship
     Scenario: Playing Cargo Ship, not gaining, it goes away
       Then I should need to 'Play an Action, or pass'
       When I choose Cargo Ship in my hand
-      Then I should have 2 cash
+      Then I should have $2
       And I should need to "Play Treasures, or pass"
       When I choose "Stop playing treasures" in my hand
       Then I should need to "Buy a card, or pass"

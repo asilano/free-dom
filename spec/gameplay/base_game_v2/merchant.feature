@@ -16,7 +16,7 @@ Feature: Merchant
     When I choose "Leave Action Phase" in my hand
     Then I should need to "Play Treasures, or pass"
     When I choose Silver in my hand
-    Then I should have 3 cash
+    Then I should have $3
 
   Scenario: Merchant affects only the first Silver played
     Then I should need to 'Play an Action, or pass'
@@ -29,10 +29,10 @@ Feature: Merchant
     When I choose "Leave Action Phase" in my hand
     Then I should need to "Play Treasures, or pass"
     When I choose Silver in my hand
-    Then I should have 3 cash
+    Then I should have $3
     Then I should need to "Play Treasures, or pass"
     When I choose Silver in my hand
-    Then I should have 5 cash
+    Then I should have $5
 
   Scenario: Merchant does not affect and is not affected by non-Silver treasures
     Then I should need to 'Play an Action, or pass'
@@ -45,10 +45,10 @@ Feature: Merchant
     When I choose "Leave Action Phase" in my hand
     Then I should need to "Play Treasures, or pass"
     When I choose Copper in my hand
-    Then I should have 1 cash
+    Then I should have $1
     Then I should need to "Play Treasures, or pass"
     When I choose Silver in my hand
-    Then I should have 4 cash
+    Then I should have $4
 
   Scenario: Multiple Merchants affect the first Silver played
     Then I should need to 'Play an Action, or pass'
@@ -66,10 +66,10 @@ Feature: Merchant
     When I choose "Leave Action Phase" in my hand
     Then I should need to "Play Treasures, or pass"
     When I choose Silver in my hand
-    Then I should have 4 cash
+    Then I should have $4
     Then I should need to "Play Treasures, or pass"
     When I choose Silver in my hand
-    Then I should have 6 cash
+    Then I should have $6
 
   Scenario: Merchant should not affect next turn
     Then I should need to 'Play an Action, or pass'
@@ -89,4 +89,4 @@ Feature: Merchant
     When I choose "Leave Action Phase" in my hand
     Then I should need to "Play Treasures, or pass"
     When I choose Silver in my hand
-    Then I should have 2 cash
+    Then I should have $2

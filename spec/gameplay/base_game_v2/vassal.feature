@@ -11,7 +11,7 @@ Feature: Vassal
     Then cards should move as follows:
       Then I should discard Gold from my deck
       And these card moves should happen
-    And I should have 2 cash
+    And I should have $2
     And I should need to 'Play Treasures, or pass'
 
   Scenario: Playing Vassal, hit action, choose to play
@@ -21,7 +21,7 @@ Feature: Vassal
     Then cards should move as follows:
       Then I should discard Smithy from my deck
       And these card moves should happen
-    And I should have 2 cash
+    And I should have $2
     And I should need to 'Choose to play Smithy'
     When I choose the option 'Play Smithy'
     Then cards should move as follows:
@@ -37,7 +37,7 @@ Feature: Vassal
     Then cards should move as follows:
       Then I should discard Smithy from my deck
       And these card moves should happen
-    And I should have 2 cash
+    And I should have $2
     And I should need to 'Choose to play Smithy'
     When I choose the option "Don't play"
     Then cards should not move
@@ -50,7 +50,7 @@ Feature: Vassal
     Then cards should move as follows:
       Then I should discard Village from my deck
       And these card moves should happen
-    And I should have 2 cash
+    And I should have $2
     And I should need to 'Choose to play Village'
     When I choose the option 'Play Village'
     Then cards should move as follows:
@@ -68,7 +68,7 @@ Feature: Vassal
     Then cards should move as follows:
       Then I should discard Throne Room from my deck
       And these card moves should happen
-    And I should have 2 cash
+    And I should have $2
     And I should need to 'Choose to play Throne Room'
     When I choose the option 'Play Throne Room'
     Then cards should move as follows:
@@ -88,5 +88,5 @@ Feature: Vassal
     Then I should need to 'Play an Action, or pass'
     When I choose Vassal in my hand
     Then cards should not move
-    And I should have 2 cash
+    And I should have $2
     And I should need to 'Play Treasures, or pass'

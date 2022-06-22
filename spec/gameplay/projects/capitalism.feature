@@ -16,7 +16,7 @@ Feature: Capitalism
       Then I should move Market from my hand to in play
       Then I should draw 1 card
       And these card moves should happen
-    And I should have 1 cash
+    And I should have $1
     And I should need to "Play Treasures, or pass"
 
   Scenario: Capitalism lets me trash and gain Actions as Treasures (via Mine)

@@ -9,7 +9,7 @@ Feature: Patron
 
   Scenario: Playing Patron
     When I choose Patron in my hand
-    Then I should have 2 cash
+    Then I should have $2
     And I should have 1 Villager
 
   # Requires Courtier, Ambassador or Gladiator

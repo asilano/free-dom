@@ -679,7 +679,7 @@ module GameSteps
       expect(get_player(name).buys).to eq count.to_i
     end
 
-    step ':player_name should have :amount cash' do |name, amount|
+    step ':player_name should have $:amount' do |name, amount|
       @game.process
       expect(get_player(name).cash).to eq amount.to_i
     end

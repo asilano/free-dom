@@ -11,7 +11,7 @@ Feature: Treasurer
 
   Scenario: Playing Treasurer - choose to Trash
     When I choose Treasurer in my hand
-    Then I should have 3 cash
+    Then I should have $3
     And I should need to "Choose mode for Treasurer"
     When I choose the option "Trash a Treasure"
     Then I should need to "Choose a Treasure to trash"
@@ -26,7 +26,7 @@ Feature: Treasurer
   Scenario: Playing Treasurer - choose to gain from Trash
     Given the trash contains Silver, Scepter, Village
     When I choose Treasurer in my hand
-    Then I should have 3 cash
+    Then I should have $3
     And I should need to "Choose mode for Treasurer"
     When I choose the option "Gain a Treasure"
     Then I should need to "Choose a Treasure to gain from trash"
@@ -41,7 +41,7 @@ Feature: Treasurer
 
   Scenario: Playing Treasurer - choose to take the Key
     When I choose Treasurer in my hand
-    Then I should have 3 cash
+    Then I should have $3
     And I should need to "Choose mode for Treasurer"
     When I choose the option "Take the Key"
     Then I should have the Key
@@ -50,12 +50,12 @@ Feature: Treasurer
   Scenario: Key acts at start of turn
     Given I have the Key
     When I pass through to my next turn
-    Then I should have 1 cash
+    Then I should have $1
 
   Scenario: Choose to Trash when can't
     Given my hand contains Treasurer, Market, Village, Curse
     When I choose Treasurer in my hand
-    Then I should have 3 cash
+    Then I should have $3
     And I should need to "Choose mode for Treasurer"
     When I choose the option "Trash a Treasure"
     Then I should need to "Choose a Treasure to trash"
@@ -67,7 +67,7 @@ Feature: Treasurer
 
   Scenario: Choose to gain from Trash when can't
     When I choose Treasurer in my hand
-    Then I should have 3 cash
+    Then I should have $3
     And I should need to "Choose mode for Treasurer"
     When I choose the option "Gain a Treasure"
     Then I should need to "Choose a Treasure to gain from trash"

@@ -13,7 +13,7 @@ Feature: Scepter
     When I choose Scepter in my hand
     Then I should need to "Choose mode for Scepter"
     When I choose the option "Gain cash"
-    Then I should have 2 cash
+    Then I should have $2
     And I should need to "Play Treasures, or pass"
 
   Scenario: Playing Scepter, choose to replay, replay a choice of cards
@@ -29,7 +29,7 @@ Feature: Scepter
     Then I should need to "Play an Action, or pass"
     When I choose "Leave Action Phase" in my hand
     Then I should need to "Play Treasures, or pass"
-    And I should have 1 cash
+    And I should have $1
     And I should have 2 buys
     When I choose Scepter in my hand
     Then I should need to "Choose mode for Scepter"
@@ -39,7 +39,7 @@ Feature: Scepter
     Then cards should move as follows:
       Then I should draw 1 card
       And these card moves should happen
-    And I should have 2 cash
+    And I should have $2
     And I should have 3 buys
     And I should need to "Play Treasures, or pass"
 

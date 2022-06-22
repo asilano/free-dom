@@ -12,7 +12,7 @@ Feature: Flag Bearer
 
   Scenario: Playing Flag Bearer
     When I choose Flag Bearer in my hand
-    Then I should have 2 cash
+    Then I should have $2
     And I should need to "Play Treasures, or pass"
 
   Scenario: Take Flag on gain

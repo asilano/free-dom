@@ -9,9 +9,9 @@ Feature: Festival
     When I choose Festival in my hand
     Then I should have 2 actions
     And I should have 2 buys
-    And I should have 2 cash
+    And I should have $2
     And I should need to 'Play an Action, or pass'
     When I choose Festival in my hand
     Then I should have 3 actions
     And I should have 3 buys
-    And I should have 4 cash
+    And I should have $4

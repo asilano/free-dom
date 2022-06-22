@@ -13,7 +13,7 @@ Feature: Market
       And these card moves should happen
     And I should have 1 action
     And I should have 2 buys
-    And I should have 1 cash
+    And I should have $1
     And I should need to 'Play an Action, or pass'
     When I choose Market in my hand
     Then cards should move as follows:
@@ -21,7 +21,7 @@ Feature: Market
       And these card moves should happen
     And I should have 1 action
     And I should have 3 buys
-    And I should have 2 cash
+    And I should have $2
 
   Scenario: Playing Market, no cards
     And my deck contains nothing
@@ -30,4 +30,4 @@ Feature: Market
     Then cards should not move
     And I should have 1 action
     And I should have 2 buys
-    And I should have 1 cash
+    And I should have $1

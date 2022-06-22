@@ -9,7 +9,7 @@ Feature: Priest
 
   Scenario: Playing Priest, nothing further
     When I choose Priest in my hand
-    Then I should have 2 cash
+    Then I should have $2
     And I should need to "Choose a card to trash"
     When I choose Village in my hand
     Then cards should move as follows:
@@ -24,7 +24,7 @@ Feature: Priest
       And these card moves should happen
     And I should need to "Play an Action, or pass"
     When I choose Priest in my hand
-    Then I should have 2 cash
+    Then I should have $2
     And I should need to "Choose a card to trash"
     When I choose Copper in my hand
     Then cards should move as follows:
@@ -37,7 +37,7 @@ Feature: Priest
     Then cards should move as follows:
       Then I should trash Cargo Ship, Gold from my hand
       And these card moves should happen
-    And I should have 6 cash
+    And I should have $6
     And I should need to "Play Treasures, or pass"
 
   Scenario: Playing Priest, then trashing owned not from hand
@@ -49,7 +49,7 @@ Feature: Priest
       And these card moves should happen
     And I should need to "Play an Action, or pass"
     When I choose Priest in my hand
-    Then I should have 2 cash
+    Then I should have $2
     And I should need to "Choose a card to trash"
     When I choose Copper in my hand
     Then cards should move as follows:
@@ -59,7 +59,7 @@ Feature: Priest
     When I choose Acting Troupe in my hand
     Then cards should move as follows:
       Then I should trash Acting Troupe from in play
-    And I should have 4 cash
+    And I should have $4
     And I should need to "Spend Villagers"
 
   # Requires Lurker
@@ -80,27 +80,27 @@ Feature: Priest
       And these card moves should happen
     And I should need to "Play an Action, or pass"
     When I choose Priest in my hand
-    Then I should have 2 cash
+    Then I should have $2
     And I should need to "Choose a card to trash"
     When I choose Copper in my hand
     Then cards should move as follows:
       Then I should trash Copper from my hand
       And these card moves should happen
-    And I should have 2 cash
+    And I should have $2
     And I should need to "Play an Action, or pass"
     When I choose Priest in my hand
-    Then I should have 4 cash
+    Then I should have $4
     And I should need to "Choose a card to trash"
     When I choose Copper in my hand
     Then cards should move as follows:
       Then I should trash Copper from my hand
       And these card moves should happen
-    And I should have 6 cash
+    And I should have $6
     And I should need to "Play an Action, or pass"
     When I choose Acting Troupe in my hand
     Then cards should move as follows:
       Then I should trash Acting Troupe from in play
-    And I should have 10 cash
+    And I should have $10
 
   Scenario: Repeat-playing a Priest, then trashing
     Given my hand contains Village, Priest, Throne Room, Estate x2, Chapel, Copper
@@ -126,7 +126,7 @@ Feature: Priest
     Then cards should move as follows:
       Then I should trash Estate from my hand
       And these card moves should happen
-    And I should have 6 cash
+    And I should have $6
     And I should need to "Play an Action, or pass"
     When I choose Chapel in my hand
     Then I should need to "Trash up to 4 cards"
@@ -134,7 +134,7 @@ Feature: Priest
     Then cards should move as follows:
       Then I should trash Copper x2 from my hand
       And these card moves should happen
-    And I should have 14 cash
+    And I should have $14
     And I should need to "Play Treasures, or pass"
 
   # Requires Sewers

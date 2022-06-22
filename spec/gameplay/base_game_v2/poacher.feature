@@ -10,7 +10,7 @@ Feature: Poacher
     Then cards should move as follows:
       Then I should draw 1 card
       And these card moves should happen
-    And I should have 1 cash
+    And I should have $1
     And I should need to 'Play an Action, or pass'
 
   Scenario: Playing Poacher, one empty pile
@@ -20,7 +20,7 @@ Feature: Poacher
     Then cards should move as follows:
       Then I should draw 1 card
       And these card moves should happen
-    And I should have 1 cash
+    And I should have $1
     And I should need to 'Discard 1 card'
     When I choose Copper in my hand
     Then cards should move as follows:
@@ -36,7 +36,7 @@ Feature: Poacher
     Then cards should move as follows:
       Then I should draw 1 card
       And these card moves should happen
-    And I should have 1 cash
+    And I should have $1
     And I should need to 'Discard 2 cards'
     When I choose Copper, Silver in my hand
     Then cards should move as follows:
@@ -49,7 +49,7 @@ Feature: Poacher
     Then I should need to 'Play an Action, or pass'
     When I choose Poacher in my hand
     Then cards should not move
-    And I should have 1 cash
+    And I should have $1
     And I should need to 'Play an Action, or pass'
 
   Scenario: Playing Poacher, two empty piles, can't discard that many
@@ -62,7 +62,7 @@ Feature: Poacher
     Then cards should move as follows:
       Then I should draw 1 card
       And these card moves should happen
-    And I should have 1 cash
+    And I should have $1
     And I should need to 'Discard 1 card'
     When I choose Gold in my hand
     Then cards should move as follows:

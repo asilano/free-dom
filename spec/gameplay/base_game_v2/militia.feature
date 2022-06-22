@@ -8,7 +8,7 @@ Feature: Militia
   Scenario: Playing Militia grants cash
     Then I should need to 'Play an Action, or pass'
     When I choose Militia in my hand
-    Then I should have 2 cash
+    Then I should have $2
 
   Scenario: Playing Militia forces discard
     When Belle's hand contains Estate, Duchy, Copper x2, Village

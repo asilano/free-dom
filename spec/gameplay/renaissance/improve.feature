@@ -12,10 +12,10 @@ Feature: Improve
     Then cards should move as follows:
       Then I should draw 1 cards
       And these card moves should happen
-    And I should have 1 cash
+    And I should have $1
     And I should need to 'Play an Action, or pass'
     When I choose Improve in my hand
-    Then I should have 3 cash
+    Then I should have $3
     And I should need to "Play Treasures, or pass"
     When I choose "Stop playing treasures" in my hand
     Then I should need to "Buy a card, or pass"

@@ -12,7 +12,7 @@ Feature: Moneylender
     Then cards should move as follows:
       Then I should trash Copper from my hand
       And these card moves should happen
-    And I should have 3 cash
+    And I should have $3
 
   Scenario: Playing Moneylender, choose not to trash
     Then I should need to 'Play an Action, or pass'
@@ -20,7 +20,7 @@ Feature: Moneylender
     Then I should need to 'Choose whether to trash a Copper'
     When I choose the option "Don't trash"
     Then cards should not move
-    And I should have 0 cash
+    And I should have $0
 
   Scenario: Playing Moneylender, can't trash
     And my hand contains Moneylender, Silver x2
@@ -29,4 +29,4 @@ Feature: Moneylender
     Then I should need to 'Choose whether to trash a Copper'
     When I choose the option "Don't trash"
     Then cards should not move
-    And I should have 0 cash
+    And I should have $0

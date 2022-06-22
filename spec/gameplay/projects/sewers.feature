@@ -9,7 +9,7 @@ Feature: Sewers
     Given my hand contains Priest, Market, Cargo Ship, Gold, Village
     Then I should need to "Play an Action, or pass"
     When I choose Priest in my hand
-    Then I should have 2 cash
+    Then I should have $2
     And I should need to "Choose a card to trash"
     When I choose Village in my hand
     Then cards should move as follows:
@@ -22,7 +22,7 @@ Feature: Sewers
     Then cards should move as follows:
       Then I should trash Market from my hand
       And these card moves should happen
-    And I should have 2 cash
+    And I should have $2
     And I should need to "Play Treasures, or pass"
 
   Scenario: Trashing due to Chapel (multiple extra trashes), decline one
