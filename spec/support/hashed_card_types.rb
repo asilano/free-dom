@@ -81,6 +81,7 @@ PROJECT_TYPES = {
   "Capitalism"    => GameEngine::CardShapedThings::Projects::Capitalism,
   "Fleet"         => GameEngine::CardShapedThings::Projects::Fleet,
   "Guildhall"     => GameEngine::CardShapedThings::Projects::Guildhall,
-  "Piazza"        => GameEngine::CardShapedThings::Projects::Piazza
+  "Piazza"        => GameEngine::CardShapedThings::Projects::Piazza,
+  "Road Network"  => GameEngine::CardShapedThings::Projects::RoadNetwork
 }.freeze
 

@@ -17,7 +17,6 @@ module GameEngine
             gainer.coffers += 1
           end
         end
-
       end
     end
   end
