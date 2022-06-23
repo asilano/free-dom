@@ -84,6 +84,7 @@ PROJECT_TYPES = {
   "Piazza"        => GameEngine::CardShapedThings::Projects::Piazza,
   "Road Network"  => GameEngine::CardShapedThings::Projects::RoadNetwork,
   "Barracks"      => GameEngine::CardShapedThings::Projects::Barracks,
-  "Crop Rotation" => GameEngine::CardShapedThings::Projects::CropRotation
+  "Crop Rotation" => GameEngine::CardShapedThings::Projects::CropRotation,
+  "Innovation"    => GameEngine::CardShapedThings::Projects::Innovation
 }.freeze
 
