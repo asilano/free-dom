@@ -17,7 +17,11 @@ module CardModules
 
     def cost
       inventors = game_state.get_fact(:inventors) || 0
-      (self.class.raw_cost - inventors).clamp(0..)
+
+      canal = game_state.card_shapeds.detect { _1.is_a? GameEngine::CardShapedThings::Projects::Canal }
+      canal_reduction = canal&.owners&.include?(game_state.turn_player) ? 1 : 0
+
+      (self.class.raw_cost - inventors - canal_reduction).clamp(0..)
     end
 
     # Is this card (in play and) currently still doing something, so it cannot
