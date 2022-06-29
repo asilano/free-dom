@@ -23,16 +23,14 @@ module GameEngine
 
       def self.trigger(*args, **kwargs)
         watchers = filter_watchers(*args, **kwargs)
+        @observers -= watchers.reject(&:whenever)
 
         watchers.each do |w|
           ret = w.effect.call(*args, **kwargs)
-          w.whenever = false if ret == :unwatch
+          @observers.delete(w) if ret == :unwatch
         end
         yield if block_given?
         watchers.each { |w| w.cleanup&.call }
-
-        @observers -= watchers.reject(&:whenever)
-        0
       end
 
       def self.filter_watchers(*args, **kwargs)

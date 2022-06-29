@@ -86,6 +86,7 @@ PROJECT_TYPES = {
   "Barracks"      => GameEngine::CardShapedThings::Projects::Barracks,
   "Crop Rotation" => GameEngine::CardShapedThings::Projects::CropRotation,
   "Innovation"    => GameEngine::CardShapedThings::Projects::Innovation,
-  "Canal"         => GameEngine::CardShapedThings::Projects::Canal
+  "Canal"         => GameEngine::CardShapedThings::Projects::Canal,
+  "Citadel"       => GameEngine::CardShapedThings::Projects::Citadel
 }.freeze
 

@@ -13,9 +13,12 @@ module CardModules
                                                                 player: played_by,
                                                                 css_classes: types + %w[play])
 
+      GameEngine::Triggers::ActionPlayed.trigger(self, played_by) if action?
       GameEngine::Triggers::TreasurePlayed.trigger(self, played_by) if treasure?
 
       play(played_by: played_by)
+
+      GameEngine::Triggers::AfterActionPlayed.trigger(self, played_by) if action?
 
       if treasure?
         game.current_journal.histories << GameEngine::History.new("(total: $#{played_by.cash}).",
