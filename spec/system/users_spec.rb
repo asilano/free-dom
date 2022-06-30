@@ -52,7 +52,7 @@ RSpec.feature "Users" do
 
       mail = ActionMailer::Base.deliveries[1]
       expect(mail.subject).to eq 'New user at FreeDom!'
-      expect(mail.to).to eq ['dominion.app@gmail.com']
+      expect(mail.to).to eq ['no-reply@example.com']
       expect(mail.from).to eq ['no-reply@example.com']
       expect(mail.body.decoded).to match /A new user, going by the name of James Smith and using the email address me@example.com, just registered on FreeDom./
     end

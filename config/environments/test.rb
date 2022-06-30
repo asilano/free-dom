@@ -36,7 +36,6 @@ Rails.application.configure do
 
   config.action_mailer.perform_caching = false
   config.action_mailer.default_url_options = { host: 'free-dom.nsict.org' }
-  config.action_mailer.default_options = { from: 'no-reply@example.com' }
 
   # Tell Action Mailer not to deliver emails to the real world.
   # The :test delivery method accumulates sent emails in the
@@ -51,5 +50,5 @@ Rails.application.configure do
 
   config.colorize_logging = false
 
-  config.x.admin_email = 'dominion.app@gmail.com'
+  config.x.admin_email = "no-reply@example.com"
 end

@@ -38,7 +38,6 @@ Rails.application.configure do
   config.action_mailer.raise_delivery_errors = false
 
   config.action_mailer.perform_caching = false
-  config.action_mailer.default_options = { from: "no-reply@example.com" }
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
@@ -66,5 +65,5 @@ Rails.application.configure do
 
   config.web_console.whitelisted_ips = ["127.0.0.1"]
 
-  config.x.admin_email = "dominion.app@gmail.com"
+  config.x.admin_email = "no-reply@example.com"
 end

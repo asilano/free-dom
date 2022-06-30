@@ -20,7 +20,7 @@ RSpec.describe SignUpMailer, type: :mailer do
 
     it 'renders correctly' do
       expect(mail.subject).to eq 'New user at FreeDom!'
-      expect(mail.to).to eq ['dominion.app@gmail.com']
+      expect(mail.to).to eq ['no-reply@example.com']
       expect(mail.from).to eq ['no-reply@example.com']
       expect(mail.body.decoded).to match /A new user, going by the name of #{user.name} and using the email address #{user.email}, just registered on FreeDom./
     end
