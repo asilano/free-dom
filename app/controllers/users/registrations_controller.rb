@@ -53,7 +53,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
   end
 
   def extra_params
-    %i[name contact_me discord_uid]
+    %i[name contact_me remember_me discord_uid]
   end
 
   # The path used after sign up.
