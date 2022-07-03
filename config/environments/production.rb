@@ -74,7 +74,7 @@ Rails.application.configure do
   config.action_mailer.smtp_settings = {
     address:              Rails.application.credentials.mail[:server],
     port:                 Rails.application.credentials.mail[:port].to_i,
-    domain:               Rails.application.credentials.mail[:domain],
+    domain:               ENV["STAGING_SERVER"] ? Rails.application.credentials.mail[:staging_domain] : Rails.application.credentials.mail[:domain],
     user_name:            Rails.application.credentials.mail[:username],
     password:             Rails.application.credentials.mail[:password],
     authentication:       'plain',
