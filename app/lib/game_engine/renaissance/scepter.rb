@@ -36,6 +36,8 @@ module GameEngine
             return
           end
 
+          @histories << History.new("#{player.name} chose to replay an action with #{Scepter.readable_name}.",
+                                    player: player)
           game_state.get_journal(ChooseActionJournal, from: player, opts: { original: opts[:original] }).process(game_state)
         end
       end
@@ -67,9 +69,14 @@ module GameEngine
             return
           end
 
-          # Note the chosen card, then stop noting it when Scepter is discarded
+          # Note the chosen card, then stop noting it when Scepter is discarded. This lets us track if the replayed
+          # card is.
           card = player.played_cards[params['choice'].to_i]
           opts[:original].replayed = card
+
+          @histories << History.new("#{player.name} chose to replay #{card.readable_name}.",
+                                    player:      player,
+                                    css_classes: %w[play-action])
 
           # Play the chosen card
           card.play(played_by: player)
