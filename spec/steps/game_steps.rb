@@ -500,7 +500,11 @@ module GameSteps
 
     step ":player_name should set aside :cards from my :location on my/his/her :card :location" do |name, cards, source, host, destination|
       players_cards = cards_for_player(name)
-      host_card = players_cards.detect { |c| c[:class] == host && c[:location] == destination.to_sym }
+      if destination == "trash"
+        host_card = extract_game_cards[:trash].detect { |c| c[:class] == host }
+      else
+        host_card = players_cards.detect { |c| c[:class] == host && c[:location] == destination.to_sym }
+      end
       cards.each do |card|
         instance_ix = players_cards.index { |c| c[:class] == card && c[:location] == source.to_sym }
         instance = players_cards[instance_ix]
@@ -512,6 +516,10 @@ module GameSteps
 
     step ":player_name should set aside :cards from my :location on my/his/her :card in play" do |name, cards, source, host|
       send ":player_name should set aside :cards from my :location on my/his/her :card :location", name, cards, source, host, "play"
+    end
+
+    step ":player_name should set aside :cards from my :location on the :card in the trash" do |name, cards, source, host|
+      send ":player_name should set aside :cards from my :location on my/his/her :card :location", name, cards, source, host, "trash"
     end
 
     step ':player_name :whether_to be able to choose the :cards pile(s)' do |name, should, cards|
@@ -734,7 +742,8 @@ module GameSteps
     supply_cards = @game.game_state.piles.map do |p|
       p.cards.map { |c| extract_card(c) } + [p.card_class]
     end
-    { players: player_cards, supply: supply_cards }
+    trash_cards = @game.game_state.trashed_cards.map { extract_card(_1) }
+    { players: player_cards, supply: supply_cards, trash: trash_cards }
   end
 
   def extract_card(card)

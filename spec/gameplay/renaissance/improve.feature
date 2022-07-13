@@ -1,4 +1,4 @@
-# Action (cost: 3) - +2 Cash. At the start of Clean-up, you may trash an Action card you would
+# Action (cost: 3) - +$2. At the start of Clean-up, you may trash an Action card you would
 # discard from play this turn, to gain a card costing exactly $1 more than it.
 Feature: Improve
   Background:
@@ -40,7 +40,7 @@ Feature: Improve
   Scenario: Playing Improve, upgrade Improve itself
     Then I should need to 'Play an Action, or pass'
     When I choose Improve in my hand
-    And I should need to "Play Treasures, or pass"
+    Then I should need to "Play Treasures, or pass"
     When I choose "Stop playing treasures" in my hand
     Then I should need to "Buy a card, or pass"
     When I choose "Buy nothing" in the supply

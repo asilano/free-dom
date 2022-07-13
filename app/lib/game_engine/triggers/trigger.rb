@@ -1,7 +1,7 @@
 module GameEngine
   module Triggers
     class Trigger
-      attr_reader :effect, :filter, :cleanup
+      attr_reader :effect, :filter, :cleanup, :opts, :filter
       attr_accessor :whenever
 
       def self.inherited(subclass)
@@ -26,7 +26,7 @@ module GameEngine
         @observers -= watchers.reject(&:whenever)
 
         watchers.each do |w|
-          ret = w.effect.call(*args, **kwargs)
+          ret = w.effect.call(*args, opts: w.opts, **kwargs)
           @observers.delete(w) if ret == :unwatch
         end
         yield if block_given?
@@ -62,6 +62,7 @@ module GameEngine
 
       def set_options(options)
         @filter = options[:filter] || ->(*) { true }
+        @opts = options[:opts] || {}
       end
     end
   end

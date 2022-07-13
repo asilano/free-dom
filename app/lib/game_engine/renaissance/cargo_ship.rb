@@ -13,16 +13,20 @@ module GameEngine
         filter = lambda do |_, gainer, *|
           gainer == played_by
         end
+
+        # Record who played the Cargo Ship, as it can get trashed but still work!
         GameEngine::Triggers::CardGained.watch_for(filter:   filter,
-                                                   whenever: true) { |*args| see_gain(*args) }
+                                                   whenever: true,
+                                                   opts:     { played_by: played_by },
+                                                   stop_at:  :end_of_turn) { |*args, opts:| see_gain(*args, opts: opts) }
       end
 
-      def see_gain(card, _player, _from, to, *)
+      def see_gain(card, _player, _from, to, *, opts:)
         # Can't act on the gained card unless it's where it was gained to
         return unless card.location == to
 
         game_state.get_journal(SetAsideJournal,
-                               from: player,
+                               from: opts[:played_by],
                                opts: { card: card, ship: self }).process(game_state)
       end
 
@@ -65,6 +69,9 @@ module GameEngine
             turn_player == player
           end
           Triggers::StartOfTurn.watch_for(filter: filter) do
+            game.current_journal.histories << History.new("Cargo Ship returns #{opts[:card].readable_name} to #{player.name}'s hand.",
+              player:      player,
+              css_classes: %w[peek-cards])
             opts[:card].location = :hand
             opts[:card].location_card = nil
             opts[:ship].hosting.delete opts[:card]
