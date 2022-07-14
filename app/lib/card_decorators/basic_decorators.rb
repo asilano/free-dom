@@ -24,5 +24,9 @@ module CardDecorators
 
       define_singleton_method(:raw_cost) { cost }
     end
+
+    def sort_key
+      [raw_cost, readable_name]
+    end
   end
 end

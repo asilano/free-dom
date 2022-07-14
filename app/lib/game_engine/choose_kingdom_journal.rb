@@ -15,12 +15,15 @@ module GameEngine
       basic_piles = %w[Estate Duchy Province Copper Silver Gold Curse].map do |basic_type|
         "GameEngine::BasicCards::#{basic_type}"
       end
-      supply = basic_piles.map(&:constantize) + params["card_list"].take(10).map(&:constantize).sort_by(&:raw_cost)
+      supply = basic_piles.map(&:constantize) + params["card_list"]
+                                                .take(10)
+                                                .map(&:constantize)
+                                                .sort_by(&:sort_key)
       supply.each do |card_class|
         game_state.piles << GameEngine::Pile.new(card_class)
       end
 
-      params["card_list"][10..].map(&:constantize).sort_by(&:raw_cost).each do |card_shaped|
+      params["card_list"][10..].map(&:constantize).sort_by(&:sort_key).each do |card_shaped|
         game_state.card_shapeds << card_shaped.new(game_state)
       end
 
