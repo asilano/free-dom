@@ -71,6 +71,8 @@ jobs:
       run: cc-test-reporter after-build
 
   deploy_staging:
+    concurrency:
+      group: staging_deploy
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/restart'
     needs: [test]
