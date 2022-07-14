@@ -15,6 +15,6 @@
     "webpack-cli": "^3.3.12"
   },
   "devDependencies": {
-    "webpack-dev-server": "^4"
+    "webpack-dev-server": "^3"
   }
 }
