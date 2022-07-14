@@ -1,1 +1,6 @@
-= button_tag button[:text], value: button[:value], name: "journal[params][#{button[:key] || control.key}]", class: 'button' + control.css_class, form: "control_form_#{control.object_id}"
+= button_tag button[:text],
+  value: button[:value],
+  name: "journal[params][#{button[:key] || control.key}]",
+  class: 'button' + control.css_class,
+  form: "control_form_#{control.object_id}",
+  data: { disable_form_target: "disablingElement" }

@@ -125,7 +125,7 @@ module GameEngine
       end
 
       journal.question = template.question
-      raise UnexpectedJournalError, "Unexpected journal type: #{journal.class}. Expecting: #{template.class.module_parent}" unless template.matches? journal
+      raise UnexpectedJournalError, "Unexpected journal #{journal.id} type: #{journal.class}. Expecting: #{template.class.module_parent}" unless template.matches? journal
       raise InvalidJournalError, "Invalid journal: #{journal}" unless template.valid? journal
 
       @last_active_player = journal.player unless journal.auto

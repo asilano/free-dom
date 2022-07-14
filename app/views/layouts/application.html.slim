@@ -29,7 +29,7 @@ html lang="en"
       - if alert.present?
         .grid-padding-x.alert
           .cell = alert
-    main.flex-child-auto.flex-container.flex-dir-column class=yield(:main_class)
+    main.flex-child-auto.flex-container.flex-dir-column class=yield(:main_class) data={ controller: "disable-form" }
       .flex-child-auto.grid-y.grid-padding-y
         == yield
     footer.cell.grid-x.grid-padding-x

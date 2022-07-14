@@ -4,5 +4,8 @@
 
 import { application } from "./application"
 
+import DisableFormController from "./disable_form_controller.js"
+application.register("disable-form", DisableFormController)
+
 import RepeatableFieldController from "./repeatable_field_controller.js"
 application.register("repeatable-field", RepeatableFieldController)
