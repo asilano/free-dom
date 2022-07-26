@@ -103,7 +103,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Push to dokku staging
+      - name: Push to dokku production
         uses: dokku/github-action@master
         with:
           git_push_flags: '--force'
