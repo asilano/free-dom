@@ -5,11 +5,11 @@ on:
     branches:
       - 'main'
       - 'master'
-      - 'restart'
+      - 'staging'
   push:
     branches:
       - 'main'
-      - 'restart'
+      - 'staging'
 
 jobs:
   test:
@@ -76,7 +76,7 @@ jobs:
     concurrency:
       group: staging_deploy
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/restart'
+    if: github.ref == 'refs/heads/staging'
     needs: [test]
     steps:
       - name: Clone
