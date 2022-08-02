@@ -9,7 +9,7 @@ module GameEngine
           super
 
           Triggers::StartOfTurn.watch_for(whenever: true) do |turn_player|
-            Triggers::AfterActionPlayed.watch_for do |card, played_by|
+            Triggers::AfterActionPlayed.watch_for(stop_at: :end_of_turn) do |card, played_by|
               next unless owners.include?(played_by) && played_by == turn_player
 
               game_state.game.current_journal.histories << History.new("#{readable_name} triggered for #{played_by.name}.",

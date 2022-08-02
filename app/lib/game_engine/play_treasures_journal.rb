@@ -15,12 +15,13 @@ module GameEngine
                             css_class:    'play-treasure')]
     end
 
+    # For back-compatibility, allow arrays of choices
     validation do
       return true if params['choice'] == 'none'
       return false unless params['choice']
-      return false unless params['choice'].all?(&:integer?)
+      return false unless Array(params['choice']).all?(&:integer?)
 
-      params['choice'].map(&:to_i).all? do |choice|
+      Array(params['choice']).map(&:to_i).all? do |choice|
         choice < player.hand_cards.length && player.hand_cards[choice].treasure?
       end
     end
@@ -35,7 +36,7 @@ module GameEngine
       end
 
       # Play all the chosen cards in hand order
-      cards = params['choice'].map { |ch| player.hand_cards[ch.to_i] }
+      cards = Array(params['choice']).map { |ch| player.hand_cards[ch.to_i] }
       cards.each { |card| card.play_card(played_by: player) }
 
       # Ask again, unless the player now has no treasures in hand

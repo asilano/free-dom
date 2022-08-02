@@ -3,7 +3,7 @@ Feature: Innovation
   Background:
     Given I am in a 3 player game
     And my hand contains Copper, Cargo Ship, Gold, Workshop, Throne Room
-    And the kingdom choice contains Silk Merchant
+    And the kingdom choice contains Silk Merchant, Moat
     And the kingdom choice contains the Innovation project
     Then I should need to "Play an Action, or pass"
 
@@ -47,19 +47,32 @@ Feature: Innovation
     And I should need to "Spend Villagers"
     And I should have 2 buys
 
-  Scenario: Innovation triggers on non-Buy gain, choose not to play
+  Scenario: Innovation triggers on non-Buy gain, choose not to play, doesn't last into next turn
     Given I have the Innovation project
     When I choose Workshop in my hand
     Then I should need to "Choose a card to gain"
-    When I choose Silk Merchant in the supply
+    When I choose Silver in the supply
     Then cards should move as follows:
-      Then I should gain Silk Merchant
+      Then I should gain Silver
       And these card moves should happen
-    Then I should need to "Choose whether to play Silk Merchant"
-    When I choose the option "Don't play Silk Merchant"
-    Then cards should not move
-    And I should need to "Leave the Action phase"
+    And I should need to "Play Treasures, or pass"
     And I should have 1 buy
+    When I pass through to my next turn
+    Given my hand contains Copper, Cargo Ship, Gold, Workshop, Throne Room
+    Then I should need to "Play an Action, or pass"
+    When I choose Workshop in my hand
+    Then I should need to "Choose a card to gain"
+    When I choose Moat in the supply
+    Then cards should move as follows:
+      Then I should gain Moat
+      And these card moves should happen
+    Then I should need to "Choose whether to play Moat"
+    When I choose the option "Play Moat"
+    Then cards should move as follows:
+      Then I should move Moat from my discard to in play
+      And I should draw 2 cards
+      And these card moves should happen
+    And I should need to "Play Treasures, or pass"
 
   Scenario: Innovation triggers only on first gain
     Given I have the Innovation project
