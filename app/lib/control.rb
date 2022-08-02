@@ -1,5 +1,5 @@
 class Control
-  attr_reader :journal_type, :question, :scope, :player, :cardless_button, :key, :text, :css_class
+  attr_reader :journal_type, :question, :scope, :player, :cardless_buttons, :key, :text, :css_class
   attr_accessor :fiber_id
 
   def initialize(opts = {})
@@ -14,7 +14,12 @@ class Control
     @game_state = @player.game_state
     @text = opts.delete(:text) || 'Choose'
     @key = opts.delete(:key) || 'choice'
+    @cardless_buttons = []
     @css_class = " #{opts.delete(:css_class)}" || ''
+  end
+
+  def add_cardless_button(button)
+    @cardless_buttons << button
   end
 
   def to_partial_path

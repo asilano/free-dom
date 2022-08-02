@@ -79,8 +79,7 @@
               .cell.card.no-card
                 .card-name
                 - trash_controls.each do |ctrl|
-                  - if ctrl.cardless_button
-                    .card-ctrl= render partial: 'controls/cardless_button', object: ctrl.cardless_button, as: :button, locals: { control: ctrl }
+                  = render partial: 'controls/cardless_button', collection: ctrl.cardless_buttons, as: :button, locals: { control: ctrl }
             - elsif @game.game_state.trashed_cards.length == 1 || trash_controls.present?
               = render partial: 'card', collection: @game.game_state.trashed_cards, locals: { controls: trash_controls }
             - else
@@ -120,7 +119,7 @@
               - unless journal.histories.first.secret? && journal.user != current_user
                 li.main-journal class=journal.histories.first.css_class data={journal_id: journal.id}
                   - unless journal.fixed_for_user(current_user)
-                    = form_with url: journal_path(journal), method: :delete do |f|
+                    = form_with url: journal_path(journal), method: "delete" do |f|
                       = f.button inline_svg_tag('action-undo.svg',
                                             class: 'undo-arrow',
                                             title: 'Undo to here',
@@ -132,7 +131,7 @@
                       = content_for "journal_#{journal.id}_histories"
             - else
               li.main-journal.error-journal
-                = form_with url: journal_path(journal), method: :delete do |f|
+                = form_with url: journal_path(journal), method: "delete" do |f|
                   = f.button inline_svg_tag('action-undo.svg',
                                         class: 'undo-arrow',
                                         title: 'Undo to here',

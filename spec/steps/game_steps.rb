@@ -557,9 +557,9 @@ module GameSteps
       control = controls.detect { |c| c.scope == :supply }
 
       if should
-        expect(control.cardless_button).to_not be_nil
+        expect(control.cardless_buttons).to_not be_empty
       else
-        expect(control.cardless_button).to be_nil
+        expect(control.cardless_buttons).to be_empty
       end
     end
 
@@ -573,9 +573,9 @@ module GameSteps
       if cards.empty?
         # :cards was "nothing"
         if should
-          expect(control.cardless_button).to_not be_nil
+          expect(control.cardless_buttons).to_not be_empty
         else
-          expect(control.cardless_button).to be_nil
+          expect(control.cardless_buttons).to be_empty
         end
       else
         can_pick = cards.map do |card|
@@ -597,9 +597,9 @@ module GameSteps
       if cards.empty?
         # :cards was "nothing"
         if should
-          expect(control.cardless_button).to_not be_nil
+          expect(control.cardless_buttons).to_not be_empty
         else
-          expect(control.cardless_button).to be_nil
+          expect(control.cardless_buttons).to be_empty
         end
       else
         can_pick = cards.map do |card|
@@ -621,9 +621,9 @@ module GameSteps
       if cards.empty?
         # :cards was "nothing"
         if should
-          expect(control.cardless_button).to_not be_nil
+          expect(control.cardless_buttons).to_not be_empty
         else
-          expect(control.cardless_button).to be_nil
+          expect(control.cardless_buttons).to be_empty
         end
       else
         can_pick = cards.map do |card|
@@ -645,9 +645,9 @@ module GameSteps
       if cards.empty?
         # :cards was "nothing"
         if should
-          expect(control.cardless_button).to_not be_nil
+          expect(control.cardless_buttons).to_not be_empty
         else
-          expect(control.cardless_button).to be_nil
+          expect(control.cardless_buttons).to be_empty
         end
       else
         can_pick = cards.map do |card|
@@ -779,8 +779,8 @@ end
 # Each returns the params for the journal that will be created.
 OneCardControl.define_method(:handle_choice) do |choice|
   # First, check for the null choice
-  if @cardless_button && @cardless_button[:text] == choice
-    return { @key => @cardless_button[:value] }
+  if button = cardless_buttons.detect { _1[:text] == choice }
+    return { @key => button[:value] }
   end
 
   # Otherwise, find the index requested
@@ -790,6 +790,11 @@ end
 MultiCardControl.define_method(:handle_choice) do |choice|
   # First, check for choosing nothing
   return { @key => [] } if choice == []
+
+  # Now check for it being a null choice
+  if button = cardless_buttons.detect { _1[:text] == choice }
+    return { @key => button[:value] }
+  end
 
   if choice == 'everything'
     set = @player.cards_by_location(@scope).map.with_index.select { |c, ix| filter(c) }.map(&:second)

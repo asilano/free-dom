@@ -2,18 +2,18 @@ class OneCardControl < Control
   def initialize(opts = {})
     super
     @filter = filter_from(opts[:filter]) || ->(_card) { true }
-    @cardless_button = opts[:null_choice]
+    add_cardless_button opts[:null_choice] if opts[:null_choice]
   end
 
   def single_answer?(_game_state)
     return false unless cards_in_scope
 
-    choices = [@cardless_button] + cards_in_scope.uniq(&:class).map { |c| filter(c) }
+    choices = cardless_buttons + cards_in_scope.uniq(&:class).map { |c| filter(c) }
     choices.count(&:itself) <= 1
   end
 
   def single_answer
-    cards_in_scope.index { |c| filter(c) } || @cardless_button[:value]
+    cards_in_scope.index { |c| filter(c) } || cardless_buttons.first[:value]
   end
 
   private

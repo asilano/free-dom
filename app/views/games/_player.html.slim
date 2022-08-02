@@ -24,12 +24,11 @@
   .grid-container.fluid
     .card-grid
       = render partial: 'card', collection: current_player.hand_cards, locals: { controls: hand_controls }
-      - if hand_controls.any?(&:cardless_button)
+      - if hand_controls.any? { _1.cardless_buttons.present? }
         .cell.card.null-card
           .card-name
           - hand_controls.each do |ctrl|
-            - if ctrl.cardless_button
-              .card-ctrl= render partial: 'controls/cardless_button', object: ctrl.cardless_button, as: :button, locals: { control: ctrl }
+            = render partial: 'controls/cardless_button', collection: ctrl.cardless_buttons, as: :button, locals: { control: ctrl }
   - if (with_hand_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :with_hand }).present?
     = render partial: 'control_skeleton', collection: with_hand_controls
     - with_hand_controls.each do |ctrl|
@@ -50,12 +49,11 @@
         = render partial: 'card',
                  collection: current_player.played_cards.select { |cd| cd.visible_to? current_player },
                  locals: { controls: play_controls }
-        - if play_controls.any?(&:cardless_button)
+        - if play_controls.any? { _1.cardless_buttons.present? }
           .cell.card.null-card
             .card-name
             - play_controls.each do |ctrl|
-              - if ctrl.cardless_button
-                .card-ctrl= render partial: 'controls/cardless_button', object: ctrl.cardless_button, as: :button, locals: { control: ctrl }
+              = render partial: 'controls/cardless_button', collection: ctrl.cardless_buttons, as: :button, locals: { control: ctrl }
         - unless (non_visible_count = current_player.played_cards.count { |cd| !cd.visible_to? current_player }).zero?
           .cell.card.back-wrapper
             .card-back= non_visible_count
@@ -70,8 +68,7 @@
         .cell.card.no-card
           .card-name
           - discard_controls.each do |ctrl|
-            - if ctrl.cardless_button
-              .card-ctrl= render partial: 'controls/cardless_button', object: ctrl.cardless_button, as: :button, locals: { control: ctrl }
+            = render partial: 'controls/cardless_button', collection: ctrl.cardless_buttons, as: :button, locals: { control: ctrl }
       - elsif current_player.discarded_cards.length == 1 || discard_controls.present?
         = render partial: 'card', collection: current_player.discarded_cards, locals: { controls: discard_controls }
       - else
@@ -98,12 +95,11 @@
     .grid-container.fluid
       .card-grid class=('reorder-cards' if peeked_controls.any?(ReorderCardsControl))
         = render partial: 'card', collection: cards, locals: { controls: peeked_controls }
-        - if peeked_controls.any?(&:cardless_button)
+        - if peeked_controls.any? { _1.cardless_buttons.present? }
           .cell.card.null-card
             .card-name
             - peeked_controls.each do |ctrl|
-              - if ctrl.cardless_button
-                .card-ctrl= render partial: 'controls/cardless_button', object: ctrl.cardless_button, as: :button, locals: { control: ctrl }
+              = render partial: 'controls/cardless_button', collection: ctrl.cardless_buttons, as: :button, locals: { control: ctrl }
 
   / Revealed cards
   - current_player.revealed_cards.group_by(&:interacting_with).each do |qn, cards|
@@ -113,12 +109,11 @@
     .grid-container.fluid
       .card-grid
         = render partial: 'card', collection: cards, locals: { controls: revealed_controls }
-        - if revealed_controls.any?(&:cardless_button)
+        - if revealed_controls.any? { _1.cardless_buttons.present? }
           .cell.card.null-card
             .card-name
             - revealed_controls.each do |ctrl|
-              - if ctrl.cardless_button
-                .card-ctrl= render partial: 'controls/cardless_button', object: ctrl.cardless_button, as: :button, locals: { control: ctrl }
+              = render partial: 'controls/cardless_button', collection: ctrl.cardless_buttons, as: :button, locals: { control: ctrl }
 
   / Artifacts
   = render partial: "artifacts_section", locals: { player: current_player }

@@ -6,9 +6,9 @@ class NumberControl < Control
     @min = opts[:min]
     @max = opts[:max]
 
-    @cardless_button = { text:  opts[:submit_text],
-                         value: '',
-                         key:   'submit' }
+    add_cardless_button({ text:  opts[:submit_text],
+                          value: "",
+                          key:   "submit" })
   end
 
   def single_answer?(_)

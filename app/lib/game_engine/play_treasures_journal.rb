@@ -2,24 +2,25 @@ module GameEngine
   class PlayTreasuresJournal < Journal
     define_question('Play Treasures, or pass').prevent_auto
                                               .with_controls do |_game_state|
-      [OneCardControl.new(journal_type: PlayTreasuresJournal,
-                          question:     self,
-                          player:       @player,
-                          scope:        :hand,
-                          text:         'Play',
-                          filter:       :treasure?,
-                          null_choice:  { text:  'Stop playing treasures',
-                                          value: 'none' },
-                          css_class:    'play-treasure')]
+      [MultiCardControl.new(journal_type: PlayTreasuresJournal,
+                            question:     self,
+                            player:       @player,
+                            scope:        :hand,
+                            text:         "Play",
+                            submit_text:  "Play selected cards",
+                            filter:       :treasure?,
+                            preselect:    :treasure?,
+                            null_choice:  { text:  'Stop playing treasures',
+                                            value: 'none' },
+                            css_class:    'play-treasure')]
     end
 
-    # For back-compatibility, allow arrays of choices
     validation do
       return true if params['choice'] == 'none'
       return false unless params['choice']
-      return false unless Array(params['choice']).all?(&:integer?)
+      return false unless params['choice'].all?(&:integer?)
 
-      Array(params['choice']).map(&:to_i).all? do |choice|
+      params['choice'].map(&:to_i).all? do |choice|
         choice < player.hand_cards.length && player.hand_cards[choice].treasure?
       end
     end
@@ -34,7 +35,7 @@ module GameEngine
       end
 
       # Play all the chosen cards in hand order
-      cards = Array(params['choice']).map { |ch| player.hand_cards[ch.to_i] }
+      cards = params['choice'].map { |ch| player.hand_cards[ch.to_i] }
       cards.each { |card| card.play_card(played_by: player) }
 
       # Ask again, unless the player now has no treasures in hand

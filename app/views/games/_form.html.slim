@@ -11,8 +11,8 @@
         span.js< you can click
         | :
         span.random-name =<> random_game_name
-        = link_to random_name_path, class: 'random-regenerate', remote: true do
-          i.fas.fa-sync.js{ title='Regenerate' }
+        = link_to random_name_path, class: 'random-regenerate js', remote: true do
+          i.fas.fa-sync{ title='Regenerate' }
 
     .field
       = f.text_field :discord_webhook, help_text: 'Paste a webhook URL for a Discord channel here to receive game alerts'

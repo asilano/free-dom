@@ -7,9 +7,9 @@ class MultiCardChoicesControl < Control
     @preselect = opts[:preselect] || ->(_card) { false }
     @choices = opts[:choices]
     if opts.key? :submit_text
-      @cardless_button = { text:  opts[:submit_text],
-                           value: '',
-                           key:   'submit' }
+      add_cardless_button({ text:  opts[:submit_text],
+                            value: "",
+                            key:   "submit" })
     end
   end
 end
