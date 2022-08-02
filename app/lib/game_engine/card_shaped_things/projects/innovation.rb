@@ -10,7 +10,7 @@ module GameEngine
 
           Triggers::StartOfTurn.watch_for(whenever: true) do |turn_player|
             filter = ->(card, *) { card.action? }
-            Triggers::CardGained.watch_for(filter: filter) do |card, gainer|
+            Triggers::CardGained.watch_for(filter: filter, stop_at: :end_of_turn) do |card, gainer|
               next unless owners.include?(gainer) && gainer == turn_player
 
               game_state.game.current_journal.histories << History.new("#{readable_name} triggered for #{gainer.name}.",

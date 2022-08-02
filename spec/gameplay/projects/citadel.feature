@@ -36,6 +36,24 @@ Feature: Citadel
     And I should have $2
     And I should need to "Play Treasures, or pass"
 
+  Scenario: If Citadel doesn't double anything one turn, it still doubles first action, but not second next turn
+    When I pass through to my next turn
+    Given my hand contains Market, Cargo Ship, Gold, Village
+    Then I should need to "Play an Action, or pass"
+    When I choose Market in my hand
+    Then cards should move as follows:
+      Then I should draw 2 cards
+      And these card moves should happen
+    And I should have 2 actions
+    And I should have 3 buys
+    And I should have $2
+    And I should need to "Play an Action, or pass"
+    When I choose Village in my hand
+    Then cards should move as follows:
+      Then I should draw 1 card
+      And these card moves should happen
+    And I should have 3 actions
+
   Scenario: Citadel doubles first action if bought and moved back to action phase
     Given pending Villa
 
