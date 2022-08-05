@@ -5,7 +5,7 @@ module GameEngine
       [OneCardControl.new(journal_type: BuyCardJournal,
                           question:     self,
                           player:       @player,
-                          scope:        :supply,
+                          scope:        :full_supply,
                           text:         "Buy",
                           filter:       ->(card) { card&.player_can_buy?(player: @player) },
                           null_choice:  { text: "Buy nothing",

@@ -145,9 +145,15 @@ module GameSteps
       controls = question.controls_for(user, @game.game_state)
       scope = scope.to_sym
       unless controls.map(&:scope).any? { |s| s == :everywhere }
-        expect(controls).to include(have_attributes(scope: scope))
+        if scope == :supply
+          expect(controls).to include(have_attributes(scope: satisfy { %i[supply full_supply].include? _1 }))
+        else
+          expect(controls).to include(have_attributes(scope: scope))
+        end
       end
-      control = controls.detect { |c| c.scope == scope || c.scope == :everywhere }
+      scopes = [scope, :everywhere]
+      scopes << :full_supply if scope == :supply
+      control = controls.detect { |c| scopes.include?(c.scope) }
       make_journal(user: user,
                    type: question.journal_type,
                    fiber_id: question.fiber_id,
@@ -195,7 +201,7 @@ module GameSteps
       question = @questions.detect { |q| q&.player&.name == user.name }
       controls = question.controls_for(user, @game.game_state)
 
-      scope = :supply
+      scope = :full_supply
       unless controls.map(&:scope).any? { |s| s == :everywhere }
         expect(controls).to include(have_attributes(scope: scope))
       end
@@ -526,7 +532,7 @@ module GameSteps
       user = get_player(name).user
       question = @questions.detect { |q| q.player.name == user.name }
       controls = question.controls_for(user, @game.game_state)
-      control = controls.detect { |c| c.scope == :supply }
+      control = controls.detect { |c| %i[supply full_supply].include? c.scope }
       can_pick = cards.map do |card|
         pile = @game.game_state.piles.detect { |p| p.cards.first.is_a? card }
         pile && control.filter(pile.cards.first)
@@ -539,7 +545,7 @@ module GameSteps
       user = get_player(name).user
       question = @questions.detect { |q| q.player.name == user.name }
       controls = question.controls_for(user, @game.game_state)
-      control = controls.detect { |c| c.scope == :supply }
+      control = controls.detect { |c| c.scope == :full_supply }
       project_instance = @game.game_state.card_shapeds.detect { |c| c.is_a? project }
       can_pick = project_instance && control.filter(project_instance)
 
@@ -847,7 +853,7 @@ def find_index(control, player, game_state, scope, filter, card)
     player.cards_revealed_to(@question).index { |c| c.is_a?(card) && control.instance_exec(c, &filter) }
   when :peeked
     player.cards_peeked_to(@question).index { |c| c.is_a?(card) && control.instance_exec(c, &filter) }
-  when :supply
+  when :supply, :full_supply
     ix = game_state.piles.index { |pile| pile.cards.first.is_a?(card) && control.instance_exec(pile.cards.first, &filter) }
     if ix.nil?
       ix = game_state.card_shapeds.index { |cs| cs.is_a?(card) && control.instance_exec(cs, &filter) }

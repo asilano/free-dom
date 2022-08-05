@@ -1,4 +1,5 @@
-- pile_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :supply }
+- pile_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :supply || ctrl.scope == :full_supply }
+- card_shaped_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :full_supply }
 = render partial: 'control_skeleton', collection: pile_controls
 
 .cell.small-12.medium-12.large-8.grid.grid-x
@@ -41,7 +42,7 @@
               .card-name{data-tooltip data-allow-html="true" title=card_shaped.text}= card_shaped.readable_name
               - card_shaped.owners.sort_by(&:seat).each do |owner|
                 .card_shaped-owner class="player#{owner.seat}"= card_shaped.text_for(owner)
-              - pile_controls.each do |ctrl|
+              - card_shaped_controls.each do |ctrl|
                 .card-ctrl
                   - if ctrl.filter(card_shaped)
                     = render partial: ctrl, as: :control, locals: { value: ix + @game.game_state.piles.size, card: card_shaped }
