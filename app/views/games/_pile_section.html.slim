@@ -1,5 +1,5 @@
 - pile_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :supply || ctrl.scope == :full_supply }
-- card_shaped_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :full_supply }
+- card_shaped_controls = pile_controls.select { |ctrl| ctrl.scope == :full_supply }
 = render partial: 'control_skeleton', collection: pile_controls
 
 .cell.small-12.medium-12.large-8.grid.grid-x
