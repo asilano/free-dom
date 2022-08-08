@@ -35,13 +35,16 @@ module GameEngine
         process do |game_state|
           case params["choice"]
           when "trash"
-            @histories << History.new("#{player.name} chose to trash a treasure with #{Treasurer.readable_name}.")
+            @histories << History.new("#{player.name} chose to trash a treasure with #{Treasurer.readable_name}.",
+                                      player: player)
             game_state.get_journal(TrashTreasureJournal, from: player).process(game_state)
           when "gain"
-            @histories << History.new("#{player.name} chose to gain a treasure from trash with #{Treasurer.readable_name}.")
+            @histories << History.new("#{player.name} chose to gain a treasure from trash with #{Treasurer.readable_name}.",
+                                      player: player)
             game_state.get_journal(GainTreasureJournal, from: player).process(game_state)
           when "key"
-            @histories << History.new("#{player.name} chose to gain a gain the Key from #{Treasurer.readable_name}.")
+            @histories << History.new("#{player.name} chose to gain a gain the Key from #{Treasurer.readable_name}.",
+                                      player: player)
             game_state.artifacts["Key"].give_to(player)
           end
         end
@@ -55,7 +58,8 @@ module GameEngine
       class GainTreasureJournal < CommonJournals::GainJournal
         configure question_text: "Choose a Treasure to gain from trash",
                   filter:        :treasure?,
-                  source:        :trash
+                  source:        :trash,
+                  destination:   :hand
 
         validation do
           valid_gain_choice(filter: ->(card) { !card || card.treasure? },

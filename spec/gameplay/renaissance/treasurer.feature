@@ -35,7 +35,7 @@ Feature: Treasurer
     And I should not be able to choose nothing in the trash
     When I choose Scepter in the trash
     Then cards should move as follows:
-      Then I should gain Scepter from trash to my discard
+      Then I should gain Scepter from trash to my hand
       And these card moves should happen
     And I should need to "Play Treasures, or pass"
 
