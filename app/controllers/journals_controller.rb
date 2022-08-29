@@ -9,9 +9,16 @@ class JournalsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to @journal.game }
+
       if @journal.save
         flash[:notify_discord] = true
+        @game = @journal.game
         format.json { render :show, status: :created, location: @journal }
+        format.turbo_stream do
+          @game.process
+          @game.notify_discord
+          render "games/redraw"
+        end
       else
         flash.alert = "Couldn't create journal (was the game up-to-date?)"
         format.json { render json: @journal.errors, status: :unprocessable_entity }
@@ -22,11 +29,16 @@ class JournalsController < ApplicationController
   # DELETE /journals/1
   # DELETE /journals/1.json
   def destroy
-    to_destroy = @journal.game.journals.where('journals.order >= ?', @journal.order)
+    @game = @journal.game
+    to_destroy = @game.journals.where('journals.order >= ?', @journal.order)
     to_destroy.destroy_all
     respond_to do |format|
-      format.html { redirect_to @journal.game }
+      format.html { redirect_to @game }
       format.json { head :no_content }
+      format.turbo_stream do
+        @game.process
+        render "games/redraw"
+      end
     end
   end
 
