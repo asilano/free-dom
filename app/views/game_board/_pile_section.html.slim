@@ -1,6 +1,6 @@
 - pile_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :supply || ctrl.scope == :full_supply }
 - card_shaped_controls = pile_controls.select { |ctrl| ctrl.scope == :full_supply }
-= render partial: 'control_skeleton', collection: pile_controls
+= render partial: "game_board/control_skeleton", collection: pile_controls
 
 .cell.small-12.medium-12.large-8.grid.grid-x
   - @game.game_state.piles.each_with_index.each_slice((@game.game_state.piles.size / 2.0).round).with_index do |half, half_ix|
@@ -11,7 +11,7 @@
           .card.null-card
             .card-name
             - pile_controls.each do |ctrl|
-              = render partial: 'controls/cardless_button', collection: ctrl.cardless_buttons, as: :button, locals: { control: ctrl }
+              = render partial: "controls/cardless_button", collection: ctrl.cardless_buttons, as: :button, locals: { control: ctrl }
       - half.each do |pile, ix|
         .pile
           .pile-cost
