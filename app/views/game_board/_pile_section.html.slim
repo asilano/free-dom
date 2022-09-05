@@ -1,9 +1,9 @@
-- pile_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :supply || ctrl.scope == :full_supply }
+- pile_controls = game.controls_for(viewer).select { |ctrl| ctrl.scope == :supply || ctrl.scope == :full_supply }
 - card_shaped_controls = pile_controls.select { |ctrl| ctrl.scope == :full_supply }
-= render partial: "game_board/control_skeleton", collection: pile_controls
+= render partial: "game_board/control_skeleton", collection: pile_controls, locals: { game: game }
 
 .cell.small-12.medium-12.large-8.grid.grid-x
-  - @game.game_state.piles.each_with_index.each_slice((@game.game_state.piles.size / 2.0).round).with_index do |half, half_ix|
+  - game.game_state.piles.each_with_index.each_slice((game.game_state.piles.size / 2.0).round).with_index do |half, half_ix|
     .cell.small-12.medium-6.large-6
       - if pile_controls.any? { _1.cardless_buttons.present? }
         .pile{class=('hidden' if half_ix > 0)}
@@ -24,15 +24,15 @@
               .card-ctrl
                 - if ctrl.filter(pile.cards.first)
                   = render partial: ctrl, as: :control, locals: { value: ix, card: pile.cards.first }
-          .pile-count{class=('empty' if pile.cards.empty?)}= "#{pile.cards.size} of #{pile.card_class.starting_size(@game.users.size)}"
-        - if @game.game_state.artifacts.values.any? { |art| art.comes_from == pile.card_class && art.owner.nil? }
+          .pile-count{class=('empty' if pile.cards.empty?)}= "#{pile.cards.size} of #{pile.card_class.starting_size(game.users.size)}"
+        - if game.game_state.artifacts.values.any? { |art| art.comes_from == pile.card_class && art.owner.nil? }
           .card-grid
-            - @game.game_state.artifacts.values.select { |art| art.comes_from == pile.card_class && art.owner.nil? }.each do |art|
+            - game.game_state.artifacts.values.select { |art| art.comes_from == pile.card_class && art.owner.nil? }.each do |art|
               .cell.card.card_shaped.artifact
                 .card-name{data-tooltip data-allow-html="true" title=art.text}= art.readable_name
 
-  - if @game.game_state.card_shapeds.present?
-    - @game.game_state.card_shapeds.each_with_index.each_slice((@game.game_state.card_shapeds.size / 2.0).round).with_index do |half, half_ix|
+  - if game.game_state.card_shapeds.present?
+    - game.game_state.card_shapeds.each_with_index.each_slice((game.game_state.card_shapeds.size / 2.0).round).with_index do |half, half_ix|
       .cell.small-12.medium-6.large-6
         - half.each do |card_shaped, ix|
           .pile
@@ -45,4 +45,4 @@
               - card_shaped_controls.each do |ctrl|
                 .card-ctrl
                   - if ctrl.filter(card_shaped)
-                    = render partial: ctrl, as: :control, locals: { value: ix + @game.game_state.piles.size, card: card_shaped }
+                    = render partial: ctrl, as: :control, locals: { value: ix + game.game_state.piles.size, card: card_shaped }

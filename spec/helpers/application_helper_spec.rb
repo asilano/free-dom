@@ -5,8 +5,7 @@ RSpec.describe ApplicationHelper do
     user = FactoryBot.create(:user)
 
     log = "{#{user.id}?Private side - shhhh, secret|Public side - you can't see me!}"
-    allow(helper).to receive(:current_user).and_return(user)
-    expect(helper.display_event_for_user(log)).to eq 'Private side - shhhh, secret'
+    expect(helper.display_event_for_user(log, user)).to eq 'Private side - shhhh, secret'
   end
 
   it 'should hide a private log from other users' do
@@ -14,7 +13,6 @@ RSpec.describe ApplicationHelper do
     other_user = FactoryBot.create(:user)
 
     log = "{#{user.id}?Private side - shhhh, secret|Public side - you can't see me!}"
-    allow(helper).to receive(:current_user).and_return(other_user)
-    expect(helper.display_event_for_user(log)).to eq "Public side - you can't see me!"
+    expect(helper.display_event_for_user(log, other_user)).to eq "Public side - you can't see me!"
   end
 end

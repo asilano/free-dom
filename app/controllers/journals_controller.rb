@@ -13,9 +13,11 @@ class JournalsController < ApplicationController
       if @journal.save
         flash[:notify_discord] = true
         @game = @journal.game
+        @game.process
+        GameUpdateChannel.send_game_updates(@game)
+
         format.json { render :show, status: :created, location: @journal }
         format.turbo_stream do
-          @game.process
           @game.notify_discord
           render "games/redraw"
         end
@@ -32,11 +34,14 @@ class JournalsController < ApplicationController
     @game = @journal.game
     to_destroy = @game.journals.where('journals.order >= ?', @journal.order)
     to_destroy.destroy_all
+    @game.process
+
+    GameUpdateChannel.send_game_updates(@game)
+
     respond_to do |format|
       format.html { redirect_to @game }
       format.json { head :no_content }
       format.turbo_stream do
-        @game.process
         render "games/redraw"
       end
     end

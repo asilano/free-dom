@@ -1,15 +1,4 @@
-- if game.run_state == :waiting && !game.users.include?(current_user)
-  .cell.border-under
-    .grid-container.fluid.grid-x
-      .cell
-        p You are not currently in this game
-        = form_with model: game.journals.build do |f|
-          = f.hidden_field :game_id
-          = f.hidden_field :type, value: GameEngine::AddPlayerJournal
-          = f.hidden_field :user_id, value: current_user.id
-          = f.hidden_field :order, value: (game.journals.maximum(:order) || 0) + 1
-          = f.submit 'Join game'
-- elsif game.run_state == :ended
+- if game.run_state == :ended
   .cell.border-under#game-summary
     .grid-container.fluid.grid-x
       .cell
@@ -35,19 +24,19 @@
 
 .cell.border-under
   .grid-container.fluid
-    - if game.users.include? current_user
+    - if game.users.include? viewer
       .grid-x.grid-margin-x.this-player
-        = render partial: "game_board/player", object: current_player
+        = render partial: "game_board/player", object: game.player_for(viewer), locals: { game: game, viewer: viewer }
 
 .cell.border-under
   .grid-container.fluid
     .grid-x.grid-margin-x
-      - game.game_state.other_players(exclude_user: current_user).each do |player|
-        = render partial: "game_board/other_player", object: player
+      - game.game_state.other_players(exclude_user: viewer).each do |player|
+        = render partial: "game_board/other_player", object: player, locals: { game: game, viewer: viewer }
 
 .cell.border-under
-  - trash_controls = game.controls_for(current_user).select { |ctrl| ctrl.scope == :trash }
-  = render partial: "game_board/control_skeleton", collection: trash_controls
+  - trash_controls = game.controls_for(game.player_for(viewer)).select { |ctrl| ctrl.scope == :trash }
+  = render partial: "game_board/control_skeleton", collection: trash_controls, locals: { game: game }
   .grid-container.fluid
     .grid-x.grid-margin-x
       .cell
@@ -69,7 +58,7 @@
 .cell
   .grid-container.fluid
     .grid-x.grid-margin-x
-      = render partial: "game_board/pile_section"
+      = render partial: "game_board/pile_section", locals: { game: game, viewer: viewer }
 
       .cell.small-12.medium-12.large-4#journal-log
         .current-question
@@ -86,25 +75,25 @@
           - game.journals.each do |journal|
             - next unless journal.persisted?
             - if journal.histories.present?
-              - last_shown_journal_id = journal.id unless (journal.histories.first.secret? && journal.user != current_user)
+              - last_shown_journal_id = journal.id unless (journal.histories.first.secret? && journal.user != viewer)
               - if journal.histories.length > 1
                 - content_for "journal_#{last_shown_journal_id}_histories" do
                   - journal.histories[1..-1].each do |hist|
-                    li{class=hist.css_class}: span= display_event_for_user(hist.event)
+                    li{class=hist.css_class}: span= display_event_for_user(hist.event, viewer)
 
           - game.journals.each do |journal|
             - next unless journal.persisted?
             - if journal.histories.present?
-              - unless journal.histories.first.secret? && journal.user != current_user
+              - unless journal.histories.first.secret? && journal.user != viewer
                 li.main-journal class=journal.histories.first.css_class data={journal_id: journal.id}
-                  - unless journal.fixed_for_user(current_user)
+                  - unless journal.fixed_for_user(viewer)
                     = form_with url: journal_path(journal), method: "delete" do |f|
                       = f.button inline_svg_tag('action-undo.svg',
                                             class: 'undo-arrow',
                                             title: 'Undo to here',
                                             desc: 'Click to undo this and all later actions',
                                             aria: true), class: 'undo-button unstyle'
-                  span= display_event_for_user(journal.histories.first.event)
+                  span= display_event_for_user(journal.histories.first.event, viewer)
                   - if content_for? "journal_#{journal.id}_histories"
                     ul.sub-histories
                       = content_for "journal_#{journal.id}_histories"

@@ -1,36 +1,36 @@
 .cell.player#current-player
-  h2= current_user.name
-  - if @game.questions.any? { |q| q.player == current_player }
+  h2= player.name
+  - if game.questions.any? { |q| q.player == player }
     p
       strong> Current question:
       ul.question-list
-        - @game.questions.compact.each do |question|
-          li= question.text(@game.game_state)
+        - game.questions.compact.each do |question|
+          li= question.text(game.game_state)
 
   / Player-button controls
-  - @game.controls_for(current_user).select { |ctrl| ctrl.scope == :player }.each do |ctrl|
-    = form_with model: @game.journals.build, class: 'player-buttons' do |f|
+  - game.controls_for(viewer).select { |ctrl| ctrl.scope == :player }.each do |ctrl|
+    = form_with model: game.journals.build, class: 'player-buttons' do |f|
       = f.hidden_field :game_id
       = f.hidden_field :type, value: ctrl.journal_type
       = f.hidden_field :fiber_id, value: ctrl.fiber_id
-      = f.hidden_field :order, value: Journal.expected_order(ctrl.fiber_id, @game)
+      = f.hidden_field :order, value: Journal.expected_order(ctrl.fiber_id, game)
       - ctrl.values.each do |val|
         = f.button val[0], value: val[1], name: "journal[params][#{ctrl.key}]", class: 'button', data: { disable_with: val[0] }
 
   / Cards held in hand
   h5 Hand
-  - hand_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :hand }
-  = render partial: "game_board/control_skeleton", collection: hand_controls
+  - hand_controls = game.controls_for(viewer).select { |ctrl| ctrl.scope == :hand }
+  = render partial: "game_board/control_skeleton", collection: hand_controls, locals: { game: game }
   .grid-container.fluid
     .card-grid
-      = render partial: "game_board/card", collection: current_player.hand_cards, locals: { controls: hand_controls }
+      = render partial: "game_board/card", collection: player.hand_cards, locals: { controls: hand_controls }
       - if hand_controls.any? { _1.cardless_buttons.present? }
         .cell.card.null-card
           .card-name
           - hand_controls.each do |ctrl|
             = render partial: 'controls/cardless_button', collection: ctrl.cardless_buttons, as: :button, locals: { control: ctrl }
-  - if (with_hand_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :with_hand }).present?
-    = render partial: "game_board/control_skeleton", collection: with_hand_controls
+  - if (with_hand_controls = game.controls_for(viewer).select { |ctrl| ctrl.scope == :with_hand }).present?
+    = render partial: "game_board/control_skeleton", collection: with_hand_controls, locals: { game: game }
     - with_hand_controls.each do |ctrl|
       .grid-container.fluid
         .floating-control
@@ -38,60 +38,60 @@
 
   / Cards in play
   h5 In Play
-  - play_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :play }
-  = render partial: "game_board/control_skeleton", collection: play_controls
+  - play_controls = game.controls_for(viewer).select { |ctrl| ctrl.scope == :play }
+  = render partial: "game_board/control_skeleton", collection: play_controls, locals: { game: game }
   .grid-container.fluid
     .card-grid
-      - if current_player.played_cards.blank?
+      - if player.played_cards.blank?
         .cell.card.no-card
           .card-name
       - else
         = render partial: "game_board/card",
-                 collection: current_player.played_cards.select { |cd| cd.visible_to? current_player },
+                 collection: player.played_cards.select { |cd| cd.visible_to? player },
                  locals: { controls: play_controls }
         - if play_controls.any? { _1.cardless_buttons.present? }
           .cell.card.null-card
             .card-name
             - play_controls.each do |ctrl|
               = render partial: 'controls/cardless_button', collection: ctrl.cardless_buttons, as: :button, locals: { control: ctrl }
-        - unless (non_visible_count = current_player.played_cards.count { |cd| !cd.visible_to? current_player }).zero?
+        - unless (non_visible_count = player.played_cards.count { |cd| !cd.visible_to? player }).zero?
           .cell.card.back-wrapper
             .card-back= non_visible_count
 
   / Cards in discard
   h5 Discarded
-  - discard_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :discard }
-  = render partial: "game_board/control_skeleton", collection: discard_controls
+  - discard_controls = game.controls_for(viewer).select { |ctrl| ctrl.scope == :discard }
+  = render partial: "game_board/control_skeleton", collection: discard_controls, locals: { game: game }
   .grid-container.fluid
     .card-grid
-      - if current_player.discarded_cards.blank?
+      - if player.discarded_cards.blank?
         .cell.card.no-card
           .card-name
           - discard_controls.each do |ctrl|
             = render partial: 'controls/cardless_button', collection: ctrl.cardless_buttons, as: :button, locals: { control: ctrl }
-      - elsif current_player.discarded_cards.length == 1 || discard_controls.present?
-        = render partial: "game_board/card", collection: current_player.discarded_cards, locals: { controls: discard_controls }
+      - elsif player.discarded_cards.length == 1 || discard_controls.present?
+        = render partial: "game_board/card", collection: player.discarded_cards, locals: { controls: discard_controls }
       - else
-        = render partial: "game_board/card", collection: current_player.discarded_cards, locals: { stacked: true }
+        = render partial: "game_board/card", collection: player.discarded_cards, locals: { stacked: true }
         .cell.card.no-card.stack-info
-          .card-name #{current_player.discarded_cards.count - 1} more
+          .card-name #{player.discarded_cards.count - 1} more
 
   / Deck representation
   h5 Deck
-  /= render partial: "game_board/control_skeleton", collection: deck_controls
+  /= render partial: "game_board/control_skeleton", collection: deck_controls, locals: { game: game }
   .grid-container.fluid
     .grid-x.grid-margin-x
-      .cell.card.back-wrapper{class=('no-card' if current_player.deck_cards.empty?)}
+      .cell.card.back-wrapper{class=('no-card' if player.deck_cards.empty?)}
         .card-back
-          = current_player.deck_cards.count
-          - if current_player.deck_cards.any?(&:revealed) || current_player.deck_cards.any?(&:peeked)
-            .detail= "(#{current_player.deck_cards.count(&:peeked)} seen, #{current_player.deck_cards.count(&:revealed)} revealed)"
+          = player.deck_cards.count
+          - if player.deck_cards.any?(&:revealed) || player.deck_cards.any?(&:peeked)
+            .detail= "(#{player.deck_cards.count(&:peeked)} seen, #{player.deck_cards.count(&:revealed)} revealed)"
 
   / Peeked cards
-  - current_player.peeked_cards.group_by(&:interacting_with).each do |qn, cards|
+  - player.peeked_cards.group_by(&:interacting_with).each do |qn, cards|
     h5= "Seen with #{qn.card_type.readable_name}"
-    - peeked_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :peeked && ctrl.question == qn }
-    = render partial: "game_board/control_skeleton", collection: peeked_controls
+    - peeked_controls = game.controls_for(viewer).select { |ctrl| ctrl.scope == :peeked && ctrl.question == qn }
+    = render partial: "game_board/control_skeleton", collection: peeked_controls, locals: { game: game }
     .grid-container.fluid
       .card-grid class=('reorder-cards' if peeked_controls.any?(ReorderCardsControl))
         = render partial: "game_board/card", collection: cards, locals: { controls: peeked_controls }
@@ -102,10 +102,10 @@
               = render partial: "controls/cardless_button", collection: ctrl.cardless_buttons, as: :button, locals: { control: ctrl }
 
   / Revealed cards
-  - current_player.revealed_cards.group_by(&:interacting_with).each do |qn, cards|
+  - player.revealed_cards.group_by(&:interacting_with).each do |qn, cards|
     h5= "Revealed to #{qn.card_type.readable_name}"
-    - revealed_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :revealed && ctrl.question == qn }
-    = render partial: "game_board/control_skeleton", collection: revealed_controls
+    - revealed_controls = game.controls_for(viewer).select { |ctrl| ctrl.scope == :revealed && ctrl.question == qn }
+    = render partial: "game_board/control_skeleton", collection: revealed_controls, locals: { game: game }
     .grid-container.fluid
       .card-grid
         = render partial: "game_board/card", collection: cards, locals: { controls: revealed_controls }
@@ -116,17 +116,17 @@
               = render partial: "controls/cardless_button", collection: ctrl.cardless_buttons, as: :button, locals: { control: ctrl }
 
   / Artifacts
-  = render partial: "game_board/artifacts_section", locals: { player: current_player }
+  = render partial: "game_board/artifacts_section", locals: { player: player, game: game }
 
   / Tokens (Villagers, Coffers, Pirate...)
-  = render partial: "game_board/tokens_section", locals: { player: current_player }
+  = render partial: "game_board/tokens_section", locals: { player: player }
 
   / Cash, actions, buys
-  - if current_player == @game.game_state.turn_player
+  - if player == game.game_state.turn_player
     .turn-status
       h5 Status
       .counts
         .count= pluralize(player.actions, 'Action')
         .count= pluralize(player.buys, 'Buy')
       .cash
-        span.cost-text= current_player.cash
+        span.cost-text= player.cash

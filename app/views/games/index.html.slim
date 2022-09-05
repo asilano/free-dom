@@ -41,8 +41,13 @@
                                                                       type:    GameEngine::AddPlayerJournal,
                                                                       order:   (game.journals.maximum(:order) || 0) + 1 }),
                                                           method:  :post,
-                                                          class:   'button no-gap-under'
-                      td = button_to 'Destroy', game, data: { confirm: 'Are you sure?' }, method: :delete, class: 'button no-gap-under alert'
+                                                          class:   'button no-gap-under',
+                                                          data:    { turbo: false }
+                      td = button_to('Destroy',
+                                     game,
+                                     data: { confirm: 'Are you sure?', turbo: false },
+                                     method: :delete,
+                                     class: 'button no-gap-under alert')
 
       br
       = link_to 'New Game', new_game_path, class: "button"

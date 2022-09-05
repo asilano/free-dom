@@ -98,6 +98,10 @@ class Game < ApplicationRecord
     "<Game id: #{id}, name: #{name}>"
   end
 
+  def player_for(user)
+    game_state&.player_for(user)
+  end
+
   private
 
   def users_to_act

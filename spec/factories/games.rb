@@ -11,10 +11,15 @@ FactoryBot.define do
     end
   end
 
-  factory :game_with_two_players, parent: :game_with_kingdom do
+  factory :game_with_one_player, parent: :game_with_kingdom do
     after(:create) do |game|
-      create(:add_player_journal, game: game, user: game.users.first)
-      create(:add_player_journal, game: game)
+      create(:add_player_journal, game: game, user: game.users.first || create(:user))
+    end
+  end
+
+  factory :game_with_two_players, parent: :game_with_one_player do
+    after(:create) do |game|
+      create(:add_player_journal, game: game, user: create(:user))
     end
   end
 

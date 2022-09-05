@@ -101,7 +101,7 @@ RSpec.describe 'Games' do
       end
 
       it 'lets me join a game' do
-        game = FactoryBot.create(:game_with_kingdom)
+        game = FactoryBot.create(:game_with_one_player)
         expect(game.users).to_not include user
         visit games_path
         click_button 'Join'
