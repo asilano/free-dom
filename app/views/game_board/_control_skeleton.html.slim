@@ -1,7 +1,7 @@
-= form_with model: @game.journals.build,
+= form_with model: game.journals.build,
             id: "control_form_#{control_skeleton.object_id}",
             data: { action: "submit->disable-form#disableElements"} do |f|
-  = f.hidden_field :game_id, value: @game.id, id: "journal_game_id_#{control_skeleton.object_id}"
+  = f.hidden_field :game_id, value: game.id, id: "journal_game_id_#{control_skeleton.object_id}"
   = f.hidden_field :type, value: control_skeleton.journal_type, id: "journal_type_#{control_skeleton.object_id}"
   = f.hidden_field :fiber_id, value: control_skeleton.fiber_id, id: "journal_fiber_id_#{control_skeleton.object_id}"
-  = f.hidden_field :order, value: Journal.expected_order(control_skeleton.fiber_id, @game), id: "journal_order_#{control_skeleton.object_id}"
+  = f.hidden_field :order, value: Journal.expected_order(control_skeleton.fiber_id, game), id: "journal_order_#{control_skeleton.object_id}"

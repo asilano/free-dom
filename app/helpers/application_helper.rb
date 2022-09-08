@@ -5,10 +5,10 @@ module ApplicationHelper
     cls
   end
 
-  def display_event_for_user(event)
+  def display_event_for_user(event, user)
     event.gsub(/\{(?<user_id>\d+)\?(?<private>[^|]*)\|(?<public>[^}]*)\}/) do |str|
       match = Regexp.last_match
-      if current_user && match[:user_id] == current_user.id.to_s
+      if match[:user_id] == user&.id.to_s
         match[:private]
       else
         match[:public]

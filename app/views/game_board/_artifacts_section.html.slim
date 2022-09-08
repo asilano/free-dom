@@ -1,7 +1,7 @@
-- if @game.game_state.artifacts.values.any? { |art| art.owner == player }
+- if game.game_state.artifacts.values.any? { |art| art.owner == player }
   h5 Artifacts
   .grid-container.fluid
     .card-grid
-      - @game.game_state.artifacts.values.select { |art| art.owner == player }.each do |art|
+      - game.game_state.artifacts.values.select { |art| art.owner == player }.each do |art|
         .cell.card.card_shaped.artifact
           .card-name{data-tooltip data-allow-html="true" title=art.text}= art.readable_name

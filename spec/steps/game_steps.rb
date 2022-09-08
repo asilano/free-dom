@@ -16,6 +16,7 @@ module GameSteps
       @player_count = count
       @player_names = PLAYER_NAMES[0, count]
       @user_alan = @game.users.first
+      @user_alan.update!(name: "Alan")
       FactoryBot.create(:add_player_journal, game: @game, user: @user_alan)
 
       (count - 1).times do |n|

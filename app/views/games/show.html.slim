@@ -19,5 +19,17 @@
         = form_with model: @game, class: 'inline hide-js' do |f|
           = text_field_tag 'game[discord_webhook]', @game.discord_webhook, class: 'inline'
           = f.submit 'Change', class: 'inline hide-js'
+= turbo_stream_from @game, @game.users.include?(current_user) ? current_user : nil, channel: GameUpdateChannel
 #game.flex-child-auto.grid-y.grid-padding-y
-  = render partial: "game_board/game", object: @game
+  - if @game.run_state == :waiting && !@game.users.include?(current_user)
+    .cell.border-under
+      .grid-container.fluid.grid-x
+        .cell
+          p You are not currently in this game
+          = form_with model: @game.journals.build, data: { turbo: false } do |f|
+            = f.hidden_field :game_id
+            = f.hidden_field :type, value: GameEngine::AddPlayerJournal
+            = f.hidden_field :user_id, value: current_user.id
+            = f.hidden_field :order, value: (@game.journals.maximum(:order) || 0) + 1
+            = f.submit 'Join game'
+  = render partial: "game_board/game", object: @game, locals: { viewer: current_user }
