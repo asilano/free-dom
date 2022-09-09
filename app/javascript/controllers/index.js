@@ -9,3 +9,6 @@ application.register("disable-form", DisableFormController)
 
 import RepeatableFieldController from "./repeatable_field_controller.js"
 application.register("repeatable-field", RepeatableFieldController)
+
+import GameBoardController from "./game_board_controller.js"
+application.register("game-board", GameBoardController)
