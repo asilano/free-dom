@@ -1,108 +1,109 @@
-- if game.run_state == :ended
-  .cell.border-under#game-summary
-    .grid-container.fluid.grid-x
-      .cell
-        h3 Game Over &mdash; Scores
-        ul.scores
-          - game.game_state.players.sort_by(&:score).reverse.each.with_index do |player, ix|
-            li
-              .player-result #{player.name} &mdash; #{player.score} points
-              .player-deck
-                - player.decklist.each do |entry|
-                  - score_part = entry[:score].nil? ? '' : " (#{pluralize(entry[:score], 'pt')})"
-                  span> #{entry[:count]}x
-                  span.card{data-tooltip data-allow-html="true" class=entry[:types] title=entry[:text]} #{entry[:name]}#{score_part}
-                  span #{entry[:last] ? '.' : ', '}
-- elsif game.questions.present?
+#game.flex-child-auto.grid-y.grid-padding-y data={ controller: "game-board" }
+  - if game.run_state == :ended
+    .cell.border-under#game-summary
+      .grid-container.fluid.grid-x
+        .cell
+          h3 Game Over &mdash; Scores
+          ul.scores
+            - game.game_state.players.sort_by(&:score).reverse.each.with_index do |player, ix|
+              li
+                .player-result #{player.name} &mdash; #{player.score} points
+                .player-deck
+                  - player.decklist.each do |entry|
+                    - score_part = entry[:score].nil? ? '' : " (#{pluralize(entry[:score], 'pt')})"
+                    span> #{entry[:count]}x
+                    span.card{data-tooltip data-allow-html="true" class=entry[:types] title=entry[:text]} #{entry[:name]}#{score_part}
+                    span #{entry[:last] ? '.' : ', '}
+  - elsif game.questions.present?
+    .cell.border-under
+      .grid-container.fluid.grid-x
+        .cell
+          strong> Current question:
+          ul.question-list
+            - game.questions.compact.each do |question|
+              li= question.player.name + ': ' + question.text(game.game_state)
+
   .cell.border-under
-    .grid-container.fluid.grid-x
-      .cell
-        strong> Current question:
-        ul.question-list
-          - game.questions.compact.each do |question|
-            li= question.player.name + ': ' + question.text(game.game_state)
+    .grid-container.fluid
+      - if game.users.include? viewer
+        .grid-x.grid-margin-x.this-player
+          = render partial: "game_board/player", object: game.player_for(viewer), locals: { game: game, viewer: viewer }
 
-.cell.border-under
-  .grid-container.fluid
-    - if game.users.include? viewer
-      .grid-x.grid-margin-x.this-player
-        = render partial: "game_board/player", object: game.player_for(viewer), locals: { game: game, viewer: viewer }
+  .cell.border-under
+    .grid-container.fluid
+      .grid-x.grid-margin-x
+        - game.game_state.other_players(exclude_user: viewer).each do |player|
+          = render partial: "game_board/other_player", object: player, locals: { game: game, viewer: viewer }
 
-.cell.border-under
-  .grid-container.fluid
-    .grid-x.grid-margin-x
-      - game.game_state.other_players(exclude_user: viewer).each do |player|
-        = render partial: "game_board/other_player", object: player, locals: { game: game, viewer: viewer }
+  .cell.border-under
+    - trash_controls = game.controls_for(game.player_for(viewer)).select { |ctrl| ctrl.scope == :trash }
+    = render partial: "game_board/control_skeleton", collection: trash_controls, locals: { game: game }
+    .grid-container.fluid
+      .grid-x.grid-margin-x
+        .cell
+          h5 Trash
+          .grid-container.fluid
+            .card-grid
+              - if game.game_state.trashed_cards.blank?
+                .cell.card.no-card
+                  .card-name
+                  - trash_controls.each do |ctrl|
+                    = render partial: "controls/cardless_button", collection: ctrl.cardless_buttons, as: :button, locals: { control: ctrl }
+              - elsif game.game_state.trashed_cards.length == 1 || trash_controls.present?
+                = render partial: "game_board/card", collection: game.game_state.trashed_cards, locals: { controls: trash_controls }
+              - else
+                = render partial: "game_board/card", collection: game.game_state.trashed_cards, locals: { stacked: true }
+                .cell.card.no-card.stack-info
+                  .card-name #{game.game_state.trashed_cards.count - 1} more
 
-.cell.border-under
-  - trash_controls = game.controls_for(game.player_for(viewer)).select { |ctrl| ctrl.scope == :trash }
-  = render partial: "game_board/control_skeleton", collection: trash_controls, locals: { game: game }
-  .grid-container.fluid
-    .grid-x.grid-margin-x
-      .cell
-        h5 Trash
-        .grid-container.fluid
-          .card-grid
-            - if game.game_state.trashed_cards.blank?
-              .cell.card.no-card
-                .card-name
-                - trash_controls.each do |ctrl|
-                  = render partial: "controls/cardless_button", collection: ctrl.cardless_buttons, as: :button, locals: { control: ctrl }
-            - elsif game.game_state.trashed_cards.length == 1 || trash_controls.present?
-              = render partial: "game_board/card", collection: game.game_state.trashed_cards, locals: { controls: trash_controls }
-            - else
-              = render partial: "game_board/card", collection: game.game_state.trashed_cards, locals: { stacked: true }
-              .cell.card.no-card.stack-info
-                .card-name #{game.game_state.trashed_cards.count - 1} more
+  .cell
+    .grid-container.fluid
+      .grid-x.grid-margin-x
+        = render partial: "game_board/pile_section", locals: { game: game, viewer: viewer }
 
-.cell
-  .grid-container.fluid
-    .grid-x.grid-margin-x
-      = render partial: "game_board/pile_section", locals: { game: game, viewer: viewer }
+        .cell.small-12.medium-12.large-4#journal-log
+          .current-question
+            - if game.questions.any?
+              strong> Current question:
+              ul.question-list
+                - game.questions.compact.each do |question|
+                  li= question.player.name + ': ' + question.text(game.game_state)
+            - elsif game.run_state != :ended
+              strong> No question - check journals!
 
-      .cell.small-12.medium-12.large-4#journal-log
-        .current-question
-          - if game.questions.any?
-            strong> Current question:
-            ul.question-list
-              - game.questions.compact.each do |question|
-                li= question.player.name + ': ' + question.text(game.game_state)
-          - elsif game.run_state != :ended
-            strong> No question - check journals!
+          ul
+            - last_shown_journal_id = 0
+            - game.journals.each do |journal|
+              - next unless journal.persisted?
+              - if journal.histories.present?
+                - last_shown_journal_id = journal.id unless (journal.histories.first.secret? && journal.user != viewer)
+                - if journal.histories.length > 1
+                  - content_for "journal_#{last_shown_journal_id}_histories" do
+                    - journal.histories[1..-1].each do |hist|
+                      li{class=hist.css_class}: span= display_event_for_user(hist.event, viewer)
 
-        ul
-          - last_shown_journal_id = 0
-          - game.journals.each do |journal|
-            - next unless journal.persisted?
-            - if journal.histories.present?
-              - last_shown_journal_id = journal.id unless (journal.histories.first.secret? && journal.user != viewer)
-              - if journal.histories.length > 1
-                - content_for "journal_#{last_shown_journal_id}_histories" do
-                  - journal.histories[1..-1].each do |hist|
-                    li{class=hist.css_class}: span= display_event_for_user(hist.event, viewer)
-
-          - game.journals.each do |journal|
-            - next unless journal.persisted?
-            - if journal.histories.present?
-              - unless journal.histories.first.secret? && journal.user != viewer
-                li.main-journal class=journal.histories.first.css_class data={journal_id: journal.id}
-                  - unless journal.fixed_for_user(viewer)
-                    = form_with url: journal_path(journal), method: "delete" do |f|
-                      = f.button inline_svg_tag('action-undo.svg',
-                                            class: 'undo-arrow',
-                                            title: 'Undo to here',
-                                            desc: 'Click to undo this and all later actions',
-                                            aria: true), class: 'undo-button unstyle'
-                  span= display_event_for_user(journal.histories.first.event, viewer)
-                  - if content_for? "journal_#{journal.id}_histories"
-                    ul.sub-histories
-                      = content_for "journal_#{journal.id}_histories"
-            - else
-              li.main-journal.error-journal
-                = form_with url: journal_path(journal), method: "delete" do |f|
-                  = f.button inline_svg_tag('action-undo.svg',
-                                        class: 'undo-arrow',
-                                        title: 'Undo to here',
-                                        desc: 'Click to undo this and all later actions',
-                                        aria: true), class: 'undo-button unstyle'
-                span= "#{journal.user&.name || 'The game'}'s choice for '#{journal.class.from(journal.player).in(game).question.text(game.game_state)}', which is now invalid"
+            - game.journals.each do |journal|
+              - next unless journal.persisted?
+              - if journal.histories.present?
+                - unless journal.histories.first.secret? && journal.user != viewer
+                  li.main-journal class=journal.histories.first.css_class data={journal_id: journal.id}
+                    - unless journal.fixed_for_user(viewer)
+                      = form_with url: journal_path(journal), method: "delete" do |f|
+                        = f.button inline_svg_tag('action-undo.svg',
+                                              class: 'undo-arrow',
+                                              title: 'Undo to here',
+                                              desc: 'Click to undo this and all later actions',
+                                              aria: true), class: 'undo-button unstyle'
+                    span= display_event_for_user(journal.histories.first.event, viewer)
+                    - if content_for? "journal_#{journal.id}_histories"
+                      ul.sub-histories
+                        = content_for "journal_#{journal.id}_histories"
+              - else
+                li.main-journal.error-journal
+                  = form_with url: journal_path(journal), method: "delete" do |f|
+                    = f.button inline_svg_tag('action-undo.svg',
+                                          class: 'undo-arrow',
+                                          title: 'Undo to here',
+                                          desc: 'Click to undo this and all later actions',
+                                          aria: true), class: 'undo-button unstyle'
+                  span= "#{journal.user&.name || 'The game'}'s choice for '#{journal.class.from(journal.player).in(game).question.text(game.game_state)}', which is now invalid"

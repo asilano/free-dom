@@ -1,2 +1,2 @@
-= turbo_stream.update "game" do
+= turbo_stream.replace "game" do
   = render partial: "game_board/game", object: @game, locals: { viewer: current_user }

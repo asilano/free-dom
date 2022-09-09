@@ -1,7 +1,7 @@
 class GameUpdateChannel < Turbo::StreamsChannel
   def self.send_game_updates(game)
     game.users.each do |user|
-      broadcast_update_to(
+      broadcast_replace_to(
         game,
         user,
         target: "game",
@@ -11,7 +11,7 @@ class GameUpdateChannel < Turbo::StreamsChannel
       )
     end
 
-    broadcast_update_to(
+    broadcast_replace_to(
       game,
       nil,
       target: "game",
