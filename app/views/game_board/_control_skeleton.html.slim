@@ -1,4 +1,4 @@
-= form_with model: game.journals.build,
+= form_with model: Journal.new,
             id: "control_form_#{control_skeleton.object_id}",
             data: { action: "submit->disable-form#disableElements"} do |f|
   = f.hidden_field :game_id, value: game.id, id: "journal_game_id_#{control_skeleton.object_id}"

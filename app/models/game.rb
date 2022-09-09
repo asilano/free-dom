@@ -109,7 +109,7 @@ class Game < ApplicationRecord
   end
 
   def send_discord_log
-    journals.each.select { |j| j.id > (last_notified_journal || 0) }.each do |j|
+    journals.each.select { |j| j.persisted? && j.id > (last_notified_journal || 0) }.each do |j|
       log = j.format_for_discord
       send_msg_to_discord log if log
       sleep 1
