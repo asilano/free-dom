@@ -9,6 +9,7 @@ module GameEngine
         scope:        :with_hand,
         min:          1,
         max:          @player.villagers,
+        default:      1,
         text:         "Villagers to spend (max: #{@player.villagers})",
         submit_text:  "Spend villagers"
       )]

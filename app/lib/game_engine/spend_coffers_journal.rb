@@ -9,6 +9,7 @@ module GameEngine
         scope:        :with_hand,
         min:          1,
         max:          @player.coffers,
+        default:      1,
         text:         "Coffers to spend (max: #{@player.coffers})",
         submit_text:  "Spend coffers"
       )]
