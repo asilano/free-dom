@@ -11,11 +11,16 @@ module CardDecorators
         .slice_when { |l| l == :hr }
         .map { |sub| sub.reject { |l| l == :hr }.join("\n") }
         .join("<hr>")
-      define_method(:text) { self.class.card_text }
       define_singleton_method(:cost_str) { " (cost: #{raw_cost})" if raw_cost }
       define_singleton_method(:card_text) do
-        "<span class='metadata'>#{types.map(&:to_s).map(&:humanize).join("-")}#{cost_str}</span>\n#{str}"
+        "<span class='metadata'>#{types.map(&:to_s).map(&:humanize).join("-")}#{cost_str || ""}</span>\n#{str}"
       end
+      define_singleton_method(:html_safe_card_text) do
+        types.map(&:to_s).map(&:humanize).join("-") + (cost_str || "") + "\n" + str
+      end
+
+      define_method(:text) { self.class.card_text }
+      define_method(:html_safe_text) { self.class.html_safe_card_text }
     end
 
     # Define the raw cost of a card, before any modifications like Bridge

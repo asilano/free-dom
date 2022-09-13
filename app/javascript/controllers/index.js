@@ -12,3 +12,6 @@ application.register("repeatable-field", RepeatableFieldController)
 
 import GameBoardController from "./game_board_controller.js"
 application.register("game-board", GameBoardController)
+
+import TooltipController from "./tooltip_controller.js"
+application.register("tooltip", TooltipController)

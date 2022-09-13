@@ -28,11 +28,12 @@ module GameEngine
       list = cards.group_by(&:class).map do |klass, cs|
         exemplar = cs.first
         entry = {
-          types: exemplar.types,
-          count: cs.count,
-          name:  klass.readable_name,
-          text:  exemplar.try(:text),
-          last:  false
+          types:          exemplar.types,
+          count:          cs.count,
+          name:           klass.readable_name,
+          text:           exemplar.try(:text),
+          html_safe_text: exemplar.try(:html_safe_text),
+          last:           false
         }
         entry[:score] = exemplar.points if exemplar.respond_to?(:points)
         entry[:cash] = exemplar.cash if exemplar.respond_to?(:cash)
