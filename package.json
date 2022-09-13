@@ -6,7 +6,6 @@
     "@hotwired/turbo-rails": "^7.1.1",
     "@rails/ujs": "^6.1.5",
     "@rails/webpacker": "5.4.3",
-    "foundation-sites": "^6.7.4",
     "jquery": "^3.6.0",
     "jquery-sortablejs": "^1.0.1",
     "onmount": "^1.3.0",

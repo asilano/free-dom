@@ -17,7 +17,6 @@
 import $ from "jquery"
 import "../src/games"
 import 'jquery-sortablejs'
-import Foundation from "foundation-sites"
 import "@hotwired/turbo-rails"
 
 import "controllers"
@@ -26,10 +25,7 @@ import Rails from "@rails/ujs";
 Rails.start();
 
 window.jQuery = $;
-require('foundation-sites');
 var onmount = require("onmount")
-
-Foundation.Tooltip.defaults.triggerClass = ''
 
 $(document).on('ready show.bs closed.bs load page:change turbo:load', function () {
   onmount()
@@ -42,7 +38,6 @@ $(function() {
 
 onmount('body', function() {
   $(this).addClass('js-active')
-  $(document).foundation()
 })
 onmount('.js', function() {
   $(this).removeClass('js')

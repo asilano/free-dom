@@ -17,4 +17,10 @@ class GameEngine::Pile
   rescue
     ''
   end
+
+  def html_safe_text
+    @cards.first&.html_safe_text || card_class.html_safe_card_text
+  rescue
+    ''
+  end
 end

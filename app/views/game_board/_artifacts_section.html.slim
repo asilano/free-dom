@@ -4,4 +4,4 @@
     .card-grid
       - game.game_state.artifacts.values.select { |art| art.owner == player }.each do |art|
         .cell.card.card_shaped.artifact
-          .card-name{data-tooltip data-allow-html="true" title=art.text}= art.readable_name
+          .card-name title=art.html_safe_text data={ controller: "tooltip", "tooltip-text-value": art.text, action: "mouseenter->tooltip#show mouseleave->tooltip#hide" } = art.readable_name

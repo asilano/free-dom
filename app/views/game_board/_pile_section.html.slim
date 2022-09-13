@@ -17,7 +17,7 @@
           .pile-cost
             span.cost-text= pile.cards.first&.cost || pile.card_class.raw_cost
           .card{class=(pile.cards.first || pile.card_class).types}
-            .card-name{data-tooltip data-allow-html="true" title=pile.text}= pile.card_class.readable_name
+            .card-name title=pile.html_safe_text data={ controller: "tooltip", "tooltip-text-value": pile.text, action: "mouseenter->tooltip#show mouseleave->tooltip#hide" } = pile.card_class.readable_name
             - pile.tokens.each do |token|
               .card-token= token.to_s.humanize
             - pile_controls.each do |ctrl|
@@ -29,7 +29,7 @@
           .card-grid
             - game.game_state.artifacts.values.select { |art| art.comes_from == pile.card_class && art.owner.nil? }.each do |art|
               .cell.card.card_shaped.artifact
-                .card-name{data-tooltip data-allow-html="true" title=art.text}= art.readable_name
+                .card-name title=art.html_safe_text data={ controller: "tooltip", "tooltip-text-value": art.text, action: "mouseenter->tooltip#show mouseleave->tooltip#hide" } = art.readable_name
 
   - if game.game_state.card_shapeds.present?
     - game.game_state.card_shapeds.each_with_index.each_slice((game.game_state.card_shapeds.size / 2.0).round).with_index do |half, half_ix|
@@ -39,7 +39,7 @@
             .pile-cost
               span.cost-text= card_shaped.cost
             .card.card_shaped{class=card_shaped.types}
-              .card-name{data-tooltip data-allow-html="true" title=card_shaped.text}= card_shaped.readable_name
+              .card-name title=card_shaped.html_safe_text data={ controller: "tooltip", "tooltip-text-value": card_shaped.text, action: "mouseenter->tooltip#show mouseleave->tooltip#hide" } = card_shaped.readable_name
               - card_shaped.owners.sort_by(&:seat).each do |owner|
                 .card_shaped-owner class="player#{owner.seat}"= card_shaped.text_for(owner)
               - card_shaped_controls.each do |ctrl|
