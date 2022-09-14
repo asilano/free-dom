@@ -3,13 +3,18 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static values = { text: String }
 
-  show() {
+  connect() {
     this.tooltip_elem = document.createElement("div");
     this.tooltip_elem.innerHTML = this.textValue;
     this.tooltip_elem.className = "tooltip top align-center transparent";
-
     this.element.append(this.tooltip_elem);
+    this.tooltip_elem.style.fontWeight = "normal";
     this.tooltip_elem.style.width = "15rem";
+  }
+
+  show() {
+    this.tooltip_elem.className = "tooltip top align-center transparent";
+
     this.tooltip_elem.style.left = "calc((" + this.element.clientWidth + "px - 15rem) / 2)";
     this.tooltip_elem.style.top = "calc(0px - " + this.tooltip_elem.clientHeight + "px - 0.75rem)";
     var bounds = this.tooltip_elem.getBoundingClientRect()
@@ -40,13 +45,6 @@ export default class extends Controller {
 
   hide() {
     this.tooltip_elem.classList.add("transparent")
-
-    setTimeout(() => {
-      Array.from(this
-        .element
-        .getElementsByClassName("tooltip"))
-        .forEach(x => x.remove())
-    }, 250)
   }
 
   convertRemToPx(rem) {
