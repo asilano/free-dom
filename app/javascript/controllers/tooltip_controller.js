@@ -10,10 +10,19 @@ export default class extends Controller {
     this.element.append(this.tooltip_elem);
     this.tooltip_elem.style.fontWeight = "normal";
     this.tooltip_elem.style.width = "15rem";
+
+    // Prevent tooltip triggering itself when invisible
+    this.tooltip_elem.style.pointerEvents = "none";
   }
 
-  show() {
+  show(event) {
+    if (event.target != this.element)
+      return;
+
     this.tooltip_elem.className = "tooltip top align-center transparent";
+
+    // Allow tooltip to remain when self-hovered
+    this.tooltip_elem.style.pointerEvents = "auto";
 
     this.tooltip_elem.style.left = "calc((" + this.element.clientWidth + "px - 15rem) / 2)";
     this.tooltip_elem.style.top = "calc(0px - " + this.tooltip_elem.clientHeight + "px - 0.75rem)";
@@ -45,6 +54,9 @@ export default class extends Controller {
 
   hide() {
     this.tooltip_elem.classList.add("transparent")
+
+    // Prevent tooltip triggering itself when invisible
+    this.tooltip_elem.style.pointerEvents = "none";
   }
 
   convertRemToPx(rem) {
