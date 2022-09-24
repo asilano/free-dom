@@ -14,25 +14,6 @@ onmount('.random-regenerate', function() {
   $(this).on('ajax:success', event => $('.random-name').text(event.detail[0]));
 });
 
-onmount('.reorder-cards', function() {
-  let reorderable;
-  const wrapper = $(this);
-  wrapper.find('.reorder-no-js').each(function(ix, el) {
-    const sel = $(el).find('select');
-    $(el).append($('<span class="reorder-position">').text(sel.children('option:selected').text()));
-    sel.hide();
-  });
-  reorderable = Sortable.create(this, {
-    onEnd(evt) {
-      wrapper.find('.reorder-no-js').each(function(ix, el) {
-        const sel = $(el).find('select');
-        sel.val(ix + 1);
-        $(el).children('span.reorder-position').text(sel.children('option:selected').text());
-      });
-    }
-  });
-});
-
 let scrollPosition = 0;
 const refreshTimer = undefined;
 onmount('body[data-controller=games][data-action=show]', function() {

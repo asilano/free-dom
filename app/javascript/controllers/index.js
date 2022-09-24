@@ -15,3 +15,6 @@ application.register("game-board", GameBoardController)
 
 import TooltipController from "./tooltip_controller.js"
 application.register("tooltip", TooltipController)
+
+import SortableCards from './sortable_cards.js'
+application.register('sortable-cards', SortableCards)

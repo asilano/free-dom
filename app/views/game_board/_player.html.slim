@@ -93,10 +93,12 @@
     - peeked_controls = game.controls_for(viewer).select { |ctrl| ctrl.scope == :peeked && ctrl.question == qn }
     = render partial: "game_board/control_skeleton", collection: peeked_controls, locals: { game: game }
     .grid-container.fluid
-      .card-grid class=('reorder-cards' if peeked_controls.any?(ReorderCardsControl))
+      - peeked_class = peeked_controls.any?(ReorderCardsControl) ? "reorder-cards" : ""
+      - peeked_controller = peeked_controls.any?(ReorderCardsControl) ? "sortable-cards" : ""
+      .card-grid class=peeked_class data-controller=peeked_controller
         = render partial: "game_board/card", collection: cards, locals: { controls: peeked_controls }
         - if peeked_controls.any? { _1.cardless_buttons.present? }
-          .cell.card.null-card
+          .cell.card.null-card.unsortable
             .card-name
             - peeked_controls.each do |ctrl|
               = render partial: "controls/cardless_button", collection: ctrl.cardless_buttons, as: :button, locals: { control: ctrl }

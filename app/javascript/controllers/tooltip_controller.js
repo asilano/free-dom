@@ -26,17 +26,17 @@ export default class extends Controller {
 
     this.tooltip_elem.style.left = "calc((" + this.element.clientWidth + "px - 15rem) / 2)";
     this.tooltip_elem.style.top = "calc(0px - " + this.tooltip_elem.clientHeight + "px - 0.75rem)";
-    var bounds = this.tooltip_elem.getBoundingClientRect()
+    const bounds = this.tooltip_elem.getBoundingClientRect()
 
     if (bounds.left < 5) {
-      var rightShift = 5 - bounds.left;
+      const rightShift = 5 - bounds.left;
       this.tooltip_elem.style.left = "calc((" + this.element.clientWidth + "px - 15rem) / 2 + " + rightShift + "px)";
       this.tooltip_elem.classList.remove("align-center");
       this.tooltip_elem.classList.add("align-left");
     }
 
     if (bounds.right > window.innerWidth - 5) {
-      var leftShift = bounds.right - window.innerWidth + 5;
+      const leftShift = bounds.right - window.innerWidth + 5;
       this.tooltip_elem.style.left = "calc((" + this.element.clientWidth + "px - 15rem) / 2 - " + leftShift + "px)";
       this.tooltip_elem.classList.remove("align-center");
       this.tooltip_elem.classList.add("align-right");
