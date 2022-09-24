@@ -7,7 +7,7 @@ export default class extends Controller {
   }
 
   add(event) {
-    var input = document.createElement("input");
+    const input = document.createElement("input");
     input.type = "hidden";
     input.name = "add-fields";
     input.value = 1;
