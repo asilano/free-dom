@@ -105,6 +105,12 @@ footer {
   opacity: 0
 }
 
+.offscreen {
+  left: -9999px;
+  position: fixed;
+  top: 0;
+}
+
 .tooltip {
   white-space: pre-line;
 }

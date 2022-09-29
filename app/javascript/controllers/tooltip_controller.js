@@ -5,9 +5,9 @@ export default class extends Controller {
 
   connect() {
     this.tooltip_elem = document.createElement("div");
-    this.tooltip_elem.innerHTML = this.textValue;
-    this.tooltip_elem.className = "tooltip top align-center transparent";
+    this.tooltip_elem.className = "tooltip top align-center offscreen transparent";
     this.element.append(this.tooltip_elem);
+    this.tooltip_elem.innerHTML = this.textValue;
     this.tooltip_elem.style.fontWeight = "normal";
     this.tooltip_elem.style.width = "15rem";
 
@@ -19,13 +19,14 @@ export default class extends Controller {
     if (event.target != this.element)
       return;
 
-    this.tooltip_elem.className = "tooltip top align-center transparent";
+    this.tooltip_elem.className = "tooltip top align-center offscreen transparent";
 
     // Allow tooltip to remain when self-hovered
     this.tooltip_elem.style.pointerEvents = "auto";
 
     this.tooltip_elem.style.left = "calc((" + this.element.clientWidth + "px - 15rem) / 2)";
     this.tooltip_elem.style.top = "calc(0px - " + this.tooltip_elem.clientHeight + "px - 0.75rem)";
+    this.tooltip_elem.style.position = "absolute";
     const bounds = this.tooltip_elem.getBoundingClientRect()
 
     if (bounds.left < 5) {
@@ -49,7 +50,7 @@ export default class extends Controller {
     }
 
     this.tooltip_elem.style.transition = "opacity 0.25s"
-    this.tooltip_elem.classList.remove("transparent")
+    this.tooltip_elem.classList.remove("offscreen", "transparent")
   }
 
   hide() {
