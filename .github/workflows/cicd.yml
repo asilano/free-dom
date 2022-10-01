@@ -110,12 +110,9 @@ jobs:
           git_remote_url: 'ssh://dokku@free-dom.nsict.org/free-dom'
           ssh_private_key: ${{ secrets.DOKKU_PROD_PRIVATE_KEY }}
 
-      - name: Echo
-        run: echo "Good news! ${{ github.event.head_commit.message }} has been deployed."
-
       - name: Discord notification
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@master
         with:
-          args: 'Good news! ${{ github.event.head_commit.message }} has been deployed.'
+          args: 'Good news! "${{ github.event.head_commit.message }}" has been deployed to production.'
