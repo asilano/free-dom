@@ -65,7 +65,7 @@
       .grid-x.grid-margin-x
         = render partial: "game_board/pile_section", locals: { game: game, viewer: viewer }
 
-        .cell.small-12.medium-12.large-4#journal-log
+        .cell.small-12.medium-12.large-4#journal-log data-game-board-target="journals"
           .current-question
             - if game.questions.any?
               strong> Current question:
