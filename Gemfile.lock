@@ -232,6 +232,8 @@ GEM
     rails-dom-testing (2.0.3)
       activesupport (>= 4.2.0)
       nokogiri (>= 1.6)
+    rails-hidden_autocomplete (0.1.0)
+      rails (~> 6.0, >= 6.0.3.2)
     rails-html-sanitizer (1.4.3)
       loofah (~> 2.3)
     rails_real_favicon (0.1.1)
@@ -403,6 +405,7 @@ DEPENDENCIES
   pry-rails
   puma (~> 4.3)
   rails (~> 6.0.0)
+  rails-hidden_autocomplete
   rails_real_favicon
   rails_stats
   redis (~> 4.0)

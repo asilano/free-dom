@@ -38,6 +38,9 @@ gem "stimulus-rails"
 gem "turbo-rails"
 gem 'webpacker', '~> 5.x'
 
+# Bug fix firefox autocompleting hidden fields
+gem 'rails-hidden_autocomplete'
+
 gem 'inline_svg'
 
 gem 'devise'
