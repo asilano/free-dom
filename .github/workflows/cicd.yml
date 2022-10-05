@@ -113,5 +113,5 @@ jobs:
       - name: Discord notification
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          DISCORD_EMBEDS: '[{"title": "Good news! FreeDom has been deployed to production.", "description": "${{ github.event.head_commit.message }}"}]'
+          DISCORD_EMBEDS: '[{"title": "Good news! FreeDom has been deployed to production.", "description": ${{ toJSON(github.event.head_commit.message) }}}]'
         uses: Ilshidur/action-discord@master
