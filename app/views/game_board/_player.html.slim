@@ -4,7 +4,7 @@
     p
       strong> Current question:
       ul.question-list
-        - game.questions.compact.each do |question|
+        - game.questions.select { |q| q.player == player }.compact.each do |question|
           li= question.text(game.game_state)
 
   / Player-button controls

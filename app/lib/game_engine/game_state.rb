@@ -118,11 +118,7 @@ module GameEngine
     def get_journal(journal_class, from:, revealed_cards: [], peeked_cards: [], opts: {})
       template = journal_class.from(from).in(@game).with(opts)
 
-      journal = Fiber.yield(questions_to_ask(template, revealed_cards, peeked_cards))
-      while journal.tag_along?
-        journal.process(self)
-        journal = Fiber.yield(questions_to_ask(template, revealed_cards, peeked_cards))
-      end
+      journal = ask_questions { questions_to_ask(template, revealed_cards, peeked_cards) }
 
       journal.question = template.question
       raise UnexpectedJournalError, "Unexpected journal #{journal.id} type: #{journal.class}. Expecting: #{template.class.module_parent}" unless template.matches? journal
@@ -162,7 +158,7 @@ module GameEngine
       while questions.any?
         # Get a journal for any of the questions, and post it into the
         # relevant fiber
-        journal = Fiber.yield(questions)
+        journal = ask_questions(questions)
         target = sub_fibers.detect { |sub| journal.fiber_id =~ /^#{sub.fid_prefix}(\.|$)/ }
         raise InvalidJournalError, "Incorrect fiber for journal: #{journal}" unless target
 
@@ -241,17 +237,41 @@ module GameEngine
 
     def questions_to_ask(template, revealed_cards, peeked_cards)
       qs = [template.question]
-      if @phase == :action && @turn_player.villagers.positive?
-        qs << SpendVillagersJournal.from(@turn_player).in(@game).question
-      end
-      if @phase == :buy && @turn_player.coffers.positive?
-        qs << SpendCoffersJournal.from(@turn_player).in(@game).question
-      end
 
       qs.each_with_index do |q, ix|
         q.fiber_id = @fid_prefix
         q.auto_candidate = template.player != @last_active_player
         (revealed_cards + peeked_cards).each { |c| c.interacting_with = q } if ix.zero?
+      end
+    end
+
+    def ask_questions(questions = nil)
+      to_ask = questions.dup
+      to_ask = yield if block_given?
+      add_tag_along_questions(to_ask)
+
+      journal = Fiber.yield to_ask
+
+      while journal.tag_along?
+        journal.process(self)
+        to_ask = questions.dup
+        to_ask = yield if block_given?
+        add_tag_along_questions(to_ask)
+        journal = Fiber.yield to_ask
+      end
+      journal
+    end
+
+    def add_tag_along_questions(questions)
+      # In the master Fiber - which has no sub-fiber dots in - add the tag-along questions for SpendVillagers and
+      # SpendCoffers, if needed
+      unless @fid_prefix.include?(".")
+        if @phase == :action && @turn_player.villagers.positive?
+          questions << SpendVillagersJournal.from(@turn_player).in(@game).question.tap { _1.fiber_id = "1" }
+        end
+        if @phase == :buy && @turn_player.coffers.positive?
+          questions << SpendCoffersJournal.from(@turn_player).in(@game).question.tap { _1.fiber_id = "1" }
+        end
       end
     end
   end
