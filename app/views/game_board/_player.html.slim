@@ -23,7 +23,7 @@
   = render partial: "game_board/control_skeleton", collection: hand_controls, locals: { game: game }
   .grid-container.fluid
     .card-grid
-      = render partial: "game_board/card", collection: player.hand_cards, locals: { controls: hand_controls }
+      = render partial: "game_board/card", collection: player.hand_cards, locals: { controls: hand_controls, viewer: viewer }
       - if hand_controls.any? { _1.cardless_buttons.present? }
         .cell.card.null-card
           .card-name
@@ -48,7 +48,7 @@
       - else
         = render partial: "game_board/card",
                  collection: player.played_cards.select { |cd| cd.visible_to? player },
-                 locals: { controls: play_controls }
+                 locals: { controls: play_controls, viewer: viewer }
         - if play_controls.any? { _1.cardless_buttons.present? }
           .cell.card.null-card
             .card-name
@@ -70,9 +70,9 @@
           - discard_controls.each do |ctrl|
             = render partial: 'controls/cardless_button', collection: ctrl.cardless_buttons, as: :button, locals: { control: ctrl }
       - elsif player.discarded_cards.length == 1 || discard_controls.present?
-        = render partial: "game_board/card", collection: player.discarded_cards, locals: { controls: discard_controls }
+        = render partial: "game_board/card", collection: player.discarded_cards, locals: { controls: discard_controls, viewer: viewer }
       - else
-        = render partial: "game_board/card", collection: player.discarded_cards, locals: { stacked: true }
+        = render partial: "game_board/card", collection: player.discarded_cards, locals: { stacked: true, viewer: viewer }
         .cell.card.no-card.stack-info
           .card-name #{player.discarded_cards.count - 1} more
 
@@ -96,7 +96,7 @@
       - peeked_class = peeked_controls.any?(ReorderCardsControl) ? "reorder-cards" : ""
       - peeked_controller = peeked_controls.any?(ReorderCardsControl) ? "sortable-cards" : ""
       .card-grid class=peeked_class data-controller=peeked_controller
-        = render partial: "game_board/card", collection: cards, locals: { controls: peeked_controls }
+        = render partial: "game_board/card", collection: cards, locals: { controls: peeked_controls, viewer: viewer }
         - if peeked_controls.any? { _1.cardless_buttons.present? }
           .cell.card.null-card.unsortable
             .card-name
@@ -110,7 +110,7 @@
     = render partial: "game_board/control_skeleton", collection: revealed_controls, locals: { game: game }
     .grid-container.fluid
       .card-grid
-        = render partial: "game_board/card", collection: cards, locals: { controls: revealed_controls }
+        = render partial: "game_board/card", collection: cards, locals: { controls: revealed_controls, viewer: viewer }
         - if revealed_controls.any? { _1.cardless_buttons.present? }
           .cell.card.null-card
             .card-name
