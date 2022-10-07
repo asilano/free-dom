@@ -4,14 +4,20 @@
       - @game.errors.full_messages.each do |err|
         .cell = err
   .panel
-    .field
-      = f.text_field :name, help_text: 'A name can help make a game memorable, but isn\'t required', id: 'game_name'
+    .field data-controller="random-name"
+      = f.text_field :name,
+                     help_text: "A name can help make a game memorable, but isn't required",
+                     id: "game_name",
+                     data: { random_name_target: "nameEntry" }
       p.help-text
         | Want inspiration for a game name? Here's a suggestion
         span.js< you can click
         | :
-        span.random-name =<> random_game_name
-        = link_to random_name_path, class: 'random-regenerate js', remote: true do
+        span.random-name data-action="click->random-name#useName" data-random-name-target="randomName" =<> random_game_name
+        = link_to random_name_path,
+                  class: "random-regenerate js",
+                  remote: true,
+                  data: { action: "ajax:success->random-name#updateRandomName" } do
           i.fas.fa-sync{ title='Regenerate' }
 
     .field

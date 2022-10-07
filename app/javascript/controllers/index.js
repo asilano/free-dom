@@ -7,14 +7,17 @@ import { application } from "./application"
 import DisableFormController from "./disable_form_controller.js"
 application.register("disable-form", DisableFormController)
 
-import RepeatableFieldController from "./repeatable_field_controller.js"
-application.register("repeatable-field", RepeatableFieldController)
-
 import GameBoardController from "./game_board_controller.js"
 application.register("game-board", GameBoardController)
 
-import TooltipController from "./tooltip_controller.js"
-application.register("tooltip", TooltipController)
+import RandomNameController from "./random_name_controller.js"
+application.register("random-name", RandomNameController)
+
+import RepeatableFieldController from "./repeatable_field_controller.js"
+application.register("repeatable-field", RepeatableFieldController)
 
 import SortableCards from './sortable_cards_controller.js'
 application.register('sortable-cards', SortableCards)
+
+import TooltipController from "./tooltip_controller.js"
+application.register("tooltip", TooltipController)
