@@ -16,7 +16,7 @@
                   - player.decklist.each do |entry|
                     - score_part = entry[:score].nil? ? '' : " (#{pluralize(entry[:score], 'pt')})"
                     span> #{entry[:count]}x
-                    span.card title=entry[:html_safe_text] data={ controller: "tooltip", "tooltip-text-value": entry[:text], action: "mouseenter->tooltip#show mouseleave->tooltip#hide" } #{entry[:name]}#{score_part}
+                    span.card class=entry[:types] title=entry[:html_safe_text] data={ controller: "tooltip", "tooltip-text-value": entry[:text], action: "mouseenter->tooltip#show mouseleave->tooltip#hide" } #{entry[:name]}#{score_part}
                     span #{entry[:last] ? '.' : ', '}
   - elsif game.questions.present?
     .cell.border-under
