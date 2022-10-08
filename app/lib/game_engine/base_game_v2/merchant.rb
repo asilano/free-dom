@@ -15,7 +15,7 @@ module GameEngine
         my_silver_filter = ->(card, player) { card.is_a?(BasicCards::Silver) && player == played_by }
         Triggers::TreasurePlayed.watch_for(filter: my_silver_filter, stop_at: :end_of_turn) do
           played_by.grant_cash(1)
-          game.current_journal.histories << History.new("#{played_by} gained $1 due to Merchant (total: $#{played_by.cash}).",
+          game.current_journal.histories << History.new("#{played_by.name} gained $1 due to Merchant (total: $#{played_by.cash}).",
                                                         player: played_by)
         end
       end
