@@ -40,7 +40,7 @@
           = render partial: "game_board/other_player", object: player, locals: { game: game, viewer: viewer }
 
   .cell.border-under
-    - trash_controls = game.controls_for(game.player_for(viewer)).select { |ctrl| ctrl.scope == :trash }
+    - trash_controls = game.controls_for(viewer).select { |ctrl| ctrl.scope == :trash }
     = render partial: "game_board/control_skeleton", collection: trash_controls, locals: { game: game }
     .grid-container.fluid
       .grid-x.grid-margin-x
