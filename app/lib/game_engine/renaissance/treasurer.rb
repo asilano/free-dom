@@ -43,7 +43,7 @@ module GameEngine
                                       player: player)
             game_state.get_journal(GainTreasureJournal, from: player).process(game_state)
           when "key"
-            @histories << History.new("#{player.name} chose to gain a gain the Key from #{Treasurer.readable_name}.",
+            @histories << History.new("#{player.name} chose to gain the Key from #{Treasurer.readable_name}.",
                                       player: player)
             game_state.artifacts["Key"].give_to(player)
           end
