@@ -29,6 +29,7 @@ gem 'redis', '~> 4.0'
 gem 'sprockets-rails', '~> 2.3.3'
 
 gem 'autoprefixer-rails'
+gem "font-awesome-sass", "~> 6.2.0"
 gem 'foundation-rails', '~> 6.0'
 gem 'foundation_rails_helper', '~> 4.0'
 gem 'jquery-rails'
