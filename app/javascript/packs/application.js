@@ -15,7 +15,6 @@
 // const images = require.context('../images', true)
 // const imagePath = (name) => images(name, true)
 import $ from "jquery"
-import "../src/games"
 import 'jquery-sortablejs'
 import "@hotwired/turbo-rails"
 
@@ -34,23 +33,3 @@ import Rails from "@rails/ujs";
 Rails.start();
 
 window.jQuery = $;
-var onmount = require("onmount")
-
-$(document).on('ready show.bs closed.bs load page:change turbo:load', function () {
-  onmount()
-})
-$(document).on('turbo:before-cache', function () { onmount.teardown() })
-
-$(function() {
-  FontAwesome.dom.watch({observeMutationsRoot: document})
-})
-
-onmount('body', function() {
-  $(this).addClass('js-active')
-})
-onmount('.js', function() {
-  $(this).removeClass('js')
-})
-onmount('.hide-js', function() {
-  $(this).hide()
-})
