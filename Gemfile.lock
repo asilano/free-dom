@@ -108,6 +108,8 @@ GEM
       factory_bot (~> 6.2.0)
       railties (>= 5.0.0)
     ffi (1.15.5)
+    font-awesome-sass (6.2.0)
+      sassc (~> 2.0)
     formatador (1.1.0)
     foundation-rails (6.6.2.0)
       railties (>= 3.1.0)
@@ -391,6 +393,7 @@ DEPENDENCIES
   devise
   discordrb-webhooks
   factory_bot_rails
+  font-awesome-sass (~> 6.2.0)
   foundation-rails (~> 6.0)
   foundation_rails_helper (~> 4.0)
   guard

@@ -5,14 +5,16 @@
         - game_title = "Game #{@game.id}"
         - game_title << " — #{@game.name}" if @game.name.present?
         h2= game_title
-      .cell#discord-report
+      .cell#discord-report data-controller="hidden-form"
         - if @game.discord_webhook.present?
-          span> Posting to Discord
-          span.js> - click to edit
+          span> data-action="click->hidden-form#toggle" Posting to Discord
+          span.js> data-action="click->hidden-form#toggle" - click to edit
         - else
-          span> Not posting to Discord
-          span.js> - click to add
-        = form_with model: @game, class: 'inline hide-js' do |f|
+          span> data-action="click->hidden-form#toggle" Not posting to Discord
+          span.js> data-action="click->hidden-form#toggle" - click to add
+        = form_with model: @game,
+                    class: "inline hide-js",
+                    data: { "hidden-form-target": "form" } do |f|
           = text_field_tag 'game[discord_webhook]', @game.discord_webhook, class: 'inline'
           = f.submit 'Change', class: 'inline hide-js'
 = turbo_stream_from @game, @game.users.include?(current_user) ? current_user : nil, channel: GameUpdateChannel

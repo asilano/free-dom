@@ -18,7 +18,7 @@
                   class: "random-regenerate js",
                   remote: true,
                   data: { action: "ajax:success->random-name#updateRandomName" } do
-          i.fas.fa-sync{ title='Regenerate' }
+          i.fa-solid.fa-sync{ title='Regenerate' }
 
     .field
       = f.text_field :discord_webhook, help_text: 'Paste a webhook URL for a Discord channel here to receive game alerts'

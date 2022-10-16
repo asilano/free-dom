@@ -93,8 +93,8 @@ footer {
   }
 }
 
-.js {
-  display: none;
+.js, .out-of-flow {
+  display: none !important;
 }
 
 .hidden {
