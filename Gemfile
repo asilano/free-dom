@@ -32,7 +32,6 @@ gem 'autoprefixer-rails'
 gem "font-awesome-sass", "~> 6.2.0"
 gem 'foundation-rails', '~> 6.0'
 gem 'foundation_rails_helper', '~> 4.0'
-gem 'jquery-rails'
 gem 'slim-rails'
 gem 'sortable-rails'
 gem "stimulus-rails"

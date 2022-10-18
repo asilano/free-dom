@@ -7,8 +7,6 @@
     "@hotwired/turbo-rails": "^7.1.1",
     "@rails/ujs": "^6.1.5",
     "@rails/webpacker": "5.4.3",
-    "jquery": "^3.6.0",
-    "jquery-sortablejs": "^1.0.1",
     "sortablejs": "^1.15.0",
     "stimulus-sortable": "^3.2.0",
     "webpack": "^4.46.0",
