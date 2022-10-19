@@ -14,8 +14,6 @@
 //
 // const images = require.context('../images', true)
 // const imagePath = (name) => images(name, true)
-import $ from "jquery"
-import 'jquery-sortablejs'
 import "@hotwired/turbo-rails"
 
 import { Application } from "@hotwired/stimulus"
@@ -31,5 +29,3 @@ window.Stimulus   = application
 
 import Rails from "@rails/ujs";
 Rails.start();
-
-window.jQuery = $;
