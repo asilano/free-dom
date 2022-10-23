@@ -113,7 +113,7 @@ module GameEngine
     def set_player_villagers(game_state)
       player.villagers = params['count'].to_i
 
-      @histories << History.new("HACK! #{player.name} now has #{params["count"]} villagers.",
+      @histories << History.new("HACK! #{player.name} now has #{params["count"]} Villagers.",
                                 css_classes: %w[hack])
 
     end
@@ -121,7 +121,7 @@ module GameEngine
     def set_player_coffers(game_state)
       player.coffers = params['count'].to_i
 
-      @histories << History.new("HACK! #{player.name} now has #{params["count"]} coffers.",
+      @histories << History.new("HACK! #{player.name} now has #{params["count"]} Coffers.",
                                 css_classes: %w[hack])
 
     end
