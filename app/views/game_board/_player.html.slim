@@ -109,7 +109,9 @@
     - revealed_controls = game.controls_for(viewer).select { |ctrl| ctrl.scope == :revealed && ctrl.question == qn }
     = render partial: "game_board/control_skeleton", collection: revealed_controls, locals: { game: game }
     .grid-container.fluid
-      .card-grid
+      - revealed_class = revealed_controls.any?(ReorderCardsControl) ? "reorder-cards" : ""
+      - revealed_controller = revealed_controls.any?(ReorderCardsControl) ? "sortable-cards" : ""
+      .card-grid class=revealed_class data-controller=revealed_controller
         = render partial: "game_board/card", collection: cards, locals: { controls: revealed_controls, viewer: viewer }
         - if revealed_controls.any? { _1.cardless_buttons.present? }
           .cell.card.null-card
