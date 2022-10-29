@@ -2,9 +2,9 @@ name: Test and Deploy
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened]
     branches:
       - 'main'
-      - 'master'
       - 'staging'
   push:
     branches:
@@ -31,20 +31,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-
-    - uses: amancevice/setup-code-climate@v0
-      name: CodeClimate Install
-      with:
-        cc_test_reporter_id: ${{ secrets.CC_TEST_REPORTER_ID }}
-
     - uses: ruby/setup-ruby@v1
       with:
         bundler-cache: true
-
     - name: Install PostgreSQL client
       run: |
         sudo apt-get -yqq install libpq-dev
-
     - name: Build App
       env:
         PGHOST: localhost
@@ -55,10 +47,6 @@ jobs:
       run: |
         bin/rails db:setup
         yarn install
-
-    - name: CodeClimate Pre-build Notification
-      run: cc-test-reporter before-build
-
     - name: Run Tests
       env:
         PGHOST: localhost
@@ -68,9 +56,40 @@ jobs:
         RAILS_MASTER_KEY: ${{ secrets.TEST_MASTER_KEY }}
       run: |
         bundle exec rspec
+    - name: Where Am I?
+      run: |
+        head coverage/coverage.json
+        ls -l /home/runner/work/free-dom/free-dom/app/lib/game_engine/base_game_v2/militia.rb
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.SONAR_GITHUB_TOKEN }}  # Needed to get PR information, if any
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-    - name: Publish code coverage
-      run: cc-test-reporter after-build
+  # sonarcloud:
+  #   name: SonarCloud
+  #   if: ${{ github.actor != 'dependabot[bot]' }}
+  #   needs: [test]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #       with:
+  #         fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+  #     - name: Download code coverage
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: code-coverage-report
+  #         path: coverage
+  #     - name: ls
+  #       run: |
+  #         pwd
+  #         ls -la coverage
+  #         head coverage/coverage.json
+  #     - name: SonarCloud Scan
+  #       uses: SonarSource/sonarcloud-github-action@master
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.SONAR_GITHUB_TOKEN }}  # Needed to get PR information, if any
+  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   deploy_staging:
     concurrency:
