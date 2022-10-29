@@ -11,12 +11,13 @@
           .game-list-section
             h1 My games
 
-            - @games[:mine].each do |run_state, games|
-              .panel
-                h2= run_state.to_s.titleize
-                table.hover
-                  tbody
-                    - games.each do |game|
+            - %i[running waiting ended].each do |run_state|
+              - if @games[:mine][run_state].present?
+                .panel
+                  h2= run_state.to_s.titleize
+                  table.hover
+                    tbody
+                    - @games[:mine][run_state].each do |game|
                       tr{class=run_state}
                         td.name-column = link_to game do
                           .game-id = game.id
