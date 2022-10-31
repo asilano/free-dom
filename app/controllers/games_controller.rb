@@ -83,10 +83,12 @@ class GamesController < ApplicationController
   # DELETE /games/1
   # DELETE /games/1.json
   def destroy
-    @game.destroy
     respond_to do |format|
-      format.html { redirect_to games_url, notice: 'Game was successfully destroyed.' }
-      format.json { head :no_content }
+      if @game.journals.first.user == current_user && @game.destroy
+        format.html { redirect_to games_url, notice: 'Game was successfully destroyed.' }
+      else
+        format.html { redirect_to games_url, alert: 'Could not destroy game.' }
+      end
     end
   end
 

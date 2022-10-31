@@ -20,10 +20,19 @@
                     - @games[:mine][run_state].each do |game|
                       tr{class=run_state}
                         td.name-column = link_to game do
-                          .game-id = game.id
-                          .game-name = game.name
+                          .button.small.unstyle.play-button.no-gap-under class=run_state_button_class(run_state)
+                            i.fa-solid class=run_state_icon_class(run_state)
+                          .game-id= game.id
+                          .game-name= game.name
                         td
-                        td = button_to 'Destroy', game, data: { confirm: 'Are you sure?' }, method: :delete, class: 'button no-gap-under alert'
+                          - if game.journals.first.user == current_user
+                            = button_to game,
+                                        data: { confirm: 'Are you sure?' },
+                                        method: :delete,
+                                        class: 'hollow button small no-gap-under alert' do
+                              span.show-for-sr Delete
+                              span aria-hidden=true
+                                i.fa-solid.fa-xmark
 
         - unless @games.dig(:others, :waiting).blank?
           .game-list-section
@@ -35,6 +44,8 @@
                   - @games.dig(:others, :waiting).each do |game|
                     tr
                       td.name-column = link_to game do
+                        .button.small.unstyle.play-button.no-gap-under.warning
+                          i.fa-solid.fa-right-to-bracket
                         .game-id = game.id
                         .game-name = game.name
                       td = button_to 'Join', journals_path(journal: { game_id: game.id,
@@ -44,11 +55,6 @@
                                                           method:  :post,
                                                           class:   'button no-gap-under',
                                                           data:    { turbo: false }
-                      td = button_to('Destroy',
-                                     game,
-                                     data: { confirm: 'Are you sure?', turbo: false },
-                                     method: :delete,
-                                     class: 'button no-gap-under alert')
 
       br
       = link_to 'New Game', new_game_path, class: "button"
