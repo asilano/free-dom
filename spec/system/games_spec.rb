@@ -146,10 +146,7 @@ RSpec.describe 'Games' do
   end
 
   describe 'destroy' do
-    let(:game) { FactoryBot.build(:game_with_kingdom, name: 'Game for deletion') }
-    before :each do
-      game.save
-    end
+    let(:game) { FactoryBot.create(:game_with_kingdom, name: 'Game for deletion') }
 
     it 'redirects to sign in page if not authd' do
       page.driver.submit :delete, game_path(game), {}
@@ -159,13 +156,13 @@ RSpec.describe 'Games' do
     describe 'when authd' do
       let(:user) { FactoryBot.create(:user) }
       before :each do
-        login_as(user)
+        login_as(game.journals.first.user)
       end
 
       it 'deletes the game' do
         visit games_path
         expect(page).to have_css('td.name-column .game-name', text: game.name)
-        click_button 'Destroy'
+        click_button 'Delete'
         expect(current_path).to eql(games_path)
         expect(page).to_not have_css('td.name-column .game-name', text: game.name)
       end
