@@ -56,10 +56,10 @@ jobs:
         RAILS_MASTER_KEY: ${{ secrets.TEST_MASTER_KEY }}
       run: |
         bundle exec rspec
-    - name: Where Am I?
+    - name: Fix code coverage paths
+      working-directory: ./coverage
       run: |
-        head coverage/coverage.json
-        ls -l /home/runner/work/free-dom/free-dom/app/lib/game_engine/base_game_v2/militia.rb
+        sed -i 's@'$GITHUB_WORKSPACE'@/github/workspace/@g' coverage.json
     - name: SonarCloud Scan
       uses: SonarSource/sonarcloud-github-action@master
       env:
