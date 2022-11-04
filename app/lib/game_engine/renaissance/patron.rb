@@ -6,7 +6,7 @@ module GameEngine
            :hr,
            "When something causes you to reveal this (using the word \"reveal\"), +1 Coffers."
       action
-      reaction from: :everywhere, to: :reveal
+      reaction from: nil, to: nil # Patron _triggers_ rather than letting the player React.
       costs 4
       on_trigger(Triggers::CardRevealed) do |_card, player, _location|
         player.coffers += 1 if player
