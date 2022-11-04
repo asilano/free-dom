@@ -1,7 +1,11 @@
 module GameEngine
   class ReactJournal < Journal
-    define_question('React, or pass').prevent_auto
-                                     .with_controls do |_game_state|
+    define_question do |_|
+      text = "React, or pass"
+      text << ". (Already reacted with: #{opts[:reacted_cards].join(", ")})" if opts[:reacted_cards].present?
+      text
+    end.prevent_auto
+       .with_controls do |_game_state|
       filter = lambda do |card|
         card.reaction? &&
           card.reacts_to == opts[:react_to] &&
@@ -32,12 +36,22 @@ module GameEngine
 
     process do |_game_state|
       if params['choice'] == 'none'
+        if opts[:reacted_cards].present?
+          @histories << GameEngine::History.new("#{player.name} stopped reacting.",
+                                                player: player,
+                                                css_classes: %w[react])
+        else
+          @histories << GameEngine::History.new_secret("#{player.name} stopped reacting.",
+                                                        player: player,
+                                                        css_classes: %w[react])
+        end
         return :stop
       end
 
       # Retrieve the card and make it react
       card = cards_in_scope(params["scope"])[params['choice'].to_i]
       card.react(opts[:response], reacted_by: player)
+      (opts[:reacted_cards] << card.readable_name).uniq!
       :continue
     end
 

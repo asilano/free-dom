@@ -23,7 +23,7 @@ Feature: Moat
     Then Belle should need to 'React, or pass'
     And Chas should need to 'Discard down by 1 card'
     When Belle chooses Moat in her hand
-    Then Belle should need to 'React, or pass'
+    Then Belle should need to 'React, or pass. (Already reacted with: Moat)'
     When Belle chooses 'Stop reacting' in my hand
     Then Belle should not need to act
 
