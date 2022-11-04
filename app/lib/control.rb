@@ -1,5 +1,5 @@
 class Control
-  attr_reader :journal_type, :question, :scope, :player, :cardless_buttons, :key, :text, :css_class
+  attr_reader :journal_type, :question, :scope, :player, :cardless_buttons, :key, :text, :params, :css_class
   attr_accessor :fiber_id
 
   def initialize(opts = {})
@@ -15,6 +15,7 @@ class Control
     @text = opts.delete(:text) || 'Choose'
     @key = opts.delete(:key) || 'choice'
     @cardless_buttons = []
+    @params = opts.delete(:params) || {}
     @css_class = " #{opts.delete(:css_class)}" || ''
   end
 

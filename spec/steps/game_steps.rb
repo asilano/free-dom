@@ -784,6 +784,10 @@ end
 
 # Monkey-patch in methods for each control type to handle being told what to do
 # Each returns the params for the journal that will be created.
+Control.define_method(:handle_choice) do |_|
+  @params || {}
+end
+
 OneCardControl.define_method(:handle_choice) do |choice|
   # First, check for the null choice
   if button = cardless_buttons.detect { _1[:text] == choice }
@@ -792,20 +796,20 @@ OneCardControl.define_method(:handle_choice) do |choice|
 
   # Otherwise, find the index requested
   choice = choice.first if choice.is_a? Array
-  { @key => find_index(self, @player, @game_state, @scope, @filter, choice) }
+  { @key => find_index(self, @player, @game_state, @scope, @filter, choice) }.merge(super(choice))
 end
 MultiCardControl.define_method(:handle_choice) do |choice|
   # First, check for choosing nothing
-  return { @key => [] } if choice == []
+  return { @key => [] }.merge(super(choice)) if choice == []
 
   # Now check for it being a null choice
   if button = cardless_buttons.detect { _1[:text] == choice }
-    return { @key => button[:value] }
+    return { @key => button[:value] }.merge(super(choice))
   end
 
   if choice == 'everything'
     set = @player.cards_by_location(@scope).map.with_index.select { |c, ix| filter(c) }.map(&:second)
-    return { @key => set }
+    return { @key => set }.merge(super(choice))
   end
 
   # Otherwise, find the indices requested
@@ -817,27 +821,27 @@ MultiCardControl.define_method(:handle_choice) do |choice|
       hand_cards[ix] = nil
       ix
     end
-    { @key => indices }
+    { @key => indices }.merge(super(choice))
   end
 end
 MultiCardChoicesControl.define_method(:handle_choice) do |choices|
   # First, check for choosing nothing
-  return { @key => [] } if choices == []
+  return { @key => [] }.merge(super(choices)) if choices == []
 
   params = {}
 
   choices.each do |pair|
     params[find_index(self, @player, @game_state, @scope, @filter, pair[0])] = @choices.detect { |opt| opt[0] == pair[1] }[1]
   end
-  { @key => params }
+  { @key => params }.merge(super(choices))
 end
 
 ButtonControl.define_method(:handle_choice) do |choice|
-  { @key => @values.detect { |opt| opt[0] == choice }[1] }
+  { @key => @values.detect { |opt| opt[0] == choice }[1] }.merge(super(choice))
 end
 
 NumberControl.define_method(:handle_choice) do |choice|
-  { @key => choice.to_s }
+  { @key => choice.to_s }.merge(super(choice))
 end
 
 def find_index(control, player, game_state, scope, filter, card)
