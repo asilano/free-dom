@@ -5,3 +5,5 @@
   = f.hidden_field :type, value: control_skeleton.journal_type, id: "journal_type_#{control_skeleton.object_id}"
   = f.hidden_field :fiber_id, value: control_skeleton.fiber_id, id: "journal_fiber_id_#{control_skeleton.object_id}"
   = f.hidden_field :order, value: Journal.expected_order(control_skeleton.fiber_id, game), id: "journal_order_#{control_skeleton.object_id}"
+  - control_skeleton.params.each do |key, value|
+    = hidden_field_tag "journal[params][#{key}]", value, id: "journal_#{key}_#{control_skeleton.object_id}"
