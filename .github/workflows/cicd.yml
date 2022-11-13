@@ -61,6 +61,7 @@ jobs:
       run: |
         sed -i 's@'$GITHUB_WORKSPACE'@/github/workspace/@g' coverage.json
     - name: SonarCloud Scan
+      if: ${{ github.actor != 'dependabot[bot]' }}
       uses: SonarSource/sonarcloud-github-action@master
       env:
         GITHUB_TOKEN: ${{ secrets.SONAR_GITHUB_TOKEN }}  # Needed to get PR information, if any
