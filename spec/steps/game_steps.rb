@@ -729,6 +729,16 @@ module GameSteps
       expect(project_card.player_tokens[get_player(name)]).to eq count
     end
 
+    step "the last journal :whether_to be fixed" do |should|
+      @game.process
+      journal = @game.journals.last
+      if should
+        expect(@game.fiber_last_fixed_journal_orders[journal.fiber_id]).to eq(journal.order), "#{journal.class} should be fixed"
+      else
+        expect(@game.fiber_last_fixed_journal_orders[journal.fiber_id]).not_to eq(journal.order), "#{journal.class} should not be fixed"
+      end
+    end
+
     step "the game should have ended" do
       @game.process
       expect(@game.run_state).to eq :ended
