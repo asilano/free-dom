@@ -30,6 +30,8 @@ module GameEngine
             return
           end
 
+          game.fix_journal
+
           log = "#{player.name} set aside " +
             History.personal_log(private_to: player.user,
                                  private_msg: cards_to_move.map(&:readable_name).join(", "),

@@ -17,6 +17,7 @@ Feature: Research
       Then I should trash Village from my hand
       And I should set aside Copper, Silver, Gold from my deck on my Research in play
       And these card moves should happen
+    And the last journal should be fixed
     And Copper, Silver, Gold on my Research should be visible to me
     And Copper, Silver, Gold on my Research should not be visible to Belle
     And I should need to "Play an Action, or pass"
@@ -44,6 +45,7 @@ Feature: Research
     Then cards should move as follows:
       Then I should trash Copper from my hand
       And these card moves should happen
+    And the last journal should not be fixed
     And I should need to "Play an Action, or pass"
     When I choose "Leave Action Phase" in my hand
     Then I should need to "Play Treasures, or pass"
@@ -63,7 +65,8 @@ Feature: Research
     Then I should have 1 action
     And I should need to "Choose a card to trash"
     When I choose "Trash nothing" in my hand
-    Then I should need to "Play an Action, or pass"
+    Then the last journal should not be fixed
+    And I should need to "Play an Action, or pass"
     When I choose "Leave Action Phase" in my hand
     Then I should need to "Play Treasures, or pass"
     When I choose "Stop playing treasures" in my hand

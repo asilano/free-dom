@@ -37,6 +37,8 @@ module CardModules
     end
 
     def visible_to?(check_player)
+      check_player = game.player_for(check_player) if check_player.is_a? User
+
       # Default visibility based on card location
       visible = case location
                 when :deck
