@@ -36,7 +36,7 @@ module CardDecorators
             card.location
           end
         end
-      end
+      end.uniq
     end
   end
 end
