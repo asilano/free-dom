@@ -30,7 +30,7 @@ jobs:
           - 5432:5432
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: ruby/setup-ruby@v1
       with:
         bundler-cache: true
@@ -75,7 +75,7 @@ jobs:
     needs: [test]
     steps:
       - name: Clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -95,7 +95,7 @@ jobs:
     needs: [test]
     steps:
       - name: Clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -108,6 +108,7 @@ jobs:
           ssh_private_key: ${{ secrets.DOKKU_PROD_PRIVATE_KEY }}
 
       - name: Discord notification
+        if: "!contains(github.event.commits[0].message, '[skip discord]')"
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
           DISCORD_EMBEDS: '[{"title": "Good news! FreeDom has been deployed to production.", "description": ${{ toJSON(github.event.head_commit.message) }}}]'
