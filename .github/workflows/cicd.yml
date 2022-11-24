@@ -1,11 +1,11 @@
 name: Test and Deploy
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-    branches:
-      - 'main'
-      - 'staging'
+  # pull_request:
+  #   types: [opened, synchronize, reopened]
+  #   branches:
+  #     - 'main'
+  #     - 'staging'
   push:
     branches:
       - 'main'
@@ -108,7 +108,7 @@ jobs:
           ssh_private_key: ${{ secrets.DOKKU_PROD_PRIVATE_KEY }}
 
       - name: Discord notification
-        if: "!contains(github.event.commits[0].message, '[skip discord]')"
+        if: "!contains(github.event.head_commit.message, '[skip discord]')"
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
           DISCORD_EMBEDS: '[{"title": "Good news! FreeDom has been deployed to production.", "description": ${{ toJSON(github.event.head_commit.message) }}}]'
