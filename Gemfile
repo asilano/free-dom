@@ -8,7 +8,7 @@ end
 ruby `cat ./.ruby-version`
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 6.0.0'
+gem 'rails', '~> 6.1.0'
 # Use postgresql as the database for Active Record
 gem 'pg', '>= 0.18', '< 2.0'
 # Use Puma as the app server
@@ -30,7 +30,7 @@ gem 'sprockets-rails', '~> 2.3.3'
 
 gem 'autoprefixer-rails'
 gem "font-awesome-sass", "~> 6.2.0"
-gem 'foundation-rails', '~> 6.0'
+gem 'foundation-rails', '~> 6.1'
 gem 'foundation_rails_helper', '~> 4.0'
 gem 'slim-rails'
 gem 'sortable-rails'
