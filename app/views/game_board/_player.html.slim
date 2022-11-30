@@ -9,7 +9,7 @@
 
   / Player-button controls
   - game.controls_for(viewer).select { |ctrl| ctrl.scope == :player }.each do |ctrl|
-    = form_with model: game.journals.build, class: 'player-buttons' do |f|
+    = form_with model: game.journals.build, class: 'player-buttons', local: true do |f|
       = f.hidden_field :game_id
       = f.hidden_field :type, value: ctrl.journal_type
       = f.hidden_field :fiber_id, value: ctrl.fiber_id

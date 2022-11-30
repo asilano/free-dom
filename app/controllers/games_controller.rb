@@ -70,7 +70,7 @@ class GamesController < ApplicationController
   # PATCH /games/1.json
   def update
     respond_to do |format|
-      if @game.update_attributes(game_params)
+      if @game.update(game_params)
         format.html { redirect_to @game, notice: 'Game was successfully updated.' }
         format.json { render :show, status: :created, location: @game }
       else
