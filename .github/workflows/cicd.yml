@@ -7,9 +7,6 @@ on:
   #     - 'main'
   #     - 'staging'
   push:
-    branches:
-      - 'main'
-      - 'staging'
 
 jobs:
   test:

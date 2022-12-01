@@ -92,7 +92,7 @@
                 - unless journal.histories.first.secret? && journal.user != viewer
                   li.main-journal class=journal.histories.first.css_class data={journal_id: journal.id}
                     - unless journal.fixed_for_user(viewer)
-                      = form_with url: journal_path(journal), method: "delete" do |f|
+                      = form_with url: journal_path(journal), method: "delete", local: true do |f|
                         = f.button inline_svg_tag('action-undo.svg',
                                               class: 'undo-arrow',
                                               title: 'Undo to here',
@@ -104,7 +104,7 @@
                         = content_for "journal_#{journal.id}_histories"
               - else
                 li.main-journal.error-journal
-                  = form_with url: journal_path(journal), method: "delete" do |f|
+                  = form_with url: journal_path(journal), method: "delete", local: true do |f|
                     = f.button inline_svg_tag('action-undo.svg',
                                           class: 'undo-arrow',
                                           title: 'Undo to here',

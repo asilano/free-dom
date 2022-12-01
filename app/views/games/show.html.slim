@@ -14,6 +14,7 @@
           span.js> data-action="click->hidden-form#toggle" - click to add
         = form_with model: @game,
                     class: "inline hide-js",
+                    local: true,
                     data: { "hidden-form-target": "form" } do |f|
           = text_field_tag 'game[discord_webhook]', @game.discord_webhook, class: 'inline'
           = f.submit 'Change', class: 'inline hide-js'
@@ -23,7 +24,7 @@
     .grid-container.fluid.grid-x
       .cell
         p You are not currently in this game
-        = form_with model: Journal.new, data: { turbo: false } do |f|
+        = form_with model: Journal.new, local: true, data: { turbo: false } do |f|
           = f.hidden_field :game_id, value: @game.id
           = f.hidden_field :type, value: GameEngine::AddPlayerJournal
           = f.hidden_field :user_id, value: current_user.id
