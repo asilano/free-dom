@@ -8,7 +8,7 @@ end
 ruby `cat ./.ruby-version`
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 6.1.0'
+gem 'rails', '~> 7.0.0'
 # Use postgresql as the database for Active Record
 gem 'pg', '>= 0.18', '< 2.0'
 # Use Puma as the app server
@@ -37,9 +37,6 @@ gem 'sortable-rails'
 gem "stimulus-rails"
 gem "turbo-rails"
 gem 'webpacker', '~> 5.x'
-
-# Bug fix firefox autocompleting hidden fields
-gem 'rails-hidden_autocomplete'
 
 gem 'inline_svg'
 

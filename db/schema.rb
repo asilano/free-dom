@@ -10,16 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_11_26_213326) do
-
+ActiveRecord::Schema[7.0].define(version: 2022_12_02_114449) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "games", force: :cascade do |t|
     t.string "name"
-    t.datetime "end_time"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "end_time", precision: nil
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.string "discord_webhook"
     t.json "last_notified_players"
     t.integer "last_notified_journal"
@@ -31,8 +30,8 @@ ActiveRecord::Schema.define(version: 2022_11_26_213326) do
     t.integer "order"
     t.string "type"
     t.json "params"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.string "fiber_id"
     t.index ["game_id"], name: "index_journals_on_game_id"
     t.index ["user_id"], name: "index_journals_on_user_id"
@@ -42,17 +41,17 @@ ActiveRecord::Schema.define(version: 2022_11_26_213326) do
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
-    t.datetime "reset_password_sent_at"
-    t.datetime "remember_created_at"
+    t.datetime "reset_password_sent_at", precision: nil
+    t.datetime "remember_created_at", precision: nil
     t.integer "sign_in_count", default: 0, null: false
-    t.datetime "current_sign_in_at"
-    t.datetime "last_sign_in_at"
+    t.datetime "current_sign_in_at", precision: nil
+    t.datetime "last_sign_in_at", precision: nil
     t.inet "current_sign_in_ip"
     t.inet "last_sign_in_ip"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.string "name"
-    t.datetime "last_completed"
+    t.datetime "last_completed", precision: nil
     t.boolean "admin", default: false
     t.boolean "contact_me", default: false
     t.string "discord_uid"
