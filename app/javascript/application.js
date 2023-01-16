@@ -1,5 +1,5 @@
 /* eslint no-console:0 */
-// This file is automatically compiled by Webpack, along with any other files
+// This file is automatically compiled by esbuild, along with any other files
 // present in this directory. You're encouraged to place your actual application logic in
 // a relevant structure within app/javascript and only use these pack files to reference
 // that code so it'll be compiled.
@@ -17,11 +17,10 @@
 import "@hotwired/turbo-rails"
 
 import { Application } from "@hotwired/stimulus"
-import { definitionsFromContext } from "@hotwired/stimulus-webpack-helpers"
+import { definitions } from 'stimulus:./controllers';
 
 const application = Application.start()
-const context = require.context("../controllers", true, /\.js$/)
-application.load(definitionsFromContext(context))
+application.load(definitions)
 
 // Configure Stimulus development experience
 application.debug = false
