@@ -1,6 +1,6 @@
-= form_with model: @game, local: true, id: 'new_game' do |f|
+= form_with model: @game, id: 'new_game', data: { turbo: false } do |f|
   - if @game.errors.present?
-    .grid-padding-x.alert
+    .form-errors.alert
       - @game.errors.full_messages.each do |err|
         .cell = err
   .panel

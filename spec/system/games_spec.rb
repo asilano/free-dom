@@ -92,6 +92,23 @@ RSpec.describe 'Games' do
         expect(page).to_not have_css('td.name-column .game-name', text: 'Rambunctious Princess')
       end
 
+      it "fails if cards are duplicated" do
+        visit new_game_path
+        select("Moat", from: "Kingdom card 1:")
+        select("Moat", from: "Kingdom card 2:")
+        click_button "Create Game"
+        expect(current_path).to eql games_path
+        expect(page).to have_css("form[action='#{games_path}']")
+        expect(page).to have_text "Card list is not unique"
+      end
+
+      it "lets me add and remove card-shaped things" do
+        visit new_game_path
+
+        expect { click_button "Add card-shaped thing" }.to change { page.all("#card_shaped_selects .card-select-row").count }.by(1)
+        expect { first(".delete-card_shaped").click }.to change { page.all("#card_shaped_selects .card-select-row").count }.by(-1)
+      end
+
       it 'adds me to a game I create' do
         visit new_game_path
         click_button 'Create Game'

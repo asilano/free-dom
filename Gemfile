@@ -36,7 +36,7 @@ gem 'slim-rails'
 gem 'sortable-rails'
 gem "stimulus-rails"
 gem "turbo-rails"
-gem 'webpacker', '~> 5.x'
+gem 'jsbundling-rails'
 
 gem 'inline_svg'
 

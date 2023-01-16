@@ -44,6 +44,7 @@ jobs:
       run: |
         bin/rails db:setup
         yarn install
+        yarn build
     - name: Run Tests
       env:
         PGHOST: localhost

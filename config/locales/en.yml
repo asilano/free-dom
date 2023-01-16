@@ -30,6 +30,10 @@
 # available at http://guides.rubyonrails.org/i18n.html.
 
 en:
+  activerecord:
+    attributes:
+      game/journals:
+        base: Card list
   devise:
     registrations:
       new: &reg_text
