@@ -12,7 +12,7 @@ module CardModules
 
     module ClassMethods
       def expansions
-        [GameEngine::BaseGameV2, GameEngine::Renaissance]
+        [GameEngine::BaseGameV2, GameEngine::Renaissance, GameEngine::Cornucopia]
       end
 
       def randomised_card_shaped_things

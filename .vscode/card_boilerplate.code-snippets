@@ -15,12 +15,12 @@
 	// 	],
 	// 	"description": "Log output to console"
 	// }
-	"Add Renaissance card": {
+	"Add Cornucopia card": {
 		"scope": "ruby",
-		"prefix": "renaissance",
+		"prefix": "cornucopia",
 		"body": [
 			"module GameEngine",
-			"  module Renaissance",
+			"  module Cornucopia",
 			"    class ${1:${TM_FILENAME_BASE/.*/${0:/pascalcase}/}} < Card",
 			"      text \"$2\"",
 			"      ${3:action}",
