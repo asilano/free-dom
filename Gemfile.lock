@@ -430,7 +430,7 @@ DEPENDENCIES
   webdrivers
 
 RUBY VERSION
-   ruby 3.0.4p208
+   ruby 3.2.0p0
 
 BUNDLED WITH
    2.3.19
