@@ -51,7 +51,7 @@ RSpec.describe GameEngine, type: :model do
     webhooks_client = instance_double('Discordrb::Webhooks::Client')
     builder = Struct.new(:content, :username, :avatar_url).new
 
-    expect(webhooks_client_klass).to receive(:new).with(url: 'https://my.discord.webhook').exactly(5).times.and_return(webhooks_client)
+    expect(webhooks_client_klass).to receive(:new).with({url: 'https://my.discord.webhook'}).exactly(5).times.and_return(webhooks_client)
     expect(webhooks_client).to receive(:execute).exactly(5).times.and_yield(builder)
     expect(builder).to receive(:content=).with('Artisan, Bandit, Bureaucrat, Cellar, Chapel, Council Room, Festival, Gardens, Harbinger, Laboratory chosen for the kingdom.')
     expect(builder).to receive(:content=).with("#{usernames[0]} joined the game.")
