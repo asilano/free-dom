@@ -52,6 +52,7 @@ CARD_TYPES = {
   "Villain"          => GameEngine::Renaissance::Villain,
   "Hamlet"           => GameEngine::Cornucopia::Hamlet,
   "Fortune Teller"   => GameEngine::Cornucopia::FortuneTeller,
+  "Menagerie"        => GameEngine::Cornucopia::Menagerie,
   "Estate"           => GameEngine::BasicCards::Estate,
   "Duchy"            => GameEngine::BasicCards::Duchy,
   "Province"         => GameEngine::BasicCards::Province,
