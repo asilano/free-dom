@@ -11,7 +11,7 @@ module GameEngine
       on_trigger(Triggers::CardRevealed) do |_card, player, _location|
         player.coffers += 1 if player
         player.game.current_journal.histories << History.new("#{player.name} gained 1 Coffers.",
-          player: player)
+                                                             player:)
       end
 
       def play(played_by:)

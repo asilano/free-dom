@@ -426,6 +426,10 @@ module GameSteps
       end
     end
 
+    step ":player_name should shuffle my/his/her discards" do |name|
+      shuffle_discard_under_deck(cards_for_player(name))
+    end
+
     step ':player_name should gain :cards' do |name, cards|
       send ':player_name should gain :cards from :source to my/his/her :destination', name, cards, 'supply', 'discard'
     end

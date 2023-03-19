@@ -39,5 +39,14 @@ module PlayerModules
     def other_players
       @game_state.players.reject { |p| p == self }
     end
+
+    def each_card_from(location)
+      case location
+      in :deck
+        DeckEnumerator.for(self)
+      else
+        cards_by_location(location).each
+      end
+    end
   end
 end

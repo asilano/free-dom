@@ -1,8 +1,7 @@
 module PlayerModules
   module Manipulation
     def draw_cards(num)
-      shuffle_discard_under_deck if deck_cards.length < num && discarded_cards.present?
-      drawn_cards = deck_cards.take(num)
+      drawn_cards = DeckEnumerator.for(self).take(num)
       if drawn_cards.blank?
         @game.current_journal.histories << GameEngine::History.new("#{name} drew no cards.",
                                                                    player:      self,
@@ -23,6 +22,8 @@ module PlayerModules
 
     def shuffle_discard_under_deck
       discards, other = cards.partition { |c| c.location == :discard }
+      return if discards.empty?
+
       GameEngine::Triggers::Shuffle.trigger(self) do
         @cards = other + discards.shuffle(random: game_state.rng).each { |c| c.location = :deck }
       end
@@ -33,30 +34,21 @@ module PlayerModules
 
     def reveal_cards(num, from:)
       num = cards_by_location(from).length if num == :all
-      shuffle_discard_under_deck if from == :deck && deck_cards.length < num && discarded_cards.present?
-      revealed_cards = cards_by_location(from).take(num)
-      if revealed_cards.blank?
-        @game.current_journal.histories << GameEngine::History.new("#{name} revealed no cards.",
-                                                                   player:      self,
-                                                                   css_classes: %w[reveal-cards])
-        return []
-      end
+      reveal_cards_with(taker: -> (card_set) { card_set.take(num) }, from:)
+    end
 
-      @game.fix_journal
-      @game.current_journal.histories << GameEngine::History.new(
-        "#{name} revealed #{revealed_cards.map(&:readable_name).join(', ')}",
-        player:      self,
-        css_classes: %w[reveal-cards]
-      )
-      revealed_cards.each(&:be_revealed)
-      @game_state.observe
-      revealed_cards
+    def reveal_cards_until(from:, at_most: nil, &condition)
+      taker = -> (card_set) do
+        card_set = card_set.take(at_most) if at_most
+
+        card_set.take_until(&condition)
+      end
+      reveal_cards_with(taker:, from:)
     end
 
     def peek_cards(num, from:)
       num = cards_by_location(from).length if num == :all
-      shuffle_discard_under_deck if from == :deck && deck_cards.length < num && discarded_cards.present?
-      peeked_cards = cards_by_location(from).take(num)
+      peeked_cards = each_card_from(from).take(num)
       if peeked_cards.blank?
         @game.current_journal.histories << GameEngine::History.new("#{name} looked at no cards.",
                                                                    player:      self,
@@ -78,8 +70,7 @@ module PlayerModules
 
     def discard_cards(num, from:)
       num = cards_by_location(from).length if num == :all
-      shuffle_discard_under_deck if from == :deck && deck_cards.length < num && discarded_cards.present?
-      discards = cards_by_location(from).take(num)
+      discards = each_card_from(from).take(num)
       @game.current_journal.histories << GameEngine::History.new(
         "#{name} discarded #{discards.map(&:readable_name).join(', ')}"
       )
@@ -96,6 +87,28 @@ module PlayerModules
 
     def grant_cash(num)
       @cash += num
+    end
+
+    private
+
+    def reveal_cards_with(taker:, from:)
+      revealed_cards = taker.call(each_card_from(from))
+      if revealed_cards.blank?
+        @game.current_journal.histories << GameEngine::History.new("#{name} revealed no cards.",
+                                                                   player:      self,
+                                                                   css_classes: %w[reveal-cards])
+        return []
+      end
+
+      @game.fix_journal
+      @game.current_journal.histories << GameEngine::History.new(
+        "#{name} revealed #{revealed_cards.map(&:readable_name).join(', ')}",
+        player:      self,
+        css_classes: %w[reveal-cards]
+      )
+      revealed_cards.each(&:be_revealed)
+      @game_state.observe
+      revealed_cards
     end
   end
 end

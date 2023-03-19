@@ -19,3 +19,14 @@ class String
     self =~ /\A#{'-?' if allow_negative}\d+\z/
   end
 end
+
+module Enumerable
+  def take_until
+    ary = []
+    each do |elem|
+      ary << elem
+      break if yield elem, ary
+    end
+    ary
+  end
+end
