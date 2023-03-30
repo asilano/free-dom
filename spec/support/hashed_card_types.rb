@@ -53,6 +53,7 @@ CARD_TYPES = {
   "Hamlet"           => GameEngine::Cornucopia::Hamlet,
   "Fortune Teller"   => GameEngine::Cornucopia::FortuneTeller,
   "Menagerie"        => GameEngine::Cornucopia::Menagerie,
+  "Farming Village"  => GameEngine::Cornucopia::FarmingVillage,
   "Estate"           => GameEngine::BasicCards::Estate,
   "Duchy"            => GameEngine::BasicCards::Duchy,
   "Province"         => GameEngine::BasicCards::Province,
