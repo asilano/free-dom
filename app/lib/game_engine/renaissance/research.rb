@@ -20,7 +20,7 @@ module GameEngine
       end
 
       class TrashCardJournal < CommonJournals::TrashJournal
-        configure question_text: 'Choose a card to trash'
+        configure question_text: "Choose a card to trash"
 
         def post_process
           # Move trashed-cost cards face down from deck to this card
@@ -37,12 +37,10 @@ module GameEngine
                                  private_msg: cards_to_move.map(&:readable_name).join(", "),
                                  public_msg: "#{cards_to_move.length} #{"card".pluralize(cards_to_move.length)}") +
             " on #{Research.readable_name}."
-          @histories << History.new(log, player: player)
+          @histories << History.new(log, player:)
 
           cards_to_move.each do |card|
-            card.move_to :set_aside
-            card.location_card = opts[:research]
-            opts[:research].hosting << card
+            card.set_aside on: opts[:research]
 
             card.add_visibility_effect(self, to: player, visible: true)
             player.other_players.each do |ply|
@@ -55,9 +53,7 @@ module GameEngine
           end
           Triggers::StartOfTurn.watch_for(filter: filter) do
             cards_to_move.each do |card|
-              card.location = :hand
-              card.location_card = nil
-              opts[:research].hosting.delete card
+              card.return_from_set_aside to: :hand
             end
           end
         end

@@ -94,6 +94,22 @@ module CardModules
       end
     end
 
+    def set_aside(on: nil)
+      move_to :set_aside
+      return unless on
+
+      self.location_card = on
+      on.hosting << self
+    end
+
+    def return_from_set_aside(to:)
+      move_to to
+      return unless location_card
+
+      location_card.hosting.delete self
+      self.location_card = nil
+    end
+
     # Add a visibility effect to the card
     def add_visibility_effect(source, to:, visible:)
       @visibility_effects << {

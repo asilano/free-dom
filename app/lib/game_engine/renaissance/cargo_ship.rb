@@ -15,9 +15,9 @@ module GameEngine
         end
 
         # Record who played the Cargo Ship, as it can get trashed but still work!
-        GameEngine::Triggers::CardGained.watch_for(filter:   filter,
+        GameEngine::Triggers::CardGained.watch_for(filter:,
                                                    whenever: true,
-                                                   opts:     { played_by: played_by },
+                                                   opts:     { played_by: },
                                                    stop_at:  :end_of_turn) { |*args, opts:| see_gain(*args, opts: opts) }
       end
 
@@ -27,7 +27,7 @@ module GameEngine
 
         game_state.get_journal(SetAsideJournal,
                                from: opts[:played_by],
-                               opts: { card: card, ship: self }).process(game_state)
+                               opts: { card:, ship: self }).process(game_state)
       end
 
       def tracking?
@@ -54,15 +54,13 @@ module GameEngine
         process do |_game_state|
           if params["choice"] == "decline"
             @histories << History.new("#{player.name} chose not to set aside #{opts[:card].readable_name} on Cargo Ship.",
-                                      player: player)
+                                      player:)
             return
           end
 
           @histories << History.new("#{player.name} set aside #{opts[:card].readable_name} on Cargo Ship.",
-                                    player: player)
-          opts[:card].move_to :set_aside
-          opts[:card].location_card = opts[:ship]
-          opts[:ship].hosting << opts[:card]
+                                    player:)
+          opts[:card].set_aside on: opts[:ship]
           opts[:card].add_visibility_effect(self, to: :all, visible: true)
 
           filter = lambda do |turn_player|
@@ -70,11 +68,9 @@ module GameEngine
           end
           Triggers::StartOfTurn.watch_for(filter: filter) do
             game.current_journal.histories << History.new("Cargo Ship returns #{opts[:card].readable_name} to #{player.name}'s hand.",
-              player:      player,
+              player:,
               css_classes: %w[peek-cards])
-            opts[:card].location = :hand
-            opts[:card].location_card = nil
-            opts[:ship].hosting.delete opts[:card]
+            opts[:card].return_from_set_aside to: :hand
           end
           :unwatch
         end
