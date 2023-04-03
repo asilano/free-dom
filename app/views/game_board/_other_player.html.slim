@@ -62,6 +62,14 @@
             - revealed_controls.each do |ctrl|
               = render partial: "controls/cardless_button", collection: ctrl.cardless_buttons, as: :button, locals: { control: ctrl }
 
+  / Cards set aside not on other cards
+  - set_aside_cards = other_player.set_aside_cards.select { |c| c.location_card.nil? }.group_by(&:interacting_with)
+  - set_aside_cards.each do |qn, cards|
+    h5 Set Aside
+    .grid-container.fluid
+      .card-grid
+        = render partial: "game_board/card", collection: cards, locals: { controls: nil, viewer: }
+
   / Artifacts
   = render partial: "game_board/artifacts_section", locals: { player: other_player, game: game }
 

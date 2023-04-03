@@ -44,9 +44,9 @@ Feature: Library
     And I should need to 'Set aside or keep action'
     When I choose Artisan in my hand
     Then cards should move as follows:
-      Then I should move Artisan from my hand to my library
+      Then I should set aside Artisan from my hand
       And I should draw 3 cards
-      And I should move Artisan from my library to my discard
+      And I should move Artisan from being set aside to my discard
       And these card moves should happen
     And I should need to 'Play Treasures, or pass'
 
@@ -61,14 +61,14 @@ Feature: Library
     And I should need to 'Set aside or keep action'
     When I choose Artisan in my hand
     Then cards should move as follows:
-      Then I should move Artisan from my hand to my library
+      Then I should set aside Artisan from my hand
       And I should draw 2 cards
       And these card moves should happen
     And I should need to 'Set aside or keep action'
     When I choose Keep in my hand
     Then cards should move as follows:
       Then I should draw 1 card
-      And I should move Artisan from my library to my discard
+      And I should move Artisan from being set aside to my discard
       And these card moves should happen
     And I should need to 'Play Treasures, or pass'
 
@@ -83,14 +83,14 @@ Feature: Library
     And I should need to 'Set aside or keep action'
     When I choose Artisan in my hand
     Then cards should move as follows:
-      Then I should move Artisan from my hand to my library
+      Then I should set aside Artisan from my hand
       And I should draw 1 card
       And these card moves should happen
     And I should need to 'Set aside or keep action'
     When I choose Keep in my hand
     Then cards should move as follows:
       Then I should draw 1 card
-      And I should move Artisan from my library to my discard
+      And I should move Artisan from being set aside to my discard
       And these card moves should happen
     And I should need to 'Play Treasures, or pass'
 
@@ -105,7 +105,7 @@ Feature: Library
     And I should need to 'Set aside or keep action'
     When I choose Artisan in my hand
     Then cards should move as follows:
-      Then I should move Artisan from my hand to my library
+      Then I should set aside Artisan from my hand
       And I should draw 1 card
       And these card moves should happen
     And I should need to 'Set aside or keep action'
@@ -117,7 +117,7 @@ Feature: Library
     When I choose Keep in my hand
     Then cards should move as follows:
       Then I should draw 3 card
-      And I should move Artisan from my library to my discard
+      And I should move Artisan from being set aside to my discard
       And these card moves should happen
     And I should need to 'Play Treasures, or pass'
 
@@ -133,9 +133,9 @@ Feature: Library
     And I should need to 'Set aside or keep action'
     When I choose Artisan in my hand
     Then cards should move as follows:
-      Then I should move Artisan from my hand to my library
+      Then I should set aside Artisan from my hand
       And I should draw 3 cards
-      And I should move Artisan from my library to my discard
+      And I should move Artisan from being set aside to my discard
       And these card moves should happen
     And I should need to 'Play Treasures, or pass'
 
@@ -150,8 +150,8 @@ Feature: Library
     And I should need to 'Set aside or keep action'
     When I choose Research in my hand
     Then cards should move as follows:
-      Then I should move Research from my hand to my library
+      Then I should set aside Research from my hand
       And I should draw 3 cards
-      And I should move Research from my library to my discard
+      And I should move Research from being set aside to my discard
       And these card moves should happen
     And I should need to 'Play Treasures, or pass'

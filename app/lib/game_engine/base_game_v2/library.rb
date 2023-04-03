@@ -1,8 +1,8 @@
 module GameEngine
   module BaseGameV2
     class Library < GameEngine::Card
-      text 'Draw until you have 7 cards in hand, skipping any Action' \
-           ' cards you choose to; set those aside, discarding them afterwards.'
+      text "Draw until you have 7 cards in hand, skipping any Action" \
+           " cards you choose to; set those aside, discarding them afterwards."
       action
       costs 5
 
@@ -19,45 +19,52 @@ module GameEngine
         end
 
         # Discard any set-aside cards
-        if (set_aside = played_by.cards_by_location(:library)).any?
+        discard_set_aside(played_by)
+      end
+
+      private
+
+      def discard_set_aside(played_by)
+        set_aside = played_by.cards_by_location(:set_aside).select { |c| c.facts[:library_action] }
+        if set_aside.any?
           game.current_journal.histories << History.new("#{played_by.name} discarded #{set_aside.map(&:readable_name).join(', ')}.",
                                                          player: played_by,
                                                          css_classes: %w[discard])
-          set_aside.each(&:discard)
+          set_aside.each { |c| c.facts.delete(:library_action) }.each(&:discard)
         end
       end
 
       class SetAsideJournal < Journal
-        define_question('Set aside or keep action').with_controls do |_game_state|
+        define_question("Set aside or keep action").with_controls do |_game_state|
           [OneCardControl.new(journal_type: SetAsideJournal,
                               question:     self,
                               player:       @player,
                               scope:        :hand,
-                              text:         'Set aside',
+                              text:         "Set aside",
                               filter:       ->(card) { card == opts[:card] },
-                              null_choice:  { text: 'Keep', value: 'keep' })]
+                              null_choice:  { text: "Keep", value: "keep" })]
         end
 
         validation do
-          return true if params['choice'] == 'keep'
-          return false unless params['choice']&.integer?
+          return true if params["choice"] == "keep"
+          return false unless params["choice"]&.integer?
 
-          player.hand_cards[params['choice'].to_i] == opts[:card]
+          player.hand_cards[params["choice"].to_i] == opts[:card]
         end
 
         process do |_game_state|
           # Do nothing if the player chose to keep - it should be totally secret
           # but create a private history for the player.
-          if params['choice'] == 'keep'
+          if params["choice"] == "keep"
             @histories << History.new_secret("#{player.name} chose to keep #{opts[:card].readable_name}.",
-                                             player: player)
+                                             player:)
             return
           end
 
-          card = player.hand_cards[params['choice'].to_i]
+          card = player.hand_cards[params["choice"].to_i]
           @histories << History.new("#{player.name} chose to set aside #{card.readable_name}.",
-                                    player: player)
-          card.move_to(:library)
+                                    player:)
+          card.set_aside(library_action: true)
         end
       end
     end

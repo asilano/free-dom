@@ -28,6 +28,10 @@ module PlayerModules
       cards.select(&:peeked)
     end
 
+    def set_aside_cards
+      cards_by_location(:set_aside)
+    end
+
     def cards_revealed_to(question)
       revealed_cards.select { |c| c.interacting_with == question }
     end

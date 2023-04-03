@@ -94,16 +94,18 @@ module CardModules
       end
     end
 
-    def set_aside(on: nil)
+    def set_aside(on: nil, **new_facts)
       move_to :set_aside
+      facts.merge! new_facts
       return unless on
 
       self.location_card = on
       on.hosting << self
     end
 
-    def return_from_set_aside(to:)
+    def return_from_set_aside(to:, old_facts: [])
       move_to to
+      facts.except!(*old_facts)
       return unless location_card
 
       location_card.hosting.delete self

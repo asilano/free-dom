@@ -533,6 +533,16 @@ module GameSteps
       send ":player_name should set aside :cards from my :location on my/his/her :card :location", name, cards, source, host, "trash"
     end
 
+    step ":player_name should set aside :cards from my :location" do |name, cards, source|
+      players_cards = cards_for_player(name)
+      cards.each do |card|
+        instance_ix = players_cards.index { |c| c[:class] == card && c[:location] == source.to_sym }
+        instance = players_cards[instance_ix]
+        instance[:location] = :set_aside
+        instance[:revealed] = false
+      end
+    end
+
     step ':player_name :whether_to be able to choose the :cards pile(s)' do |name, should, cards|
       user = get_player(name).user
       question = @questions.detect { |q| q.player.name == user.name }
