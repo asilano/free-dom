@@ -1,0 +1,28 @@
+name: Deploy to staging
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to deploy"
+        required: true
+
+jobs:
+  deploy_staging:
+    concurrency:
+      group: staging_deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.branch }}
+
+      - name: Push to dokku staging
+        uses: dokku/github-action@master
+        with:
+          git_push_flags: '--force'
+          git_remote_url: 'ssh://dokku@free-dom.staging.chris.nsict.org/free-dom'
+          ssh_host_key: ${{ secrets.DOKKU_STAGING_HOST_KEY }}
+          ssh_private_key: ${{ secrets.DOKKU_PRIVATE_KEY }}
