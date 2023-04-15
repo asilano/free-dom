@@ -509,7 +509,7 @@ module GameSteps
       send ':player_name should trash :cards from my/his/her :source( cards)', name, cards, 'play'
     end
 
-    step ":player_name should set aside :cards from my :location on my/his/her :card :location" do |name, cards, source, host, destination|
+    step ":player_name should set aside :cards from my/his/her :location on my/his/her :card :location" do |name, cards, source, host, destination|
       players_cards = cards_for_player(name)
       if destination == "trash"
         host_card = extract_game_cards[:trash].detect { |c| c[:class] == host }
@@ -525,15 +525,15 @@ module GameSteps
       end
     end
 
-    step ":player_name should set aside :cards from my :location on my/his/her :card in play" do |name, cards, source, host|
-      send ":player_name should set aside :cards from my :location on my/his/her :card :location", name, cards, source, host, "play"
+    step ":player_name should set aside :cards from my/his/her :location on my/his/her :card in play" do |name, cards, source, host|
+      send ":player_name should set aside :cards from my/his/her :location on my/his/her :card :location", name, cards, source, host, "play"
     end
 
-    step ":player_name should set aside :cards from my :location on the :card in the trash" do |name, cards, source, host|
-      send ":player_name should set aside :cards from my :location on my/his/her :card :location", name, cards, source, host, "trash"
+    step ":player_name should set aside :cards from my/his/her :location on the :card in the trash" do |name, cards, source, host|
+      send ":player_name should set aside :cards from my/his/her :location on my/his/her :card :location", name, cards, source, host, "trash"
     end
 
-    step ":player_name should set aside :cards from my :location" do |name, cards, source|
+    step ":player_name should set aside :cards from my/his/her :location" do |name, cards, source|
       players_cards = cards_for_player(name)
       cards.each do |card|
         instance_ix = players_cards.index { |c| c[:class] == card && c[:location] == source.to_sym }
