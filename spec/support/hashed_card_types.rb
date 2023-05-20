@@ -55,6 +55,7 @@ CARD_TYPES = {
   "Menagerie"        => GameEngine::Cornucopia::Menagerie,
   "Farming Village"  => GameEngine::Cornucopia::FarmingVillage,
   "Horse Traders"    => GameEngine::Cornucopia::HorseTraders,
+  "Remake"           => GameEngine::Cornucopia::Remake,
   "Estate"           => GameEngine::BasicCards::Estate,
   "Duchy"            => GameEngine::BasicCards::Duchy,
   "Province"         => GameEngine::BasicCards::Province,

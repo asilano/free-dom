@@ -4,7 +4,7 @@ FactoryBot.define do
     user
     sequence(:order)
     type { Journal }
-    params { '' }
+    params { "" }
 
     factory :kingdom_journal, class: GameEngine::ChooseKingdomJournal do
       type { GameEngine::ChooseKingdomJournal }
