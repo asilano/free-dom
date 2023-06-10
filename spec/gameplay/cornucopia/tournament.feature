@@ -41,7 +41,21 @@ Feature: Tournament
     Given pending
 
   Scenario: Playing Tournament - only others reveal Province
-    Given pending
+    Given my hand contains Tournament
+    And Belle's hand contains Province
+    And Chas's hand contains Province
+    Then I should need to "Play an Action, or pass"
+    When I choose Tournament in my hand
+    Then I should have 1 action
+    Then I should need to "Reveal Province, or decline (Tournament player has not revealed a Province; no other player has revealed a Province)"
+    And Belle should need to "Reveal Province, or decline (Tournament player has not revealed a Province; no other player has revealed a Province)"
+    And Chas should need to "Reveal Province, or decline (Tournament player has not revealed a Province; no other player has revealed a Province)"
+    When I choose "Reveal nothing" in my hand
+    And Chas chooses "Reveal nothing" in his hand
+    And Belle chooses Province in her hand
+    Then cards should not move
+    And I should have $0
+    And I should need to "Play an Action, or pass"
 
   Scenario: Playing Tournament - everyone reveals Province
     Given pending

@@ -47,7 +47,7 @@ module GameEngine
         validation do
           return true if params["choice"] == "dont_reveal"
           return false unless params["choice"]&.integer?
-          return player.hand_cards[params["choice".to_i]].is_a? BasicCards::Province
+          return player.hand_cards[params["choice"].to_i].is_a? BasicCards::Province
         end
 
         process do |_|
@@ -63,7 +63,7 @@ module GameEngine
                                                 css_classes: %w[reveal-card])
           if player == opts[:orig_player]
             opts[:player_revealed] = true
-            opts[:to_discard] = player.hand_cards[params["choice".to_i]]
+            opts[:to_discard] = player.hand_cards[params["choice"].to_i]
           else
             opts[:other_revealed] = true
           end
