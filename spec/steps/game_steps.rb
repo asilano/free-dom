@@ -149,7 +149,7 @@ module GameSteps
         if scope == :supply
           expect(controls).to include(have_attributes(scope: satisfy { %i[supply full_supply].include? _1 }))
         else
-          expect(controls).to include(have_attributes(scope: scope))
+          expect(controls).to include(have_attributes(scope: ))
         end
       end
       scopes = [scope, :everywhere]

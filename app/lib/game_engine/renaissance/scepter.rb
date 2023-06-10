@@ -16,7 +16,7 @@ module GameEngine
       end
 
       class ChooseModeJournal < Journal
-        define_question("Choose mode for Scepter").with_controls do |game_state|
+        define_question("Choose mode for Scepter").with_controls do |_|
           [ButtonControl.new(journal_type: ChooseModeJournal,
                              question:     self,
                              player:       @player,

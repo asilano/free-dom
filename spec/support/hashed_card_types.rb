@@ -56,6 +56,7 @@ CARD_TYPES = {
   "Farming Village"  => GameEngine::Cornucopia::FarmingVillage,
   "Horse Traders"    => GameEngine::Cornucopia::HorseTraders,
   "Remake"           => GameEngine::Cornucopia::Remake,
+  "Tournament"       => GameEngine::Cornucopia::Tournament,
   "Estate"           => GameEngine::BasicCards::Estate,
   "Duchy"            => GameEngine::BasicCards::Duchy,
   "Province"         => GameEngine::BasicCards::Province,
