@@ -26,7 +26,24 @@ Feature: Tournament
     And I should need to "Play an Action, or pass"
 
   Scenario: Playing Tournament - player only reveals Province, gain one of full prize set
-    Given pending
+    Given my hand contains Tournament, Province
+    And Belle's hand contains nothing
+    And Chas's hand contains nothing
+    Then I should need to "Play an Action, or pass"
+    When I choose Tournament in my hand
+    Then I should have 1 action
+    Then I should need to "Reveal Province, or decline (Tournament player has not revealed a Province; no other player has revealed a Province)"
+    And Belle should need to "Reveal Province, or decline (Tournament player has not revealed a Province; no other player has revealed a Province)"
+    And Chas should need to "Reveal Province, or decline (Tournament player has not revealed a Province; no other player has revealed a Province)"
+    When I choose Province in my hand
+    And Chas chooses "Reveal nothing" in his hand
+    And Belle chooses "Reveal nothing" in her hand
+    Then cards should move as follows:
+      Then I should draw 1 card
+      And I should discard Province from my hand
+      And these card moves should happen
+    And I should have $1
+    And I should need to "Choose a Prize"
 
   Scenario: Playing Tournament - player only reveals Province, gain one of partial prize set, Duchy unavailable
     Given pending

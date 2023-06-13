@@ -10,7 +10,7 @@ module GameEngine
 
   class GameState
 
-    attr_reader :players, :piles, :card_shapeds, :turn_player, :game, :artifacts, :phase, :trashed_cards
+    attr_reader :players, :piles, :card_shapeds, :turn_player, :game, :artifacts, :prizes, :phase, :trashed_cards
     attr_accessor :state, :rng, :fid_prefix, :next_fid, :last_active_player
 
     def initialize(seed, game)
@@ -27,6 +27,7 @@ module GameEngine
       @phase = nil
 
       @artifacts = {}
+      @prizes = []
       @facts = {enduring: {}, per_turn: {}}
 
       @next_fid = 0

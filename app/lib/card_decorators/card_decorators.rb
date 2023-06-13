@@ -1,4 +1,4 @@
-# # This module is "extend"ed into Card.
+# This module is "extend"ed into Card.
 module CardDecorators
   module CardDecorators
     include BasicDecorators
@@ -70,6 +70,10 @@ module CardDecorators
 
     def duration
       types << :duration
+    end
+
+    def prize
+      types << :prize
     end
 
     # Define starting pile sizes
