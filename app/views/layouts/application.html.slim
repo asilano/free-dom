@@ -9,7 +9,7 @@ html lang="en"
 
     = stylesheet_link_tag "application", 'data-turbo-track': 'reload'
     = render 'application/favicon'
-    = javascript_include_tag "application", 'data-turbo-track': 'reload'
+    = javascript_include_tag "application", 'data-turbo-track': 'reload', defer: true
     = csrf_meta_tag
 
   body.flex-container.flex-dir-column data={controller: "js-active"}

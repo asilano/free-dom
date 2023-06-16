@@ -9,4 +9,5 @@ require("esbuild").build({
   absWorkingDir: path.join(process.cwd(), "app/javascript"),
   watch: process.argv.includes("--watch"),
   plugins: [stimulusPlugin()],
+  sourcemap: 'inline',
 }).catch(() => process.exit(1))

@@ -13,8 +13,6 @@ gem 'rails', '~> 7.0.0'
 gem 'pg', '>= 0.18', '< 2.0'
 # Use Puma as the app server
 gem 'puma', '~> 4.3'
-# Use SCSS for stylesheets
-gem 'sassc-rails'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
 
@@ -25,18 +23,15 @@ gem 'redis', '~> 4.0'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
-# Peg sprockets-rails to avoid whine about precompiles scss in prod
-gem 'sprockets-rails', '~> 2.3.3'
-
+gem 'propshaft'
 gem 'autoprefixer-rails'
-gem "font-awesome-sass", "~> 6.2.0"
-gem 'foundation-rails', '~> 6.1'
 gem 'foundation_rails_helper', '~> 4.0'
 gem 'slim-rails'
 gem 'sortable-rails'
 gem "stimulus-rails"
 gem "turbo-rails"
 gem 'jsbundling-rails'
+gem "cssbundling-rails"
 
 gem 'inline_svg'
 
