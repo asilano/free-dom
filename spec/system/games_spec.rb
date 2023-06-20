@@ -162,6 +162,29 @@ RSpec.describe 'Games' do
     end
   end
 
+  describe "show, or play" do
+    context "waiting to play an action" do
+      let(:game) { create(:started_game_with_two_players) }
+
+      before do
+        create(:journal,
+               type: "GameEngine::HackJournal",
+               game: ,
+               user: game.users.first,
+               params: { scope: "hand", action: "add", cards: ["GameEngine::BaseGameV2::Village"] })
+
+        login_as(game.users.first)
+        visit game_path(game)
+      end
+
+      it "lets me play the action" do
+        expect(page).to have_css("#current-player .card-name", text: "Village")
+        click_button "Play"
+        expect(page).to have_text("2 Actions")
+      end
+    end
+  end
+
   describe 'destroy' do
     let(:game) { FactoryBot.create(:game_with_kingdom, name: 'Game for deletion') }
 

@@ -32,6 +32,7 @@ gem "stimulus-rails"
 gem "turbo-rails"
 gem 'jsbundling-rails'
 gem "cssbundling-rails"
+gem "view_component"
 
 gem 'inline_svg'
 
