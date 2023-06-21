@@ -1,3 +1,5 @@
+- content_for :main_class, "game-view"
+
 .cell
   .grid-container.fluid
     .grid-x
@@ -18,7 +20,6 @@
                     data: { "hidden-form-target": "form" } do |f|
           = text_field_tag 'game[discord_webhook]', @game.discord_webhook, class: 'inline'
           = f.submit 'Change', class: 'inline hide-js'
-= turbo_stream_from @game, @game.users.include?(current_user) ? current_user : nil, channel: GameUpdateChannel
 - if @game.run_state == :waiting && !@game.users.include?(current_user)
   .cell
     .grid-container.fluid.grid-x
@@ -30,4 +31,6 @@
           = f.hidden_field :user_id, value: current_user.id
           = f.hidden_field :order, value: (@game.journals.maximum(:order) || 0) + 1
           = f.submit 'Join game'
-= render partial: "game_board/game", object: @game, locals: { viewer: current_user }
+= turbo_stream_from @game
+= turbo_frame_tag "game-board", src: game_board_game_path(@game)
+/= render partial: "game_board/game", object: @game, locals: { viewer: current_user }

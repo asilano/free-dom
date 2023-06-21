@@ -1,6 +1,6 @@
 class GamesController < ApplicationController
   before_action :authenticate_user!, except: :index
-  before_action :set_game, only: [:show, :edit, :update, :destroy]
+  before_action :set_game, only: [:show, :game_board, :edit, :update, :destroy]
 
   # GET /games
   # GET /games.json
@@ -15,8 +15,10 @@ class GamesController < ApplicationController
   # GET /games/1
   # GET /games/1.json
   def show
-    @game.process
-    @game.notify_discord if flash[:notify_discord]
+  end
+
+  def game_board
+    # @game.notify_discord if flash[:notify_discord]
   end
 
   # GET /games/new
@@ -101,6 +103,7 @@ class GamesController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_game
     @game = Game.find(params[:id])
+    @game.process
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.
