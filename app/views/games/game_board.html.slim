@@ -1,4 +1,3 @@
-- viewer = current_user
 - content_for :title, (@game.name.presence || "Game ##{@game.id}")
 - if @game.questions.present?
   - content_for :waiting_title, "Waiting for #{@game.questions.map(&:player).map(&:name).join(', ')}"
@@ -31,18 +30,18 @@
 
     .cell.border-under
       .grid-container.fluid
-        - if @game.users.include? viewer
+        - if @game.users.include? current_user
           .grid-x.grid-margin-x.this-player
-            = render partial: "game_board/player", object: @game.player_for(viewer), locals: { game: @game, viewer: viewer }
+            = render partial: "game_board/player", object: @game.player_for(current_user), locals: { game: @game }
 
     .cell.border-under
       .grid-container.fluid
         .grid-x.grid-margin-x
-          - @game.game_state.other_players(exclude_user: viewer).each do |player|
-            = render partial: "game_board/other_player", object: player, locals: { game: @game, viewer: viewer }
+          - @game.game_state.other_players(exclude_user: current_user).each do |player|
+            = render partial: "game_board/other_player", object: player, locals: { game: @game }
 
     .cell.border-under
-      - trash_controls = @game.controls_for(viewer).select { |ctrl| ctrl.scope == :trash }
+      - trash_controls = @game.controls_for(current_user).select { |ctrl| ctrl.scope == :trash }
       = render partial: "game_board/control_skeleton", collection: trash_controls, locals: { game: @game }
       .grid-container.fluid
         .grid-x.grid-margin-x
@@ -56,16 +55,16 @@
                     - trash_controls.each do |ctrl|
                       = render partial: "controls/cardless_button", collection: ctrl.cardless_buttons, as: :button, locals: { control: ctrl }
                 - elsif @game.game_state.trashed_cards.length == 1 || trash_controls.present?
-                  = render partial: "game_board/card", collection: @game.game_state.trashed_cards, locals: { controls: trash_controls, viewer: viewer }
+                  = render partial: "game_board/card", collection: @game.game_state.trashed_cards, locals: { controls: trash_controls }
                 - else
-                  = render partial: "game_board/card", collection: @game.game_state.trashed_cards, locals: { stacked: true, viewer: viewer }
+                  = render partial: "game_board/card", collection: @game.game_state.trashed_cards, locals: { stacked: true }
                   .cell.card.no-card.stack-info
                     .card-name #{@game.game_state.trashed_cards.count - 1} more
 
     .cell
       .grid-container.fluid
         .grid-x.grid-margin-x
-          = render partial: "game_board/pile_section", locals: { game: @game, viewer: viewer }
+          = render partial: "game_board/pile_section", locals: { game: @game }
 
           .cell.small-12.medium-12.large-4#journal-log data-game-board-target="journals"
             .current-question
@@ -82,25 +81,25 @@
               - @game.journals.each do |journal|
                 - next unless journal.persisted?
                 - if journal.histories.present?
-                  - last_shown_journal_id = journal.id unless (journal.histories.first.secret? && journal.user != viewer)
+                  - last_shown_journal_id = journal.id unless (journal.histories.first.secret? && journal.user != current_user)
                   - if journal.histories.length > 1
                     - content_for "journal_#{last_shown_journal_id}_histories" do
                       - journal.histories[1..-1].each do |hist|
-                        li{class=hist.css_class}: span= display_event_for_user(hist.event, viewer)
+                        li{class=hist.css_class}: span= display_event_for_user(hist.event, current_user)
 
               - @game.journals.each do |journal|
                 - next unless journal.persisted?
                 - if journal.histories.present?
-                  - unless journal.histories.first.secret? && journal.user != viewer
+                  - unless journal.histories.first.secret? && journal.user != current_user
                     li.main-journal class=journal.histories.first.css_class data={journal_id: journal.id}
-                      - unless journal.fixed_for_user(viewer)
+                      - unless journal.fixed_for_user(current_user)
                         = form_with url: journal_path(journal), method: "delete", local: true do |f|
                           = f.button inline_svg_tag('action-undo.svg',
                                                 class: 'undo-arrow',
                                                 title: 'Undo to here',
                                                 desc: 'Click to undo this and all later actions',
                                                 aria: true), class: 'undo-button unstyle'
-                      span= display_event_for_user(journal.histories.first.event, viewer)
+                      span= display_event_for_user(journal.histories.first.event, current_user)
                       - if content_for? "journal_#{journal.id}_histories"
                         ul.sub-histories
                           = content_for "journal_#{journal.id}_histories"
