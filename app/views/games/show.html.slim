@@ -33,4 +33,3 @@
           = f.submit 'Join game'
 = turbo_stream_from @game
 = turbo_frame_tag "game-board", src: game_board_game_path(@game)
-/= render partial: "game_board/game", object: @game, locals: { viewer: current_user }

@@ -18,7 +18,7 @@ class GamesController < ApplicationController
   end
 
   def game_board
-    # @game.notify_discord if flash[:notify_discord]
+    @game.notify_discord if flash[:notify_discord]
   end
 
   # GET /games/new

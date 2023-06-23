@@ -14,7 +14,6 @@ class JournalsController < ApplicationController
         flash[:notify_discord] = true
         @game = @journal.game
         @game.process
-        @game.notify_discord
         @game.broadcast_action(
           :after,
           target: "game-board",
