@@ -14,13 +14,15 @@ class JournalsController < ApplicationController
         flash[:notify_discord] = true
         @game = @journal.game
         @game.process
-        GameUpdateChannel.send_game_updates(@game)
+        @game.broadcast_action(
+          :after,
+          target: "game-board",
+          partial: "games/prompt_reload",
+          locals: { game: @game }
+        )
 
         format.json { render :show, status: :created, location: @journal }
-        format.turbo_stream do
-          @game.notify_discord
-          render "games/redraw"
-        end
+        format.turbo_stream { head :no_content }
       else
         flash.alert = "Couldn't create journal (was the game up-to-date?)"
         format.json { render json: @journal.errors, status: :unprocessable_entity }
@@ -36,14 +38,17 @@ class JournalsController < ApplicationController
     to_destroy.destroy_all
     @game.process
 
-    GameUpdateChannel.send_game_updates(@game)
+    @game.broadcast_action(
+      :after,
+      target: "game-board",
+      partial: "games/prompt_reload",
+      locals: { game: @game }
+    )
 
     respond_to do |format|
       format.html { redirect_to @game }
       format.json { head :no_content }
-      format.turbo_stream do
-        render "games/redraw"
-      end
+      format.turbo_stream { head :no_content }
     end
   end
 
