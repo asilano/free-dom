@@ -162,7 +162,7 @@ RSpec.describe 'Games' do
     end
   end
 
-  describe "show, or play" do
+  describe "show, or play", js: true do
     context "waiting to play an action" do
       let(:game) { create(:started_game_with_two_players) }
 

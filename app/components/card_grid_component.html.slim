@@ -1,0 +1,12 @@
+.grid-container.fluid
+  .card-grid
+    - if cards.blank?
+      .cell.card.no-card
+        .card-name
+    = render CardComponent.with_collection(cards) do |cpnt|
+      - controls.each { |control| cpnt.with_control(control: ) }
+    - if controls.any? { _1.cardless_buttons.present? }
+      .cell.card.null-card
+        .card-name
+        - controls.each do |ctrl|
+          = render Controls::CardlessButtonComponent.with_collection(ctrl.cardless_buttons, control: ctrl)

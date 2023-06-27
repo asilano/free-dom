@@ -1,6 +1,6 @@
-= button_tag control.text,
-  value: value,
-  name: "journal[params][#{control.key}]",
-  class: 'button' + control.css_class,
-  form: "control_form_#{control.object_id}",
-  data: { disable_form_target: "disablingElement" }
+.card-ctrl
+  = render Controls::ButtonComponent.new(text: control.text,
+                                         value: value,
+                                         name: "journal[params][#{control.key}]",
+                                         css_class: control.css_class,
+                                         form: "control_form_#{control.object_id}")
