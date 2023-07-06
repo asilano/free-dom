@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Controls
-  class OneCardControlComponent < ViewComponent::Base
+  class MultiCardControlComponent < ViewComponent::Base
     include ControlCommon
 
     def initialize(control:, card:, value:)
@@ -13,6 +13,10 @@ module Controls
 
     def render?
       @control.filter(@card)
+    end
+
+    def selected?
+      @control.preselect.call(@card)
     end
 
     private

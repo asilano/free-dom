@@ -7,6 +7,10 @@ class ControlFactory
     case control
     in OneCardControl
       Controls::OneCardControlComponent
+    in MultiCardControl
+      Controls::MultiCardControlComponent
+    in NumberControl
+      Controls::NumberControlComponent
     else
       raise UnknownControlError, "Unknown control type: #{control}"
     end

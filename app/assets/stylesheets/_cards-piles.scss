@@ -121,8 +121,9 @@
   min-width: 120px;
 
   flex-flow: row wrap;
-  align-items: center;
+  align-items: start;
   justify-content: center;
+  padding-top: 5px;
 
   &.back-wrapper {
     display: flex;

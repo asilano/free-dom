@@ -1,0 +1,12 @@
+.cell.card
+  .card-name= label_tag name, control.text
+  .card-ctrl= number_field_tag(name,
+                               control.default,
+                               min: control.min,
+                               max: control.max,
+                               class: "cell " + control.css_class,
+                               form: form_id,
+                               id: sanitize_to_id(name))
+.cell.card.null-card
+  .card-name
+  = render Controls::CardlessButtonComponent.with_collection(control.cardless_buttons, control: control)

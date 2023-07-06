@@ -24,10 +24,10 @@
   = render CardGridComponent.new(cards: player.hand_cards, controls: hand_controls)
   - if (with_hand_controls = game.controls_for(current_user).select { |ctrl| ctrl.scope == :with_hand }).present?
     = render partial: "game_board/control_skeleton", collection: with_hand_controls, locals: { game: game }
-    - with_hand_controls.each do |ctrl|
-      .grid-container.fluid
+    - with_hand_controls.each do |control|
+      .grid-container.fluid.gap-above
         .floating-control
-          = render partial: ctrl, as: :control
+          = render ControlFactory.component_from(control).new(control: )
 
   / Cards in play
   h5 In Play
