@@ -6,7 +6,7 @@ class GamesController < ApplicationController
   # GET /games.json
   def index
     games = Game.all.each(&:process)
-    games = games.group_by { |g| g.users.include?(current_user) ? :mine : :others }
+    games = games.group_by { |g| g.users.include?(Current.user) ? :mine : :others }
     @games = games.transform_values do |g_group|
       g_group.group_by(&:run_state)
     end
@@ -25,7 +25,7 @@ class GamesController < ApplicationController
   def new
     @game = Game.new
     kingdom_journal = @game.journals.build(type:     GameEngine::ChooseKingdomJournal,
-                                           user:     current_user,
+                                           user:     Current.user,
                                            fiber_id: '1',
                                            params:   {},
                                            order:    0)
@@ -54,7 +54,7 @@ class GamesController < ApplicationController
       if @game.save
         @game.discord_log_creation
         @game.journals.create!(type:     GameEngine::AddPlayerJournal,
-                               user:     current_user,
+                               user:     Current.user,
                                fiber_id: '1',
                                order:    @game.journals.maximum(:order) + 1)
         flash[:notify_discord] = true
@@ -86,7 +86,7 @@ class GamesController < ApplicationController
   # DELETE /games/1.json
   def destroy
     respond_to do |format|
-      if @game.journals.first.user == current_user && @game.destroy
+      if @game.journals.first.user == Current.user && @game.destroy
         format.html { redirect_to games_url, notice: 'Game was successfully destroyed.' }
       else
         format.html { redirect_to games_url, alert: 'Could not destroy game.' }

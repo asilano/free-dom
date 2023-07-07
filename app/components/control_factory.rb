@@ -9,6 +9,10 @@ class ControlFactory
       Controls::OneCardControlComponent
     in MultiCardControl
       Controls::MultiCardControlComponent
+    in MultiCardChoicesControl
+      Controls::MultiCardChoicesControlComponent
+    in ReorderCardsControl
+      Controls::ReorderCardsControlComponent
     in NumberControl
       Controls::NumberControlComponent
     else

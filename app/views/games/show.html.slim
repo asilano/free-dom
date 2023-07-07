@@ -20,7 +20,7 @@
                     data: { "hidden-form-target": "form" } do |f|
           = text_field_tag 'game[discord_webhook]', @game.discord_webhook, class: 'inline'
           = f.submit 'Change', class: 'inline hide-js'
-- if @game.run_state == :waiting && !@game.users.include?(current_user)
+- if @game.run_state == :waiting && !@game.users.include?(Current.user)
   .cell
     .grid-container.fluid.grid-x
       .cell
@@ -28,7 +28,7 @@
         = form_with model: Journal.new, local: true, data: { turbo: false } do |f|
           = f.hidden_field :game_id, value: @game.id
           = f.hidden_field :type, value: GameEngine::AddPlayerJournal
-          = f.hidden_field :user_id, value: current_user.id
+          = f.hidden_field :user_id, value: Current.user.id
           = f.hidden_field :order, value: (@game.journals.maximum(:order) || 0) + 1
           = f.submit 'Join game'
 = turbo_stream_from @game

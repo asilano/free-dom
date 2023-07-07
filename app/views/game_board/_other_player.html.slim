@@ -37,7 +37,7 @@
   / Peeked cards
   - other_player.peeked_cards.group_by(&:interacting_with).each do |qn, cards|
     h5= "Seen with #{qn.card_type.readable_name}"
-    - peeked_controls = game.controls_for(current_user).select { |ctrl| ctrl.scope == :peeked && ctrl.question == qn }
+    - peeked_controls = game.controls_for(Current.user).select { |ctrl| ctrl.scope == :peeked && ctrl.question == qn }
     = render partial: "game_board/control_skeleton", collection: peeked_controls, locals: { game: game }
     .grid-container.fluid
       .card-grid class=('reorder-cards' if peeked_controls.any?(ReorderCardsControl))
@@ -51,7 +51,7 @@
   / Revealed cards
   - other_player.revealed_cards.group_by(&:interacting_with).each do |qn, cards|
     h5= "Revealed to #{qn.card_type.readable_name}"
-    - revealed_controls = game.controls_for(current_user).select { |ctrl| ctrl.scope == :revealed && ctrl.question == qn }
+    - revealed_controls = game.controls_for(Current.user).select { |ctrl| ctrl.scope == :revealed && ctrl.question == qn }
     = render partial: "game_board/control_skeleton", collection: revealed_controls, locals: { game: game }
     .grid-container.fluid
       .card-grid

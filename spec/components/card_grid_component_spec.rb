@@ -51,7 +51,6 @@ RSpec.describe CardGridComponent, type: :component do
       let(:controls) { [build(:one_card_control)] }
 
       it "renders the cards' controls" do
-        puts rendered
         expect(subject).to have_css ".card-grid .card:nth-child(1) button", text: "Choose"
         expect(subject).to have_css ".card-grid .card:nth-child(2) button", text: "Choose"
       end

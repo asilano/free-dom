@@ -31,9 +31,9 @@ html lang="en"
       .flex-child-auto.grid-y.grid-padding-y
         == yield
     footer.cell.grid-x.grid-padding-x
-      - if current_user
+      - if Current.user
         .cell.shrink
-          span = "Signed in as #{current_user.name}"
+          span = "Signed in as #{Current.user.name}"
         .cell.shrink = link_to 'Preferences', edit_user_registration_path
         .cell.shrink = link_to 'Sign out', destroy_user_session_path, method: :delete
       - else
