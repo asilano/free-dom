@@ -8,19 +8,18 @@ class CardComponent < ViewComponent::Base
                                                  value: @card_counter)
     }
 
-  def initialize(card:, card_counter:)
+  def initialize(card:, card_counter:, stacked: false)
     super
     @card = card
     @card_counter = card_counter
+    @stacked = stacked
   end
 
   private
 
-  attr_reader :card, :card_counter
+  attr_reader :card, :card_counter, :stacked
 
   def css_classes
     @card.types + [stacked && "stacked"]
   end
-
-  def stacked = false
 end

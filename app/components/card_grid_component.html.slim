@@ -1,15 +1,18 @@
 .grid-container.fluid
-  .card-grid
+  .card-grid{class=extra_grid_classes data-controller=grid_stimulus_controller}
     - if cards.blank?
       .cell.card.no-card
         .card-name
-    = render CardComponent.with_collection(cards) do |cpnt|
+    = render CardComponent.with_collection(cards, stacked:) do |cpnt|
       - controls.each { |control| cpnt.with_control(control: ) }
+    - if stacked
+      .cell.card.no-card.stack-info
+        .card-name #{cards.count - 1} more
     - if controls.any? { _1.cardless_buttons.present? }
       .cell.card.null-card
         .card-name
         - controls.each do |ctrl|
           = render Controls::CardlessButtonComponent.with_collection(ctrl.cardless_buttons, control: ctrl)
     - unless (non_visible_count = cards.count { |cd| !cd.visible_to? Current.user }).zero?
-          .cell.card.back-wrapper
-            .card-back= non_visible_count
+      .cell.card.back-wrapper
+        .card-back= non_visible_count

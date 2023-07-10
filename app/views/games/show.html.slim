@@ -32,4 +32,5 @@
           = f.hidden_field :order, value: (@game.journals.maximum(:order) || 0) + 1
           = f.submit 'Join game'
 = turbo_stream_from @game
-= turbo_frame_tag "game-board", src: game_board_game_path(@game)
+= turbo_frame_tag "game-board"
+  = render template: "games/game_board"

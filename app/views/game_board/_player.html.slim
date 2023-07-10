@@ -39,19 +39,7 @@
   h5 Discarded
   - discard_controls = game.controls_for(Current.user).select { |ctrl| ctrl.scope == :discard }
   = render partial: "game_board/control_skeleton", collection: discard_controls, locals: { game: game }
-  .grid-container.fluid
-    .card-grid
-      - if player.discarded_cards.blank?
-        .cell.card.no-card
-          .card-name
-          - discard_controls.each do |ctrl|
-            = render partial: 'controls/cardless_button', collection: ctrl.cardless_buttons, as: :button, locals: { control: ctrl }
-      - elsif player.discarded_cards.length == 1 || discard_controls.present?
-        = render partial: "game_board/card", collection: player.discarded_cards, locals: { controls: discard_controls }
-      - else
-        = render partial: "game_board/card", collection: player.discarded_cards, locals: { stacked: true }
-        .cell.card.no-card.stack-info
-          .card-name #{player.discarded_cards.count - 1} more
+  = render CardGridComponent.new(cards: player.discarded_cards, controls: discard_controls, stacked: true)
 
   / Deck representation
   h5 Deck
@@ -69,16 +57,7 @@
     h5= "Seen with #{qn.card_type.readable_name}"
     - peeked_controls = game.controls_for(Current.user).select { |ctrl| ctrl.scope == :peeked && ctrl.question == qn }
     = render partial: "game_board/control_skeleton", collection: peeked_controls, locals: { game: game }
-    .grid-container.fluid
-      - peeked_class = peeked_controls.any?(ReorderCardsControl) ? "reorder-cards" : ""
-      - peeked_controller = peeked_controls.any?(ReorderCardsControl) ? "sortable-cards" : ""
-      .card-grid class=peeked_class data-controller=peeked_controller
-        = render partial: "game_board/card", collection: cards, locals: { controls: peeked_controls }
-        - if peeked_controls.any? { _1.cardless_buttons.present? }
-          .cell.card.null-card.unsortable
-            .card-name
-            - peeked_controls.each do |ctrl|
-              = render partial: "controls/cardless_button", collection: ctrl.cardless_buttons, as: :button, locals: { control: ctrl }
+    = render CardGridComponent.new(cards: cards, controls: peeked_controls)
 
   / Revealed cards
   - player.revealed_cards.group_by(&:interacting_with).each do |qn, cards|

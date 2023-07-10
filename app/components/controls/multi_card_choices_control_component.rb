@@ -9,15 +9,11 @@ module Controls
       @control = control
       @card = card
       @value = value
-      @choice ||= control.choices.first[1]
+      @choice = choice || control.choices.first[1]
     end
 
     def render?
       @control.filter(@card)
-    end
-
-    def selected?
-      @control.preselect.call(@card)
     end
 
     private
