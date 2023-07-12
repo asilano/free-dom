@@ -2,7 +2,9 @@
   .card-name title=card.try(:html_safe_text) data={ controller: "tooltip", "tooltip-text-value": card.try(:text), action: "mouseenter->tooltip#show mouseleave->tooltip#hide dragged->tooltip#hide" } = card.readable_name
   - controls.each do |ctrl|
     = ctrl
-  - if card.hosting.present?
-    - unless true #(non_visible_count = cards.count { |cd| !cd.visible_to? Current.user }).zero?
+  .nested-cards
+    - visible, invisible = card.hosting.partition { |cd| cd.visible_to? Current.user }
+    = render CardComponent.with_collection(visible)
+    - unless invisible.empty?
       .cell.card.back-wrapper
-        .card-back= non_visible_count
+        .card-back= invisible.count
