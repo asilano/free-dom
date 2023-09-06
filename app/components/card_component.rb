@@ -8,7 +8,7 @@ class CardComponent < ViewComponent::Base
                                                  value: @card_counter)
     }
 
-  def initialize(card:, card_counter:, stacked: false)
+  def initialize(card:, card_counter: nil, stacked: false)
     super
     @card = card
     @card_counter = card_counter

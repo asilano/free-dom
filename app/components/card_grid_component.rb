@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class CardGridComponent < ViewComponent::Base
-  def initialize(cards:, controls:, stacked: false)
+  def initialize(cards:, controls: nil, stacked: false)
     super
     @cards = cards
     @controls = controls
