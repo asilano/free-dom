@@ -47,19 +47,7 @@
         .grid-x.grid-margin-x
           .cell
             h5 Trash
-            .grid-container.fluid
-              .card-grid
-                - if @game.game_state.trashed_cards.blank?
-                  .cell.card.no-card
-                    .card-name
-                    - trash_controls.each do |ctrl|
-                      = render partial: "controls/cardless_button", collection: ctrl.cardless_buttons, as: :button, locals: { control: ctrl }
-                - elsif @game.game_state.trashed_cards.length == 1 || trash_controls.present?
-                  = render partial: "game_board/card", collection: @game.game_state.trashed_cards, locals: { controls: trash_controls }
-                - else
-                  = render partial: "game_board/card", collection: @game.game_state.trashed_cards, locals: { stacked: true }
-                  .cell.card.no-card.stack-info
-                    .card-name #{@game.game_state.trashed_cards.count - 1} more
+            = render CardGridComponent.new(cards: @game.game_state.trashed_cards, controls: trash_controls, stacked: true)
 
     .cell
       .grid-container.fluid
