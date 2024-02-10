@@ -36,7 +36,7 @@ h3 {
 }
 
 .hero-section {
-  background: url(asset_path('old-map.jpg')) 50% no-repeat;
+  background: url('/old-map.jpg') 50% no-repeat;
   background-size: cover;
   text-align: center;
   display: flex;
@@ -91,6 +91,10 @@ footer {
     line-height: 2em;
     color: $white;
   }
+}
+
+.gap-above {
+  margin-top: 1em;
 }
 
 .js, .out-of-flow {

@@ -14,7 +14,10 @@
 
 @import 'foundation_and_overrides';
 @import 'settings';
-@import "font-awesome";
+
+$fa-font-path: '../fonts/webfonts';
+@import '../../../node_modules/@fortawesome/fontawesome-free/scss/fontawesome';
+@import '../../../node_modules/@fortawesome/fontawesome-free/scss/solid';
 
 @import 'colours';
 @import 'fonts';

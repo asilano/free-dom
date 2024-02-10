@@ -1,0 +1,6 @@
+.card-ctrl
+  = select_tag(name + "[#{value}]",
+              options_from_collection_for_select(control.choices, :last, :first, choice),
+              class: control.css_class,
+              form:  form_id,
+              id:    sanitize_to_id(name + "[#{value}]"))

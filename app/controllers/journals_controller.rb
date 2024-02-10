@@ -5,7 +5,7 @@ class JournalsController < ApplicationController
   # POST /journals.json
   def create
     @journal = Journal.new(journal_params)
-    @journal.user_id ||= current_user.id
+    @journal.user_id ||= Current.user.id
 
     respond_to do |format|
       format.html { redirect_to @journal.game }

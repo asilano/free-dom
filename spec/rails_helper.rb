@@ -17,6 +17,7 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
 require 'webdrivers'
+require "view_component/test_helpers"
 require 'support/hashed_card_types'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
@@ -76,6 +77,7 @@ RSpec.configure do |config|
 
   config.include Warden::Test::Helpers
   config.include Devise::Test::IntegrationHelpers, type: :system
+  config.include ViewComponent::TestHelpers, type: :component
 
   config.before(:each, type: :system) do
     driven_by :rack_test

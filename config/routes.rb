@@ -11,6 +11,9 @@ Rails.application.routes.draw do
 
   get 'random_name', to: 'games#random_name'
 
+  get 'favicon/webmanifest' => 'favicon#webmanifest', format: :json
+  get 'favicon/browserconfig' => 'favicon#browserconfig', format: :xml
+
   # Temporary - so page "works" in production
   root to: 'games#index'
 end

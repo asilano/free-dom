@@ -115,15 +115,24 @@ module CardModules
     # Add a visibility effect to the card
     def add_visibility_effect(source, to:, visible:)
       @visibility_effects << {
-        source: source,
-        to: to,
-        visible: visible
+        source: ,
+        to: ,
+        visible:
       }
+    end
+
+    def remove_visibility_effect(source, to:, visible:)
+      @visibility_effects.delete({
+        source: ,
+        to: ,
+        visible:
+      })
     end
 
     # Default effect of a card being revealed.
     def be_revealed
       @revealed = true
+      add_visibility_effect(:reveal, to: :all, visible: true)
 
       game_state.trigger do
         GameEngine::Triggers::CardRevealed.trigger(self, @player, @location)
@@ -133,16 +142,19 @@ module CardModules
     # Default effect of a card being unrevealed. This is not expected to ever be overridden
     def be_unrevealed
       @revealed = false
+      remove_visibility_effect(:reveal, to: :all, visible: false)
     end
 
     # Default effect of a card being looked at.
     def be_peeked
       @peeked = true
+      add_visibility_effect(:peek, to: player, visible: true)
     end
 
     # Default effect of a card stopping being looked at. This is not expected to ever be overridden
     def be_unpeeked
       @peeked = false
+      remove_visibility_effect(:peek, to: player, visible: false)
     end
 
     def move_to_hand

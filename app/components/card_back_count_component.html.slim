@@ -1,0 +1,7 @@
+.grid-container.fluid
+  .grid-x.grid-margin-x
+    .cell.card.back-wrapper{class=("no-card" if cards.empty?)}
+      .card-back
+        = cards.count
+        - if cards.any?(&:revealed) || cards.any?(&:peeked)
+          .detail= "(#{cards.count(&:peeked)} seen, #{cards.count(&:revealed)} revealed)"
