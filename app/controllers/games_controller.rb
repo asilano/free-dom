@@ -30,6 +30,8 @@ class GamesController < ApplicationController
     randomiser = (GameEngine::Card.expansions.map(&:kingdom_cards).flatten +
                   GameEngine::Card.randomised_card_shaped_things.map(&:card_classes).flatten)
                  .shuffle
+    Rails.logger.info("randomiser holds: #{randomiser.inspect}")
+    Rails.logger.info("randomiser classes: #{randomiser.map(&:class)}")
     kingdom_cards, card_shapeds = randomiser.take_while.with_object([[], []]) do |card, sets|
       if card < GameEngine::Card
         sets[0] << card
